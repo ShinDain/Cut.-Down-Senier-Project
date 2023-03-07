@@ -19,21 +19,40 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Common\Camera.cpp" />
     <ClCompile Include="Common\D3DApp.cpp" />
     <ClCompile Include="Common\D3DUtil.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
     <ClCompile Include="Common\GameTimer.cpp" />
+    <ClCompile Include="Common\Global.cpp" />
     <ClCompile Include="Common\MathHelper.cpp" />
+    <ClCompile Include="Common\Mesh.cpp" />
+    <ClCompile Include="Common\Object.cpp" />
+    <ClCompile Include="Common\Shader.cpp" />
     <ClCompile Include="MainApp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\D3DApp.h" />
     <ClInclude Include="Common\D3DUtil.h" />
     <ClInclude Include="Common\d3dx12.h" />
     <ClInclude Include="Common\DDSTextureLoader.h" />
     <ClInclude Include="Common\GameTimer.h" />
+    <ClInclude Include="Common\Global.h" />
     <ClInclude Include="Common\MathHelper.h" />
+    <ClInclude Include="Common\Mesh.h" />
+    <ClInclude Include="Common\Object.h" />
+    <ClInclude Include="Common\Shader.h" />
     <ClInclude Include="Common\UploadBuffer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Common\default.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
