@@ -1,5 +1,7 @@
 #include "Common/D3DApp.h"
 #include "Common/MathHelper.h"
+#include "Common/Scene.h"
+
 
 
 using Microsoft::WRL::ComPtr;
@@ -30,7 +32,7 @@ private:
 
 private:
 	
-	//std::unique_ptr<Scene> mScenes;
+	std::unique_ptr<Scene> mScene;
 	//std::unique_ptr<Player> mPlayer;
 
 	
@@ -80,9 +82,8 @@ bool MainApp::Initialize()
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
 	// 각종 변수 초기화
-	//
-	//
-	//
+	if (!mScene->Initialize(md3dDevice.Get(), mCommandList.Get()))
+		return false;
 
 	// Execute
 	ThrowIfFailed(mCommandList->Close());
@@ -98,7 +99,19 @@ void MainApp::Update(const GameTimer& gt)
 {
 	OnKeyboardInput(gt);
 
+	XMMATRIX view;
+	XMMATRIX proj;
+
+	XMMATRIX viewProj = XMMatrixMultiply(view, proj);
+	XMFLOAT4X4 viewProj4x4f;
+	XMStoreFloat4x4(&viewProj4x4f, viewProj);
+
 	// 업데이트
+	if (mScene)
+	{
+		mScene->SetViewProjMatrix(viewProj4x4f);
+		mScene->Update(gt);
+	}
 
 }
 
@@ -130,9 +143,11 @@ void MainApp::Draw(const GameTimer& gt)
 	mCommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilBufferView);
 
 	// Render 함수 호출
-	//
-	//
-	//
+	if (mScene)
+	{
+		mScene->Render(gt, mCommandList.Get());
+	}
+
 
 
 	// Resource State 변경

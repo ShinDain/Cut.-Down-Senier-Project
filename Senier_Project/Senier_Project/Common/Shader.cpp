@@ -10,10 +10,10 @@ Shader::~Shader()
 
 bool Shader::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
-	assert(BuildRootSignature(pd3dDevice));
-	assert(BuildShadersAndInputLayout());
+	BuildRootSignature(pd3dDevice);
+	BuildShadersAndInputLayout();
 
-	assert(BuildPSO(pd3dDevice));
+	BuildPSO(pd3dDevice);
 
 	return true;
 }
@@ -36,8 +36,8 @@ bool Shader::BuildRootSignature(ID3D12Device* pd3dDevice)
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 
-	slotRootParameter[0].InitAsConstantBufferView(0);	// 패스 버퍼
-	slotRootParameter[1].InitAsConstantBufferView(1);	// 오브젝트 상수 버퍼
+	slotRootParameter[0].InitAsConstantBufferView(0);	// 오브젝트 상수 버퍼 
+	slotRootParameter[1].InitAsConstantBufferView(1);	// 패스 버퍼
 	slotRootParameter[2].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
 
 	// 샘플러

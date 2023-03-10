@@ -12,9 +12,14 @@ struct Vertex
 	DirectX::PackedVector::XMCOLOR Color;
 };
 
-struct tmpPassConstantBuffer
+struct tmpObjConstant
 {
-	DirectX::XMFLOAT4X4 WorldViewProj;
+	DirectX::XMFLOAT4X4 World = MathHelper::identity4x4();
+};
+
+struct tmpPassConstant
+{
+	DirectX::XMFLOAT4X4 ViewProj = MathHelper::identity4x4();
 };
 
 ID3D12Resource* CreateBufferResource(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
