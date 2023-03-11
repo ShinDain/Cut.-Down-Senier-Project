@@ -30,7 +30,7 @@ public:
 			nullptr,
 			IID_PPV_ARGS(&mUploadBuffer)));
 
-		ThrowIfFailed(mUploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(mMappedData)));
+		ThrowIfFailed(mUploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(&mMappedData)));
 
 
 		// Resource를 upmap을 해줄 필요는 없다. 왜냐하면, 우리는 GPU가 

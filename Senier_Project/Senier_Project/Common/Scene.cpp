@@ -22,7 +22,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 		return false;
 
 	mCamera = std::make_unique<Camera>();
-	mCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -10.0f));
+	mCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
 
 	mCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
 
@@ -42,16 +42,24 @@ void Scene::Update(const GameTimer& gt)
 		mShaders[i]->Update(gt);
 	}
 
-	mCamera->LookAt(XMFLOAT3(0.0f, 0.0f, -10.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	
+	XMFLOAT3 camPos3f = XMFLOAT3(0.0f, 0.0f, -100.f);
+	XMVECTOR camPos = XMLoadFloat3(&camPos3f);
+	camPos = XMVector3Transform(camPos, XMMatrixRotationY(gt.TotalTime()));
+
+	XMStoreFloat3(&camPos3f, camPos);
+
+	mCamera->LookAt(camPos3f, XMFLOAT3(0.0f, 0.0f, 0.0f), mCamera->GetUp3f());
 	mCamera->UpdateViewMatrix();
 
-	XMStoreFloat4x4(&mViewProj, XMMatrixMultiply(mCamera->GetView(), mCamera->GetProj()));
-
-	XMMATRIX viewProj = XMLoadFloat4x4(&mViewProj);
+	XMMATRIX viewProj = XMMatrixMultiply(mCamera->GetView(), mCamera->GetProj());
 
 	tmpPassConstant passConstant;
+
 	XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
 	mPassCB->CopyData(0, passConstant);
+
+	mObj->Update(gt);
 }
 
 void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -63,6 +71,8 @@ void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandLi
 
 		mShaders[i]->Render(gt, pd3dCommandList);
 	}
+
+	mObj->Render(gt, pd3dCommandList);
 
 }
 

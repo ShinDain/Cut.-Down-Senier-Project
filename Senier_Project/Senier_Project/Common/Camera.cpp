@@ -228,7 +228,7 @@ void Camera::UpdateViewMatrix()
 		L = XMVector3Normalize(L);
 		U = XMVector3Normalize(XMVector3Cross(L, R));
 
-		R = XMVector3Cross(L, U);
+		R = XMVector3Cross(U, L);
 
 		float x = -XMVectorGetX(XMVector3Dot(P, R));
 		float y = -XMVectorGetX(XMVector3Dot(P, U));

@@ -37,7 +37,7 @@ ID3D12Resource* CreateTextureResource(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 	{
 		D3D12_RESOURCE_STATES d3dResourceInitialStates = (ppd3dUploadBuffer && pData) ? D3D12_RESOURCE_STATE_COPY_DEST : d3dResourceStates;
 		HRESULT hr = pd3dDevice->CreateCommittedResource(&d3dHeapPropertiesDesc, D3D12_HEAP_FLAG_NONE,
-			&d3dResourceDesc, d3dResourceInitialStates, NULL, IID_PPV_ARGS(&pd3dBuffer));
+			&d3dResourceDesc, d3dResourceInitialStates, NULL, __uuidof(ID3D12Resource), (void**)&pd3dBuffer);
 
 		if (ppd3dUploadBuffer && pData)
 		{
@@ -55,7 +55,7 @@ ID3D12Resource* CreateTextureResource(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 			d3dResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 			d3dResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 			hr = pd3dDevice->CreateCommittedResource(&d3dHeapPropertiesDesc, D3D12_HEAP_FLAG_NONE, &d3dResourceDesc, 
-				D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_PPV_ARGS(&ppd3dUploadBuffer));
+				D3D12_RESOURCE_STATE_GENERIC_READ, NULL, __uuidof(ID3D12Resource), (void**)ppd3dUploadBuffer);
 
 #ifdef _WITH_MAPPING
 			D3D12_RANGE d3dReadRange = { 0, 0 };
@@ -93,7 +93,7 @@ ID3D12Resource* CreateTextureResource(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 	{
 		d3dResourceStates |= D3D12_RESOURCE_STATE_GENERIC_READ;
 		HRESULT hr = pd3dDevice->CreateCommittedResource(&d3dHeapPropertiesDesc, D3D12_HEAP_FLAG_NONE,
-			&d3dResourceDesc, d3dResourceStates, NULL, IID_PPV_ARGS(&pd3dBuffer));
+			&d3dResourceDesc, d3dResourceStates, NULL, __uuidof(ID3D12Resource), (void**)&pd3dBuffer);
 		if (pData)
 		{
 			D3D12_RANGE d3dReadRange = { 0, 0 };
@@ -110,7 +110,7 @@ ID3D12Resource* CreateTextureResource(ID3D12Device* pd3dDevice, ID3D12GraphicsCo
 	{
 		d3dResourceStates |= D3D12_RESOURCE_STATE_COPY_DEST;
 		HRESULT hr = pd3dDevice->CreateCommittedResource(&d3dHeapPropertiesDesc, D3D12_HEAP_FLAG_NONE, 
-			&d3dResourceDesc, d3dResourceStates, NULL, IID_PPV_ARGS(&pd3dBuffer));
+			&d3dResourceDesc, d3dResourceStates, NULL, __uuidof(ID3D12Resource), (void**)&pd3dBuffer);
 		if (pData)
 		{
 			D3D12_RANGE d3dReadRange = { 0, 0 };

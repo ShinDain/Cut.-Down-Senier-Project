@@ -81,6 +81,7 @@ bool MainApp::Initialize()
 	// 명령목록 초기화
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
+	mScene = std::make_unique<Scene>();
 	// 각종 변수 초기화
 	if (!mScene->Initialize(md3dDevice.Get(), mCommandList.Get()))
 		return false;
@@ -99,15 +100,12 @@ void MainApp::Update(const GameTimer& gt)
 {
 	OnKeyboardInput(gt);
 
-	
-
 	// 업데이트
 	if (mScene)
 	{
 		//mScene->SetViewProjMatrix(viewProj4x4f);
 		mScene->Update(gt);
 	}
-
 }
 
 void MainApp::Draw(const GameTimer& gt)

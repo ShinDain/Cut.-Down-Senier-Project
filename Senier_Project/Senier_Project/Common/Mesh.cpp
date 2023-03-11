@@ -18,41 +18,41 @@ void Mesh::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 
     Vertices.resize(24);
 
-    float w = 10.f / 2;
-    float h = 10.f / 2;
-    float d = 10.f / 2;
+    float w = 10.0f / 2;
+    float h = 10.0f / 2;
+    float d = 10.0f / 2;
 
 	Vertices =
 	{
-		Vertex({XMFLOAT3(-w, -h, -d), PackedVector::XMCOLOR(Colors::White)}),
-		Vertex({XMFLOAT3(-w, +h, -d), PackedVector::XMCOLOR(Colors::White)}),
-		Vertex({XMFLOAT3(+w, +h, -d), PackedVector::XMCOLOR(Colors::White)}),
-		Vertex({XMFLOAT3(+w, -h, -d), PackedVector::XMCOLOR(Colors::White)}),
+		Vertex({XMFLOAT3(-w, -h, -d), XMFLOAT4(Colors::White)}),
+		Vertex({XMFLOAT3(-w, +h, -d), XMFLOAT4(Colors::White)}),
+		Vertex({XMFLOAT3(+w, +h, -d), XMFLOAT4(Colors::White)}),
+		Vertex({XMFLOAT3(+w, -h, -d), XMFLOAT4(Colors::White)}),
 
-		Vertex({XMFLOAT3(-w, -h, +d), PackedVector::XMCOLOR(Colors::Black)}),
-		Vertex({XMFLOAT3(+w, -h, +d), PackedVector::XMCOLOR(Colors::Black)}),
-		Vertex({XMFLOAT3(+w, +h, +d), PackedVector::XMCOLOR(Colors::Black)}),
-		Vertex({XMFLOAT3(-w, +h, +d), PackedVector::XMCOLOR(Colors::Black)}),
-
-		Vertex({XMFLOAT3(-w, +h, -d), PackedVector::XMCOLOR(Colors::Red)}),
-		Vertex({XMFLOAT3(-w, +h, +d), PackedVector::XMCOLOR(Colors::Red)}),
-		Vertex({XMFLOAT3(+w, +h, +d), PackedVector::XMCOLOR(Colors::Red)}),
-		Vertex({XMFLOAT3(+w, +h, -d), PackedVector::XMCOLOR(Colors::Red)}),
-
-		Vertex({XMFLOAT3(-w, -h, -d), PackedVector::XMCOLOR(Colors::Aquamarine)}),
-		Vertex({XMFLOAT3(+w, -h, -d), PackedVector::XMCOLOR(Colors::Aquamarine)}),
-		Vertex({XMFLOAT3(+w, -h, +d), PackedVector::XMCOLOR(Colors::Aquamarine)}),
-		Vertex({XMFLOAT3(-w, -h, +d), PackedVector::XMCOLOR(Colors::Aquamarine)}),
-
-		Vertex({XMFLOAT3(-w, -h, +d), PackedVector::XMCOLOR(Colors::Indigo)}),
-		Vertex({XMFLOAT3(-w, +h, +d), PackedVector::XMCOLOR(Colors::Indigo)}),
-		Vertex({XMFLOAT3(-w, +h, -d), PackedVector::XMCOLOR(Colors::Indigo)}),
-		Vertex({XMFLOAT3(-w, -h, -d), PackedVector::XMCOLOR(Colors::Indigo)}),
-
-		Vertex({XMFLOAT3(+w, -h, -d), PackedVector::XMCOLOR(Colors::LawnGreen)}),
-		Vertex({XMFLOAT3(+w, +h, -d), PackedVector::XMCOLOR(Colors::LawnGreen)}),
-		Vertex({XMFLOAT3(+w, +h, +d), PackedVector::XMCOLOR(Colors::LawnGreen)}),
-		Vertex({XMFLOAT3(+w, -h, +d), PackedVector::XMCOLOR(Colors::LawnGreen)})
+		Vertex({XMFLOAT3(-w, -h, +d), XMFLOAT4(Colors::BurlyWood)}),
+		Vertex({XMFLOAT3(+w, -h, +d), XMFLOAT4(Colors::BurlyWood)}),
+		Vertex({XMFLOAT3(+w, +h, +d), XMFLOAT4(Colors::BurlyWood)}),
+		Vertex({XMFLOAT3(-w, +h, +d), XMFLOAT4(Colors::BurlyWood)}),
+									
+		Vertex({XMFLOAT3(-w, +h, -d), XMFLOAT4(Colors::Red)}),
+		Vertex({XMFLOAT3(-w, +h, +d), XMFLOAT4(Colors::Red)}),
+		Vertex({XMFLOAT3(+w, +h, +d), XMFLOAT4(Colors::Red)}),
+		Vertex({XMFLOAT3(+w, +h, -d), XMFLOAT4(Colors::Red)}),
+								
+		Vertex({XMFLOAT3(-w, -h, -d), XMFLOAT4(Colors::Aquamarine)}),
+		Vertex({XMFLOAT3(+w, -h, -d), XMFLOAT4(Colors::Aquamarine)}),
+		Vertex({XMFLOAT3(+w, -h, +d), XMFLOAT4(Colors::Aquamarine)}),
+		Vertex({XMFLOAT3(-w, -h, +d), XMFLOAT4(Colors::Aquamarine)}),
+							
+		Vertex({XMFLOAT3(-w, -h, +d), XMFLOAT4(Colors::Indigo)}),
+		Vertex({XMFLOAT3(-w, +h, +d), XMFLOAT4(Colors::Indigo)}),
+		Vertex({XMFLOAT3(-w, +h, -d), XMFLOAT4(Colors::Indigo)}),
+		Vertex({XMFLOAT3(-w, -h, -d), XMFLOAT4(Colors::Indigo)}),
+								
+		Vertex({XMFLOAT3(+w, -h, -d), XMFLOAT4(Colors::LawnGreen)}),
+		Vertex({XMFLOAT3(+w, +h, -d), XMFLOAT4(Colors::LawnGreen)}),
+		Vertex({XMFLOAT3(+w, +h, +d), XMFLOAT4(Colors::LawnGreen)}),
+		Vertex({XMFLOAT3(+w, -h, +d), XMFLOAT4(Colors::LawnGreen)})
 	};
 
 	Indices.resize(36);
