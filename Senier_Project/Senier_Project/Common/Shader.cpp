@@ -64,6 +64,7 @@ bool Shader::BuildRootSignature(ID3D12Device* pd3dDevice)
 		serializedRootSig->GetBufferSize(),
 		IID_PPV_ARGS(&mRootSignature)));
 
+	return true;
 }
 
 bool Shader::BuildShadersAndInputLayout()
@@ -77,6 +78,8 @@ bool Shader::BuildShadersAndInputLayout()
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
 		{"COLOR", 0, DXGI_FORMAT_R8G8B8A8_UINT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
 	};
+
+	return true;
 }
 
 bool Shader::BuildPSO(ID3D12Device* pd3dDevice)
@@ -103,6 +106,7 @@ bool Shader::BuildPSO(ID3D12Device* pd3dDevice)
 	psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	ThrowIfFailed(pd3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
 
+	return true;
 }
 
 std::array<const CD3DX12_STATIC_SAMPLER_DESC, 2> Shader::GetStaticSampler()

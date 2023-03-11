@@ -58,7 +58,7 @@ protected:
 	float mFriction = 0.0f;
 
 public:
-	void SetPosition(float x, float y, float z) { mPosition = XMFLOAT3(x, y, z) };
+	void SetPosition(float x, float y, float z) { mPosition = XMFLOAT3(x, y, z); }
 	void SetPosition(XMFLOAT3 Position) { mPosition = Position; }
 	void SetScale(XMFLOAT3 Scale) { mScale = Scale; }
 	void SetFriction(float fFriction) { mFriction = fFriction; }

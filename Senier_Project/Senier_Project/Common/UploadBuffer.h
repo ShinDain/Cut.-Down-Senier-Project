@@ -28,7 +28,7 @@ public:
 			&bufferDesc,
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
-			IID_PPV_ARGS(&mUploadbuffer)));
+			IID_PPV_ARGS(&mUploadBuffer)));
 
 		ThrowIfFailed(mUploadBuffer->Map(0, nullptr, reinterpret_cast<void**>(mMappedData)));
 

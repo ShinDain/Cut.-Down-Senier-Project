@@ -99,17 +99,12 @@ void MainApp::Update(const GameTimer& gt)
 {
 	OnKeyboardInput(gt);
 
-	XMMATRIX view;
-	XMMATRIX proj;
-
-	XMMATRIX viewProj = XMMatrixMultiply(view, proj);
-	XMFLOAT4X4 viewProj4x4f;
-	XMStoreFloat4x4(&viewProj4x4f, viewProj);
+	
 
 	// 업데이트
 	if (mScene)
 	{
-		mScene->SetViewProjMatrix(viewProj4x4f);
+		//mScene->SetViewProjMatrix(viewProj4x4f);
 		mScene->Update(gt);
 	}
 

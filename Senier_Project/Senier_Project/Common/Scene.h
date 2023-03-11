@@ -38,6 +38,7 @@ private:
 
 
 	std::unique_ptr<Object> mObj = nullptr;
+	std::unique_ptr<Camera> mCamera = nullptr;
 
 public:
 	void SetViewProjMatrix(XMFLOAT4X4 viewProj) { mViewProj = viewProj; }
