@@ -24,35 +24,35 @@ void Mesh::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 
 	Vertices =
 	{
-		Vertex({XMFLOAT3(-w, -h, -d), XMFLOAT4(Colors::White)}),
-		Vertex({XMFLOAT3(-w, +h, -d), XMFLOAT4(Colors::White)}),
-		Vertex({XMFLOAT3(+w, +h, -d), XMFLOAT4(Colors::White)}),
-		Vertex({XMFLOAT3(+w, -h, -d), XMFLOAT4(Colors::White)}),
+		Vertex({XMFLOAT3(-w, -h, -d), XMFLOAT2(0.0f, 1.0f)}),
+		Vertex({XMFLOAT3(-w, +h, -d), XMFLOAT2(0.0f, 0.0f)}),
+		Vertex({XMFLOAT3(+w, +h, -d), XMFLOAT2(1.0f, 0.0f)}),
+		Vertex({XMFLOAT3(+w, -h, -d), XMFLOAT2(1.0f, 1.0f)}),
 
-		Vertex({XMFLOAT3(-w, -h, +d), XMFLOAT4(Colors::BurlyWood)}),
-		Vertex({XMFLOAT3(+w, -h, +d), XMFLOAT4(Colors::BurlyWood)}),
-		Vertex({XMFLOAT3(+w, +h, +d), XMFLOAT4(Colors::BurlyWood)}),
-		Vertex({XMFLOAT3(-w, +h, +d), XMFLOAT4(Colors::BurlyWood)}),
-									
-		Vertex({XMFLOAT3(-w, +h, -d), XMFLOAT4(Colors::Red)}),
-		Vertex({XMFLOAT3(-w, +h, +d), XMFLOAT4(Colors::Red)}),
-		Vertex({XMFLOAT3(+w, +h, +d), XMFLOAT4(Colors::Red)}),
-		Vertex({XMFLOAT3(+w, +h, -d), XMFLOAT4(Colors::Red)}),
-								
-		Vertex({XMFLOAT3(-w, -h, -d), XMFLOAT4(Colors::Aquamarine)}),
-		Vertex({XMFLOAT3(+w, -h, -d), XMFLOAT4(Colors::Aquamarine)}),
-		Vertex({XMFLOAT3(+w, -h, +d), XMFLOAT4(Colors::Aquamarine)}),
-		Vertex({XMFLOAT3(-w, -h, +d), XMFLOAT4(Colors::Aquamarine)}),
-							
-		Vertex({XMFLOAT3(-w, -h, +d), XMFLOAT4(Colors::Indigo)}),
-		Vertex({XMFLOAT3(-w, +h, +d), XMFLOAT4(Colors::Indigo)}),
-		Vertex({XMFLOAT3(-w, +h, -d), XMFLOAT4(Colors::Indigo)}),
-		Vertex({XMFLOAT3(-w, -h, -d), XMFLOAT4(Colors::Indigo)}),
-								
-		Vertex({XMFLOAT3(+w, -h, -d), XMFLOAT4(Colors::LawnGreen)}),
-		Vertex({XMFLOAT3(+w, +h, -d), XMFLOAT4(Colors::LawnGreen)}),
-		Vertex({XMFLOAT3(+w, +h, +d), XMFLOAT4(Colors::LawnGreen)}),
-		Vertex({XMFLOAT3(+w, -h, +d), XMFLOAT4(Colors::LawnGreen)})
+		Vertex({XMFLOAT3(-w, -h, +d), XMFLOAT2(1.0f, 1.0f)}),
+		Vertex({XMFLOAT3(+w, -h, +d), XMFLOAT2(0.0f, 1.0f)}),
+		Vertex({XMFLOAT3(+w, +h, +d), XMFLOAT2(0.0f, 0.0f)}),
+		Vertex({XMFLOAT3(-w, +h, +d), XMFLOAT2(1.0f, 0.0f)}),
+
+		Vertex({XMFLOAT3(-w, +h, -d), XMFLOAT2(0.0f, 1.0f)}),
+		Vertex({XMFLOAT3(-w, +h, +d), XMFLOAT2(0.0f, 0.0f)}),
+		Vertex({XMFLOAT3(+w, +h, +d), XMFLOAT2(1.0f, 0.0f)}),
+		Vertex({XMFLOAT3(+w, +h, -d), XMFLOAT2(1.0f, 1.0f)}),
+
+		Vertex({XMFLOAT3(-w, -h, -d), XMFLOAT2(1.0f, 1.0f)}),
+		Vertex({XMFLOAT3(+w, -h, -d), XMFLOAT2(0.0f, 1.0f)}),
+		Vertex({XMFLOAT3(+w, -h, +d), XMFLOAT2(0.0f, 0.0f)}),
+		Vertex({XMFLOAT3(-w, -h, +d), XMFLOAT2(1.0f, 0.0f)}),
+
+		Vertex({XMFLOAT3(-w, -h, +d), XMFLOAT2(0.0f, 1.0f)}),
+		Vertex({XMFLOAT3(-w, +h, +d), XMFLOAT2(0.0f, 0.0f)}),
+		Vertex({XMFLOAT3(-w, +h, -d), XMFLOAT2(1.0f, 0.0f)}),
+		Vertex({XMFLOAT3(-w, -h, -d), XMFLOAT2(1.0f, 1.0f)}),
+
+		Vertex({XMFLOAT3(+w, -h, -d), XMFLOAT2(0.0f, 1.0f)}),
+		Vertex({XMFLOAT3(+w, +h, -d), XMFLOAT2(0.0f, 0.0f)}),
+		Vertex({XMFLOAT3(+w, +h, +d), XMFLOAT2(1.0f, 0.0f)}),
+		Vertex({XMFLOAT3(+w, -h, +d), XMFLOAT2(1.0f, 1.0f)})
 	};
 
 	Indices.resize(36);

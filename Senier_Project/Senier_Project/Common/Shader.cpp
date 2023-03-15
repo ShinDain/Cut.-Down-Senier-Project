@@ -31,14 +31,14 @@ void Shader::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandL
 
 bool Shader::BuildRootSignature(ID3D12Device* pd3dDevice)
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[3];
 
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 
 	slotRootParameter[0].InitAsConstantBufferView(0);	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(1);	// 패스 버퍼
-	//slotRootParameter[2].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
+	slotRootParameter[2].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
 
 	// 샘플러
 	auto staticSamplers = GetStaticSampler();
@@ -76,7 +76,7 @@ bool Shader::BuildShadersAndInputLayout()
 
 	mInputLayout = {
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
-		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
 	};
 
 	return true;

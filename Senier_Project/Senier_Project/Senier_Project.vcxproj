@@ -19,12 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Common\AnimationController.cpp" />
     <ClCompile Include="Common\Camera.cpp" />
     <ClCompile Include="Common\D3DApp.cpp" />
     <ClCompile Include="Common\D3DUtil.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
     <ClCompile Include="Common\GameTimer.cpp" />
     <ClCompile Include="Common\Global.cpp" />
+    <ClCompile Include="Common\Material.cpp" />
     <ClCompile Include="Common\MathHelper.cpp" />
     <ClCompile Include="Common\Mesh.cpp" />
     <ClCompile Include="Common\Object.cpp" />
@@ -33,6 +35,7 @@
     <ClCompile Include="MainApp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common\AnimationController.h" />
     <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\D3DApp.h" />
     <ClInclude Include="Common\D3DUtil.h" />
@@ -40,6 +43,7 @@
     <ClInclude Include="Common\DDSTextureLoader.h" />
     <ClInclude Include="Common\GameTimer.h" />
     <ClInclude Include="Common\Global.h" />
+    <ClInclude Include="Common\Material.h" />
     <ClInclude Include="Common\MathHelper.h" />
     <ClInclude Include="Common\Mesh.h" />
     <ClInclude Include="Common\Object.h" />

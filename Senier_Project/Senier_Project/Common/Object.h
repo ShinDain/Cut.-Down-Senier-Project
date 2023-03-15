@@ -9,9 +9,28 @@
 #include "UploadBuffer.h"
 #include "Global.h"
 #include "Mesh.h"
-// #include "Material.h"
+#include "Material.h"
+#include "AnimationController.h"
 
 using namespace DirectX;
+
+class ModelDataInfo
+{
+public:
+	ModelDataInfo() {}
+	~ModelDataInfo();
+
+	Object* mpRootObject = nullptr;
+
+	int mnSkinMeshes = 0;
+	//SkinMesh* mpSkinMeshes = nullptr;
+
+	AnimationSets* mpAnimationSets = nullptr;
+
+public:
+	void PrepareSkinning();
+
+};
 
 class Object
 {
@@ -30,12 +49,24 @@ public:
 	virtual void BuildConstantBuffers(ID3D12Device* pd3dDevice);
 
 protected:
+	char mFrameName[64];
+
+	Object* mpParent = nullptr;
+	Object* mpChild = nullptr;
+	Object* mpSibling = nullptr;
 
 	std::unique_ptr<UploadBuffer<tmpObjConstant>> mObjectCB = nullptr;
 
 	std::unique_ptr<Mesh> mMesh = nullptr;
-	// std::unique_ptr<Material> mMaterial = nullptr;
+	std::unique_ptr<Material> mMaterial = nullptr;
 
+public:
+	void SetChild(Object* pChild);
+	void SetMesh(std::unique_ptr<Mesh> pMesh);
+	void SetMaterial(std::unique_ptr<Material> pMesh);
+
+
+protected:
 	UINT mObjCBByteSize = 0;
 	XMFLOAT4X4 mWorld = MathHelper::identity4x4();
 

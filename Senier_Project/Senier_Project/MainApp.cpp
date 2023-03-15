@@ -47,6 +47,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE previnstance, PSTR cmdLine, in
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
+	if(S_OK != CoInitializeEx(NULL, COINIT_MULTITHREADED))
+		return 0;
+
 	try
 	{
 		MainApp theApp(hInstance);
@@ -59,6 +62,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE previnstance, PSTR cmdLine, in
 		MessageBox(nullptr, e.ToString().c_str(), L"HR_Failed", MB_OK);
 		return 0;
 	}
+
+	CoUninitialize();
 
 }
 
@@ -168,11 +173,14 @@ void MainApp::OnMouseDown(WPARAM btnState, int x, int y)
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
 
+	mScene->OnMouseDown(btnState, x, y);
+
 	SetCapture(mhMainWnd);
 }
 
 void MainApp::OnMouseUp(WPARAM btnState, int x, int y)
 {
+	mScene->OnMouseUp(btnState, x, y);
 
 	ReleaseCapture();
 }
@@ -181,11 +189,13 @@ void MainApp::OnMouseMove(WPARAM btnState, int x, int y)
 {
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
+
+	mScene->OnMouseMove(btnState, x, y);
 }
 
 void MainApp::OnWinKeyboardInput(WPARAM wParam)
 {
-
+	if (mScene) mScene->OnWinKeyboardInput(wParam);
 }
 
 void MainApp::OnKeyboardInput(const GameTimer& gt)

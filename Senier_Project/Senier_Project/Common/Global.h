@@ -9,7 +9,7 @@
 struct Vertex
 {
 	DirectX::XMFLOAT3 Pos;
-	DirectX::XMFLOAT4 Color;
+	DirectX::XMFLOAT2 TexC;
 };
 
 struct tmpObjConstant
@@ -20,6 +20,11 @@ struct tmpObjConstant
 struct tmpPassConstant
 {
 	DirectX::XMFLOAT4X4 ViewProj = MathHelper::identity4x4();
+};
+
+struct tmpMatConstant
+{
+	DirectX::XMFLOAT4 AlbedoColor = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 };
 
 ID3D12Resource* CreateBufferResource(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,

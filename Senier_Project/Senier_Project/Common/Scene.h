@@ -27,6 +27,9 @@ public:
 
 	void OnKeyboardInput(const GameTimer& gt) {}
 	void OnWinKeyboardInput(WPARAM wParam);
+	void OnMouseDown(WPARAM btnState, int x, int y);
+	void OnMouseUp(WPARAM btnState, int x, int y);
+	void OnMouseMove(WPARAM btnState, int x, int y);
 
 	// virtual void CreateRtvAndDsvDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
@@ -39,6 +42,8 @@ private:
 
 	std::unique_ptr<Object> mObj = nullptr;
 	std::unique_ptr<Camera> mCamera = nullptr;
+
+	POINT mLastMousePos = { 0,0 };
 
 public:
 	void SetViewProjMatrix(XMFLOAT4X4 viewProj) { mViewProj = viewProj; }
