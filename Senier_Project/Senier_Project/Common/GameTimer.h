@@ -19,16 +19,16 @@ public:
 	void Tick();	// 매 프레임 호출
 
 private:
-	double mSecondsPerCount;
-	double mDeltaTime;
+	double m_SecondsPerCount;
+	double m_DeltaTime;
 
-	__int64 mBaseTime;
-	__int64 mPausedTime;
-	__int64 mStopTime;
-	__int64 mPrevTime;
-	__int64 mCurrTime;
+	__int64 m_BaseTime;
+	__int64 m_PausedTime;
+	__int64 m_StopTime;
+	__int64 m_PrevTime;
+	__int64 m_CurrTime;
 
-	bool mStopped;
+	bool m_Stopped;
 
 };
 

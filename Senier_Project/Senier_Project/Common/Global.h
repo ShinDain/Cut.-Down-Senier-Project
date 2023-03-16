@@ -27,6 +27,11 @@ struct tmpMatConstant
 	DirectX::XMFLOAT4 AlbedoColor = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 };
 
+int ReadintegerFromFile(FILE* pInFile);
+float ReadFloatFromFile(FILE* pInFile);
+BYTE ReadStringFromFile(FILE* pInFile, char* pstrToken);
+
+
 ID3D12Resource* CreateBufferResource(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 	void* pData, UINT nBytes, D3D12_HEAP_TYPE d3dHeapType, D3D12_RESOURCE_STATES d3dResourceStates,
 	ID3D12Resource** ppd3dUploadBuffer);

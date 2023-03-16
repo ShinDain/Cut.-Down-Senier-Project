@@ -58,22 +58,22 @@ public:
 
 
 protected:
-	DirectX::XMFLOAT3 mPosition = { 0.0f, 0.0f, 0.0f };
-	DirectX::XMFLOAT3 mRight = { 1.0f, 0.0f, 0.0f };
-	DirectX::XMFLOAT3 mUp = { 0.0f, 1.0f, 0.0f };
-	DirectX::XMFLOAT3 mLook = { 0.0f, 0.0f, 1.0f };
+	DirectX::XMFLOAT3 m_xmf3Position = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 m_xmf3Right = { 1.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 m_xmf3Up = { 0.0f, 1.0f, 0.0f };
+	DirectX::XMFLOAT3 m_xmf3Look = { 0.0f, 0.0f, 1.0f };
 
-	float mNearZ = 0.0f;
-	float mFarZ = 0.0f;
-	float mAspect = 0.0f;
-	float mFovY = 0.0f;
-	float mNearWindowHeight = 0.0f;
-	float mFarWindowHeight = 0.0f;
+	float m_NearZ = 0.0f;
+	float m_FarZ = 0.0f;
+	float m_Aspect = 0.0f;
+	float m_FovY = 0.0f;
+	float m_NearWindowHeight = 0.0f;
+	float m_FarWindowHeight = 0.0f;
 
-	bool mViewDirty = true;
+	bool m_bViewDirty = true;
 
-	DirectX::XMFLOAT4X4 mView = MathHelper::identity4x4();
-	DirectX::XMFLOAT4X4 mProj = MathHelper::identity4x4();
+	DirectX::XMFLOAT4X4 m_xmf4x4View = MathHelper::identity4x4();
+	DirectX::XMFLOAT4X4 m_xmf4x4Proj = MathHelper::identity4x4();
 };
 
 class Third_Person_Camera : Camera
@@ -82,19 +82,19 @@ public:
 	Third_Person_Camera();
 	virtual ~Third_Person_Camera();
 
-	DirectX::XMFLOAT3 GetOffset() const { return mOffset; }
-	DirectX::XMFLOAT3 GetPlayerPos()const { return mPlayerPos; }
+	DirectX::XMFLOAT3 GetOffset() const { return m_xmf3Offset; }
+	DirectX::XMFLOAT3 GetPlayerPos()const { return m_xmf3PlayerPos; }
 
-	void SetOffset(const DirectX::XMFLOAT3& v) { mOffset = v; }
-	void SetOffset(float x, float y, float z) { mOffset = DirectX::XMFLOAT3(x, y ,z); }
-	void SetPlayerPos(const DirectX::XMFLOAT3& v) {	mPlayerPos = v;	}
-	void SetPlayerPos(float x, float y, float z) {	mPlayerPos = DirectX::XMFLOAT3(x, y, z);}
+	void SetOffset(const DirectX::XMFLOAT3& v) { m_xmf3Offset = v; }
+	void SetOffset(float x, float y, float z) { m_xmf3Offset = DirectX::XMFLOAT3(x, y ,z); }
+	void SetPlayerPos(const DirectX::XMFLOAT3& v) {	m_xmf3PlayerPos = v;	}
+	void SetPlayerPos(float x, float y, float z) {	m_xmf3PlayerPos = DirectX::XMFLOAT3(x, y, z);}
 
 	virtual void UpdateViewMatrix() override;
 
 protected:
-	DirectX::XMFLOAT3 mOffset = { 0.0f, 0.0f, 0.0f };
-	DirectX::XMFLOAT3 mPlayerPos = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 m_xmf3Offset = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 m_xmf3PlayerPos = { 0.0f, 0.0f, 0.0f };
 
 };
 

@@ -75,55 +75,55 @@ protected:
 
 protected:
 	
-	static D3DApp* mApp;
+	static D3DApp* m_App;
 
-	HINSTANCE mhAppInst = nullptr;
-	HWND mhMainWnd = nullptr;
-	bool mAppPaused = false;
-	bool mMinimized = false;
-	bool mMaximized = false;
-	bool mResizing = false;
-	bool mFullscreenState = false;
+	HINSTANCE m_hAppInst = nullptr;
+	HWND m_hMainWnd = nullptr;
+	bool m_AppPaused = false;
+	bool m_Minimized = false;
+	bool m_Maximized = false;
+	bool m_Resizing = false;
+	bool m_FullscreenState = false;
 
 	// 4x msaa 사용 여부, 기본은 false
-	bool m4xMsaaState = false;
-	UINT m4xMsaaQuality = 0;
+	bool m_4xMsaaState = false;
+	UINT m_4xMsaaQuality = 0;
 
-	GameTimer mTimer;
+	GameTimer m_Timer;
 
-	Microsoft::WRL::ComPtr<IDXGIFactory4> mdxgiFactory;
-	Microsoft::WRL::ComPtr<IDXGISwapChain> mSwapChain;
-	Microsoft::WRL::ComPtr<ID3D12Device> md3dDevice;
+	Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
+	Microsoft::WRL::ComPtr<IDXGISwapChain> m_SwapChain;
+	Microsoft::WRL::ComPtr<ID3D12Device> m_d3dDevice;
 
-	Microsoft::WRL::ComPtr<ID3D12Fence> mFence;
-	UINT64 mCurrentFence = 0;
+	Microsoft::WRL::ComPtr<ID3D12Fence> m_Fence;
+	UINT64 m_CurrentFence = 0;
 	
-	Microsoft::WRL::ComPtr<ID3D12CommandQueue> mCommandQueue;
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> mDirectCmdListAlloc;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> mCommandList;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_CommandQueue;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_DirectCmdListAlloc;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> m_CommandList;
 
 	static const int SwapChainBufferCount = 2;
-	int mCurrBackBuffer = 0;
-	Microsoft::WRL::ComPtr<ID3D12Resource> mSwapChainBuffer[SwapChainBufferCount];
-	Microsoft::WRL::ComPtr<ID3D12Resource> mDepthStencilBuffer;
+	int m_CurrBackBuffer = 0;
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_SwapChainBuffer[SwapChainBufferCount];
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_DepthStencilBuffer;
 
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mRtvHeap;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mDsvHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_RtvHeap;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DsvHeap;
 
-	D3D12_VIEWPORT mScreenViewport;
-	D3D12_RECT mScissorRect;
+	D3D12_VIEWPORT m_ScreenViewport;
+	D3D12_RECT m_ScissorRect;
 
-	UINT mRtvDescriptorSize = 0;
-	UINT mDsvDescriptorSize = 0;
-	UINT mCbvSrvUavDescriptorSize = 0;
+	UINT m_RtvDescriptorSize = 0;
+	UINT m_DsvDescriptorSize = 0;
+	UINT m_CbvSrvUavDescriptorSize = 0;
 
 	// 파생 클래스는 다음 파생 변수들을 초기화해줘야 한다.
-	std::wstring mMainWndCaption = L"d3dd App";
-	D3D_DRIVER_TYPE md3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
-	DXGI_FORMAT mBackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-	DXGI_FORMAT mDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	int mClientWidth = 1920;
-	int mClientHeight = 1080;
+	std::wstring m_MainWndCaption = L"d3dd App";
+	D3D_DRIVER_TYPE m_d3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
+	DXGI_FORMAT m_BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	DXGI_FORMAT m_DepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	int m_ClientWidth = 1920;
+	int m_ClientHeight = 1080;
 
 };
 

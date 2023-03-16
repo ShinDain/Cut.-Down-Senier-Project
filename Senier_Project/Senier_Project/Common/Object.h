@@ -31,72 +31,83 @@ public:
 
 	virtual void BuildConstantBuffers(ID3D12Device* pd3dDevice);
 
+	std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, char* pstrFileName);
+	std::shared_ptr<Object> LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
+	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommnadList, FILE* pInFile);
+	void LoadAnimationFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
+
+
 protected:
-	char mFrameName[64];
+	char m_FrameName[64];
 
-	std::shared_ptr<Object> mpChild = NULL;
-	std::shared_ptr<Object> mpSibling = NULL;
+	std::shared_ptr<Object> m_pChild = NULL;
+	std::shared_ptr<Object> m_pSibling = NULL;
 
-	std::unique_ptr<UploadBuffer<tmpObjConstant>> mObjectCB = nullptr;
+	std::unique_ptr<UploadBuffer<tmpObjConstant>> m_pObjectCB = nullptr;
 
-	std::shared_ptr<Mesh> mMesh = nullptr;
-	std::shared_ptr<Material> mMaterial = nullptr;
+
+	std::shared_ptr<Mesh> m_pMesh = nullptr;
+	std::shared_ptr<Material> m_pMaterial = nullptr;
 
 public:
 	void SetChild(std::shared_ptr<Object> pChild);
 	void SetMesh(std::shared_ptr<Mesh> pMesh);
-	void SetMaterial(std::shared_ptr<Material> pMesh);
+	void SetMaterial(std::shared_ptr<Material> pMaterial);
+
+
 
 
 protected:
-	UINT mObjCBByteSize = 0;
-	XMFLOAT4X4 mWorld = MathHelper::identity4x4();
-	XMFLOAT4X4 mParentWorld = MathHelper::identity4x4();
+	UINT m_ObjCBByteSize = 0;
+	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
+	XMFLOAT4X4 m_xmf4x4ParentWorld = MathHelper::identity4x4();
+	XMFLOAT4X4 m_xmf4x4LocalTransform = MathHelper::identity4x4();	// 부모로부터 상대 좌표
 
-	XMFLOAT3 mPosition = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	XMFLOAT3 mRight = XMFLOAT3(1.0f, 0.0f, 0.0f);
-	XMFLOAT3 mUp = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	XMFLOAT3 mLook = XMFLOAT3(0.0f, 0.0f, 1.0f);
+	XMFLOAT3 m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT3 m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	XMFLOAT3 m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	XMFLOAT3 m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
-	XMFLOAT3 mScale = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	XMFLOAT3 m_xmf3Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
 
-	XMFLOAT3 mVelocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	XMFLOAT3 mGravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT3 m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 
-	float mPitch = 0.0f; // x
-	float mYaw = 0.0f;   // y
-	float mRoll = 0.0f;  // z
+	float m_Pitch = 0.0f; // x
+	float m_Yaw = 0.0f;   // y
+	float m_Roll = 0.0f;  // z
 
-	float mMaxVelocityXZ = 0.0f;
-	float mMaxVelocityY = 0.0f;
-	float mFriction = 0.0f;
+	float m_MaxVelocityXZ = 0.0f;
+	float m_MaxVelocityY = 0.0f;
+	float m_Friction = 0.0f;
 
 public:
-	void SetParentWorld(XMFLOAT4X4 ParentWorld) { mParentWorld = ParentWorld; }
+	void SetParentWorld(XMFLOAT4X4 ParentWorld) { m_xmf4x4ParentWorld = ParentWorld; }
+	void SetLocalTransform(XMFLOAT4X4 LocalTransform) { m_xmf4x4LocalTransform = LocalTransform; }
 
-	void SetPosition(float x, float y, float z) { mPosition = XMFLOAT3(x, y, z); }
-	void SetPosition(XMFLOAT3 Position) { mPosition = Position; }
-	void SetScale(XMFLOAT3 Scale) { mScale = Scale; }
-	void SetFriction(float fFriction) { mFriction = fFriction; }
-	void SetGravity(const XMFLOAT3& Gravity) { mGravity = Gravity; }
-	void SetMaxVelocityXZ(float Velocity) { mMaxVelocityXZ = Velocity; }
-	void SetMaxVelocityY(float Velocity) { mMaxVelocityY = Velocity; }
-	void SetVelocity(const XMFLOAT3& Velocity) { mVelocity = Velocity; }
-	void SetYaw(const float in) { mYaw = in; }
-	void SetPitch(const float in) { mPitch = in; }
-	void SetRoll(const float in) { mRoll = in; }
+	void SetPosition(float x, float y, float z) { m_xmf3Position = XMFLOAT3(x, y, z); }
+	void SetPosition(XMFLOAT3 Position) { m_xmf3Position = Position; }
+	void SetScale(XMFLOAT3 Scale) { m_xmf3Scale = Scale; }
+	void SetFriction(float fFriction) { m_Friction = fFriction; }
+	void SetGravity(const XMFLOAT3& Gravity) { m_xmf3Gravity = Gravity; }
+	void SetMaxVelocityXZ(float Velocity) { m_MaxVelocityXZ = Velocity; }
+	void SetMaxVelocityY(float Velocity) { m_MaxVelocityY = Velocity; }
+	void SetVelocity(const XMFLOAT3& Velocity) { m_xmf3Velocity = Velocity; }
+	void SetYaw(const float in) { m_Yaw = in; }
+	void SetPitch(const float in) { m_Pitch = in; }
+	void SetRoll(const float in) { m_Roll = in; }
 
-	const XMFLOAT3& GetPosition() { return(mPosition); }
-	const XMFLOAT3& GetScale() { return(mScale); }
-	const XMFLOAT3& GetLookVector() { return(mLook); }
-	const XMFLOAT3& GetUpVector() { return(mUp); }
-	const XMFLOAT3& GetRightVector() { return(mRight); }
-	const XMFLOAT3& GetVelocity() const { return(mVelocity); }
-	const float& GetYaw() const { return(mYaw); }
-	const float& GetPitch() const { return(mPitch); }
-	const float& GetRoll() const { return(mRoll); }
-	const XMFLOAT4X4& GetWorld() const { return mWorld; }
-	const XMFLOAT4X4& GetParentWorld() const { return mParentWorld; }
+	const XMFLOAT3& GetPosition() { return(m_xmf3Position); }
+	const XMFLOAT3& GetScale() { return(m_xmf3Scale); }
+	const XMFLOAT3& GetLookVector() { return(m_xmf3Look); }
+	const XMFLOAT3& GetUpVector() { return(m_xmf3Up); }
+	const XMFLOAT3& GetRightVector() { return(m_xmf3Right); }
+	const XMFLOAT3& GetVelocity() const { return(m_xmf3Velocity); }
+	const float& GetYaw() const { return(m_Yaw); }
+	const float& GetPitch() const { return(m_Pitch); }
+	const float& GetRoll() const { return(m_Roll); }
+	const XMFLOAT4X4& GetWorld() const { return m_xmf4x4World; }
+	const XMFLOAT4X4& GetParentWorld() const { return m_xmf4x4ParentWorld; }
 
 };
 

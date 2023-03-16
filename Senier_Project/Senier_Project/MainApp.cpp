@@ -74,7 +74,7 @@ MainApp::MainApp(HINSTANCE hInstance) : D3DApp(hInstance)
 
 MainApp::~MainApp()
 {
-	if (md3dDevice != nullptr)
+	if (m_d3dDevice != nullptr)
 		FlushCommandQueue();
 }
 
@@ -84,17 +84,17 @@ bool MainApp::Initialize()
 		return false;
 
 	// 명령목록 초기화
-	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
+	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
 	mScene = std::make_unique<Scene>();
 	// 각종 변수 초기화
-	if (!mScene->Initialize(md3dDevice.Get(), mCommandList.Get()))
+	if (!mScene->Initialize(m_d3dDevice.Get(), m_CommandList.Get()))
 		return false;
 
 	// Execute
-	ThrowIfFailed(mCommandList->Close());
-	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
-	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+	ThrowIfFailed(m_CommandList->Close());
+	ID3D12CommandList* cmdsLists[] = { m_CommandList.Get() };
+	m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
 	FlushCommandQueue();
 
@@ -117,33 +117,33 @@ void MainApp::Draw(const GameTimer& gt)
 {
 	FlushCommandQueue();
 	
-	auto cmdListalloc = mDirectCmdListAlloc;
+	auto cmdListalloc = m_DirectCmdListAlloc;
 
 	// 명령어 할당자, 리스트 초기화
 	ThrowIfFailed(cmdListalloc->Reset());
-	ThrowIfFailed(mCommandList->Reset(cmdListalloc.Get(), NULL));
+	ThrowIfFailed(m_CommandList->Reset(cmdListalloc.Get(), NULL));
 
 	// Viewport, ScissorRect 설정
-	mCommandList->RSSetViewports(1, &mScreenViewport);
-	mCommandList->RSSetScissorRects(1, &mScissorRect);
+	m_CommandList->RSSetViewports(1, &m_ScreenViewport);
+	m_CommandList->RSSetScissorRects(1, &m_ScissorRect);
 
 	// Resource State 변경
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	mCommandList->ResourceBarrier(1, &d3dResourceBarrier);
+	m_CommandList->ResourceBarrier(1, &d3dResourceBarrier);
 
 	// 렌더 타겟, 깊이/스텐실 버퍼 초기화 후 설정
 	const D3D12_CPU_DESCRIPTOR_HANDLE currentBackBufferView = CurrentBackBufferView();
 	const D3D12_CPU_DESCRIPTOR_HANDLE depthStencilBufferView = DepthStencilView();
-	mCommandList->ClearRenderTargetView(currentBackBufferView, Colors::LightSteelBlue, 0, nullptr);
-	mCommandList->ClearDepthStencilView(depthStencilBufferView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+	m_CommandList->ClearRenderTargetView(currentBackBufferView, Colors::LightSteelBlue, 0, nullptr);
+	m_CommandList->ClearDepthStencilView(depthStencilBufferView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
 		1.0f, 0, 0, NULL);
-	mCommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilBufferView);
+	m_CommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilBufferView);
 
 	// Render 함수 호출
 	if (mScene)
 	{
-		mScene->Render(gt, mCommandList.Get());
+		mScene->Render(gt, m_CommandList.Get());
 	}
 
 
@@ -151,14 +151,14 @@ void MainApp::Draw(const GameTimer& gt)
 	// Resource State 변경
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier_Ren_Pre = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-	mCommandList->ResourceBarrier(1, &d3dResourceBarrier_Ren_Pre);
+	m_CommandList->ResourceBarrier(1, &d3dResourceBarrier_Ren_Pre);
 
-	ThrowIfFailed(mCommandList->Close());
-	ID3D12CommandList* cmdsLists[] = { mCommandList.Get() };
-	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+	ThrowIfFailed(m_CommandList->Close());
+	ID3D12CommandList* cmdsLists[] = { m_CommandList.Get() };
+	m_CommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
-	ThrowIfFailed(mSwapChain->Present(0, 0));
-	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
+	ThrowIfFailed(m_SwapChain->Present(0, 0));
+	m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;
 
 }
 
@@ -175,7 +175,7 @@ void MainApp::OnMouseDown(WPARAM btnState, int x, int y)
 
 	mScene->OnMouseDown(btnState, x, y);
 
-	SetCapture(mhMainWnd);
+	SetCapture(m_hMainWnd);
 }
 
 void MainApp::OnMouseUp(WPARAM btnState, int x, int y)

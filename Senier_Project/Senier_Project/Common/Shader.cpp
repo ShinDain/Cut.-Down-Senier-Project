@@ -20,8 +20,8 @@ bool Shader::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 void Shader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	pd3dCommandList->SetGraphicsRootSignature(mRootSignature.Get());
-	pd3dCommandList->SetPipelineState(mPSO.Get());
+	pd3dCommandList->SetGraphicsRootSignature(m_RootSignature.Get());
+	pd3dCommandList->SetPipelineState(m_PSO.Get());
 
 }
 
@@ -62,7 +62,7 @@ bool Shader::BuildRootSignature(ID3D12Device* pd3dDevice)
 	ThrowIfFailed(pd3dDevice->CreateRootSignature(
 		0, serializedRootSig->GetBufferPointer(),
 		serializedRootSig->GetBufferSize(),
-		IID_PPV_ARGS(&mRootSignature)));
+		IID_PPV_ARGS(&m_RootSignature)));
 
 	return true;
 }
@@ -71,10 +71,10 @@ bool Shader::BuildShadersAndInputLayout()
 {
 	HRESULT hr = S_OK;
 
-	mvsByteCode = d3dUtil::CompileShader(L"Shader\\default.hlsl", nullptr, "VS", "vs_5_0");
-	mpsByteCode = d3dUtil::CompileShader(L"Shader\\default.hlsl", nullptr, "PS", "ps_5_0");
+	m_vsByteCode = d3dUtil::CompileShader(L"Shader\\default.hlsl", nullptr, "VS", "vs_5_0");
+	m_psByteCode = d3dUtil::CompileShader(L"Shader\\default.hlsl", nullptr, "PS", "ps_5_0");
 
-	mInputLayout = {
+	m_InputLayout = {
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
 		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
 	};
@@ -86,14 +86,14 @@ bool Shader::BuildPSO(ID3D12Device* pd3dDevice)
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 	ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-	psoDesc.InputLayout = { mInputLayout.data(), (UINT)mInputLayout.size() };
-	psoDesc.pRootSignature = mRootSignature.Get();
+	psoDesc.InputLayout = { m_InputLayout.data(), (UINT)m_InputLayout.size() };
+	psoDesc.pRootSignature = m_RootSignature.Get();
 	psoDesc.VS = {
-		reinterpret_cast<BYTE*>(mvsByteCode->GetBufferPointer()),
-		mvsByteCode->GetBufferSize() };
+		reinterpret_cast<BYTE*>(m_vsByteCode->GetBufferPointer()),
+		m_vsByteCode->GetBufferSize() };
 	psoDesc.PS = {
-		reinterpret_cast<BYTE*>(mpsByteCode->GetBufferPointer()),
-		mpsByteCode->GetBufferSize() };
+		reinterpret_cast<BYTE*>(m_psByteCode->GetBufferPointer()),
+		m_psByteCode->GetBufferSize() };
 
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -104,7 +104,7 @@ bool Shader::BuildPSO(ID3D12Device* pd3dDevice)
 	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 	psoDesc.SampleDesc.Count = 1;
 	psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	ThrowIfFailed(pd3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPSO)));
+	ThrowIfFailed(pd3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_PSO)));
 
 	return true;
 }

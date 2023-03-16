@@ -15,27 +15,27 @@ public:
 
 protected:
 
-	std::string mName;
+	char m_Name[64];
 	
-	D3D12_PRIMITIVE_TOPOLOGY mPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-	Microsoft::WRL::ComPtr<ID3DBlob> mVertexBufferCPU = nullptr;
-	Microsoft::WRL::ComPtr<ID3DBlob> mIndexBufferCPU = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> m_VertexBufferCPU = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> m_IndexBufferCPU = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> mVertexBufferGPU = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> mIndexBufferGPU = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_VertexBufferGPU = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_IndexBufferGPU = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> mVertexBufferUploader = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> mIndexBufferUploader = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_VertexBufferUploader = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_IndexBufferUploader = nullptr;
 
-	UINT mVertexByteStride = 0;
-	UINT mVertexBufferByteSize = 0;
-	DXGI_FORMAT mIndexFormat = DXGI_FORMAT_R16_UINT;
-	UINT mIndexBufferByteSize = 0;
+	UINT m_VertexByteStride = 0;
+	UINT m_VertexBufferByteSize = 0;
+	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R16_UINT;
+	UINT m_IndexBufferByteSize = 0;
 
-	std::vector<SubmeshGeometry> mDrawArgs;
+	std::vector<SubmeshGeometry> m_DrawArgs;
 
-	int mnVertices = 0;
+	int m_nVertices = 0;
 
 public:
 
@@ -53,7 +53,7 @@ public:
 
 	void DisposeUploaders();
 
-	int GetVertexCnt() { return mnVertices; }
+	int GetVertexCnt() { return m_nVertices; }
 
 };
 

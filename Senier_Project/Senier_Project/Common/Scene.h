@@ -34,19 +34,19 @@ public:
 	// virtual void CreateRtvAndDsvDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 private:
-	std::vector<std::unique_ptr<Shader>> mShaders;
-	std::unique_ptr<UploadBuffer<tmpPassConstant>> mPassCB = nullptr;
+	std::vector<std::unique_ptr<Shader>> m_pShaders;
+	std::unique_ptr<UploadBuffer<tmpPassConstant>> m_pPassCB = nullptr;
 
-	XMFLOAT4X4 mViewProj = MathHelper::identity4x4();
+	XMFLOAT4X4 m_xmf4x4ViewProj = MathHelper::identity4x4();
 
 
-	std::vector<std::shared_ptr<Object>> mObjs;
-	std::unique_ptr<Camera> mCamera = nullptr;
+	std::vector<std::shared_ptr<Object>> m_pObjs;
+	std::unique_ptr<Camera> m_pCamera = nullptr;
 
-	POINT mLastMousePos = { 0,0 };
+	POINT m_LastMousePos = { 0,0 };
 
 public:
-	void SetViewProjMatrix(XMFLOAT4X4 viewProj) { mViewProj = viewProj; }
+	void SetViewProjMatrix(XMFLOAT4X4 viewProj) { m_xmf4x4ViewProj = viewProj; }
 };
 
 

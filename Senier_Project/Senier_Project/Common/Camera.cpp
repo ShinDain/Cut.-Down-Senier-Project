@@ -17,115 +17,115 @@ Camera::~Camera()
 
 DirectX::XMVECTOR Camera::GetPosition() const
 {
-	return XMLoadFloat3(&mPosition);
+	return XMLoadFloat3(&m_xmf3Position);
 }
 
 DirectX::XMFLOAT3 Camera::GetPosition3f() const
 {
-	return mPosition;
+	return m_xmf3Position;
 }
 
 void Camera::SetPosition(float x, float y, float z)
 {
-	mPosition = XMFLOAT3(x, y, z);
-	mViewDirty = true;
+	m_xmf3Position = XMFLOAT3(x, y, z);
+	m_bViewDirty = true;
 
 }
 
 void Camera::SetPosition(const DirectX::XMFLOAT3& v)
 {
-	mPosition = v;
-	mViewDirty = true;
+	m_xmf3Position = v;
+	m_bViewDirty = true;
 }
 
 DirectX::XMVECTOR Camera::GetRight() const
 {
-	return XMLoadFloat3(&mRight);
+	return XMLoadFloat3(&m_xmf3Right);
 }
 
 DirectX::XMFLOAT3 Camera::GetRight3f() const
 {
-	return mRight;
+	return m_xmf3Right;
 }
 
 DirectX::XMVECTOR Camera::GetUp() const
 {
-	return XMLoadFloat3(&mUp);
+	return XMLoadFloat3(&m_xmf3Up);
 }
 
 DirectX::XMFLOAT3 Camera::GetUp3f() const
 {
-	return mUp;
+	return m_xmf3Up;
 }
 
 DirectX::XMVECTOR Camera::GetLook() const
 {
-	return XMLoadFloat3(&mLook);
+	return XMLoadFloat3(&m_xmf3Look);
 }
 
 DirectX::XMFLOAT3 Camera::GetLook3f() const
 {
-	return mLook;
+	return m_xmf3Look;
 }
 
 float Camera::GetNearZ() const
 {
-	return mNearZ;
+	return m_NearZ;
 }
 
 float Camera::GetFarZ() const
 {
-	return mFarZ;
+	return m_FarZ;
 }
 
 float Camera::GetAspect() const
 {
-	return mAspect;
+	return m_Aspect;
 }
 
 float Camera::GetFovY() const
 {
-	return mFovY;
+	return m_FovY;
 }
 
 float Camera::GetFovX() const
 {
 	float halfWidth = 0.5f * GetNearWindowWidth();
-	return 2.0f * atan(halfWidth / mNearZ);
+	return 2.0f * atan(halfWidth / m_NearZ);
 }
 
 float Camera::GetNearWindowWidth() const
 {
-	return mAspect * mNearWindowHeight;
+	return m_Aspect * m_NearWindowHeight;
 }
 
 float Camera::GetNearWindowHeight() const
 {
-	return mNearWindowHeight;
+	return m_NearWindowHeight;
 }
 
 float Camera::GetFarWindowWidth() const
 {
-	return mAspect * mFarWindowHeight;
+	return m_Aspect * m_FarWindowHeight;
 }
 
 float Camera::GetFarWindowHeight() const
 {
-	return mFarWindowHeight;
+	return m_FarWindowHeight;
 }
 
 void Camera::SetLens(float fovY, float aspect, float zn, float zf)
 {
-	mFovY = fovY;
-	mAspect = aspect;
-	mNearZ = zn;
-	mFarZ = zf;
+	m_FovY = fovY;
+	m_Aspect = aspect;
+	m_NearZ = zn;
+	m_FarZ = zf;
 	
-	mNearWindowHeight = 2.0f * mNearZ * tanf(0.5f * mFovY);
-	mFarWindowHeight = 2.0f * mFarZ * tanf(0.5f * mFovY);
+	m_NearWindowHeight = 2.0f * m_NearZ * tanf(0.5f * m_FovY);
+	m_FarWindowHeight = 2.0f * m_FarZ * tanf(0.5f * m_FovY);
 
-	XMMATRIX P = XMMatrixPerspectiveFovLH(mFovY, mAspect, mNearZ, mFarZ);
-	XMStoreFloat4x4(&mProj, P);
+	XMMATRIX P = XMMatrixPerspectiveFovLH(m_FovY, m_Aspect, m_NearZ, m_FarZ);
+	XMStoreFloat4x4(&m_xmf4x4Proj, P);
 }
 
 void Camera::LookAt(DirectX::FXMVECTOR pos, DirectX::FXMVECTOR target, DirectX::FXMVECTOR worldUp)
@@ -134,12 +134,12 @@ void Camera::LookAt(DirectX::FXMVECTOR pos, DirectX::FXMVECTOR target, DirectX::
 	XMVECTOR R = XMVector3Normalize(XMVector3Cross(worldUp, L));
 	XMVECTOR U = XMVector3Cross(L, R);
 
-	XMStoreFloat3(&mPosition, pos);
-	XMStoreFloat3(&mLook, L);
-	XMStoreFloat3(&mRight, R);
-	XMStoreFloat3(&mUp, U);
+	XMStoreFloat3(&m_xmf3Position, pos);
+	XMStoreFloat3(&m_xmf3Look, L);
+	XMStoreFloat3(&m_xmf3Right, R);
+	XMStoreFloat3(&m_xmf3Up, U);
 
-	mViewDirty = true;
+	m_bViewDirty = true;
 }
 
 void Camera::LookAt(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& target, const DirectX::XMFLOAT3& up)
@@ -150,80 +150,80 @@ void Camera::LookAt(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& targe
 
 	LookAt(P, T, U);
 
-	mViewDirty = true;
+	m_bViewDirty = true;
 }
 
 DirectX::XMMATRIX Camera::GetView() const
 {
-	assert(!mViewDirty);
-	return XMLoadFloat4x4(&mView);
+	assert(!m_bViewDirty);
+	return XMLoadFloat4x4(&m_xmf4x4View);
 }
 
 DirectX::XMMATRIX Camera::GetProj() const
 {
-	return XMLoadFloat4x4(&mProj);
+	return XMLoadFloat4x4(&m_xmf4x4Proj);
 }
 
 DirectX::XMFLOAT4X4 Camera::GetView4x4f() const
 {
-	assert(!mViewDirty);
-	return mView;
+	assert(!m_bViewDirty);
+	return m_xmf4x4View;
 }
 
 DirectX::XMFLOAT4X4 Camera::GetProj4x4f() const
 {
-	return mProj;
+	return m_xmf4x4Proj;
 }
 
 void Camera::Strafe(float d)
 {
 	XMVECTOR s = XMVectorReplicate(d);
-	XMVECTOR r = XMLoadFloat3(&mRight);
-	XMVECTOR p = XMLoadFloat3(&mPosition);
-	XMStoreFloat3(&mPosition, XMVectorMultiplyAdd(s, r, p));
+	XMVECTOR r = XMLoadFloat3(&m_xmf3Right);
+	XMVECTOR p = XMLoadFloat3(&m_xmf3Position);
+	XMStoreFloat3(&m_xmf3Position, XMVectorMultiplyAdd(s, r, p));
 
-	mViewDirty = true;
+	m_bViewDirty = true;
 }
 
 void Camera::Walk(float d)
 {
 	XMVECTOR s = XMVectorReplicate(d);
-	XMVECTOR l = XMLoadFloat3(&mLook);
-	XMVECTOR p = XMLoadFloat3(&mPosition);
-	XMStoreFloat3(&mPosition, XMVectorMultiplyAdd(s, l, p));
+	XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+	XMVECTOR p = XMLoadFloat3(&m_xmf3Position);
+	XMStoreFloat3(&m_xmf3Position, XMVectorMultiplyAdd(s, l, p));
 
-	mViewDirty = true;
+	m_bViewDirty = true;
 }
 
 void Camera::Pitch(float angle)
 {
-	XMMATRIX R = XMMatrixRotationAxis(XMLoadFloat3(&mRight), angle);
+	XMMATRIX R = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), angle);
 
-	XMStoreFloat3(&mUp, XMVector3TransformNormal(XMLoadFloat3(&mUp), R));
-	XMStoreFloat3(&mLook, XMVector3TransformNormal(XMLoadFloat3(&mLook), R));
+	XMStoreFloat3(&m_xmf3Up, XMVector3TransformNormal(XMLoadFloat3(&m_xmf3Up), R));
+	XMStoreFloat3(&m_xmf3Look, XMVector3TransformNormal(XMLoadFloat3(&m_xmf3Look), R));
 
-	mViewDirty = true;
+	m_bViewDirty = true;
 }
 
 void Camera::RotateY(float angle)
 {
 	XMMATRIX R = XMMatrixRotationY(angle);
 
-	XMStoreFloat3(&mRight, XMVector3TransformNormal(XMLoadFloat3(&mRight), R));
-	XMStoreFloat3(&mUp, XMVector3TransformNormal(XMLoadFloat3(&mUp), R));
-	XMStoreFloat3(&mLook, XMVector3TransformNormal(XMLoadFloat3(&mLook), R));
+	XMStoreFloat3(&m_xmf3Right, XMVector3TransformNormal(XMLoadFloat3(&m_xmf3Right), R));
+	XMStoreFloat3(&m_xmf3Up, XMVector3TransformNormal(XMLoadFloat3(&m_xmf3Up), R));
+	XMStoreFloat3(&m_xmf3Look, XMVector3TransformNormal(XMLoadFloat3(&m_xmf3Look), R));
 
-	mViewDirty = true;
+	m_bViewDirty = true;
 }
 
 void Camera::UpdateViewMatrix()
 {
-	if (mViewDirty)
+	if (m_bViewDirty)
 	{
-		XMVECTOR R = XMLoadFloat3(&mRight);
-		XMVECTOR U = XMLoadFloat3(&mUp);
-		XMVECTOR L = XMLoadFloat3(&mLook);
-		XMVECTOR P = XMLoadFloat3(&mPosition);
+		XMVECTOR R = XMLoadFloat3(&m_xmf3Right);
+		XMVECTOR U = XMLoadFloat3(&m_xmf3Up);
+		XMVECTOR L = XMLoadFloat3(&m_xmf3Look);
+		XMVECTOR P = XMLoadFloat3(&m_xmf3Position);
 
 		L = XMVector3Normalize(L);
 		U = XMVector3Normalize(XMVector3Cross(L, R));
@@ -234,31 +234,31 @@ void Camera::UpdateViewMatrix()
 		float y = -XMVectorGetX(XMVector3Dot(P, U));
 		float z = -XMVectorGetX(XMVector3Dot(P, L));
 
-		XMStoreFloat3(&mRight, R);
-		XMStoreFloat3(&mUp, U);
-		XMStoreFloat3(&mLook, L);
+		XMStoreFloat3(&m_xmf3Right, R);
+		XMStoreFloat3(&m_xmf3Up, U);
+		XMStoreFloat3(&m_xmf3Look, L);
 
-		mView(0, 0) = mRight.x;
-		mView(1, 0) = mRight.y;
-		mView(2, 0) = mRight.z;
-		mView(3, 0) = x; 
+		m_xmf4x4View(0, 0) = m_xmf3Right.x;
+		m_xmf4x4View(1, 0) = m_xmf3Right.y;
+		m_xmf4x4View(2, 0) = m_xmf3Right.z;
+		m_xmf4x4View(3, 0) = x; 
 
-		mView(0, 1) = mUp.x;
-		mView(1, 1) = mUp.y;
-		mView(2, 1) = mUp.z;
-		mView(3, 1) = y;
+		m_xmf4x4View(0, 1) = m_xmf3Up.x;
+		m_xmf4x4View(1, 1) = m_xmf3Up.y;
+		m_xmf4x4View(2, 1) = m_xmf3Up.z;
+		m_xmf4x4View(3, 1) = y;
 
-		mView(0, 2) = mLook.x;
-		mView(1, 2) = mLook.y;
-		mView(2, 2) = mLook.z;
-		mView(3, 2) = z;
+		m_xmf4x4View(0, 2) = m_xmf3Look.x;
+		m_xmf4x4View(1, 2) = m_xmf3Look.y;
+		m_xmf4x4View(2, 2) = m_xmf3Look.z;
+		m_xmf4x4View(3, 2) = z;
 
-		mView(0, 3) = 0.0f;
-		mView(1, 3) = 0.0f;
-		mView(2, 3) = 0.0f;
-		mView(3, 3) = 1.f;
+		m_xmf4x4View(0, 3) = 0.0f;
+		m_xmf4x4View(1, 3) = 0.0f;
+		m_xmf4x4View(2, 3) = 0.0f;
+		m_xmf4x4View(3, 3) = 1.f;
 
-		mViewDirty = false;
+		m_bViewDirty = false;
 	}
 }
 

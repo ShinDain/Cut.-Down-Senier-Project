@@ -33,12 +33,12 @@ public:
 	ModelDataInfo() {}
 	~ModelDataInfo();
 
-	std::shared_ptr<Object> mpRootObject = nullptr;
+	std::shared_ptr<Object> m_pRootObject = nullptr;
 
-	int mnSkinMeshes = 0;
-	//std::shared_ptr<SkinMesh> mpSkinMeshes = nullptr;
+	int m_nSkinMeshes = 0;
+	//std::shared_ptr<SkinMesh> m_pSkinMeshes = nullptr;
 
-	std::shared_ptr<AnimationSets> mpAnimationSets = nullptr;
+	std::shared_ptr<AnimationSets> m_pAnimationSets = nullptr;
 
 public:
 	void PrepareSkinning();

@@ -10,23 +10,23 @@ Material::~Material()
 
 bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 {
-	if (mTextures.size() < 1)
+	if (m_pTextures.size() < 1)
 		return false;
 
 	//mMatCB = std::make_unique<UploadBuffer<tmpMatConstant>>(pd3dDevice, 1, true);
 
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = mTextures.size();
+	srvHeapDesc.NumDescriptors = m_pTextures.size();
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	ThrowIfFailed(pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&mDescriptorHeap)));
+	ThrowIfFailed(pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_DescriptorHeap)));
 
-	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(mDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 	UINT CbvSrvUavDescriptorSize = pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	for (size_t i = 0; i < mTextures.size(); ++i)
+	for (size_t i = 0; i < m_pTextures.size(); ++i)
 	{
-		auto tex = mTextures[i]->Resource;
+		auto tex = m_pTextures[i]->Resource;
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -47,18 +47,18 @@ bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 void Material::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	//MatConstants matConstants;
-	//matConstants.AlbedoColor = mAlbedoColor;
+	//matConstants.AlbedoColor = m_AlbedoColor;
 	//mMatCB->CopyData(0, matConstants);
 
 	//pd3dCommandList->SetGraphicsRootConstantBufferView(1, mMatCB->Resource()->GetGPUVirtualAddress());
 
-	if (mDescriptorHeap == NULL)
+	if (m_DescriptorHeap == NULL)
 		return;
 
-	ID3D12DescriptorHeap* descriptorHeap[] = { mDescriptorHeap.Get() };
+	ID3D12DescriptorHeap* descriptorHeap[] = { m_DescriptorHeap.Get() };
 	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
 
-	D3D12_GPU_DESCRIPTOR_HANDLE matHandle = mDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	D3D12_GPU_DESCRIPTOR_HANDLE matHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 	pd3dCommandList->SetGraphicsRootDescriptorTable(2, matHandle);
 
 }
@@ -72,7 +72,7 @@ void Material::LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 		texMap->FileName.c_str(),
 		texMap->Resource, texMap->UploadHeap));
 
-	mTextures.emplace_back(std::move(texMap));
+	m_pTextures.emplace_back(std::move(texMap));
 }
 
 void Material::LoadMaterialFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)
@@ -99,49 +99,49 @@ void Material::LoadMaterialFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComm
 		{
 			XMFLOAT4 tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 4, pInFile);
-			mAlbedoColor = tmp;
+			m_xmf4AlbedoColor = tmp;
 		}
 		else if (!strcmp(pstrToken, "<EmissiveColor>:"))
 		{
 			XMFLOAT4 tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 4, pInFile);
-			mEmissiveColor = tmp;
+			m_xmf4EmissiveColor = tmp;
 		}
 		else if (!strcmp(pstrToken, "<SpecularColor>:"))
 		{
 			XMFLOAT4 tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 4, pInFile);
-			mSpecularColor = tmp;
+			m_xmf4SpecularColor = tmp;
 		}
 		else if (!strcmp(pstrToken, "<Glossiness>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			mGlossiness = tmp;
+			m_Glossiness = tmp;
 		}
 		else if (!strcmp(pstrToken, "<Smoothness>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			mSmoothness = tmp;
+			m_Smoothness = tmp;
 		}
 		else if (!strcmp(pstrToken, "<Metallic>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			mMetallic = tmp;
+			m_Metallic = tmp;
 		}
 		else if (!strcmp(pstrToken, "<SpecularHighlight>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			mSpecularHighlight = tmp;
+			m_SpecularHighlight = tmp;
 		}
 		else if (!strcmp(pstrToken, "<GlossyReflection>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			mGlossyReflection = tmp;
+			m_GlossyReflection = tmp;
 		}
 		else if (!strcmp(pstrToken, "<AlbedoMap>:"))
 		{

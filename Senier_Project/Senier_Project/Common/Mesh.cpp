@@ -87,28 +87,30 @@ void Mesh::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	const UINT vbByteSize = (UINT)Vertices.size() * sizeof(Vertex);
 	const UINT ibByteSize = (UINT)Indices.size() * sizeof(std::uint_fast16_t);
 
-	mName = "boxGeo";
+	const char* tmpStr = "boxGeo";
+	strcpy_s(m_Name, tmpStr);
+	//m_Name = "boxGeo";
 
 	// CPU에 정점 정보 저장, 사용해본적은 아직 없음
-	ThrowIfFailed(D3DCreateBlob(vbByteSize, &mVertexBufferCPU));
-	CopyMemory(mVertexBufferCPU->GetBufferPointer(), Vertices.data(), vbByteSize);
-	ThrowIfFailed(D3DCreateBlob(ibByteSize, &mIndexBufferCPU));
-	CopyMemory(mIndexBufferCPU->GetBufferPointer(), Indices.data(), ibByteSize);
+	ThrowIfFailed(D3DCreateBlob(vbByteSize, &m_VertexBufferCPU));
+	CopyMemory(m_VertexBufferCPU->GetBufferPointer(), Vertices.data(), vbByteSize);
+	ThrowIfFailed(D3DCreateBlob(ibByteSize, &m_IndexBufferCPU));
+	CopyMemory(m_IndexBufferCPU->GetBufferPointer(), Indices.data(), ibByteSize);
 
 	// GPU 리소스에 정점 정보 저장
-	mVertexBufferGPU = d3dUtil::CreateDefaultBuffer(
+	m_VertexBufferGPU = d3dUtil::CreateDefaultBuffer(
 		pd3dDevice, pd3dCommandList,
 		Vertices.data(), vbByteSize,
-		mVertexBufferUploader);
-	mIndexBufferGPU = d3dUtil::CreateDefaultBuffer(
+		m_VertexBufferUploader);
+	m_IndexBufferGPU = d3dUtil::CreateDefaultBuffer(
 		pd3dDevice, pd3dCommandList,
 		Indices.data(), ibByteSize,
-		mIndexBufferUploader);
+		m_IndexBufferUploader);
 
-	mVertexByteStride = sizeof(Vertex);
-	mVertexBufferByteSize = vbByteSize;
-	mIndexFormat = mIndexFormat;
-	mIndexBufferByteSize = ibByteSize;
+	m_VertexByteStride = sizeof(Vertex);
+	m_VertexBufferByteSize = vbByteSize;
+	m_IndexFormat = m_IndexFormat;
+	m_IndexBufferByteSize = ibByteSize;
 
 	SubmeshGeometry subMesh;
 	subMesh.IndexCount = (UINT)Indices.size();
@@ -116,7 +118,7 @@ void Mesh::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	subMesh.BaseVertexLocation = 0;
 	// subMesh.Bounds = BoundingBox()
 
-	mDrawArgs.emplace_back(subMesh);
+	m_DrawArgs.emplace_back(subMesh);
 }
 
 void Mesh::OnprepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -125,12 +127,12 @@ void Mesh::OnprepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dC
     D3D12_INDEX_BUFFER_VIEW GeoIBView = IndexBufferView();
     pd3dCommandList->IASetVertexBuffers(0, 1, &GeoVBView);
     pd3dCommandList->IASetIndexBuffer(&GeoIBView);
-    pd3dCommandList->IASetPrimitiveTopology(mPrimitiveTopology);
+    pd3dCommandList->IASetPrimitiveTopology(m_PrimitiveTopology);
 }
 
 void Mesh::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-    for (auto begin = mDrawArgs.begin(); begin != mDrawArgs.end(); ++begin)
+    for (auto begin = m_DrawArgs.begin(); begin != m_DrawArgs.end(); ++begin)
     {
         pd3dCommandList->DrawIndexedInstanced(
             begin->IndexCount, 1, begin->StartIndexLocation, begin->BaseVertexLocation, 0);
@@ -140,9 +142,9 @@ void Mesh::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandLis
 D3D12_VERTEX_BUFFER_VIEW Mesh::VertexBufferView() const
 {
     D3D12_VERTEX_BUFFER_VIEW vbv;
-    vbv.BufferLocation = mVertexBufferGPU->GetGPUVirtualAddress();
-    vbv.StrideInBytes = mVertexByteStride;
-    vbv.SizeInBytes = mVertexBufferByteSize;
+    vbv.BufferLocation = m_VertexBufferGPU->GetGPUVirtualAddress();
+    vbv.StrideInBytes = m_VertexByteStride;
+    vbv.SizeInBytes = m_VertexBufferByteSize;
 
     return vbv;
 }
@@ -150,15 +152,15 @@ D3D12_VERTEX_BUFFER_VIEW Mesh::VertexBufferView() const
 D3D12_INDEX_BUFFER_VIEW Mesh::IndexBufferView() const
 {
     D3D12_INDEX_BUFFER_VIEW ibv;
-    ibv.BufferLocation = mIndexBufferGPU->GetGPUVirtualAddress();
-    ibv.Format = mIndexFormat;
-    ibv.SizeInBytes = mIndexBufferByteSize;
+    ibv.BufferLocation = m_IndexBufferGPU->GetGPUVirtualAddress();
+    ibv.Format = m_IndexFormat;
+    ibv.SizeInBytes = m_IndexBufferByteSize;
 
     return ibv;
 }
 
 void Mesh::DisposeUploaders()
 {
-    mVertexBufferUploader = nullptr;
-    mIndexBufferUploader = nullptr;
+    m_VertexBufferUploader = nullptr;
+    m_IndexBufferUploader = nullptr;
 }

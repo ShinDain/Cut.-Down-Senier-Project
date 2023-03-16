@@ -10,122 +10,122 @@ Scene::~Scene()
 
 bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	mPassCB = std::make_unique<UploadBuffer<tmpPassConstant>>(pd3dDevice, 1, true);
+	m_pPassCB = std::make_unique<UploadBuffer<tmpPassConstant>>(pd3dDevice, 1, true);
 
 	std::unique_ptr<Shader> defaultShader = std::make_unique<Shader>();
 	if (!defaultShader->Initialize(pd3dDevice, pd3dCommandList, NULL))
 		return false;
-	mShaders.push_back(move(defaultShader));
+	m_pShaders.push_back(move(defaultShader));
 
 	std::shared_ptr<Object> tmpObj = std::make_shared<Object>();
 	if (!tmpObj->Initialize(pd3dDevice, pd3dCommandList, NULL))
 		return false;
 
-	mObjs.emplace_back(std::make_shared<Object>());
-	mObjs.emplace_back(std::make_shared<Object>());
+	m_pObjs.emplace_back(std::make_shared<Object>());
+	m_pObjs.emplace_back(std::make_shared<Object>());
 	
-	for (int i = 0; i < mObjs.size(); ++i)
+	for (int i = 0; i < m_pObjs.size(); ++i)
 	{
-		mObjs[i]->BuildConstantBuffers(pd3dDevice);
+		m_pObjs[i]->BuildConstantBuffers(pd3dDevice);
 	}
 
-	mObjs[0]->SetChild(tmpObj);
-	mObjs[1]->SetChild(tmpObj);
+	m_pObjs[0]->SetChild(tmpObj);
+	m_pObjs[1]->SetChild(tmpObj);
 
-	mObjs[0]->SetPosition(XMFLOAT3(-10.f, 0.0f, 0.0f));
-	mObjs[1]->SetPosition(XMFLOAT3(10.f, 0.0f, 0.0f));
+	m_pObjs[0]->SetPosition(XMFLOAT3(-10.f, 0.0f, 0.0f));
+	m_pObjs[1]->SetPosition(XMFLOAT3(10.f, 0.0f, 0.0f));
 
-	mCamera = std::make_unique<Camera>();
-	mCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -100.f));
+	m_pCamera = std::make_unique<Camera>();
+	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -100.f));
 
-	mCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
+	m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
 
 	return true;
 }
 
 void Scene::OnResize(float aspectRatio)
 {
-	mCamera->SetLens(0.25f * MathHelper::Pi, aspectRatio, 1.0f, 10000.0f);
+	m_pCamera->SetLens(0.25f * MathHelper::Pi, aspectRatio, 1.0f, 10000.0f);
 
 }
 
 void Scene::Update(const GameTimer& gt)
 {
-	for (int i = 0; i < mShaders.size(); ++i)
+	for (int i = 0; i < m_pShaders.size(); ++i)
 	{
-		mShaders[i]->Update(gt);
+		m_pShaders[i]->Update(gt);
 	}
 
 	
 	XMFLOAT3 camPos3f = XMFLOAT3(0.0f, 0.0f, -100.f);
-	XMVECTOR camPos = mCamera->GetPosition();
+	XMVECTOR camPos = m_pCamera->GetPosition();
 	XMStoreFloat3(&camPos3f, camPos);
 
-	mCamera->LookAt(camPos3f, XMFLOAT3(0.0f, 0.0f, 0.0f), mCamera->GetUp3f());
-	mCamera->UpdateViewMatrix();
+	m_pCamera->LookAt(camPos3f, XMFLOAT3(0.0f, 0.0f, 0.0f), m_pCamera->GetUp3f());
+	m_pCamera->UpdateViewMatrix();
 
-	XMMATRIX viewProj = XMMatrixMultiply(mCamera->GetView(), mCamera->GetProj());
+	XMMATRIX viewProj = XMMatrixMultiply(m_pCamera->GetView(), m_pCamera->GetProj());
 
 	tmpPassConstant passConstant;
 
 	XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
-	mPassCB->CopyData(0, passConstant);
+	m_pPassCB->CopyData(0, passConstant);
 
-	for (int i = 0; i < mObjs.size(); ++i)
+	for (int i = 0; i < m_pObjs.size(); ++i)
 	{
-		mObjs[i]->Update(gt);
+		m_pObjs[i]->Update(gt);
 	}
 }
 
 void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	for (int i = 0; i < mShaders.size(); ++i)
+	for (int i = 0; i < m_pShaders.size(); ++i)
 	{
-		mShaders[i]->OnPrepareRender(pd3dCommandList);
-		pd3dCommandList->SetGraphicsRootConstantBufferView(1, mPassCB->Resource()->GetGPUVirtualAddress());
+		m_pShaders[i]->OnPrepareRender(pd3dCommandList);
+		pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
 
-		mShaders[i]->Render(gt, pd3dCommandList);
+		m_pShaders[i]->Render(gt, pd3dCommandList);
 	}
 
-	for (int i = 0; i < mObjs.size(); ++i)
+	for (int i = 0; i < m_pObjs.size(); ++i)
 	{
-		mObjs[i]->PrepareRender(gt, pd3dCommandList);
-		mObjs[i]->Render(gt, pd3dCommandList);
+		m_pObjs[i]->PrepareRender(gt, pd3dCommandList);
+		m_pObjs[i]->Render(gt, pd3dCommandList);
 	}
 }
 
 void Scene::OnWinKeyboardInput(WPARAM wParam)
 {
-	for (int i = 0; i < mShaders.size(); ++i)
-		mShaders[i]->OnWinKeyboardInput(wParam);
+	for (int i = 0; i < m_pShaders.size(); ++i)
+		m_pShaders[i]->OnWinKeyboardInput(wParam);
 
 	float delta = 1.0f;
 
 	if (wParam == 'W')
 	{
-		mCamera->Walk(delta);
+		m_pCamera->Walk(delta);
 	}
 
 	if (wParam == 'S')
 	{
-		mCamera->Walk(-delta);
+		m_pCamera->Walk(-delta);
 	}
 
 	if (wParam == 'A')
 	{
-		mCamera->Strafe(-delta);
+		m_pCamera->Strafe(-delta);
 	}
 
 	if (wParam == 'D')
 	{
-		mCamera->Strafe(delta);
+		m_pCamera->Strafe(delta);
 	}
 }
 
 void Scene::OnMouseDown(WPARAM btnState, int x, int y)
 {
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
+	m_LastMousePos.x = x;
+	m_LastMousePos.y = y;
 }
 
 void Scene::OnMouseUp(WPARAM btnState, int x, int y)
@@ -136,17 +136,17 @@ void Scene::OnMouseMove(WPARAM btnState, int x, int y)
 {
 	if ((btnState & MK_LBUTTON) != 0)
 	{
-		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
+		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - m_LastMousePos.x));
+		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - m_LastMousePos.y));
 
-		mObjs[0]->SetPitch(mObjs[0]->GetPitch() - dy);
-		mObjs[1]->SetYaw(mObjs[1]->GetYaw() - dx);
+		m_pObjs[0]->SetPitch(m_pObjs[0]->GetPitch() - dy);
+		m_pObjs[1]->SetYaw(m_pObjs[1]->GetYaw() - dx);
 	}
 	else if ((btnState & MK_RBUTTON) != 0)
 	{
 
 	}
 
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
+	m_LastMousePos.x = x;
+	m_LastMousePos.y = y;
 }

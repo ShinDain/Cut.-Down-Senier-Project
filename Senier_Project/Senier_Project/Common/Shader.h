@@ -38,14 +38,14 @@ public:
 	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 2> GetStaticSampler();
 
 protected:
-	ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
+	ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
 
-	ComPtr<ID3DBlob> mvsByteCode = nullptr;
-	ComPtr<ID3DBlob> mpsByteCode = nullptr;
+	ComPtr<ID3DBlob> m_vsByteCode = nullptr;
+	ComPtr<ID3DBlob> m_psByteCode = nullptr;
 
-	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
+	std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputLayout;
 
-	ComPtr<ID3D12PipelineState> mPSO = nullptr;
+	ComPtr<ID3D12PipelineState> m_PSO = nullptr;
 };
 
 
