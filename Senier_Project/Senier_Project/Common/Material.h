@@ -26,13 +26,12 @@ public:
 	virtual bool BuildDescriptorHeap(ID3D12Device* pd3dDevice);
 
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void LoadMaterialFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
 	virtual void LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
 
 	void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::wstring texFileName);
 
 protected:
-	std::vector<std::unique_ptr<Texture>> m_pTextures;
+	std::vector<std::unique_ptr<Texture>> m_ppTextures;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
 
 	std::unique_ptr<UploadBuffer<tmpMatConstant>> m_pMatCB = nullptr;

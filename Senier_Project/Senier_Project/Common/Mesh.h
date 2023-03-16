@@ -14,9 +14,6 @@ public:
 	virtual ~Mesh();
 
 protected:
-
-	char m_Name[64];
-	
 	D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 	Microsoft::WRL::ComPtr<ID3DBlob> m_VertexBufferCPU = nullptr;
@@ -27,15 +24,6 @@ protected:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_VertexBufferUploader = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_IndexBufferUploader = nullptr;
-
-	UINT m_VertexByteStride = 0;
-	UINT m_VertexBufferByteSize = 0;
-	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R16_UINT;
-	UINT m_IndexBufferByteSize = 0;
-
-	std::vector<SubmeshGeometry> m_DrawArgs;
-
-	int m_nVertices = 0;
 
 public:
 
@@ -53,7 +41,32 @@ public:
 
 	void DisposeUploaders();
 
-	int GetVertexCnt() { return m_nVertices; }
+protected:
+	char m_Name[64];
+
+	UINT m_VertexByteStride = 0;
+	UINT m_VertexBufferByteSize = 0;
+	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R16_UINT;
+	UINT m_IndexBufferByteSize = 0;
+
+	std::vector<SubmeshGeometry> m_DrawArgs;
+
+	int m_nVertices = 0;
+
+public:
+	void SetMeshName(const char* str)						{ strcpy_s(m_Name, str); }
+	void SetVertexByteStride(UINT vertexByteStride)			{ m_VertexByteStride = vertexByteStride; }
+	void SetVertexBufferByteSize(UINT vertexBufferByteSize) { m_VertexBufferByteSize = vertexBufferByteSize; }
+	void SetIndexFormat(DXGI_FORMAT indexFormat)			{ m_IndexFormat = indexFormat; }
+	void SetIndexBufferByteSize(UINT indexBufferByteSize)	{ m_IndexBufferByteSize = indexBufferByteSize; }
+	void SetVertexCnt(int nVertices)						{ m_nVertices = nVertices; }
+
+	const char* GetMeshName()				{ return m_Name; }
+	const UINT GetVertexByteStride()		{ return m_VertexByteStride; }
+	const UINT GetVertexBufferByteSize()	{ return m_VertexBufferByteSize; }
+	const DXGI_FORMAT GetIndexFormat()		{ return m_IndexFormat; }
+	const UINT GetIndexBufferByteSize()		{ return m_IndexBufferByteSize; }
+	const int GetVertexCnt()				{ return m_nVertices; }
 
 };
 

@@ -33,7 +33,8 @@ public:
 
 	std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, char* pstrFileName);
 	std::shared_ptr<Object> LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
-	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommnadList, FILE* pInFile);
+	void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
+	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
 	void LoadAnimationFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
 
 
@@ -47,7 +48,9 @@ protected:
 
 
 	std::shared_ptr<Mesh> m_pMesh = nullptr;
-	std::shared_ptr<Material> m_pMaterial = nullptr;
+
+	int m_nMaterial = 0;
+	std::vector<std::shared_ptr<Material>> m_ppMaterials;
 
 public:
 	void SetChild(std::shared_ptr<Object> pChild);
@@ -102,12 +105,12 @@ public:
 	const XMFLOAT3& GetLookVector() { return(m_xmf3Look); }
 	const XMFLOAT3& GetUpVector() { return(m_xmf3Up); }
 	const XMFLOAT3& GetRightVector() { return(m_xmf3Right); }
-	const XMFLOAT3& GetVelocity() const { return(m_xmf3Velocity); }
-	const float& GetYaw() const { return(m_Yaw); }
-	const float& GetPitch() const { return(m_Pitch); }
-	const float& GetRoll() const { return(m_Roll); }
-	const XMFLOAT4X4& GetWorld() const { return m_xmf4x4World; }
-	const XMFLOAT4X4& GetParentWorld() const { return m_xmf4x4ParentWorld; }
+	const XMFLOAT3& GetVelocity() { return(m_xmf3Velocity); }
+	const float& GetYaw() { return(m_Yaw); }
+	const float& GetPitch() { return(m_Pitch); }
+	const float& GetRoll() { return(m_Roll); }
+	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
+	const XMFLOAT4X4& GetParentWorld() { return m_xmf4x4ParentWorld; }
 
 };
 

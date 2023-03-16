@@ -34,13 +34,13 @@ public:
 	// virtual void CreateRtvAndDsvDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 private:
-	std::vector<std::unique_ptr<Shader>> m_pShaders;
+	std::vector<std::unique_ptr<Shader>> m_ppShaders;
 	std::unique_ptr<UploadBuffer<tmpPassConstant>> m_pPassCB = nullptr;
 
 	XMFLOAT4X4 m_xmf4x4ViewProj = MathHelper::identity4x4();
 
 
-	std::vector<std::shared_ptr<Object>> m_pObjs;
+	std::vector<std::shared_ptr<Object>> m_ppObjs;
 	std::unique_ptr<Camera> m_pCamera = nullptr;
 
 	POINT m_LastMousePos = { 0,0 };

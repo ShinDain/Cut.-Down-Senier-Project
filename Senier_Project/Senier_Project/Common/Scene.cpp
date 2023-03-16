@@ -15,25 +15,25 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	std::unique_ptr<Shader> defaultShader = std::make_unique<Shader>();
 	if (!defaultShader->Initialize(pd3dDevice, pd3dCommandList, NULL))
 		return false;
-	m_pShaders.push_back(move(defaultShader));
+	m_ppShaders.push_back(move(defaultShader));
 
 	std::shared_ptr<Object> tmpObj = std::make_shared<Object>();
 	if (!tmpObj->Initialize(pd3dDevice, pd3dCommandList, NULL))
 		return false;
 
-	m_pObjs.emplace_back(std::make_shared<Object>());
-	m_pObjs.emplace_back(std::make_shared<Object>());
+	m_ppObjs.emplace_back(std::make_shared<Object>());
+	m_ppObjs.emplace_back(std::make_shared<Object>());
 	
-	for (int i = 0; i < m_pObjs.size(); ++i)
+	for (int i = 0; i < m_ppObjs.size(); ++i)
 	{
-		m_pObjs[i]->BuildConstantBuffers(pd3dDevice);
+		m_ppObjs[i]->BuildConstantBuffers(pd3dDevice);
 	}
 
-	m_pObjs[0]->SetChild(tmpObj);
-	m_pObjs[1]->SetChild(tmpObj);
+	m_ppObjs[0]->SetChild(tmpObj);
+	m_ppObjs[1]->SetChild(tmpObj);
 
-	m_pObjs[0]->SetPosition(XMFLOAT3(-10.f, 0.0f, 0.0f));
-	m_pObjs[1]->SetPosition(XMFLOAT3(10.f, 0.0f, 0.0f));
+	m_ppObjs[0]->SetPosition(XMFLOAT3(-10.f, 0.0f, 0.0f));
+	m_ppObjs[1]->SetPosition(XMFLOAT3(10.f, 0.0f, 0.0f));
 
 	m_pCamera = std::make_unique<Camera>();
 	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -100.f));
@@ -51,9 +51,9 @@ void Scene::OnResize(float aspectRatio)
 
 void Scene::Update(const GameTimer& gt)
 {
-	for (int i = 0; i < m_pShaders.size(); ++i)
+	for (int i = 0; i < m_ppShaders.size(); ++i)
 	{
-		m_pShaders[i]->Update(gt);
+		m_ppShaders[i]->Update(gt);
 	}
 
 	
@@ -71,33 +71,33 @@ void Scene::Update(const GameTimer& gt)
 	XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
 	m_pPassCB->CopyData(0, passConstant);
 
-	for (int i = 0; i < m_pObjs.size(); ++i)
+	for (int i = 0; i < m_ppObjs.size(); ++i)
 	{
-		m_pObjs[i]->Update(gt);
+		m_ppObjs[i]->Update(gt);
 	}
 }
 
 void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	for (int i = 0; i < m_pShaders.size(); ++i)
+	for (int i = 0; i < m_ppShaders.size(); ++i)
 	{
-		m_pShaders[i]->OnPrepareRender(pd3dCommandList);
+		m_ppShaders[i]->OnPrepareRender(pd3dCommandList);
 		pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
 
-		m_pShaders[i]->Render(gt, pd3dCommandList);
+		m_ppShaders[i]->Render(gt, pd3dCommandList);
 	}
 
-	for (int i = 0; i < m_pObjs.size(); ++i)
+	for (int i = 0; i < m_ppObjs.size(); ++i)
 	{
-		m_pObjs[i]->PrepareRender(gt, pd3dCommandList);
-		m_pObjs[i]->Render(gt, pd3dCommandList);
+		m_ppObjs[i]->PrepareRender(gt, pd3dCommandList);
+		m_ppObjs[i]->Render(gt, pd3dCommandList);
 	}
 }
 
 void Scene::OnWinKeyboardInput(WPARAM wParam)
 {
-	for (int i = 0; i < m_pShaders.size(); ++i)
-		m_pShaders[i]->OnWinKeyboardInput(wParam);
+	for (int i = 0; i < m_ppShaders.size(); ++i)
+		m_ppShaders[i]->OnWinKeyboardInput(wParam);
 
 	float delta = 1.0f;
 
@@ -139,8 +139,8 @@ void Scene::OnMouseMove(WPARAM btnState, int x, int y)
 		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - m_LastMousePos.x));
 		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - m_LastMousePos.y));
 
-		m_pObjs[0]->SetPitch(m_pObjs[0]->GetPitch() - dy);
-		m_pObjs[1]->SetYaw(m_pObjs[1]->GetYaw() - dx);
+		m_ppObjs[0]->SetPitch(m_ppObjs[0]->GetPitch() - dy);
+		m_ppObjs[1]->SetYaw(m_ppObjs[1]->GetYaw() - dx);
 	}
 	else if ((btnState & MK_RBUTTON) != 0)
 	{

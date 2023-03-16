@@ -10,13 +10,13 @@ Material::~Material()
 
 bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 {
-	if (m_pTextures.size() < 1)
+	if (m_ppTextures.size() < 1)
 		return false;
 
 	//mMatCB = std::make_unique<UploadBuffer<tmpMatConstant>>(pd3dDevice, 1, true);
 
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = m_pTextures.size();
+	srvHeapDesc.NumDescriptors = m_ppTextures.size();
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	ThrowIfFailed(pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_DescriptorHeap)));
@@ -24,9 +24,9 @@ bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 	UINT CbvSrvUavDescriptorSize = pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	for (size_t i = 0; i < m_pTextures.size(); ++i)
+	for (size_t i = 0; i < m_ppTextures.size(); ++i)
 	{
-		auto tex = m_pTextures[i]->Resource;
+		auto tex = m_ppTextures[i]->Resource;
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -72,110 +72,7 @@ void Material::LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 		texMap->FileName.c_str(),
 		texMap->Resource, texMap->UploadHeap));
 
-	m_pTextures.emplace_back(std::move(texMap));
-}
-
-void Material::LoadMaterialFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)
-{
-	char pstrToken[64] = { '\0' };
-
-	int nMaterial = 0;
-	BYTE nStrLength = 0;
-
-	UINT nReads;
-
-	for (; ; )
-	{
-		nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pInFile);
-		nReads = (UINT)::fread(pstrToken, sizeof(char), nStrLength, pInFile);
-		pstrToken[nStrLength] = '\0';
-
-		if (!strcmp(pstrToken, "<Material>:"))
-		{
-			nReads = (UINT)::fread(&nMaterial, sizeof(int), 1, pInFile);
-			break;
-		}
-		else if (!strcmp(pstrToken, "<AlbedoColor>:"))
-		{
-			XMFLOAT4 tmp;
-			nReads = (UINT)::fread(&tmp, sizeof(float), 4, pInFile);
-			m_xmf4AlbedoColor = tmp;
-		}
-		else if (!strcmp(pstrToken, "<EmissiveColor>:"))
-		{
-			XMFLOAT4 tmp;
-			nReads = (UINT)::fread(&tmp, sizeof(float), 4, pInFile);
-			m_xmf4EmissiveColor = tmp;
-		}
-		else if (!strcmp(pstrToken, "<SpecularColor>:"))
-		{
-			XMFLOAT4 tmp;
-			nReads = (UINT)::fread(&tmp, sizeof(float), 4, pInFile);
-			m_xmf4SpecularColor = tmp;
-		}
-		else if (!strcmp(pstrToken, "<Glossiness>:"))
-		{
-			float tmp;
-			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			m_Glossiness = tmp;
-		}
-		else if (!strcmp(pstrToken, "<Smoothness>:"))
-		{
-			float tmp;
-			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			m_Smoothness = tmp;
-		}
-		else if (!strcmp(pstrToken, "<Metallic>:"))
-		{
-			float tmp;
-			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			m_Metallic = tmp;
-		}
-		else if (!strcmp(pstrToken, "<SpecularHighlight>:"))
-		{
-			float tmp;
-			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			m_SpecularHighlight = tmp;
-		}
-		else if (!strcmp(pstrToken, "<GlossyReflection>:"))
-		{
-			float tmp;
-			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			m_GlossyReflection = tmp;
-		}
-		else if (!strcmp(pstrToken, "<AlbedoMap>:"))
-		{
-			LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
-		}
-		else if (!strcmp(pstrToken, "<SpecularMap>:"))
-		{
-			LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
-		}
-		else if (!strcmp(pstrToken, "<NormalMap>:"))
-		{
-			LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
-		}
-		else if (!strcmp(pstrToken, "<MetallicMap>:"))
-		{
-			LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
-		}
-		else if (!strcmp(pstrToken, "<EmissionMap>:"))
-		{
-			LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
-		}
-		else if (!strcmp(pstrToken, "<DetailAlbedoMap>:"))
-		{
-			LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
-		}
-		else if (!strcmp(pstrToken, "<DetailNormalMap>:"))
-		{
-			LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
-		}
-		else if (!strcmp(pstrToken, "</Materials>"))
-		{
-			break;
-		}
-	}
+	m_ppTextures.emplace_back(std::move(texMap));
 }
 
 void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)
