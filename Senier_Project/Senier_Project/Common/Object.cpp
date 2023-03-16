@@ -12,13 +12,13 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 {
 	BuildConstantBuffers(pd3dDevice);
 
-	mMesh = std::make_unique<Mesh>();
+	mMesh = std::make_shared<Mesh>();
 	if (mMesh == nullptr)
 		return false;
 	else 
 		mMesh->BuildMesh(pd3dDevice, pd3dCommandList);
 
-	mMaterial = std::make_unique<Material>();
+	mMaterial = std::make_shared<Material>();
 	if (mMaterial == nullptr)
 		return false;
 	else
@@ -32,7 +32,6 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 void Object::Update(const GameTimer& gt)
 {
-
 	mWorld._41 = mPosition.x;
 	mWorld._42 = mPosition.y;
 	mWorld._43 = mPosition.z;
@@ -42,18 +41,32 @@ void Object::Update(const GameTimer& gt)
 
 	tmpObjConstant objConstant;
 	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(world));
-	mObjectCB->CopyData(0, objConstant);
+	if(mObjectCB) mObjectCB->CopyData(0, objConstant);
 
+	if (mpSibling) mpSibling->Update(gt);
+	if (mpChild) {
+		mpChild->SetParentWorld(mWorld);
+		mpChild->Update(gt);
+	}
+}
+
+void Object::PrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	if (mObjectCB) pd3dCommandList->SetGraphicsRootConstantBufferView(0, mObjectCB->Resource()->GetGPUVirtualAddress());
 }
 
 void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	pd3dCommandList->SetGraphicsRootConstantBufferView(0, mObjectCB->Resource()->GetGPUVirtualAddress());
+	if(mMaterial) mMaterial->OnPrepareRender(pd3dCommandList);
 
-	mMaterial->OnPrepareRender(pd3dCommandList);
+	if (mMesh)
+	{
+		mMesh->OnprepareRender(gt, pd3dCommandList);
+		mMesh->Render(gt, pd3dCommandList);
+	}
 
-	mMesh->OnprepareRender(gt, pd3dCommandList);
-	mMesh->Render(gt, pd3dCommandList);
+	if (mpSibling) mpSibling->Render(gt, pd3dCommandList);
+	if (mpChild) mpChild->Render(gt, pd3dCommandList);
 }
 
 void Object::BuildConstantBuffers(ID3D12Device* pd3dDevice)
@@ -62,14 +75,9 @@ void Object::BuildConstantBuffers(ID3D12Device* pd3dDevice)
 	mObjCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(tmpObjConstant));
 }
 
-void Object::SetChild(Object* pChild)
+void Object::SetChild(std::shared_ptr<Object> pChild)
 {
-	if (pChild)
-	{
-		pChild->mpParent = this;
-		
-	}
-	if (mpChild)
+	if (mpChild != NULL)
 	{
 		if (pChild) pChild->mpSibling = mpChild->mpSibling;
 		mpChild->mpSibling = pChild;
@@ -80,10 +88,10 @@ void Object::SetChild(Object* pChild)
 	}
 }
 
-void Object::SetMesh(std::unique_ptr<Mesh> pMesh)
+void Object::SetMesh(std::shared_ptr<Mesh> pMesh)
 {
 }
 
-void Object::SetMaterial(std::unique_ptr<Material> pMesh)
+void Object::SetMaterial(std::shared_ptr<Material> pMesh)
 {
 }

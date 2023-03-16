@@ -14,24 +14,6 @@
 
 using namespace DirectX;
 
-class ModelDataInfo
-{
-public:
-	ModelDataInfo() {}
-	~ModelDataInfo();
-
-	Object* mpRootObject = nullptr;
-
-	int mnSkinMeshes = 0;
-	//SkinMesh* mpSkinMeshes = nullptr;
-
-	AnimationSets* mpAnimationSets = nullptr;
-
-public:
-	void PrepareSkinning();
-
-};
-
 class Object
 {
 public:
@@ -44,6 +26,7 @@ public:
 
 	virtual void OnResize(float aspectRatio) {}
 	virtual void Update(const GameTimer& gt);
+	virtual void PrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void BuildConstantBuffers(ID3D12Device* pd3dDevice);
@@ -51,24 +34,24 @@ public:
 protected:
 	char mFrameName[64];
 
-	Object* mpParent = nullptr;
-	Object* mpChild = nullptr;
-	Object* mpSibling = nullptr;
+	std::shared_ptr<Object> mpChild = NULL;
+	std::shared_ptr<Object> mpSibling = NULL;
 
 	std::unique_ptr<UploadBuffer<tmpObjConstant>> mObjectCB = nullptr;
 
-	std::unique_ptr<Mesh> mMesh = nullptr;
-	std::unique_ptr<Material> mMaterial = nullptr;
+	std::shared_ptr<Mesh> mMesh = nullptr;
+	std::shared_ptr<Material> mMaterial = nullptr;
 
 public:
-	void SetChild(Object* pChild);
-	void SetMesh(std::unique_ptr<Mesh> pMesh);
-	void SetMaterial(std::unique_ptr<Material> pMesh);
+	void SetChild(std::shared_ptr<Object> pChild);
+	void SetMesh(std::shared_ptr<Mesh> pMesh);
+	void SetMaterial(std::shared_ptr<Material> pMesh);
 
 
 protected:
 	UINT mObjCBByteSize = 0;
 	XMFLOAT4X4 mWorld = MathHelper::identity4x4();
+	XMFLOAT4X4 mParentWorld = MathHelper::identity4x4();
 
 	XMFLOAT3 mPosition = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 mRight = XMFLOAT3(1.0f, 0.0f, 0.0f);
@@ -89,6 +72,8 @@ protected:
 	float mFriction = 0.0f;
 
 public:
+	void SetParentWorld(XMFLOAT4X4 ParentWorld) { mParentWorld = ParentWorld; }
+
 	void SetPosition(float x, float y, float z) { mPosition = XMFLOAT3(x, y, z); }
 	void SetPosition(XMFLOAT3 Position) { mPosition = Position; }
 	void SetScale(XMFLOAT3 Scale) { mScale = Scale; }
@@ -111,6 +96,7 @@ public:
 	const float& GetPitch() const { return(mPitch); }
 	const float& GetRoll() const { return(mRoll); }
 	const XMFLOAT4X4& GetWorld() const { return mWorld; }
+	const XMFLOAT4X4& GetParentWorld() const { return mParentWorld; }
 
 };
 

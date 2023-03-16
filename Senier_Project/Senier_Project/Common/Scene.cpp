@@ -17,9 +17,23 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 		return false;
 	mShaders.push_back(move(defaultShader));
 
-	mObj = std::make_unique<Object>();
-	if (!mObj->Initialize(pd3dDevice, pd3dCommandList, NULL))
+	std::shared_ptr<Object> tmpObj = std::make_shared<Object>();
+	if (!tmpObj->Initialize(pd3dDevice, pd3dCommandList, NULL))
 		return false;
+
+	mObjs.emplace_back(std::make_shared<Object>());
+	mObjs.emplace_back(std::make_shared<Object>());
+	
+	for (int i = 0; i < mObjs.size(); ++i)
+	{
+		mObjs[i]->BuildConstantBuffers(pd3dDevice);
+	}
+
+	mObjs[0]->SetChild(tmpObj);
+	mObjs[1]->SetChild(tmpObj);
+
+	mObjs[0]->SetPosition(XMFLOAT3(-10.f, 0.0f, 0.0f));
+	mObjs[1]->SetPosition(XMFLOAT3(10.f, 0.0f, 0.0f));
 
 	mCamera = std::make_unique<Camera>();
 	mCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -100.f));
@@ -57,7 +71,10 @@ void Scene::Update(const GameTimer& gt)
 	XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
 	mPassCB->CopyData(0, passConstant);
 
-	mObj->Update(gt);
+	for (int i = 0; i < mObjs.size(); ++i)
+	{
+		mObjs[i]->Update(gt);
+	}
 }
 
 void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -70,8 +87,11 @@ void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandLi
 		mShaders[i]->Render(gt, pd3dCommandList);
 	}
 
-	mObj->Render(gt, pd3dCommandList);
-
+	for (int i = 0; i < mObjs.size(); ++i)
+	{
+		mObjs[i]->PrepareRender(gt, pd3dCommandList);
+		mObjs[i]->Render(gt, pd3dCommandList);
+	}
 }
 
 void Scene::OnWinKeyboardInput(WPARAM wParam)
@@ -119,8 +139,8 @@ void Scene::OnMouseMove(WPARAM btnState, int x, int y)
 		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
 		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
 
-		mObj->SetPitch(mObj->GetPitch() - dy);
-		mObj->SetYaw(mObj->GetYaw() - dx);
+		mObjs[0]->SetPitch(mObjs[0]->GetPitch() - dy);
+		mObjs[1]->SetYaw(mObjs[1]->GetYaw() - dx);
 	}
 	else if ((btnState & MK_RBUTTON) != 0)
 	{

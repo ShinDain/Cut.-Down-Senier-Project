@@ -40,7 +40,7 @@ private:
 	XMFLOAT4X4 mViewProj = MathHelper::identity4x4();
 
 
-	std::unique_ptr<Object> mObj = nullptr;
+	std::vector<std::shared_ptr<Object>> mObjs;
 	std::unique_ptr<Camera> mCamera = nullptr;
 
 	POINT mLastMousePos = { 0,0 };
