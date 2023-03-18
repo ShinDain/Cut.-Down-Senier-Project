@@ -129,5 +129,4 @@ void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		}*/
 	}
 
-
 }

@@ -6,12 +6,6 @@
 #include "MathHelper.h"
 #include "UploadBuffer.h"
 
-struct Vertex
-{
-	DirectX::XMFLOAT3 Pos;
-	DirectX::XMFLOAT2 TexC;
-};
-
 struct tmpObjConstant
 {
 	DirectX::XMFLOAT4X4 World = MathHelper::identity4x4();

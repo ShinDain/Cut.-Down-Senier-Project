@@ -17,9 +17,13 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 		return false;
 	m_ppShaders.push_back(move(defaultShader));
 
-	std::shared_ptr<Object> tmpObj = std::make_shared<Object>();
-	if (!tmpObj->Initialize(pd3dDevice, pd3dCommandList, NULL))
-		return false;
+	char strFileName[64] = "Model/Mi24.bin";
+
+	std::shared_ptr<Object> tmpObj; 
+	tmpObj = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName);
+	// = std::make_shared<Object>();
+	/*if (!tmpObj->Initialize(pd3dDevice, pd3dCommandList, NULL))
+		return false;*/
 
 	m_ppObjs.emplace_back(std::make_shared<Object>());
 	m_ppObjs.emplace_back(std::make_shared<Object>());
@@ -28,7 +32,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	{
 		m_ppObjs[i]->BuildConstantBuffers(pd3dDevice);
 	}
-
+	
 	m_ppObjs[0]->SetChild(tmpObj);
 	m_ppObjs[1]->SetChild(tmpObj);
 

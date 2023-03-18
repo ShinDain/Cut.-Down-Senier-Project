@@ -87,9 +87,17 @@ void Object::BuildConstantBuffers(ID3D12Device* pd3dDevice)
 
 
 
-std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)
+std::shared_ptr<Object> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)
 {
-	return nullptr;
+	FILE* pInFile = NULL;
+	::fopen_s(&pInFile, pstrFileName, "rb");
+	::rewind(pInFile);
+
+	std::shared_ptr<Object> pObject;
+
+	pObject = Object::LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile);
+	
+	return pObject;
 }
 
 std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)
@@ -99,7 +107,8 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 
 	int nFrame = 0, nTextures = 0;
 
-	std::shared_ptr<Object> pObject;
+	std::shared_ptr<Object> pObject = std::make_shared<Object>();
+	pObject->BuildConstantBuffers(pd3dDevice);
 
 	for (; ; )
 	{
@@ -110,25 +119,30 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 			nFrame = ReadintegerFromFile(pInFile);
 			nTextures = ReadintegerFromFile(pInFile);
 
-			ReadStringFromFile(pInFile, pObject->m_FrameName);
+			char tmpstr[64] = { '\0' };
+			ReadStringFromFile(pInFile, tmpstr);
+			
+			strcpy_s(pObject->m_FrameName, tmpstr);
+			pObject->SetName(tmpstr);
 		}
 		else if (!strcmp(pstrToken, "<Transform>:"))
 		{
-			XMFLOAT3 position, rotation, scale;
-			XMFLOAT4 quaternion;
-
-			nReads = (UINT)fread(&position, sizeof(float), 3, pInFile);
-			nReads = (UINT)fread(&rotation, sizeof(float), 3, pInFile);
-			nReads = (UINT)fread(&scale, sizeof(float), 3, pInFile);
-			nReads = (UINT)fread(&quaternion, sizeof(float), 4, pInFile);
+			nReads = (UINT)fread(&pObject->m_xmf3Position, sizeof(float), 3, pInFile);
+			nReads = (UINT)fread(&pObject->m_Pitch, sizeof(float), 1, pInFile);
+			nReads = (UINT)fread(&pObject->m_Yaw, sizeof(float), 1, pInFile);
+			nReads = (UINT)fread(&pObject->m_Roll, sizeof(float), 1, pInFile);
+			nReads = (UINT)fread(&pObject->m_xmf3Scale, sizeof(float), 3, pInFile);
+			nReads = (UINT)fread(&pObject->m_xmf4Quaternion, sizeof(float), 4, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<TransformMatrix>:"))
 		{
-			nReads = (UINT)fread(&pObject->m_xmf4x4LocalTransform, sizeof(float), 16, pInFile);
+			nReads = (UINT)fread(&pObject->m_xmf4x4LocalTransform, sizeof(XMFLOAT4X4), 1, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<Mesh>:"))
 		{
-			pObject->LoadMeshFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			std::shared_ptr<Mesh> pMesh = std::make_shared<Mesh>();
+			pMesh->LoadMeshFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			pObject->SetMesh(pMesh);
 		}
 		else if (!strcmp(pstrToken, "<SkinningInfo>:"))
 		{
@@ -166,7 +180,7 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 			}
 
 		}
-		else if (!strcmp(pstrToken, "</Frame>:"))
+		else if (!strcmp(pstrToken, "</Frame>"))
 		{
 			break;
 		}
@@ -175,82 +189,22 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 	return pObject;
 }
 
-void Object::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommnadList, FILE* pInFile)
-{
-	char pstrToken[64] = { '\0' };
-	
-	UINT nReads;
-
-	std::shared_ptr<Mesh> pMesh = std::make_shared<Mesh>();
-
-	int nVertices = 0;
-
-	nVertices = ReadintegerFromFile(pInFile);
-	nReads = ReadStringFromFile(pInFile, pstrToken);
-	pMesh->SetMeshName(pstrToken);
-
-	std::vector<Vertex> vertices;
-	std::vector<std::uint32_t> indices;
-	vertices.resize(nVertices);
-	indices.resize(nVertices);
-
-	for (; ; )
-	{
-		nReads = ReadStringFromFile(pInFile, pstrToken);
-
-		if (!strcmp(pstrToken, "<Bounds>:"))
-		{
-
-		}
-		else if (!strcmp(pstrToken, "<Position>:"))
-		{
-
-		}
-		else if (!strcmp(pstrToken, "<Colors>:"))
-		{
-
-		}
-		else if (!strcmp(pstrToken, "<TextureCoords0>:"))
-		{
-
-		}
-		else if (!strcmp(pstrToken, "<TextureCoords1>:"))
-		{
-
-		}
-		else if (!strcmp(pstrToken, "<Normals>:"))
-		{
-
-		}
-		else if (!strcmp(pstrToken, "<Tangents>:"))
-		{
-
-		}
-		else if (!strcmp(pstrToken, "<BiTangents>:"))
-		{
-
-		}
-		else if (!strcmp(pstrToken, "<SubMeshes>:"))
-		{
-
-		}
-		else if (!strcmp(pstrToken, "</Mesh>:"))
-		{
-			break;
-		}
-	}
-
-}
-
 void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)
 {
 	char pstrToken[64] = { '\0' };
 
 	int nMaterial = 0;
+	int nMatcnt = 0;
 
 	UINT nReads;
+	nMaterial = ReadintegerFromFile(pInFile);
 
-	std::shared_ptr<Material> pMat = std::make_shared<Material>();
+	std::vector<std::shared_ptr<Material>> ppMat;
+
+	for (int i = 0; i < nMaterial; ++i)
+	{
+		ppMat.emplace_back(std::make_shared<Material>());
+	}
 
 	for (; ; )
 	{
@@ -258,84 +212,83 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 		if (!strcmp(pstrToken, "<Material>:"))
 		{
-			nReads = (UINT)::fread(&nMaterial, sizeof(int), 1, pInFile);
-			break;
+			nMatcnt = ReadintegerFromFile(pInFile);
 		}
 		else if (!strcmp(pstrToken, "<AlbedoColor>:"))
 		{
 			XMFLOAT4 tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 4, pInFile);
-			pMat->SetAlbedoColor(tmp);
+			ppMat[nMatcnt]->SetAlbedoColor(tmp);
 		}
 		else if (!strcmp(pstrToken, "<EmissiveColor>:"))
 		{
 			XMFLOAT4 tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 4, pInFile);
-			pMat->SetEmissiveColor(tmp);
+			ppMat[nMatcnt]->SetEmissiveColor(tmp);
 		}
 		else if (!strcmp(pstrToken, "<SpecularColor>:"))
 		{
 			XMFLOAT4 tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 4, pInFile);
-			pMat->SetSpecularColor(tmp);
+			ppMat[nMatcnt]->SetSpecularColor(tmp);
 		}
 		else if (!strcmp(pstrToken, "<Glossiness>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			pMat->SetGlossiness(tmp);
+			ppMat[nMatcnt]->SetGlossiness(tmp);
 		}
 		else if (!strcmp(pstrToken, "<Smoothness>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			pMat->SetSmoothness(tmp);
+			ppMat[nMatcnt]->SetSmoothness(tmp);
 		}
 		else if (!strcmp(pstrToken, "<Metallic>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			pMat->SetMetallic(tmp);
+			ppMat[nMatcnt]->SetMetallic(tmp);
 		}
 		else if (!strcmp(pstrToken, "<SpecularHighlight>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			pMat->SetMetallic(tmp);
+			ppMat[nMatcnt]->SetMetallic(tmp);
 		}
 		else if (!strcmp(pstrToken, "<GlossyReflection>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			pMat->SetGlossyReflection(tmp);
+			ppMat[nMatcnt]->SetGlossyReflection(tmp);
 		}
 		else if (!strcmp(pstrToken, "<AlbedoMap>:"))
 		{
-			pMat->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			ppMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<SpecularMap>:"))
 		{
-			pMat->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			ppMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<NormalMap>:"))
 		{
-			pMat->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			ppMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<MetallicMap>:"))
 		{
-			pMat->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			ppMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<EmissionMap>:"))
 		{
-			pMat->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			ppMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<DetailAlbedoMap>:"))
 		{
-			pMat->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			ppMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<DetailNormalMap>:"))
 		{
-			pMat->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			ppMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
 		}
 		else if (!strcmp(pstrToken, "</Materials>"))
 		{
@@ -343,7 +296,10 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		}
 	}
 
-	SetMaterial(pMat);
+	for (int i = 0; i < ppMat.size(); ++i)
+		ppMat[i]->BuildDescriptorHeap(pd3dDevice);
+
+	SetMaterials(ppMat);
 }
 
 void Object::LoadAnimationFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)
@@ -370,7 +326,7 @@ void Object::SetMesh(std::shared_ptr<Mesh> pMesh)
 	m_pMesh = pMesh;
 }
 
-void Object::SetMaterial(std::shared_ptr<Material> pMaterial)
+void Object::SetMaterials(std::vector<std::shared_ptr<Material>> ppMaterial)
 {
-	m_ppMaterials.emplace_back(pMaterial);
+	m_ppMaterials = ppMaterial;
 }

@@ -31,9 +31,8 @@ public:
 
 	virtual void BuildConstantBuffers(ID3D12Device* pd3dDevice);
 
-	std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, char* pstrFileName);
-	std::shared_ptr<Object> LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
-	void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
+	static std::shared_ptr<Object> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, char* pstrFileName);
+	static std::shared_ptr<Object> LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
 	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
 	void LoadAnimationFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
 
@@ -55,10 +54,7 @@ protected:
 public:
 	void SetChild(std::shared_ptr<Object> pChild);
 	void SetMesh(std::shared_ptr<Mesh> pMesh);
-	void SetMaterial(std::shared_ptr<Material> pMaterial);
-
-
-
+	void SetMaterials(std::vector<std::shared_ptr<Material>> ppMaterial);
 
 protected:
 	UINT m_ObjCBByteSize = 0;
@@ -72,6 +68,7 @@ protected:
 	XMFLOAT3 m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 	XMFLOAT3 m_xmf3Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	XMFLOAT4 m_xmf4Quaternion = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -88,6 +85,7 @@ public:
 	void SetParentWorld(XMFLOAT4X4 ParentWorld) { m_xmf4x4ParentWorld = ParentWorld; }
 	void SetLocalTransform(XMFLOAT4X4 LocalTransform) { m_xmf4x4LocalTransform = LocalTransform; }
 
+	void SetName(char* pstrName) { strcpy_s(m_FrameName, pstrName); }
 	void SetPosition(float x, float y, float z) { m_xmf3Position = XMFLOAT3(x, y, z); }
 	void SetPosition(XMFLOAT3 Position) { m_xmf3Position = Position; }
 	void SetScale(XMFLOAT3 Scale) { m_xmf3Scale = Scale; }
@@ -99,7 +97,9 @@ public:
 	void SetYaw(const float in) { m_Yaw = in; }
 	void SetPitch(const float in) { m_Pitch = in; }
 	void SetRoll(const float in) { m_Roll = in; }
+	void SetQuaternion(const XMFLOAT4& quaternion) { m_xmf4Quaternion = quaternion; }
 
+	const char* GetName() { return m_FrameName; }
 	const XMFLOAT3& GetPosition() { return(m_xmf3Position); }
 	const XMFLOAT3& GetScale() { return(m_xmf3Scale); }
 	const XMFLOAT3& GetLookVector() { return(m_xmf3Look); }
@@ -109,6 +109,8 @@ public:
 	const float& GetYaw() { return(m_Yaw); }
 	const float& GetPitch() { return(m_Pitch); }
 	const float& GetRoll() { return(m_Roll); }
+	const XMFLOAT4& SetQuaternion() { return m_xmf4Quaternion; }
+
 	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
 	const XMFLOAT4X4& GetParentWorld() { return m_xmf4x4ParentWorld; }
 

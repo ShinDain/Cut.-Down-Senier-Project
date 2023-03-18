@@ -26,9 +26,9 @@ public:
 	virtual bool BuildDescriptorHeap(ID3D12Device* pd3dDevice);
 
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
-
+	
 	void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::wstring texFileName);
+	void LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
 
 protected:
 	std::vector<std::unique_ptr<Texture>> m_ppTextures;
