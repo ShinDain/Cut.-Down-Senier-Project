@@ -7,6 +7,8 @@
 
 using namespace DirectX;
 
+class Object;
+
 class Mesh
 {
 public:
@@ -53,10 +55,11 @@ protected:
 	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R32_UINT;
 
 public:
-
 	void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
-	virtual void OnprepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList) {}
+
+	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
@@ -112,8 +115,55 @@ public:
 	const XMFLOAT3 GetAABBExtents()			{ return m_AABBExtents; }
 };
 
+#define SKINNED_ANIMATION_BONES 256
+
 class SkinnedMesh : public Mesh
 {
+public:
+	SkinnedMesh();
+	SkinnedMesh(const SkinnedMesh& rhs) = delete;
+	SkinnedMesh& operator=(const SkinnedMesh& rhs) = delete;
+	virtual ~SkinnedMesh();
 
+protected:
+	std::vector<XMINT4>			m_xmn4BoneIndices;
+	std::vector<XMFLOAT4>		m_xmf4BoneWeights;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_BoneIndexBufferGPU = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_BoneIndexBufferUploader = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW			   m_BoneIndexBufferView;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_BoneWeightBufferGPU = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_BoneWeightBufferUploader = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW			   m_BoneWeightBufferView;
+
+	std::vector<char[64]> m_strSkinningBoneNames;
+	std::vector<std::shared_ptr<Object>> m_SkinningBoneFrameCaches;
+
+	std::vector<XMFLOAT4X4> m_xmf4x4BindPoseBoneOffsets;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_BindPoseBoneOffsetResource = nullptr;
+	std::vector<XMFLOAT4X4> m_xmf4x4MappedBindPoseBoneOffset;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> m_SkinningBoneTransformResource = nullptr;
+	std::vector<XMFLOAT4X4> m_xmf4x4MappedSkinningBoneTransform;
+
+public:
+	void LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
+	void PrepareSkinning(Object* pModelRootObject);
+
+	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList) override;
+	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList) override;
+
+protected:
+	int m_nBonesPerVertex = 4;
+	int m_nSkinningBones = 0;
+
+public:
+	void SetBonesPerVertex(int nBonesPerVertex) { m_nBonesPerVertex = nBonesPerVertex; }
+	void SetSkinningBones(int nSkinningBones) { m_nSkinningBones = nSkinningBones; }
+
+	const int GetBonesPerVertex() { return m_nBonesPerVertex; }
+	const int GetSkinningBones() { return m_nSkinningBones; }
 };
 

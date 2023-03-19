@@ -15,7 +15,7 @@ void Mesh::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 {
     std::vector<XMFLOAT3> Positions;
     std::vector<XMFLOAT2> TexC0;
-    std::vector<std::uint16_t> Indices;
+    std::vector<std::uint32_t> Indices;
 
 	Positions.resize(24);
 	TexC0.resize(24);
@@ -120,7 +120,7 @@ void Mesh::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 
 	const UINT positionBufferByteSize = (UINT)Positions.size() * sizeof(XMFLOAT3);
 	const UINT texC0BufferByteSize = (UINT)TexC0.size() * sizeof(XMFLOAT2);
-	const UINT indexBufferByteSize = (UINT)Indices.size() * sizeof(std::uint_fast16_t);
+	const UINT indexBufferByteSize = (UINT)Indices.size() * sizeof(std::uint_fast32_t);
 
 	const char* tmpStr = "boxGeo";
 	SetMeshName(tmpStr);
@@ -149,7 +149,7 @@ void Mesh::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	m_DrawArgs.emplace_back(subMesh);
 }
 
-void Mesh::OnprepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
+void Mesh::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[2] = { m_PositionBufferView, m_TexC0BufferView };
     pd3dCommandList->IASetVertexBuffers(0, 2, pVertexBufferView);
@@ -380,16 +380,16 @@ void Mesh::CreateIndexBuffer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferGPU, 
 	Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferUploader,
 	UINT bufferByteSize,
-	D3D12_INDEX_BUFFER_VIEW* pVertexBufferView, void* pData)
+	D3D12_INDEX_BUFFER_VIEW* pIndexBufferView, void* pData)
 {
 	*pBufferGPU = d3dUtil::CreateDefaultBuffer(
 		pd3dDevice, pd3dCommandList,
 		pData, bufferByteSize,
 		*pBufferUploader);
 
-	pVertexBufferView->BufferLocation = (*pBufferGPU)->GetGPUVirtualAddress();
-	pVertexBufferView->Format = m_IndexFormat;
-	pVertexBufferView->SizeInBytes = bufferByteSize;
+	pIndexBufferView->BufferLocation = (*pBufferGPU)->GetGPUVirtualAddress();
+	pIndexBufferView->Format = m_IndexFormat;
+	pIndexBufferView->SizeInBytes = bufferByteSize;
 }
 
 void Mesh::DisposeUploaders()
@@ -397,4 +397,30 @@ void Mesh::DisposeUploaders()
     m_PositionBufferUploader = nullptr;
     m_ColorBufferUploader = nullptr;
     m_IndexBufferUploader = nullptr;
+}
+
+////////////////////////////////////////////////////////////////////
+
+SkinnedMesh::SkinnedMesh()
+{
+}
+
+SkinnedMesh::~SkinnedMesh()
+{
+}
+
+void SkinnedMesh::LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pFile)
+{
+}
+
+void SkinnedMesh::PrepareSkinning(Object* pModelRootObject)
+{
+}
+
+void SkinnedMesh::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+}
+
+void SkinnedMesh::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
 }

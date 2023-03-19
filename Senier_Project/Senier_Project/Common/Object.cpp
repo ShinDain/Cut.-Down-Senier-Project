@@ -56,7 +56,7 @@ void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandL
 
 	if (m_pMesh)
 	{
-		m_pMesh->OnprepareRender(gt, pd3dCommandList);
+		m_pMesh->OnPrepareRender(pd3dCommandList);
 		m_pMesh->Render(gt, pd3dCommandList);
 	}
 

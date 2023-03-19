@@ -35,12 +35,11 @@ public:
 class AnimationSet
 {
 public:
-	AnimationSet(float Length, int nFramesPerSecond,
-		int nKeyFrameTransforms, int nSkinningBones, char* pstrName);
+	AnimationSet();
 	~AnimationSet();
 
 public:
-	char m_strAnimationName[64];
+	char m_strAnimationName[64] = {'\0'};
 
 	float m_Length = 0.0f;
 	int m_nFramesPerSecond = 0;
@@ -63,7 +62,7 @@ public:
 class AnimationSets
 {
 public:
-	AnimationSets(int nAnimationSets);
+	AnimationSets();
 	~AnimationSets();
 
 public:
@@ -77,7 +76,7 @@ public:
 class AnimationTrack
 {
 public:
-	AnimationTrack() {}
+	AnimationTrack();
 	~AnimationTrack();
 
 public:
@@ -118,7 +117,7 @@ public:
 class ModelDataInfo
 {
 public:
-	ModelDataInfo() {}
+	ModelDataInfo();
 	~ModelDataInfo();
 
 	std::shared_ptr<Object> m_pRootObject = nullptr;
@@ -136,7 +135,7 @@ public:
 class AnimationController
 {
 public:
-	AnimationController(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int nAnimationTracks, ModelDataInfo* pModel);
+	AnimationController();
 	~AnimationController();
 
 public:
@@ -148,7 +147,6 @@ public:
 public:
 	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 	void AdvanceTime(float ElapsedTime, Object* pRootGameObject);
-
 
 };
 
