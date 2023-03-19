@@ -45,7 +45,6 @@ protected:
 
 	std::unique_ptr<UploadBuffer<tmpObjConstant>> m_pObjectCB = nullptr;
 
-
 	std::shared_ptr<Mesh> m_pMesh = nullptr;
 
 	int m_nMaterial = 0;
@@ -82,6 +81,7 @@ protected:
 	float m_Friction = 0.0f;
 
 public:
+	void SetWorld(XMFLOAT4X4 World) { m_xmf4x4World = World; }
 	void SetParentWorld(XMFLOAT4X4 ParentWorld) { m_xmf4x4ParentWorld = ParentWorld; }
 	void SetLocalTransform(XMFLOAT4X4 LocalTransform) { m_xmf4x4LocalTransform = LocalTransform; }
 

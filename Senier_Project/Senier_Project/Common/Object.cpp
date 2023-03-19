@@ -12,45 +12,28 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 {
 	BuildConstantBuffers(pd3dDevice);
 
-	// 제거 예정
-
-	m_pMesh = std::make_shared<Mesh>();
-	if (m_pMesh == nullptr)
-		return false;
-	else 
-		m_pMesh->BuildMesh(pd3dDevice, pd3dCommandList);
-
-	m_ppMaterials.emplace_back(std::make_shared<Material>());
-
-	for (int i = 0; i < m_ppMaterials.size(); ++i)
-	{
-		if (m_ppMaterials[i] == nullptr)
-			return false;
-		else
-		{
-			m_ppMaterials[i]->LoadTexture(pd3dDevice, pd3dCommandList, L"Textures\\bricks.dds");
-			m_ppMaterials[i]->BuildDescriptorHeap(pd3dDevice);
-		}
-	}
-	// --------------------
-
 	return true;
 }
 
 void Object::Update(const GameTimer& gt)
 {
-	m_xmf4x4World._41 = m_xmf3Position.x;
-	m_xmf4x4World._42 = m_xmf3Position.y;
-	m_xmf4x4World._43 = m_xmf3Position.z;
-	
-	XMMATRIX world = XMMatrixMultiply(XMMatrixRotationY(m_Yaw), XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), m_Pitch));
-	world = XMMatrixMultiply(world, XMLoadFloat4x4(&m_xmf4x4World));
+	m_xmf4x4World = m_xmf4x4ParentWorld;
 
+	XMMATRIX rotate = XMMatrixMultiply(XMMatrixRotationY(m_Yaw), XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), m_Pitch));
+	XMMATRIX world = XMMatrixMultiply(XMLoadFloat4x4(&m_xmf4x4LocalTransform), XMLoadFloat4x4(&m_xmf4x4World));
+
+	XMMATRIX lastMat = XMMatrixMultiply(rotate, world);
+
+	XMStoreFloat4x4(&m_xmf4x4World, lastMat);
+	
 	tmpObjConstant objConstant;
-	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(world));
+	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(lastMat));
 	if(m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
 
-	if (m_pSibling) m_pSibling->Update(gt);
+	if (m_pSibling) {
+		m_pSibling->SetParentWorld(m_xmf4x4ParentWorld);
+		m_pSibling->Update(gt);
+	}
 	if (m_pChild) {
 		m_pChild->SetParentWorld(m_xmf4x4World);
 		m_pChild->Update(gt);
@@ -64,6 +47,8 @@ void Object::PrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dC
 
 void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	PrepareRender(gt, pd3dCommandList);
+
 	for (int i = 0; i < m_ppMaterials.size(); ++i)
 	{
 		m_ppMaterials[i]->OnPrepareRender(pd3dCommandList);
@@ -84,8 +69,6 @@ void Object::BuildConstantBuffers(ID3D12Device* pd3dDevice)
 	m_pObjectCB = std::make_unique<UploadBuffer<tmpObjConstant>>(pd3dDevice, 1, true);
 	m_ObjCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(tmpObjConstant));
 }
-
-
 
 std::shared_ptr<Object> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)
 {

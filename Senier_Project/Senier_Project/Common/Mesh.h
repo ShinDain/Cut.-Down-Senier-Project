@@ -112,5 +112,8 @@ public:
 	const XMFLOAT3 GetAABBExtents()			{ return m_AABBExtents; }
 };
 
+class SkinnedMesh : public Mesh
+{
 
+};
 

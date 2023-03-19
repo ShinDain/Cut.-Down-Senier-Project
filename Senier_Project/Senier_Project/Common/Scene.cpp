@@ -21,24 +21,15 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	std::shared_ptr<Object> tmpObj; 
 	tmpObj = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName);
-	// = std::make_shared<Object>();
-	/*if (!tmpObj->Initialize(pd3dDevice, pd3dCommandList, NULL))
-		return false;*/
 
 	m_ppObjs.emplace_back(std::make_shared<Object>());
-	m_ppObjs.emplace_back(std::make_shared<Object>());
-	
+
 	for (int i = 0; i < m_ppObjs.size(); ++i)
 	{
 		m_ppObjs[i]->BuildConstantBuffers(pd3dDevice);
+		m_ppObjs[i]->SetChild(tmpObj);
 	}
 	
-	m_ppObjs[0]->SetChild(tmpObj);
-	m_ppObjs[1]->SetChild(tmpObj);
-
-	m_ppObjs[0]->SetPosition(XMFLOAT3(-10.f, 0.0f, 0.0f));
-	m_ppObjs[1]->SetPosition(XMFLOAT3(10.f, 0.0f, 0.0f));
-
 	m_pCamera = std::make_unique<Camera>();
 	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -100.f));
 
@@ -60,7 +51,6 @@ void Scene::Update(const GameTimer& gt)
 		m_ppShaders[i]->Update(gt);
 	}
 
-	
 	XMFLOAT3 camPos3f = XMFLOAT3(0.0f, 0.0f, -100.f);
 	XMVECTOR camPos = m_pCamera->GetPosition();
 	XMStoreFloat3(&camPos3f, camPos);
@@ -93,7 +83,6 @@ void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandLi
 
 	for (int i = 0; i < m_ppObjs.size(); ++i)
 	{
-		m_ppObjs[i]->PrepareRender(gt, pd3dCommandList);
 		m_ppObjs[i]->Render(gt, pd3dCommandList);
 	}
 }
@@ -144,7 +133,7 @@ void Scene::OnMouseMove(WPARAM btnState, int x, int y)
 		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - m_LastMousePos.y));
 
 		m_ppObjs[0]->SetPitch(m_ppObjs[0]->GetPitch() - dy);
-		m_ppObjs[1]->SetYaw(m_ppObjs[1]->GetYaw() - dx);
+		m_ppObjs[0]->SetYaw(m_ppObjs[0]->GetYaw() - dx);
 	}
 	else if ((btnState & MK_RBUTTON) != 0)
 	{
