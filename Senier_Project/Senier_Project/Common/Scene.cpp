@@ -15,19 +15,19 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	std::unique_ptr<Shader> defaultShader = std::make_unique<Shader>();
 	if (!defaultShader->Initialize(pd3dDevice, pd3dCommandList, NULL))
 		return false;
-	m_ppShaders.push_back(move(defaultShader));
+	m_vpShaders.push_back(move(defaultShader));
 
 	char strFileName[64] = "Model/Mi24.bin";
 
 	std::shared_ptr<Object> tmpObj; 
 	tmpObj = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName);
 
-	m_ppObjs.emplace_back(std::make_shared<Object>());
+	m_vpObjs.emplace_back(std::make_shared<Object>());
 
-	for (int i = 0; i < m_ppObjs.size(); ++i)
+	for (int i = 0; i < m_vpObjs.size(); ++i)
 	{
-		m_ppObjs[i]->BuildConstantBuffers(pd3dDevice);
-		m_ppObjs[i]->SetChild(tmpObj);
+		m_vpObjs[i]->BuildConstantBuffers(pd3dDevice);
+		m_vpObjs[i]->SetChild(tmpObj);
 	}
 	
 	m_pCamera = std::make_unique<Camera>();
@@ -46,9 +46,9 @@ void Scene::OnResize(float aspectRatio)
 
 void Scene::Update(const GameTimer& gt)
 {
-	for (int i = 0; i < m_ppShaders.size(); ++i)
+	for (int i = 0; i < m_vpShaders.size(); ++i)
 	{
-		m_ppShaders[i]->Update(gt);
+		m_vpShaders[i]->Update(gt);
 	}
 
 	XMFLOAT3 camPos3f = XMFLOAT3(0.0f, 0.0f, -100.f);
@@ -65,32 +65,32 @@ void Scene::Update(const GameTimer& gt)
 	XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
 	m_pPassCB->CopyData(0, passConstant);
 
-	for (int i = 0; i < m_ppObjs.size(); ++i)
+	for (int i = 0; i < m_vpObjs.size(); ++i)
 	{
-		m_ppObjs[i]->Update(gt);
+		m_vpObjs[i]->Update(gt);
 	}
 }
 
 void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	for (int i = 0; i < m_ppShaders.size(); ++i)
+	for (int i = 0; i < m_vpShaders.size(); ++i)
 	{
-		m_ppShaders[i]->OnPrepareRender(pd3dCommandList);
+		m_vpShaders[i]->OnPrepareRender(pd3dCommandList);
 		pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
 
-		m_ppShaders[i]->Render(gt, pd3dCommandList);
+		m_vpShaders[i]->Render(gt, pd3dCommandList);
 	}
 
-	for (int i = 0; i < m_ppObjs.size(); ++i)
+	for (int i = 0; i < m_vpObjs.size(); ++i)
 	{
-		m_ppObjs[i]->Render(gt, pd3dCommandList);
+		m_vpObjs[i]->Render(gt, pd3dCommandList);
 	}
 }
 
 void Scene::OnWinKeyboardInput(WPARAM wParam)
 {
-	for (int i = 0; i < m_ppShaders.size(); ++i)
-		m_ppShaders[i]->OnWinKeyboardInput(wParam);
+	for (int i = 0; i < m_vpShaders.size(); ++i)
+		m_vpShaders[i]->OnWinKeyboardInput(wParam);
 
 	float delta = 1.0f;
 
@@ -132,8 +132,8 @@ void Scene::OnMouseMove(WPARAM btnState, int x, int y)
 		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - m_LastMousePos.x));
 		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - m_LastMousePos.y));
 
-		m_ppObjs[0]->SetPitch(m_ppObjs[0]->GetPitch() - dy);
-		m_ppObjs[0]->SetYaw(m_ppObjs[0]->GetYaw() - dx);
+		m_vpObjs[0]->SetPitch(m_vpObjs[0]->GetPitch() - dy);
+		m_vpObjs[0]->SetYaw(m_vpObjs[0]->GetYaw() - dx);
 	}
 	else if ((btnState & MK_RBUTTON) != 0)
 	{

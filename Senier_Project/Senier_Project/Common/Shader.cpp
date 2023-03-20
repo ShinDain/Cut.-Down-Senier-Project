@@ -74,7 +74,7 @@ bool Shader::BuildShadersAndInputLayout()
 	m_vsByteCode = d3dUtil::CompileShader(L"Shader\\default.hlsl", nullptr, "VS", "vs_5_0");
 	m_psByteCode = d3dUtil::CompileShader(L"Shader\\default.hlsl", nullptr, "PS", "ps_5_0");
 
-	m_InputLayout = {
+	m_vInputLayout = {
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
 		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
 	};
@@ -86,7 +86,7 @@ bool Shader::BuildPSO(ID3D12Device* pd3dDevice)
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 	ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-	psoDesc.InputLayout = { m_InputLayout.data(), (UINT)m_InputLayout.size() };
+	psoDesc.InputLayout = { m_vInputLayout.data(), (UINT)m_vInputLayout.size() };
 	psoDesc.pRootSignature = m_RootSignature.Get();
 	psoDesc.VS = {
 		reinterpret_cast<BYTE*>(m_vsByteCode->GetBufferPointer()),

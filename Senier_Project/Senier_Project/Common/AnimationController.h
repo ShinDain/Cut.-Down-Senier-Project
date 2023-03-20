@@ -45,8 +45,8 @@ public:
 	int m_nFramesPerSecond = 0;
 
 	int m_nKeyFrames = 0;
-	float m_KeyFrameTimes = NULL;
-	std::vector<XMFLOAT4X4> m_xmf4x4KeyFrameTransforms;
+	std::vector<float> m_vKeyFrameTimes;
+	std::vector<XMFLOAT4X4> m_vxmf4x4KeyFrameTransforms;
 
 #ifdef _WITH_ANIMATION_SRT
 	int m_nKeyFrameScales = 0;
@@ -67,10 +67,10 @@ public:
 
 public:
 	int m_nAnimationSets = 0;
-	std::vector<std::shared_ptr<AnimationSet>> m_pAnimationSets;
+	std::vector<std::shared_ptr<AnimationSet>> m_vpAnimationSets;
 
 	int m_nAnimatedBoneFrames = 0;
-	std::vector<std::shared_ptr<Object>> m_pAnimatedBoneFrameCaches;
+	std::vector<std::shared_ptr<Object>> m_vpAnimatedBoneFrameCaches;
 };
 
 class AnimationTrack
@@ -81,7 +81,7 @@ public:
 
 public:
 	int m_nCallbackKeys = 0;
-	std::vector<CALLBACKKEY> m_CallbackKeys;
+	std::vector<CALLBACKKEY> m_vCallbackKeys;
 
 	std::shared_ptr<AnimationCallbackHandler> m_pAnimationCallbackHandler = nullptr;
 
@@ -123,9 +123,9 @@ public:
 	std::shared_ptr<Object> m_pRootObject = nullptr;
 
 	int m_nSkinMeshes = 0;
-	std::vector<std::shared_ptr<SkinnedMesh>> m_pSkinnedMeshes;
+	std::vector<std::shared_ptr<SkinnedMesh>> m_vpSkinnedMeshes;
 
-	std::shared_ptr<AnimationSets> m_pAnimationSets = nullptr;
+	std::vector<std::shared_ptr<AnimationSets>> m_vpAnimationSets;
 
 public:
 	void PrepareSkinning();
@@ -142,7 +142,7 @@ public:
 	float m_Time = 0.0f;
 
 	int m_nAnimationTracks = 0;
-	std::vector<AnimationTrack> m_AnimationTracks;
+	std::vector<AnimationTrack> m_vAnimationTracks;
 
 public:
 	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);

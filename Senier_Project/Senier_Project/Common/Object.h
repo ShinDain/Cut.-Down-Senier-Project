@@ -14,7 +14,7 @@
 
 using namespace DirectX;
 
-class Object
+class Object : public std::enable_shared_from_this<Object>
 {
 public:
 	Object();
@@ -31,10 +31,10 @@ public:
 
 	virtual void BuildConstantBuffers(ID3D12Device* pd3dDevice);
 
-	static std::shared_ptr<Object> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, char* pstrFileName);
+	static std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, char* pstrFileName);
 	static std::shared_ptr<Object> LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
+	static void LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData);
 	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
-	void LoadAnimationFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
 
 
 protected:
@@ -48,12 +48,15 @@ protected:
 	std::shared_ptr<Mesh> m_pMesh = nullptr;
 
 	int m_nMaterial = 0;
-	std::vector<std::shared_ptr<Material>> m_ppMaterials;
+	std::vector<std::shared_ptr<Material>> m_vpMaterials;
 
 public:
 	void SetChild(std::shared_ptr<Object> pChild);
 	void SetMesh(std::shared_ptr<Mesh> pMesh);
-	void SetMaterials(std::vector<std::shared_ptr<Material>> ppMaterial);
+	void SetMaterials(std::vector<std::shared_ptr<Material>> vpMaterial);
+
+	std::shared_ptr<Object> FindFrame(char* pstrFrameName);
+	void FindAndSkinnedMesh(SkinnedMesh** ppSkinnedMeshes, int* pnSkinnedMesh);
 
 protected:
 	UINT m_ObjCBByteSize = 0;

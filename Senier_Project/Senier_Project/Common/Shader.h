@@ -43,7 +43,7 @@ protected:
 	ComPtr<ID3DBlob> m_vsByteCode = nullptr;
 	ComPtr<ID3DBlob> m_psByteCode = nullptr;
 
-	std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputLayout;
+	std::vector<D3D12_INPUT_ELEMENT_DESC> m_vInputLayout;
 
 	ComPtr<ID3D12PipelineState> m_PSO = nullptr;
 };

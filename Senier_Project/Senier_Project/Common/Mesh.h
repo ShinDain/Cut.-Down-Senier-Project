@@ -71,19 +71,19 @@ public:
 protected:
 	char m_Name[64];
 
-	std::vector<SubmeshGeometry> m_DrawArgs;
+	std::vector<SubmeshGeometry> m_vDrawArgs;
 
 	int m_nVertices = 0;
 
-	std::vector<XMFLOAT3> m_Positions;
-	std::vector<XMFLOAT3> m_Colors;
-	std::vector<XMFLOAT2> m_TextureC0;
-	std::vector<XMFLOAT2> m_TextureC1;
-	std::vector<XMFLOAT3> m_Normals;
-	std::vector<XMFLOAT3> m_Tangents;
-	std::vector<XMFLOAT3> m_BiTangents;
+	std::vector<XMFLOAT3> m_vPositions;
+	std::vector<XMFLOAT3> m_vColors;
+	std::vector<XMFLOAT2> m_vTextureC0;
+	std::vector<XMFLOAT2> m_vTextureC1;
+	std::vector<XMFLOAT3> m_vNormals;
+	std::vector<XMFLOAT3> m_vTangents;
+	std::vector<XMFLOAT3> m_vBiTangents;
 
-	std::vector<UINT> m_Indices;
+	std::vector<UINT> m_vIndices;
 	
 	XMFLOAT3 m_AABBCenter;
 	XMFLOAT3 m_AABBExtents;
@@ -126,8 +126,8 @@ public:
 	virtual ~SkinnedMesh();
 
 protected:
-	std::vector<XMINT4>			m_xmn4BoneIndices;
-	std::vector<XMFLOAT4>		m_xmf4BoneWeights;
+	std::vector<XMINT4>			m_vxmn4BoneIndices;
+	std::vector<XMFLOAT4>		m_vxmf4BoneWeights;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_BoneIndexBufferGPU = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_BoneIndexBufferUploader = nullptr;
@@ -137,16 +137,16 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_BoneWeightBufferUploader = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW			   m_BoneWeightBufferView;
 
-	std::vector<char[64]> m_strSkinningBoneNames;
-	std::vector<std::shared_ptr<Object>> m_SkinningBoneFrameCaches;
+	std::vector<char[64]> m_vstrSkinningBoneNames;
+	std::vector<std::shared_ptr<Object>> m_vpSkinningBoneFrameCaches;
 
-	std::vector<XMFLOAT4X4> m_xmf4x4BindPoseBoneOffsets;
+	std::vector<XMFLOAT4X4> m_vxmf4x4BindPoseBoneOffsets;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_BindPoseBoneOffsetResource = nullptr;
-	std::vector<XMFLOAT4X4> m_xmf4x4MappedBindPoseBoneOffset;
+	std::vector<XMFLOAT4X4> m_vxmf4x4MappedBindPoseBoneOffset;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_SkinningBoneTransformResource = nullptr;
-	std::vector<XMFLOAT4X4> m_xmf4x4MappedSkinningBoneTransform;
+	std::vector<XMFLOAT4X4> m_vxmf4x4MappedSkinningBoneTransform;
 
 public:
 	void LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);

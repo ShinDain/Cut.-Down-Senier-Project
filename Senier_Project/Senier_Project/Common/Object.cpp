@@ -49,9 +49,9 @@ void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandL
 {
 	PrepareRender(gt, pd3dCommandList);
 
-	for (int i = 0; i < m_ppMaterials.size(); ++i)
+	for (int i = 0; i < m_vpMaterials.size(); ++i)
 	{
-		m_ppMaterials[i]->OnPrepareRender(pd3dCommandList);
+		m_vpMaterials[i]->OnPrepareRender(pd3dCommandList);
 	}
 
 	if (m_pMesh)
@@ -70,17 +70,44 @@ void Object::BuildConstantBuffers(ID3D12Device* pd3dDevice)
 	m_ObjCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(tmpObjConstant));
 }
 
-std::shared_ptr<Object> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)
+std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)
 {
 	FILE* pInFile = NULL;
 	::fopen_s(&pInFile, pstrFileName, "rb");
 	::rewind(pInFile);
 
-	std::shared_ptr<Object> pObject;
+	std::shared_ptr<ModelDataInfo> pModelData;
 
-	pObject = Object::LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile);
-	
-	return pObject;
+	char pstrToken[64] = { '\0' };
+
+	for (; ; )
+	{
+		if (ReadStringFromFile(pInFile, pstrToken))
+		{
+			if (!strcmp(pstrToken, "<Hierarchy>:"))
+			{
+				pModelData->m_pRootObject = Object::LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile);
+				::ReadStringFromFile(pInFile, pstrToken); //"</Hierarchy>"
+			}
+			else if (!strcmp(pstrToken, "Animation>:"))
+			{
+				Object::LoadAnimationFromFile(pInFile, pModelData);
+				pModelData->PrepareSkinning();
+
+			}
+			else if (!strcmp(pstrToken, "</Animation>:"))
+			{
+				break;
+			}
+		}
+		else
+		{
+			break;
+		}
+	}
+
+
+	return pModelData;
 }
 
 std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)
@@ -182,11 +209,11 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	UINT nReads;
 	nMaterial = ReadintegerFromFile(pInFile);
 
-	std::vector<std::shared_ptr<Material>> ppMat;
+	std::vector<std::shared_ptr<Material>> vpMat;
 
 	for (int i = 0; i < nMaterial; ++i)
 	{
-		ppMat.emplace_back(std::make_shared<Material>());
+		vpMat.emplace_back(std::make_shared<Material>());
 	}
 
 	for (; ; )
@@ -201,77 +228,77 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		{
 			XMFLOAT4 tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 4, pInFile);
-			ppMat[nMatcnt]->SetAlbedoColor(tmp);
+			vpMat[nMatcnt]->SetAlbedoColor(tmp);
 		}
 		else if (!strcmp(pstrToken, "<EmissiveColor>:"))
 		{
 			XMFLOAT4 tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 4, pInFile);
-			ppMat[nMatcnt]->SetEmissiveColor(tmp);
+			vpMat[nMatcnt]->SetEmissiveColor(tmp);
 		}
 		else if (!strcmp(pstrToken, "<SpecularColor>:"))
 		{
 			XMFLOAT4 tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 4, pInFile);
-			ppMat[nMatcnt]->SetSpecularColor(tmp);
+			vpMat[nMatcnt]->SetSpecularColor(tmp);
 		}
 		else if (!strcmp(pstrToken, "<Glossiness>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			ppMat[nMatcnt]->SetGlossiness(tmp);
+			vpMat[nMatcnt]->SetGlossiness(tmp);
 		}
 		else if (!strcmp(pstrToken, "<Smoothness>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			ppMat[nMatcnt]->SetSmoothness(tmp);
+			vpMat[nMatcnt]->SetSmoothness(tmp);
 		}
 		else if (!strcmp(pstrToken, "<Metallic>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			ppMat[nMatcnt]->SetMetallic(tmp);
+			vpMat[nMatcnt]->SetMetallic(tmp);
 		}
 		else if (!strcmp(pstrToken, "<SpecularHighlight>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			ppMat[nMatcnt]->SetMetallic(tmp);
+			vpMat[nMatcnt]->SetMetallic(tmp);
 		}
 		else if (!strcmp(pstrToken, "<GlossyReflection>:"))
 		{
 			float tmp;
 			nReads = (UINT)::fread(&tmp, sizeof(float), 1, pInFile);
-			ppMat[nMatcnt]->SetGlossyReflection(tmp);
+			vpMat[nMatcnt]->SetGlossyReflection(tmp);
 		}
 		else if (!strcmp(pstrToken, "<AlbedoMap>:"))
 		{
-			ppMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<SpecularMap>:"))
 		{
-			ppMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<NormalMap>:"))
 		{
-			ppMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<MetallicMap>:"))
 		{
-			ppMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<EmissionMap>:"))
 		{
-			ppMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<DetailAlbedoMap>:"))
 		{
-			ppMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<DetailNormalMap>:"))
 		{
-			ppMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
 		}
 		else if (!strcmp(pstrToken, "</Materials>"))
 		{
@@ -279,17 +306,89 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		}
 	}
 
-	for (int i = 0; i < ppMat.size(); ++i)
-		ppMat[i]->BuildDescriptorHeap(pd3dDevice);
+	for (int i = 0; i < vpMat.size(); ++i)
+		vpMat[i]->BuildDescriptorHeap(pd3dDevice);
 
-	SetMaterials(ppMat);
+	SetMaterials(vpMat);
 }
 
-void Object::LoadAnimationFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)
+void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData)
 {
+	char pstrToken[64] = { '\0' };
+	UINT nReads = 0;
+
+	int nAnimationSets = 0;
+	int nAnimationSetCnt = -1;
+
+	for (; ; )
+	{
+		ReadStringFromFile(pInFile, pstrToken);
+		if (!strcmp(pstrToken, "<AnimationSets>:"))
+		{
+			nAnimationSets = ReadintegerFromFile(pInFile);
+			for (int i = 0; i < nAnimationSets; ++i)
+			{
+				pModelData->m_vpAnimationSets.emplace_back(std::make_shared<AnimationSets>());
+			}
+		}
+		else if (!strcmp(pstrToken, "<FrameNames>:"))
+		{
+			nAnimationSetCnt++;
+
+			int nBoneFrames = ReadintegerFromFile(pInFile);
+			pModelData->m_vpAnimationSets[nAnimationSetCnt]->m_nAnimatedBoneFrames = nBoneFrames;
+
+			for (int i = 0; i < nBoneFrames; ++i)
+			{
+				ReadStringFromFile(pInFile, pstrToken);
+				pModelData->m_vpAnimationSets[nAnimationSetCnt]->m_vpAnimatedBoneFrameCaches[i] = pModelData->m_pRootObject->FindFrame(pstrToken);
+			}
+
+		}
+		else if (!strcmp(pstrToken, "<AnimationSet>:"))
+		{
+			int nAnimationSet = ReadintegerFromFile(pInFile);
+
+			ReadStringFromFile(pInFile, pstrToken);
+
+			float Length = ReadFloatFromFile(pInFile);
+			int nFramesPerSecond = ReadintegerFromFile(pInFile);
+			int nKeyFrames = ReadintegerFromFile(pInFile);
+
+			pModelData->m_vpAnimationSets[nAnimationSetCnt]->m_vpAnimationSets.emplace_back();
+
+			for (int i = 0; i < nKeyFrames; i++)
+			{
+				::ReadStringFromFile(pInFile, pstrToken);
+				if (!strcmp(pstrToken, "<Transforms>:"))
+				{
+					std::shared_ptr<AnimationSet> pAnimationSet = pModelData->m_vpAnimationSets[nAnimationSetCnt]->m_vpAnimationSets[nAnimationSet];
+
+					int nKey = ReadintegerFromFile(pInFile);
+					float KeyTime = ReadFloatFromFile(pInFile);
+
+#ifdef _WITH_ANIMATION_SRT
+					m_pfKeyFrameScaleTimes[i] = fKeyTime;
+					m_pfKeyFrameRotationTimes[i] = fKeyTime;
+					m_pfKeyFrameTranslationTimes[i] = fKeyTime;
+					nReads = (UINT)::fread(pAnimationSet->m_ppxmf3KeyFrameScales[i], sizeof(XMFLOAT3), pLoadedModel->m_pAnimationSets->m_nAnimatedBoneFrames, pInFile);
+					nReads = (UINT)::fread(pAnimationSet->m_ppxmf4KeyFrameRotations[i], sizeof(XMFLOAT4), pLoadedModel->m_pAnimationSets->m_nAnimatedBoneFrames, pInFile);
+					nReads = (UINT)::fread(pAnimationSet->m_ppxmf3KeyFrameTranslations[i], sizeof(XMFLOAT3), pLoadedModel->m_pAnimationSets->m_nAnimatedBoneFrames, pInFile);
+#else
+					pAnimationSet->m_vKeyFrameTimes[i] = KeyTime;
+					nReads = (UINT)::fread(pAnimationSet->m_ppxmf4x4KeyFrameTransforms[i], sizeof(XMFLOAT4X4), pLoadedModel->m_pAnimationSets->m_nAnimatedBoneFrames, pInFile);
+#endif
+
+				}
+			}
+
+		}
+		else if (!strcmp(pstrToken, "</AnimationSets>"))
+		{
+			break;
+		}
+	}
 }
-
-
 
 void Object::SetChild(std::shared_ptr<Object> pChild)
 {
@@ -309,7 +408,23 @@ void Object::SetMesh(std::shared_ptr<Mesh> pMesh)
 	m_pMesh = pMesh;
 }
 
-void Object::SetMaterials(std::vector<std::shared_ptr<Material>> ppMaterial)
+void Object::SetMaterials(std::vector<std::shared_ptr<Material>> vpMaterial)
 {
-	m_ppMaterials = ppMaterial;
+	m_vpMaterials = vpMaterial;
+}
+
+
+std::shared_ptr<Object> Object::FindFrame(char* pstrFrameName)
+{
+	std::shared_ptr<Object> pObject = NULL;
+	if (!strncmp(GetName(), pstrFrameName, strlen(pstrFrameName))) return shared_from_this();
+
+	if (m_pSibling) if (pObject = m_pSibling->FindFrame(pstrFrameName)) return pObject;
+	if (m_pChild) if (pObject = m_pChild->FindFrame(pstrFrameName)) return pObject;
+
+	return NULL;
+}
+
+void Object::FindAndSkinnedMesh(SkinnedMesh** ppSkinnedMeshes, int* pnSkinnedMesh)
+{
 }

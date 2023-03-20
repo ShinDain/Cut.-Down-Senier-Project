@@ -146,7 +146,7 @@ void Mesh::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	subMesh.BaseVertexLocation = 0;
 	// subMesh.Bounds = BoundingBox()
 
-	m_DrawArgs.emplace_back(subMesh);
+	m_vDrawArgs.emplace_back(subMesh);
 }
 
 void Mesh::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -159,7 +159,7 @@ void Mesh::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Mesh::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-    for (auto begin = m_DrawArgs.begin(); begin != m_DrawArgs.end(); ++begin)
+    for (auto begin = m_vDrawArgs.begin(); begin != m_vDrawArgs.end(); ++begin)
     {
         pd3dCommandList->DrawIndexedInstanced(
             begin->IndexCount, 1, begin->StartIndexLocation, begin->BaseVertexLocation, 0);
@@ -191,15 +191,15 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			nPosition = ReadintegerFromFile(pInFile);
 			if (nPosition)
 			{
-				m_Positions.resize(nPosition);
-				nReads = (UINT)fread(&m_Positions[0], sizeof(XMFLOAT3), nPosition, pInFile);
+				m_vPositions.resize(nPosition);
+				nReads = (UINT)fread(&m_vPositions[0], sizeof(XMFLOAT3), nPosition, pInFile);
 
 				UINT positionBufferByteSize = sizeof(XMFLOAT3) * nPosition;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_PositionBufferGPU, &m_PositionBufferUploader,
 					positionBufferByteSize, sizeof(XMFLOAT3),
-					&m_PositionBufferView, m_Positions.data());
+					&m_PositionBufferView, m_vPositions.data());
 			}
 		}
 		else if (!strcmp(pstrToken, "<Colors>:"))
@@ -208,15 +208,15 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			nColor = ReadintegerFromFile(pInFile);
 			if (nColor)
 			{
-				m_Colors.resize(nColor);
-				nReads = (UINT)fread(&m_Colors[0], sizeof(XMFLOAT3), nColor, pInFile);
+				m_vColors.resize(nColor);
+				nReads = (UINT)fread(&m_vColors[0], sizeof(XMFLOAT3), nColor, pInFile);
 
 				UINT colorBufferByteSize = sizeof(XMFLOAT3) * nColor;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_ColorBufferGPU, &m_ColorBufferUploader,
 					colorBufferByteSize, sizeof(XMFLOAT3),
-					&m_ColorBufferView, m_Colors.data());
+					&m_ColorBufferView, m_vColors.data());
 			}
 		}
 		else if (!strcmp(pstrToken, "<TextureCoords0>:"))
@@ -225,15 +225,15 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			nTexC0 = ReadintegerFromFile(pInFile);
 			if (nTexC0)
 			{
-				m_TextureC0.resize(nTexC0);
-				nReads = (UINT)fread(&m_TextureC0[0], sizeof(XMFLOAT2), nTexC0, pInFile);
+				m_vTextureC0.resize(nTexC0);
+				nReads = (UINT)fread(&m_vTextureC0[0], sizeof(XMFLOAT2), nTexC0, pInFile);
 
 				UINT TextureC0BufferByteSize = sizeof(XMFLOAT2) * nTexC0;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_TexC0BufferGPU, &m_TexC0BufferUploader,
 					TextureC0BufferByteSize, sizeof(XMFLOAT2),
-					&m_TexC0BufferView, m_TextureC0.data());
+					&m_TexC0BufferView, m_vTextureC0.data());
 			}
 		}
 		else if (!strcmp(pstrToken, "<TextureCoords1>:"))
@@ -242,15 +242,15 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			nTexC1 = ReadintegerFromFile(pInFile);
 			if (nTexC1)
 			{
-				m_TextureC1.resize(nTexC1);
-				nReads = (UINT)fread(&m_TextureC1[0], sizeof(XMFLOAT2), nTexC1, pInFile);
+				m_vTextureC1.resize(nTexC1);
+				nReads = (UINT)fread(&m_vTextureC1[0], sizeof(XMFLOAT2), nTexC1, pInFile);
 
 				UINT TextureC1BufferByteSize = sizeof(XMFLOAT2) * nTexC1;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_TexC1BufferGPU, &m_TexC1BufferUploader,
 					TextureC1BufferByteSize, sizeof(XMFLOAT2),
-					&m_TexC1BufferView, m_TextureC1.data());
+					&m_TexC1BufferView, m_vTextureC1.data());
 			}
 		}
 		else if (!strcmp(pstrToken, "<Normals>:"))
@@ -259,15 +259,15 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			nNormal = ReadintegerFromFile(pInFile);
 			if (nNormal)
 			{
-				m_Normals.resize(nNormal);
-				nReads = (UINT)fread(&m_Normals[0], sizeof(XMFLOAT3), nNormal, pInFile);
+				m_vNormals.resize(nNormal);
+				nReads = (UINT)fread(&m_vNormals[0], sizeof(XMFLOAT3), nNormal, pInFile);
 
 				UINT normalBufferByteSize = sizeof(XMFLOAT3) * nNormal;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_NormalBufferGPU, &m_NormalBufferUploader,
 					normalBufferByteSize, sizeof(XMFLOAT3),
-					&m_NormalBufferView, m_Normals.data());
+					&m_NormalBufferView, m_vNormals.data());
 			}
 		}
 		else if (!strcmp(pstrToken, "<Tangents>:"))
@@ -276,15 +276,15 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			nTangent = ReadintegerFromFile(pInFile);
 			if (nTangent)
 			{
-				m_Tangents.resize(nTangent);
-				nReads = (UINT)fread(&m_Tangents[0], sizeof(XMFLOAT3), nTangent, pInFile);
+				m_vTangents.resize(nTangent);
+				nReads = (UINT)fread(&m_vTangents[0], sizeof(XMFLOAT3), nTangent, pInFile);
 
 				UINT tangentBufferByteSize = sizeof(XMFLOAT3) * nTangent;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_TangentBufferGPU, &m_TangentBufferUploader,
 					tangentBufferByteSize, sizeof(XMFLOAT3),
-					&m_TangentBufferView, m_Tangents.data());
+					&m_TangentBufferView, m_vTangents.data());
 			}
 		}
 		else if (!strcmp(pstrToken, "<BiTangents>:"))
@@ -293,15 +293,15 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			nBiTangent = ReadintegerFromFile(pInFile);
 			if (nBiTangent)
 			{
-				m_BiTangents.resize(nBiTangent);
-				nReads = (UINT)fread(&m_BiTangents[0], sizeof(XMFLOAT3), nBiTangent, pInFile);
+				m_vBiTangents.resize(nBiTangent);
+				nReads = (UINT)fread(&m_vBiTangents[0], sizeof(XMFLOAT3), nBiTangent, pInFile);
 
 				UINT bitangentBufferByteSize = sizeof(XMFLOAT3) * nBiTangent;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_BiTangentBufferGPU, &m_BiTangentBufferUploader,
 					bitangentBufferByteSize, sizeof(XMFLOAT3),
-					&m_BiTangentBufferView, m_BiTangents.data());
+					&m_BiTangentBufferView, m_vBiTangents.data());
 			}
 		}
 		else if (!strcmp(pstrToken, "<SubMeshes>:"))
@@ -325,8 +325,8 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 						if (nIdxCnt > 0)
 						{
-							m_Indices.resize(nIdxCnt + nIdxStack);
-							nReads = (UINT)fread(&m_Indices[nIdxStack], sizeof(UINT), nIdxCnt, pInFile);
+							m_vIndices.resize(nIdxCnt + nIdxStack);
+							nReads = (UINT)fread(&m_vIndices[nIdxStack], sizeof(UINT), nIdxCnt, pInFile);
 
 							SubmeshGeometry subMesh;
 							subMesh.IndexCount = nIdxCnt;
@@ -335,14 +335,14 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 							nIdxStack += nIdxCnt;
 
-							m_DrawArgs.emplace_back(subMesh);
+							m_vDrawArgs.emplace_back(subMesh);
 
 							UINT indexBufferByteSize = sizeof(UINT) * nIdxCnt;
 
 							CreateIndexBuffer(pd3dDevice, pd3dCommandList,
 								&m_IndexBufferGPU, &m_IndexBufferUploader,
 								indexBufferByteSize,
-								&m_IndexBufferView, m_Indices.data());
+								&m_IndexBufferView, m_vIndices.data());
 						}
 					}
 				}
