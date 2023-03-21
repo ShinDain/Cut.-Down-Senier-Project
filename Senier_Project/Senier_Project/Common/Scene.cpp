@@ -17,19 +17,13 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 		return false;
 	m_vpShaders.push_back(move(defaultShader));
 
-	char strFileName[64] = "Model/Mi24.bin";
 
-	std::shared_ptr<Object> tmpObj; 
-	tmpObj = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName);
+	// ModelData 로드 미완성
+	//char strFileName[64] = "Model/Mi24.bin";
 
-	m_vpObjs.emplace_back(std::make_shared<Object>());
+	//std::shared_ptr<ModelDataInfo> tmpModel; 
+	//tmpModel = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName);
 
-	for (int i = 0; i < m_vpObjs.size(); ++i)
-	{
-		m_vpObjs[i]->BuildConstantBuffers(pd3dDevice);
-		m_vpObjs[i]->SetChild(tmpObj);
-	}
-	
 	m_pCamera = std::make_unique<Camera>();
 	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -100.f));
 

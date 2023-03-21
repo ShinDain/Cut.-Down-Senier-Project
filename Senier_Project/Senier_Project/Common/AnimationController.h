@@ -46,7 +46,7 @@ public:
 
 	int m_nKeyFrames = 0;
 	std::vector<float> m_vKeyFrameTimes;
-	std::vector<XMFLOAT4X4> m_vxmf4x4KeyFrameTransforms;
+	std::vector<std::vector<XMFLOAT4X4>> m_vvxmf4x4KeyFrameTransforms;		// 키프레임 개수만큼의 변환을 각 뼈마다
 
 #ifdef _WITH_ANIMATION_SRT
 	int m_nKeyFrameScales = 0;
@@ -144,10 +144,73 @@ public:
 	int m_nAnimationTracks = 0;
 	std::vector<AnimationTrack> m_vAnimationTracks;
 
+	std::vector<AnimationSets> m_vAnimationSets;
+
+	int m_nSkinnedMeshes = 0;
+	std::vector<std::shared_ptr<SkinnedMesh>> m_vpSkinnedMeshes;
+
+	//--------------------
+
+	std::vector<std::shared_ptr<UploadBuffer<XMFLOAT4X4>>> m_SkinningBoneTransformCBs;
+
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> m_vSkinningBoneTransforms;
+	std::vector<std::vector<XMFLOAT4X4>> m_vvxmf4x4MappedSkinningBoneTransfroms;
+
+	//---------------------
+
 public:
 	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 	void AdvanceTime(float ElapsedTime, Object* pRootGameObject);
 
+public:
+	bool	m_bRootMotion = false;
+	Object* m_pModelRootObject = NULL;
+
+	Object* m_pRootMotionObject = NULL;
+	XMFLOAT3 m_xmf3FirstRootMotionPosition = XMFLOAT3(0.0f, 0.0f, 0.0f);
+
+	void SetRootMotion(bool bRootMotion) { m_bRootMotion = bRootMotion; }
+
+	// 미구현
+	// virtual void OnRootMotion(Object* pRootGameObject) { }
+	// virtual void OnAnimationIK(Object* pRootGameObject) { }
+
+public:
+	// Set Track
+	void SetTrackAnimationSet(int nAnimationTrack, int nAnimationSet)
+	{
+		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].m_nAnimationSet = nAnimationSet;
+	}
+	void SetTrackEnable(int nAnimationTrack, bool bEnable)
+	{
+		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].SetEnable(bEnable);
+	}
+	void SetTrackPosition(int nAnimationTrack, float Position)
+	{
+		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].SetPosition(Position);
+	}
+	void SetTrackSpeed(int nAnimationTrack, float Speed)
+	{
+		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].SetSpeed(Speed);
+	}
+	void SetTrackWeight(int nAnimationTrack, float Weight)
+	{
+		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].SetWeight(Weight);
+	}
+
+	// Set Callback
+	void SetCallbackKeys(int nAnimationTrack, int nCallbackKeys)
+	{
+		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].SetCallbackKeys(nCallbackKeys);
+	}
+	void SetCallbackKey(int nAnimationTrack, int nKeyidx, float Time, void* pData)
+	{
+		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].SetCallbackKey(nKeyidx, Time, pData);
+	}
+	void SetAnimationCallbackHandler(int nAnimationTrack, std::shared_ptr<AnimationCallbackHandler> pCallbackHandler)
+	{
+		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].SetAnimationCallbackHandler(pCallbackHandler);
+	}
 };
 
 

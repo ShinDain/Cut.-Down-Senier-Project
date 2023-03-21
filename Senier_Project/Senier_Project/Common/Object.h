@@ -32,7 +32,7 @@ public:
 	virtual void BuildConstantBuffers(ID3D12Device* pd3dDevice);
 
 	static std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, char* pstrFileName);
-	static std::shared_ptr<Object> LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
+	static std::shared_ptr<Object> LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, int* pnSkinnedMeshes);
 	static void LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData);
 	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
 
@@ -56,7 +56,7 @@ public:
 	void SetMaterials(std::vector<std::shared_ptr<Material>> vpMaterial);
 
 	std::shared_ptr<Object> FindFrame(char* pstrFrameName);
-	void FindAndSkinnedMesh(SkinnedMesh** ppSkinnedMeshes, int* pnSkinnedMesh);
+	void FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>> vpSkinnedMeshes);
 
 protected:
 	UINT m_ObjCBByteSize = 0;

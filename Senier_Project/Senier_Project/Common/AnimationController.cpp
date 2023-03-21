@@ -1,4 +1,5 @@
 #include "AnimationController.h"
+#include "Mesh.h"
 
 AnimationSet::AnimationSet()
 {
@@ -74,6 +75,8 @@ void ModelDataInfo::PrepareSkinning()
 
 AnimationController::AnimationController()
 {
+	m_SkinningBoneTransformCBs.resize(m_nSkinnedMeshes);
+
 }
 
 AnimationController::~AnimationController()
@@ -86,4 +89,8 @@ void AnimationController::AdvanceTime(float ElapsedTime, Object* pRootGameObject
 
 void AnimationController::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	for (int i = 0; i < m_nSkinnedMeshes; ++i)
+	{
+		m_vpSkinnedMeshes[i]->SetSkinningBoneTransformCB(m_SkinningBoneTransformCBs[i]);
+	}
 }

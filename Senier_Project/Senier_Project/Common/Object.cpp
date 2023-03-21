@@ -79,6 +79,7 @@ std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dD
 	std::shared_ptr<ModelDataInfo> pModelData;
 
 	char pstrToken[64] = { '\0' };
+	int nSkinnedMeshes = 0;
 
 	for (; ; )
 	{
@@ -86,7 +87,8 @@ std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dD
 		{
 			if (!strcmp(pstrToken, "<Hierarchy>:"))
 			{
-				pModelData->m_pRootObject = Object::LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile);
+				pModelData->m_pRootObject = Object::LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile, &nSkinnedMeshes);
+				pModelData->m_nSkinMeshes = nSkinnedMeshes;
 				::ReadStringFromFile(pInFile, pstrToken); //"</Hierarchy>"
 			}
 			else if (!strcmp(pstrToken, "Animation>:"))
@@ -110,7 +112,7 @@ std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dD
 	return pModelData;
 }
 
-std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)
+std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, int* pnSkinnedMeshes)
 {
 	char pstrToken[64] = { '\0' };
 	UINT nReads = 0;
@@ -156,14 +158,15 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 		}
 		else if (!strcmp(pstrToken, "<SkinningInfo>:"))
 		{
-			// =======================================
-			// =======================================
-			// =======================================
-			// ============== 미 구 현 ===============
-			// ============== 미 구 현 ===============
-			// =======================================
-			// =======================================
-			// =======================================
+			if (pnSkinnedMeshes) (*pnSkinnedMeshes)++;
+
+			std::shared_ptr<SkinnedMesh> pSkinMesh = std::make_shared<SkinnedMesh>();
+			pSkinMesh->LoadSkinInfoFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			
+			ReadStringFromFile(pInFile, pstrToken); // <Mesh>:
+			if (!strcmp(pstrToken, "<Mesh>:")) pSkinMesh->LoadMeshFromFile(pd3dDevice, pd3dCommandList, pInFile);
+
+			pObject->SetMesh(pSkinMesh);
 		}
 		else if (!strcmp(pstrToken, "<Materials>:"))
 		{
@@ -177,7 +180,7 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 			{
 				for (int i = 0; i < nChild; ++i)
 				{
-					std::shared_ptr<Object> pChild = LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile);
+					std::shared_ptr<Object> pChild = LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile, pnSkinnedMeshes);
 					if (pChild) pObject->SetChild(pChild);
 
 #ifdef _WITH_DEBUG_FRAME_HIERARCHY
@@ -341,31 +344,49 @@ void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo>
 			for (int i = 0; i < nBoneFrames; ++i)
 			{
 				ReadStringFromFile(pInFile, pstrToken);
-				pModelData->m_vpAnimationSets[nAnimationSetCnt]->m_vpAnimatedBoneFrameCaches[i] = pModelData->m_pRootObject->FindFrame(pstrToken);
+				pModelData->m_vpAnimationSets[nAnimationSetCnt]->m_vpAnimatedBoneFrameCaches.emplace_back(pModelData->m_pRootObject->FindFrame(pstrToken));
 			}
 
 		}
 		else if (!strcmp(pstrToken, "<AnimationSet>:"))
 		{
-			int nAnimationSet = ReadintegerFromFile(pInFile);
+			std::shared_ptr<AnimationSets> pAnimationSets = pModelData->m_vpAnimationSets[nAnimationSetCnt];
 
+			// n번째 애니메이션 데이터
+			int nAnimationSet = ReadintegerFromFile(pInFile);
+			
+			// 애니메이션 명칭
 			ReadStringFromFile(pInFile, pstrToken);
 
-			float Length = ReadFloatFromFile(pInFile);
-			int nFramesPerSecond = ReadintegerFromFile(pInFile);
-			int nKeyFrames = ReadintegerFromFile(pInFile);
+			float Length = ReadFloatFromFile(pInFile);				// 애니메이션 길이
+			int nFramesPerSecond = ReadintegerFromFile(pInFile);	// 초당 프레임
+			int nKeyFrames = ReadintegerFromFile(pInFile);			// 총 키프레임 수
+			
+			// AnimationSet 생성
+			std::shared_ptr<AnimationSet> tmpAnimationSet = std::make_shared<AnimationSet>();
+			tmpAnimationSet->m_Length = Length;
+			tmpAnimationSet->m_nFramesPerSecond = nFramesPerSecond;
+			tmpAnimationSet->m_nKeyFrames = nKeyFrames;
+			strcpy_s(tmpAnimationSet->m_strAnimationName, pstrToken);
+			tmpAnimationSet->m_vKeyFrameTimes.resize(nKeyFrames);
+			tmpAnimationSet->m_vvxmf4x4KeyFrameTransforms.resize(nKeyFrames);
+			for (int i = 0; i < nKeyFrames; ++i)
+				tmpAnimationSet->m_vvxmf4x4KeyFrameTransforms[i].resize(pAnimationSets->m_nAnimatedBoneFrames);
 
-			pModelData->m_vpAnimationSets[nAnimationSetCnt]->m_vpAnimationSets.emplace_back();
+			pAnimationSets->m_vpAnimationSets.emplace_back(tmpAnimationSet);
 
+
+			// n번째 애니메이션 Set 참조
+			std::shared_ptr<AnimationSet> pAnimationSet = pAnimationSets->m_vpAnimationSets[nAnimationSet];
+
+			// KeyFrame 수만큼 순회하며 변환행렬 저장
 			for (int i = 0; i < nKeyFrames; i++)
 			{
 				::ReadStringFromFile(pInFile, pstrToken);
 				if (!strcmp(pstrToken, "<Transforms>:"))
 				{
-					std::shared_ptr<AnimationSet> pAnimationSet = pModelData->m_vpAnimationSets[nAnimationSetCnt]->m_vpAnimationSets[nAnimationSet];
-
-					int nKey = ReadintegerFromFile(pInFile);
-					float KeyTime = ReadFloatFromFile(pInFile);
+					int nKey = ReadintegerFromFile(pInFile);		// n번째 키	== i
+					float KeyTime = ReadFloatFromFile(pInFile);		// n번째 키 시간
 
 #ifdef _WITH_ANIMATION_SRT
 					m_pfKeyFrameScaleTimes[i] = fKeyTime;
@@ -375,10 +396,11 @@ void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo>
 					nReads = (UINT)::fread(pAnimationSet->m_ppxmf4KeyFrameRotations[i], sizeof(XMFLOAT4), pLoadedModel->m_pAnimationSets->m_nAnimatedBoneFrames, pInFile);
 					nReads = (UINT)::fread(pAnimationSet->m_ppxmf3KeyFrameTranslations[i], sizeof(XMFLOAT3), pLoadedModel->m_pAnimationSets->m_nAnimatedBoneFrames, pInFile);
 #else
+					// n번째 키프레임 시간 저장
 					pAnimationSet->m_vKeyFrameTimes[i] = KeyTime;
-					nReads = (UINT)::fread(pAnimationSet->m_ppxmf4x4KeyFrameTransforms[i], sizeof(XMFLOAT4X4), pLoadedModel->m_pAnimationSets->m_nAnimatedBoneFrames, pInFile);
+					// n번째 키에서의 변환 행렬 저장 (Bone 개수만큼)
+					nReads = (UINT)::fread(&(pAnimationSet->m_vvxmf4x4KeyFrameTransforms[nKey][0]), sizeof(XMFLOAT4X4), pAnimationSets->m_nAnimatedBoneFrames, pInFile);
 #endif
-
 				}
 			}
 
@@ -425,6 +447,10 @@ std::shared_ptr<Object> Object::FindFrame(char* pstrFrameName)
 	return NULL;
 }
 
-void Object::FindAndSkinnedMesh(SkinnedMesh** ppSkinnedMeshes, int* pnSkinnedMesh)
+void Object::FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>> ppSkinnedMeshes)
 {
+	if (m_pMesh && (m_pMesh->GetType() & VERTEXT_BONE_INDEX_WEIGHT)) ppSkinnedMeshes.push_back(std::static_pointer_cast<SkinnedMesh>(m_pMesh));
+
+	if (m_pSibling) m_pSibling->FindAndSetSkinnedMesh(ppSkinnedMeshes);
+	if (m_pChild) m_pChild->FindAndSetSkinnedMesh(ppSkinnedMeshes);
 }
