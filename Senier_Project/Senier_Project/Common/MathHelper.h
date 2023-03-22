@@ -126,6 +126,17 @@ namespace MathHelper
 		return I;
 	}
 
+	inline XMFLOAT4X4 Zero4x4()
+	{
+		static XMFLOAT4X4 I(
+			0.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 0.0f);
+
+		return I;
+	}
+
 	inline XMVECTOR RandUnitVec3()
 	{
 		XMVECTOR One = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);

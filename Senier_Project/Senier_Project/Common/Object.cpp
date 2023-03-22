@@ -330,25 +330,25 @@ void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo>
 		{
 			nAnimationSets = ReadintegerFromFile(pInFile);
 
-			pModelData->m_vpAnimationSets.resize(nAnimationSets);
+			pModelData->m_pAnimationSets = std::make_shared<AnimationSets>();
 		}
 		else if (!strcmp(pstrToken, "<FrameNames>:"))
 		{
 			nAnimationSetCnt++;
 
 			int nBoneFrames = ReadintegerFromFile(pInFile);
-			pModelData->m_vpAnimationSets[nAnimationSetCnt]->m_nAnimatedBoneFrames = nBoneFrames;
+			pModelData->m_pAnimationSets->m_nAnimatedBoneFrames = nBoneFrames;
 
 			for (int i = 0; i < nBoneFrames; ++i)
 			{
 				ReadStringFromFile(pInFile, pstrToken);
-				pModelData->m_vpAnimationSets[nAnimationSetCnt]->m_vpAnimatedBoneFrameCaches.emplace_back(pModelData->m_pRootObject->FindFrame(pstrToken));
+				pModelData->m_pAnimationSets->m_vpAnimatedBoneFrameCaches.emplace_back(pModelData->m_pRootObject->FindFrame(pstrToken));
 			}
 
 		}
 		else if (!strcmp(pstrToken, "<AnimationSet>:"))
 		{
-			std::shared_ptr<AnimationSets> pAnimationSets = pModelData->m_vpAnimationSets[nAnimationSetCnt];
+			std::shared_ptr<AnimationSets> pAnimationSets = pModelData->m_pAnimationSets;
 
 			// n번째 애니메이션 데이터
 			int nAnimationSet = ReadintegerFromFile(pInFile);

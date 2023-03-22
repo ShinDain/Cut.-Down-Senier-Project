@@ -95,7 +95,7 @@ public:
 	float m_Position = -ANIMATION_CALLBACK_EPSILON;
 	float m_Weight = 1.0f;
 
-	int m_nAnimationSet = 0;
+	int m_nAnimationSet = 0;			// n번 애니메이션, 개수 아님
 
 	int m_Type = ANIMATION_TYPE_LOOP;		//Once, Loop, PingPong
 
@@ -125,7 +125,7 @@ public:
 	int m_nSkinnedMeshes = 0;
 	std::vector<std::shared_ptr<SkinnedMesh>> m_vpSkinnedMeshes;
 
-	std::vector<std::shared_ptr<AnimationSets>> m_vpAnimationSets;
+	std::shared_ptr<AnimationSets> m_pAnimationSets;
 
 public:
 	void PrepareSkinning();
@@ -135,16 +135,16 @@ public:
 class AnimationController
 {
 public:
-	AnimationController();
+	AnimationController(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int nAnimationTracks, ModelDataInfo* pModel);
 	~AnimationController();
 
 public:
 	float m_Time = 0.0f;
 
 	int m_nAnimationTracks = 0;
-	std::vector<AnimationTrack> m_vAnimationTracks;
+	std::vector<std::shared_ptr<AnimationTrack>> m_vpAnimationTracks;
 
-	std::vector<AnimationSets> m_vAnimationSets;
+	std::shared_ptr<AnimationSets> m_pAnimationSets;
 
 	int m_nSkinnedMeshes = 0;
 	std::vector<std::shared_ptr<SkinnedMesh>> m_vpSkinnedMeshes;
@@ -162,12 +162,13 @@ public:
 public:
 	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 	void AdvanceTime(float ElapsedTime, Object* pRootGameObject);
+	virtual void OnRootMotion(Object* pRootGameObject) {}
 
 public:
 	bool	m_bRootMotion = false;
-	Object* m_pModelRootObject = NULL;
+	std::shared_ptr<Object> m_pModelRootObject = NULL;
 
-	Object* m_pRootMotionObject = NULL;
+	std::shared_ptr<Object> m_pRootMotionObject = NULL;
 	XMFLOAT3 m_xmf3FirstRootMotionPosition = XMFLOAT3(0.0f, 0.0f, 0.0f);
 
 	void SetRootMotion(bool bRootMotion) { m_bRootMotion = bRootMotion; }
@@ -180,37 +181,37 @@ public:
 	// Set Track
 	void SetTrackAnimationSet(int nAnimationTrack, int nAnimationSet)
 	{
-		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].m_nAnimationSet = nAnimationSet;
+		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->m_nAnimationSet = nAnimationSet;
 	}
 	void SetTrackEnable(int nAnimationTrack, bool bEnable)
 	{
-		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].SetEnable(bEnable);
+		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetEnable(bEnable);
 	}
 	void SetTrackPosition(int nAnimationTrack, float Position)
 	{
-		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].SetPosition(Position);
+		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetPosition(Position);
 	}
 	void SetTrackSpeed(int nAnimationTrack, float Speed)
 	{
-		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].SetSpeed(Speed);
+		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetSpeed(Speed);
 	}
 	void SetTrackWeight(int nAnimationTrack, float Weight)
 	{
-		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].SetWeight(Weight);
+		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetWeight(Weight);
 	}
 
 	// Set Callback
 	void SetCallbackKeys(int nAnimationTrack, int nCallbackKeys)
 	{
-		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].SetCallbackKeys(nCallbackKeys);
+		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetCallbackKeys(nCallbackKeys);
 	}
 	void SetCallbackKey(int nAnimationTrack, int nKeyidx, float Time, void* pData)
 	{
-		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].SetCallbackKey(nKeyidx, Time, pData);
+		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetCallbackKey(nKeyidx, Time, pData);
 	}
 	void SetAnimationCallbackHandler(int nAnimationTrack, std::shared_ptr<AnimationCallbackHandler> pCallbackHandler)
 	{
-		if (nAnimationTrack <= m_vAnimationTracks.size()) m_vAnimationTracks[nAnimationTrack].SetAnimationCallbackHandler(pCallbackHandler);
+		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetAnimationCallbackHandler(pCallbackHandler);
 	}
 };
 

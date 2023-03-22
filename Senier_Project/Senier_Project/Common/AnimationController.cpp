@@ -144,14 +144,30 @@ void ModelDataInfo::PrepareSkinning()
 
 ////////////////////////////////////////////////////////////////
 
-AnimationController::AnimationController()
+AnimationController::AnimationController(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int nAnimationTracks, ModelDataInfo* pModel)
 {
+	m_nAnimationTracks = nAnimationTracks;
+	m_vpAnimationTracks.resize(nAnimationTracks);
+
+	m_pAnimationSets = pModel->m_pAnimationSets;
+
+	m_pModelRootObject = pModel->m_pRootObject;
+
+	m_nSkinnedMeshes = pModel->m_nSkinnedMeshes;
+
+	m_vpSkinnedMeshes.resize(m_nSkinnedMeshes);
+	for (int i = 0; i < m_nSkinnedMeshes; ++i) m_vpSkinnedMeshes[i] = pModel->m_vpSkinnedMeshes[i];
+
 	m_SkinningBoneTransformCBs.resize(m_nSkinnedMeshes);
 
 	// 원본 코드에서는 가정할 수 있는 최대 크기의 버퍼를 생성
-	// 뼈의 개수 만큼만 버퍼를 가진다면??
-	//for (int i = 0; i < m_nSkinnedMeshes; ++i)
-		//m_SkinningBoneTransformCBs[i] = std::make_unique<UploadBuffer<XMFLOAT4X4>>(pd3dDevice, m_nskinn;
+	// 뼈의 개수 만큼만 버퍼를 가진다면
+
+	for (int i = 0; i < m_nSkinnedMeshes; ++i)
+	{
+		int nBoneCnt = m_vpSkinnedMeshes[i]->GetSkinningBones();
+		m_SkinningBoneTransformCBs[i] = std::make_unique<UploadBuffer<XMFLOAT4X4>>(pd3dDevice, nBoneCnt, true);
+	}
 }
 
 AnimationController::~AnimationController()
@@ -160,6 +176,35 @@ AnimationController::~AnimationController()
 
 void AnimationController::AdvanceTime(float ElapsedTime, Object* pRootGameObject)
 {
+	m_Time += ElapsedTime;
+	if (m_vpAnimationTracks.size() > 0)
+	{
+		for (int i = 0; i < m_pAnimationSets->m_nAnimatedBoneFrames; ++i)
+			m_pAnimationSets->m_vpAnimatedBoneFrameCaches[i]->SetLocalTransform(MathHelper::Zero4x4());
+
+		for (int k = 0; k < m_nAnimationTracks; ++k)
+		{
+			if (m_vpAnimationTracks[k]->m_bEnable)
+			{
+				AnimationSet* pAnimationSet = m_pAnimationSets->m_vpAnimationSets[m_vpAnimationTracks[k]->m_nAnimationSet].get();
+				float fPosition = m_vpAnimationTracks[k]->UpdatePosition(m_vpAnimationTracks[k]->m_Position, ElapsedTime, pAnimationSet->m_Length);
+
+				for (int j = 0; j < m_pAnimationSets->m_nAnimatedBoneFrames; ++j)
+				{
+					XMFLOAT4X4 xmf4x4Transform = m_pAnimationSets->m_vpAnimatedBoneFrameCaches[j]->GetLocalTransform();
+					XMFLOAT4X4 xmf4x4TrackTransform = pAnimationSet->GetSRT(j, fPosition);
+					XMStoreFloat4x4(&xmf4x4Transform, XMLoadFloat4x4(&xmf4x4Transform) + XMLoadFloat4x4(&xmf4x4TrackTransform) * m_vpAnimationTracks[k]->m_Weight);
+
+
+					m_pAnimationSets->m_vpAnimatedBoneFrameCaches[j]->SetLocalTransform(xmf4x4Transform);
+				}
+				m_vpAnimationTracks[k]->HandleCallback();
+			}
+		}
+
+
+		OnRootMotion(pRootGameObject);
+	}
 }
 
 void AnimationController::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)

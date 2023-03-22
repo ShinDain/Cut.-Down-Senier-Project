@@ -102,6 +102,10 @@ public:
 	void SetRoll(const float in) { m_Roll = in; }
 	void SetQuaternion(const XMFLOAT4& quaternion) { m_xmf4Quaternion = quaternion; }
 
+	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
+	const XMFLOAT4X4& GetParentWorld() { return m_xmf4x4ParentWorld; }
+	const XMFLOAT4X4& GetLocalTransform() { return m_xmf4x4LocalTransform; }
+
 	const char* GetName() { return m_FrameName; }
 	const XMFLOAT3& GetPosition() { return(m_xmf3Position); }
 	const XMFLOAT3& GetScale() { return(m_xmf3Scale); }
@@ -114,8 +118,6 @@ public:
 	const float& GetRoll() { return(m_Roll); }
 	const XMFLOAT4& SetQuaternion() { return m_xmf4Quaternion; }
 
-	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
-	const XMFLOAT4X4& GetParentWorld() { return m_xmf4x4ParentWorld; }
 
 };
 
