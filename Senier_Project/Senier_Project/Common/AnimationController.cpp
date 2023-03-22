@@ -1,5 +1,6 @@
 #include "AnimationController.h"
 #include "Mesh.h"
+#include "Object.h"
 
 AnimationSet::AnimationSet()
 {
@@ -79,9 +80,22 @@ float AnimationTrack::UpdatePosition(float TrackPosition, float ElapsedTime, flo
 	switch (m_Type)
 	{
 	case ANIMATION_TYPE_LOOP:
+		if (m_Position < 0.0f) m_Position = 0.0f;
+		else
+		{
+			m_Position = TrackPosition + fTrackElapsedTime;
+			if (m_Position > AnimationLength)
+			{
+				m_Position = -ANIMATION_CALLBACK_EPSILON;
+				return (AnimationLength);
+			}
+		}
+
 		break;
 
 	case ANIMATION_TYPE_ONCE:
+		m_Position = TrackPosition + fTrackElapsedTime;
+		if (m_Position > AnimationLength) m_Position = AnimationLength;
 		break;
 	case ANIMATION_TYPE_PINGPONG:
 		break;
@@ -120,7 +134,12 @@ ModelDataInfo::~ModelDataInfo()
 
 void ModelDataInfo::PrepareSkinning()
 {
+	int nSkinnedMesh = 0;
+	m_vpSkinnedMeshes.resize(m_nSkinnedMeshes);
+	m_pRootObject->FindAndSetSkinnedMesh(m_vpSkinnedMeshes);
 
+	for (int i = 0; i < m_nSkinnedMeshes; ++i)
+		m_vpSkinnedMeshes[i]->PrepareSkinning(m_pRootObject.get());
 }
 
 ////////////////////////////////////////////////////////////////
@@ -129,6 +148,10 @@ AnimationController::AnimationController()
 {
 	m_SkinningBoneTransformCBs.resize(m_nSkinnedMeshes);
 
+	// 원본 코드에서는 가정할 수 있는 최대 크기의 버퍼를 생성
+	// 뼈의 개수 만큼만 버퍼를 가진다면??
+	//for (int i = 0; i < m_nSkinnedMeshes; ++i)
+		//m_SkinningBoneTransformCBs[i] = std::make_unique<UploadBuffer<XMFLOAT4X4>>(pd3dDevice, m_nskinn;
 }
 
 AnimationController::~AnimationController()

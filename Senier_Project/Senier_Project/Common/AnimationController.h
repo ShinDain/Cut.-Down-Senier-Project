@@ -122,7 +122,7 @@ public:
 
 	std::shared_ptr<Object> m_pRootObject = nullptr;
 
-	int m_nSkinMeshes = 0;
+	int m_nSkinnedMeshes = 0;
 	std::vector<std::shared_ptr<SkinnedMesh>> m_vpSkinnedMeshes;
 
 	std::vector<std::shared_ptr<AnimationSets>> m_vpAnimationSets;
@@ -151,6 +151,7 @@ public:
 
 	//--------------------
 
+	// skinnedMesh 개수 * Bone 개수 * xmfloat4x4 만큼의 버퍼
 	std::vector<std::shared_ptr<UploadBuffer<XMFLOAT4X4>>> m_SkinningBoneTransformCBs;
 
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> m_vSkinningBoneTransforms;

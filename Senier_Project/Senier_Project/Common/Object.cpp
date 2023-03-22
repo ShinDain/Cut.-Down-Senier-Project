@@ -88,7 +88,7 @@ std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dD
 			if (!strcmp(pstrToken, "<Hierarchy>:"))
 			{
 				pModelData->m_pRootObject = Object::LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile, &nSkinnedMeshes);
-				pModelData->m_nSkinMeshes = nSkinnedMeshes;
+				pModelData->m_nSkinnedMeshes = nSkinnedMeshes;
 				::ReadStringFromFile(pInFile, pstrToken); //"</Hierarchy>"
 			}
 			else if (!strcmp(pstrToken, "Animation>:"))
