@@ -86,7 +86,7 @@ public:
 	std::shared_ptr<AnimationCallbackHandler> m_pAnimationCallbackHandler = nullptr;
 
 public:
-	float UpdatePosition(float TrackPosition, float TrackElapsedTime, float AnimationLength);
+	float UpdatePosition(float TrackPosition, float ElapsedTime, float AnimationLength);
 	void HandleCallback();
 
 public:

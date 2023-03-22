@@ -329,10 +329,8 @@ void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo>
 		if (!strcmp(pstrToken, "<AnimationSets>:"))
 		{
 			nAnimationSets = ReadintegerFromFile(pInFile);
-			for (int i = 0; i < nAnimationSets; ++i)
-			{
-				pModelData->m_vpAnimationSets.emplace_back(std::make_shared<AnimationSets>());
-			}
+
+			pModelData->m_vpAnimationSets.resize(nAnimationSets);
 		}
 		else if (!strcmp(pstrToken, "<FrameNames>:"))
 		{
