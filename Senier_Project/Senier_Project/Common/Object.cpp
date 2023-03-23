@@ -4,6 +4,14 @@ Object::Object()
 {
 }
 
+Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks)
+{
+	ModelDataInfo* pModelData = pModel.get();
+
+	SetChild(pModelData->m_pRootObject);
+	m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
+}
+
 Object::~Object()
 {
 }
@@ -15,17 +23,27 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	return true;
 }
 
+void Object::Animate(const GameTimer& gt)
+{
+	if (m_pAnimationController)
+		m_pAnimationController->AdvanceTime(gt.DeltaTime(), this);
+
+	if (m_pSibling) { m_pSibling->Animate(gt); }
+	if (m_pChild) {	m_pChild->Animate(gt); }
+}
+
 void Object::Update(const GameTimer& gt)
 {
-	m_xmf4x4World = m_xmf4x4ParentWorld;
-
+	//m_xmf4x4World = m_xmf4x4ParentWorld;
+	m_xmf4x4World = MathHelper::identity4x4();
 	XMMATRIX rotate = XMMatrixMultiply(XMMatrixRotationY(m_Yaw), XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), m_Pitch));
-	XMMATRIX world = XMMatrixMultiply(XMLoadFloat4x4(&m_xmf4x4LocalTransform), XMLoadFloat4x4(&m_xmf4x4World));
 
-	XMMATRIX lastMat = XMMatrixMultiply(rotate, world);
-
-	XMStoreFloat4x4(&m_xmf4x4World, lastMat);
+	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixMultiply( rotate, XMLoadFloat4x4(&m_xmf4x4World)));
+	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixMultiply(XMLoadFloat4x4(&m_xmf4x4LocalTransform), XMLoadFloat4x4(&m_xmf4x4World)));
+	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixMultiply(XMLoadFloat4x4(&m_xmf4x4World), XMLoadFloat4x4(&m_xmf4x4ParentWorld)));
 	
+	XMMATRIX lastMat = XMLoadFloat4x4(&m_xmf4x4World);
+
 	tmpObjConstant objConstant;
 	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(lastMat));
 	if(m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
@@ -43,6 +61,7 @@ void Object::Update(const GameTimer& gt)
 void Object::PrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	if (m_pObjectCB) pd3dCommandList->SetGraphicsRootConstantBufferView(0, m_pObjectCB->Resource()->GetGPUVirtualAddress());
+	if (m_pAnimationController) m_pAnimationController->UpdateShaderVariables(pd3dCommandList);
 }
 
 void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -76,7 +95,8 @@ std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dD
 	::fopen_s(&pInFile, pstrFileName, "rb");
 	::rewind(pInFile);
 
-	std::shared_ptr<ModelDataInfo> pModelData;
+	std::shared_ptr<ModelDataInfo> pModelData = std::make_shared<ModelDataInfo>();
+	pModelData->m_pRootObject = std::make_shared<Object>();
 
 	char pstrToken[64] = { '\0' };
 	int nSkinnedMeshes = 0;
@@ -91,7 +111,7 @@ std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dD
 				pModelData->m_nSkinnedMeshes = nSkinnedMeshes;
 				::ReadStringFromFile(pInFile, pstrToken); //"</Hierarchy>"
 			}
-			else if (!strcmp(pstrToken, "Animation>:"))
+			else if (!strcmp(pstrToken, "<Animation>:"))
 			{
 				Object::LoadAnimationFromFile(pInFile, pModelData);
 				pModelData->PrepareSkinning();
@@ -445,9 +465,10 @@ std::shared_ptr<Object> Object::FindFrame(char* pstrFrameName)
 	return NULL;
 }
 
-void Object::FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>> ppSkinnedMeshes)
+void Object::FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>>* ppSkinnedMeshes)
 {
-	if (m_pMesh && (m_pMesh->GetType() & VERTEXT_BONE_INDEX_WEIGHT)) ppSkinnedMeshes.push_back(std::static_pointer_cast<SkinnedMesh>(m_pMesh));
+	if (m_pMesh && (m_pMesh->GetType() & VERTEXT_BONE_INDEX_WEIGHT)) 
+		ppSkinnedMeshes->push_back(std::static_pointer_cast<SkinnedMesh>(m_pMesh));
 
 	if (m_pSibling) m_pSibling->FindAndSetSkinnedMesh(ppSkinnedMeshes);
 	if (m_pChild) m_pChild->FindAndSetSkinnedMesh(ppSkinnedMeshes);

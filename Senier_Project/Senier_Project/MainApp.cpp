@@ -146,8 +146,6 @@ void MainApp::Draw(const GameTimer& gt)
 		mScene->Render(gt, m_CommandList.Get());
 	}
 
-
-
 	// Resource State º¯°æ
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier_Ren_Pre = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
@@ -159,7 +157,6 @@ void MainApp::Draw(const GameTimer& gt)
 
 	ThrowIfFailed(m_SwapChain->Present(0, 0));
 	m_CurrBackBuffer = (m_CurrBackBuffer + 1) % SwapChainBufferCount;
-
 }
 
 

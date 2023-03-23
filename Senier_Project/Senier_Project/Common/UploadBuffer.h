@@ -57,11 +57,6 @@ public:
 		memcpy(&m_MappedData[elementidx * m_ElementByteSize], &data, sizeof(T));
 	}
 
-	void CopyVecData(int elementidx, const std::vector<T>& data, int elementCnt)
-	{
-		memcpy(&m_MappedData[elementidx * m_ElementByteSize], &data, sizeof(T) * elementCnt);
-	}
-
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_UploadBuffer;
 	BYTE* m_MappedData = nullptr;

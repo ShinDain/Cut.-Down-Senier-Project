@@ -162,7 +162,6 @@ public:
 public:
 	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
 	void AdvanceTime(float ElapsedTime, Object* pRootGameObject);
-	virtual void OnRootMotion(Object* pRootGameObject) {}
 
 public:
 	bool	m_bRootMotion = false;
@@ -173,31 +172,32 @@ public:
 
 	void SetRootMotion(bool bRootMotion) { m_bRootMotion = bRootMotion; }
 
+	virtual void OnRootMotion(Object* pRootGameObject) { }
+
 	// ¹Ì±¸Çö
-	// virtual void OnRootMotion(Object* pRootGameObject) { }
 	// virtual void OnAnimationIK(Object* pRootGameObject) { }
 
 public:
 	// Set Track
 	void SetTrackAnimationSet(int nAnimationTrack, int nAnimationSet)
 	{
-		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->m_nAnimationSet = nAnimationSet;
+		if (nAnimationTrack < m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->m_nAnimationSet = nAnimationSet;
 	}
 	void SetTrackEnable(int nAnimationTrack, bool bEnable)
 	{
-		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetEnable(bEnable);
+		if (nAnimationTrack < m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetEnable(bEnable);
 	}
 	void SetTrackPosition(int nAnimationTrack, float Position)
 	{
-		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetPosition(Position);
+		if (nAnimationTrack < m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetPosition(Position);
 	}
 	void SetTrackSpeed(int nAnimationTrack, float Speed)
 	{
-		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetSpeed(Speed);
+		if (nAnimationTrack < m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetSpeed(Speed);
 	}
 	void SetTrackWeight(int nAnimationTrack, float Weight)
 	{
-		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetWeight(Weight);
+		if (nAnimationTrack < m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetWeight(Weight);
 	}
 
 	// Set Callback

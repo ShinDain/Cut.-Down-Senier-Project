@@ -18,6 +18,8 @@ class Object : public std::enable_shared_from_this<Object>
 {
 public:
 	Object();
+	Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks);
+
 	Object(const Object& rhs) = delete;
 	Object& operator=(const Object& rhs) = delete;
 	virtual ~Object();
@@ -25,6 +27,7 @@ public:
 	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
 
 	virtual void OnResize(float aspectRatio) {}
+	virtual void Animate(const GameTimer& gt);
 	virtual void Update(const GameTimer& gt);
 	virtual void PrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
@@ -56,7 +59,7 @@ public:
 	void SetMaterials(std::vector<std::shared_ptr<Material>> vpMaterial);
 
 	std::shared_ptr<Object> FindFrame(char* pstrFrameName);
-	void FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>> vpSkinnedMeshes);
+	void FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>>* vpSkinnedMeshes);
 
 protected:
 	UINT m_ObjCBByteSize = 0;
@@ -84,6 +87,8 @@ protected:
 	float m_Friction = 0.0f;
 
 public:
+	std::unique_ptr<AnimationController> m_pAnimationController = nullptr;
+
 	void SetWorld(XMFLOAT4X4 World) { m_xmf4x4World = World; }
 	void SetParentWorld(XMFLOAT4X4 ParentWorld) { m_xmf4x4ParentWorld = ParentWorld; }
 	void SetLocalTransform(XMFLOAT4X4 LocalTransform) { m_xmf4x4LocalTransform = LocalTransform; }

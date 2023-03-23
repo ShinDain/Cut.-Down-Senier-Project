@@ -12,20 +12,25 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 {
 	m_pPassCB = std::make_unique<UploadBuffer<tmpPassConstant>>(pd3dDevice, 1, true);
 
-	std::unique_ptr<Shader> defaultShader = std::make_unique<Shader>();
+	//std::unique_ptr<Shader> defaultShader = std::make_unique<Shader>();
+	std::unique_ptr<Shader> defaultShader = std::make_unique<SkinnedMeshShader>();
 	if (!defaultShader->Initialize(pd3dDevice, pd3dCommandList, NULL))
 		return false;
 	m_vpShaders.push_back(move(defaultShader));
 
 
 	// ModelData 로드 미완성
-	//char strFileName[64] = "Model/Mi24.bin";
+	//char strFileName[64] = "Model/Ethan.bin";
+	char strFileName[64] = "Model/Angrybot.bin";
 
-	//std::shared_ptr<ModelDataInfo> tmpModel; 
-	//tmpModel = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName);
+	std::shared_ptr<ModelDataInfo> tmpModel; 
+	tmpModel = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName);
+
+	m_vpObjs.emplace_back(std::make_shared<Object>(pd3dDevice, pd3dCommandList, tmpModel, 1));
+	m_vpObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
 
 	m_pCamera = std::make_unique<Camera>();
-	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -100.f));
+	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -50.0f));
 
 	m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
 
@@ -61,6 +66,7 @@ void Scene::Update(const GameTimer& gt)
 
 	for (int i = 0; i < m_vpObjs.size(); ++i)
 	{
+		m_vpObjs[i]->Animate(gt);
 		m_vpObjs[i]->Update(gt);
 	}
 }
@@ -70,7 +76,7 @@ void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandLi
 	for (int i = 0; i < m_vpShaders.size(); ++i)
 	{
 		m_vpShaders[i]->OnPrepareRender(pd3dCommandList);
-		pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
+		pd3dCommandList->SetGraphicsRootConstantBufferView(m_vpShaders[i]->GetPassBufferNum(), m_pPassCB->Resource()->GetGPUVirtualAddress());
 
 		m_vpShaders[i]->Render(gt, pd3dCommandList);
 	}

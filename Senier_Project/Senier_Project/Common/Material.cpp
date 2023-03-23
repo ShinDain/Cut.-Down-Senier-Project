@@ -46,12 +46,6 @@ bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 
 void Material::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	//MatConstants matConstants;
-	//matConstants.AlbedoColor = m_AlbedoColor;
-	//mMatCB->CopyData(0, matConstants);
-
-	//pd3dCommandList->SetGraphicsRootConstantBufferView(1, mMatCB->Resource()->GetGPUVirtualAddress());
-
 	if (m_DescriptorHeap == NULL)
 		return;
 

@@ -70,9 +70,9 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_BiTangentBufferUploader = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW				 m_BiTangentBufferView;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_IndexBufferGPU = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_IndexBufferUploader = nullptr;
-	D3D12_INDEX_BUFFER_VIEW					 m_IndexBufferView;
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>>	 m_vIndexBufferGPU;
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>>	 m_vIndexBufferUploader;
+	std::vector<D3D12_INDEX_BUFFER_VIEW>				 m_vIndexBufferView;
 
 	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R32_UINT;
 
@@ -97,14 +97,14 @@ protected:
 	int m_nVertices = 0;
 
 	std::vector<XMFLOAT3> m_vPositions;
-	std::vector<XMFLOAT3> m_vColors;
+	std::vector<XMFLOAT4> m_vColors;
 	std::vector<XMFLOAT2> m_vTextureC0;
 	std::vector<XMFLOAT2> m_vTextureC1;
 	std::vector<XMFLOAT3> m_vNormals;
 	std::vector<XMFLOAT3> m_vTangents;
 	std::vector<XMFLOAT3> m_vBiTangents;
 
-	std::vector<UINT> m_vIndices;
+	std::vector<std::vector<UINT>> m_vvIndices;
 	
 	XMFLOAT3 m_xmf3AABBCenter;
 	XMFLOAT3 m_xmf3AABBExtents;
@@ -189,7 +189,6 @@ protected:
 	//------------------
 
 public:
-	void BuildConstantBuffer(ID3D12Device* pd3dDevice);
 	void LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
 	void PrepareSkinning(Object* pModelRootObject);
 

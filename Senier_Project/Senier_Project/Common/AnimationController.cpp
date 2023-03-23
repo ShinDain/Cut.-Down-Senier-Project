@@ -24,11 +24,11 @@ XMFLOAT4X4 AnimationSet::GetSRT(int nBone, float Position)
 		if ((m_vKeyFrameTimes[i] <= Position) && (Position < m_vKeyFrameTimes[i + 1]))
 		{
 			float t = (Position - m_vKeyFrameTimes[i]) / (m_vKeyFrameTimes[i + 1] - m_vKeyFrameTimes[i]);
-			xmf4x4Transform = MathHelper::XMFloat4x4Interpolate(m_vvxmf4x4KeyFrameTransforms[i + 1][nBone], m_vvxmf4x4KeyFrameTransforms[i][nBone], t);
+			xmf4x4Transform = MathHelper::XMFloat4x4Interpolate(m_vvxmf4x4KeyFrameTransforms[i + 1][nBone], m_vvxmf4x4KeyFrameTransforms[i + 1][nBone], t);
 			break;
 		}
 	}
-	if (Position >= m_vKeyFrameTimes[m_nKeyFrames - 1]) xmf4x4Transform = m_vvxmf4x4KeyFrameTransforms[m_nKeyFrames][nBone];
+	if (Position >= m_vKeyFrameTimes[m_nKeyFrames - 1]) xmf4x4Transform = m_vvxmf4x4KeyFrameTransforms[m_nKeyFrames - 1][nBone];
 
 #endif
 
@@ -135,8 +135,7 @@ ModelDataInfo::~ModelDataInfo()
 void ModelDataInfo::PrepareSkinning()
 {
 	int nSkinnedMesh = 0;
-	m_vpSkinnedMeshes.resize(m_nSkinnedMeshes);
-	m_pRootObject->FindAndSetSkinnedMesh(m_vpSkinnedMeshes);
+	m_pRootObject->FindAndSetSkinnedMesh(&m_vpSkinnedMeshes);
 
 	for (int i = 0; i < m_nSkinnedMeshes; ++i)
 		m_vpSkinnedMeshes[i]->PrepareSkinning(m_pRootObject.get());
@@ -147,7 +146,10 @@ void ModelDataInfo::PrepareSkinning()
 AnimationController::AnimationController(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int nAnimationTracks, ModelDataInfo* pModel)
 {
 	m_nAnimationTracks = nAnimationTracks;
-	m_vpAnimationTracks.resize(nAnimationTracks);
+	for (int i = 0; i < nAnimationTracks; ++i)
+	{
+		m_vpAnimationTracks.emplace_back(std::make_shared<AnimationTrack>());
+	}
 
 	m_pAnimationSets = pModel->m_pAnimationSets;
 
@@ -177,6 +179,7 @@ AnimationController::~AnimationController()
 void AnimationController::AdvanceTime(float ElapsedTime, Object* pRootGameObject)
 {
 	m_Time += ElapsedTime;
+
 	if (m_vpAnimationTracks.size() > 0)
 	{
 		for (int i = 0; i < m_pAnimationSets->m_nAnimatedBoneFrames; ++i)
@@ -195,13 +198,11 @@ void AnimationController::AdvanceTime(float ElapsedTime, Object* pRootGameObject
 					XMFLOAT4X4 xmf4x4TrackTransform = pAnimationSet->GetSRT(j, fPosition);
 					XMStoreFloat4x4(&xmf4x4Transform, XMLoadFloat4x4(&xmf4x4Transform) + XMLoadFloat4x4(&xmf4x4TrackTransform) * m_vpAnimationTracks[k]->m_Weight);
 
-
 					m_pAnimationSets->m_vpAnimatedBoneFrameCaches[j]->SetLocalTransform(xmf4x4Transform);
 				}
 				m_vpAnimationTracks[k]->HandleCallback();
 			}
 		}
-
 
 		OnRootMotion(pRootGameObject);
 	}
