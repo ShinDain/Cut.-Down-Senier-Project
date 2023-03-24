@@ -34,7 +34,7 @@ void Object::Animate(const GameTimer& gt)
 
 void Object::Update(const GameTimer& gt)
 {
-	tmpObjConstant objConstant;
+	ObjConstant objConstant;
 	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
 	if(m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
 
@@ -90,8 +90,8 @@ void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandL
 
 void Object::BuildConstantBuffers(ID3D12Device* pd3dDevice)
 {
-	m_pObjectCB = std::make_unique<UploadBuffer<tmpObjConstant>>(pd3dDevice, 1, true);
-	m_ObjCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(tmpObjConstant));
+	m_pObjectCB = std::make_unique<UploadBuffer<ObjConstant>>(pd3dDevice, 1, true);
+	m_ObjCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjConstant));
 }
 
 std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)

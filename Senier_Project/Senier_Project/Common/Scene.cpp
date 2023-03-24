@@ -10,7 +10,7 @@ Scene::~Scene()
 
 bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	m_pPassCB = std::make_unique<UploadBuffer<tmpPassConstant>>(pd3dDevice, 1, true);
+	m_pPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
 
 	//std::unique_ptr<Shader> defaultShader = std::make_unique<Shader>();
 	std::unique_ptr<Shader> defaultShader = std::make_unique<SkinnedMeshShader>();
@@ -22,17 +22,19 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// ModelData 로드 미완성
 	//char strFileName[64] = "Model/Ethan.bin";
 	char strFileName[64] = "Model/Angrybot.bin";
+	//char strFileName[64] = "Model/Zebra.bin";
+	//char strFileName[64] = "Model/Eagle.bin";
 
 	std::shared_ptr<ModelDataInfo> tmpModel; 
 	tmpModel = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName);
 
 	m_vpObjs.emplace_back(std::make_shared<Object>(pd3dDevice, pd3dCommandList, tmpModel, 1));
 	m_vpObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
-	m_vpObjs[0]->SetPosition(0.0f, 0.0f, 0.0f);
-	m_vpObjs[0]->SetScale(10.0f, 10.0f, 10.0f);
+	//m_vpObjs[0]->SetPosition(0.0f, 0.0f, 0.0f);
+
 
 	m_pCamera = std::make_unique<Camera>();
-	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -50.0f));
+	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -100.0f));
 
 	m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
 
@@ -61,7 +63,7 @@ void Scene::Update(const GameTimer& gt)
 
 	XMMATRIX viewProj = XMMatrixMultiply(m_pCamera->GetView(), m_pCamera->GetProj());
 
-	tmpPassConstant passConstant;
+	PassConstant passConstant;
 
 	XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
 	m_pPassCB->CopyData(0, passConstant);

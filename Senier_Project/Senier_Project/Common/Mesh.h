@@ -140,8 +140,6 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////
 
-#define SKINNED_ANIMATION_BONES 256
-
 class SkinnedMesh : public Mesh
 {
 public:
@@ -168,16 +166,12 @@ protected:
 	//---------------
 
 	std::vector<XMFLOAT4X4> m_vxmf4x4BindPoseBoneOffsets;	
-
-	//---------------
-
-	UINT m_nBindPoseBoneOffsetCBByteSize = 0;
-	std::unique_ptr<UploadBuffer<XMFLOAT4X4>> m_BindPoseBoneOffsetCB = nullptr;
+	std::unique_ptr<UploadBuffer<BoneBindPoseOffsetConstant>> m_BindPoseBoneOffsetCB = nullptr;
 
 	//---------------
 
 	std::vector<XMFLOAT4X4> m_vxmf4x4SkinningBoneTransforms;
-	std::shared_ptr<UploadBuffer<XMFLOAT4X4>> m_SkinningBoneTransformCB = nullptr;
+	std::shared_ptr<UploadBuffer<SkinningBoneTransformConstant>> m_SkinningBoneTransformCB = nullptr;
 
 	//------------------
 
@@ -193,7 +187,7 @@ protected:
 	int m_nSkinningBones = 0;
 
 public:
-	void SetSkinningBoneTransformCB(std::shared_ptr<UploadBuffer<XMFLOAT4X4>> pSkinningBoneTransformBuffer)
+	void SetSkinningBoneTransformCB(std::shared_ptr<UploadBuffer<SkinningBoneTransformConstant>> pSkinningBoneTransformBuffer)
 	{
 		m_SkinningBoneTransformCB = pSkinningBoneTransformBuffer;
 	}

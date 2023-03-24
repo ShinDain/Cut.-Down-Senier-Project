@@ -151,12 +151,9 @@ public:
 
 	//--------------------
 
-	// skinnedMesh 개수 * Bone 개수 * xmfloat4x4 만큼의 버퍼
-	std::vector<std::shared_ptr<UploadBuffer<XMFLOAT4X4>>> m_SkinningBoneTransformCBs;
+	UINT m_nxmf4x4CBByteSize = 0;
 
-	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> m_vSkinningBoneTransforms;
-	std::vector<std::vector<XMFLOAT4X4>> m_vvxmf4x4MappedSkinningBoneTransfroms;
-
+	std::vector<std::shared_ptr<UploadBuffer<SkinningBoneTransformConstant>>> m_vSkinningBoneTransformCBs;
 	//---------------------
 
 public:

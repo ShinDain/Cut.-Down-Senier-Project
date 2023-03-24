@@ -160,15 +160,12 @@ AnimationController::AnimationController(ID3D12Device* pd3dDevice, ID3D12Graphic
 	m_vpSkinnedMeshes.resize(m_nSkinnedMeshes);
 	for (int i = 0; i < m_nSkinnedMeshes; ++i) m_vpSkinnedMeshes[i] = pModel->m_vpSkinnedMeshes[i];
 
-	m_SkinningBoneTransformCBs.resize(m_nSkinnedMeshes);
-
-	// 원본 코드에서는 가정할 수 있는 최대 크기의 버퍼를 생성
-	// 뼈의 개수 만큼만 버퍼를 가진다면
+	m_vSkinningBoneTransformCBs.resize(m_nSkinnedMeshes);
 
 	for (int i = 0; i < m_nSkinnedMeshes; ++i)
 	{
 		int nBoneCnt = m_vpSkinnedMeshes[i]->GetSkinningBones();
-		m_SkinningBoneTransformCBs[i] = std::make_unique<UploadBuffer<XMFLOAT4X4>>(pd3dDevice, nBoneCnt, true);
+		m_vSkinningBoneTransformCBs[i] = std::make_shared<UploadBuffer<SkinningBoneTransformConstant>>(pd3dDevice, nBoneCnt, true);
 	}
 }
 
@@ -214,6 +211,6 @@ void AnimationController::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dC
 {
 	for (int i = 0; i < m_nSkinnedMeshes; ++i)
 	{
-		m_vpSkinnedMeshes[i]->SetSkinningBoneTransformCB(m_SkinningBoneTransformCBs[i]);
+		m_vpSkinnedMeshes[i]->SetSkinningBoneTransformCB(m_vSkinningBoneTransformCBs[i]);
 	}
 }

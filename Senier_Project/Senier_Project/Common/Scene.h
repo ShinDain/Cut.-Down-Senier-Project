@@ -35,7 +35,7 @@ public:
 
 private:
 	std::vector<std::unique_ptr<Shader>> m_vpShaders;
-	std::unique_ptr<UploadBuffer<tmpPassConstant>> m_pPassCB = nullptr;
+	std::unique_ptr<UploadBuffer<PassConstant>> m_pPassCB = nullptr;
 
 	XMFLOAT4X4 m_xmf4x4ViewProj = MathHelper::identity4x4();
 

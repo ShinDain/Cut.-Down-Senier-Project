@@ -469,16 +469,14 @@ void SkinnedMesh::LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 				m_vxmf4x4BindPoseBoneOffsets.resize(m_nSkinningBones);
 				nReads = (UINT)fread(&m_vxmf4x4BindPoseBoneOffsets[0], sizeof(XMFLOAT4X4), m_nSkinningBones, pInFile);
 
-				m_BindPoseBoneOffsetCB = std::make_unique<UploadBuffer<XMFLOAT4X4>>(pd3dDevice, m_nSkinningBones, true);
-				m_nBindPoseBoneOffsetCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(XMFLOAT4X4) * m_nSkinningBones);
+				m_BindPoseBoneOffsetCB = std::make_unique<UploadBuffer<BoneBindPoseOffsetConstant>>(pd3dDevice, m_nSkinningBones, true);
 
+				BoneBindPoseOffsetConstant tmpBoneOffsetConstant;
 				for (int i = 0; i < m_nSkinningBones; ++i)
 				{
-					XMFLOAT4X4 transposeOffset;
-					XMStoreFloat4x4(&transposeOffset, XMMatrixTranspose(XMLoadFloat4x4(&m_vxmf4x4BindPoseBoneOffsets[i])));
-
-					m_BindPoseBoneOffsetCB->CopyData(i, transposeOffset);
+					XMStoreFloat4x4(&tmpBoneOffsetConstant.BoneOffset[i], XMMatrixTranspose(XMLoadFloat4x4(&m_vxmf4x4BindPoseBoneOffsets[i])));
 				}
+				m_BindPoseBoneOffsetCB->CopyData(0, tmpBoneOffsetConstant);
 			}
 		}
 		else if (!strcmp(pstrToken, "<BoneIndices>:"))
@@ -545,7 +543,6 @@ void SkinnedMesh::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandLi
 	if (m_BindPoseBoneOffsetCB != nullptr)
 	{
 		D3D12_GPU_VIRTUAL_ADDRESS BoneOffsetsGpuVirtualAddress = m_BindPoseBoneOffsetCB->Resource()->GetGPUVirtualAddress();
-		// 루트 서명에 상수 버퍼 연결
 		pd3dCommandList->SetGraphicsRootConstantBufferView(3, BoneOffsetsGpuVirtualAddress);
 	}
 
@@ -556,12 +553,12 @@ void SkinnedMesh::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandLi
 		// 루트 서명에 상수 버퍼 연결
 		pd3dCommandList->SetGraphicsRootConstantBufferView(4, SkinnginBoneTransformGpuVirtualAddress);
 
+		SkinningBoneTransformConstant tmpBoneTransformConstant;
 		for (int i = 0; i < m_nSkinningBones; ++i)
 		{
-			XMStoreFloat4x4(&m_vxmf4x4SkinningBoneTransforms[i], XMMatrixTranspose(XMLoadFloat4x4(&m_vpSkinningBoneFrameCaches[i]->GetWorld())));
-
-			if (m_SkinningBoneTransformCB) m_SkinningBoneTransformCB->CopyData(i, m_vxmf4x4SkinningBoneTransforms[i]);
+			XMStoreFloat4x4(&tmpBoneTransformConstant.BoneTransform[i], XMMatrixTranspose(XMLoadFloat4x4(&m_vpSkinningBoneFrameCaches[i]->GetWorld())));
 		}
+		if (m_SkinningBoneTransformCB) m_SkinningBoneTransformCB->CopyData(0, tmpBoneTransformConstant);
 	}
 }
 

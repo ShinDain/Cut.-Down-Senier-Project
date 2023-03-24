@@ -89,11 +89,8 @@ SkinnedMeshVertexOut VSSkinnedMesh(SkinnedMeshVertexIn vin)
 	for (int i = 0; i < MAX_VERTEX_INFLUENCES; i++)
 	{
 		mtxVertexToBoneWorld += vin.Weight[i] * mul(gmtxBoneOffsets[vin.Indices[i]], gmtxBoneTransforms[vin.Indices[i]]);
-		//mtxVertexToBoneWorld += vin.Weight[i] * gmtxBoneTransforms[vin.Indices[i]];
-		//mtxVertexToBoneWorld += gmtxBoneOffsets[vin.Indices[i]];
 	}
-	//vout.PosW = vin.PosL;
-	//vout.PosW = mul(float4(vin.PosL, 1.0f), gWorld).xyz;
+
 	vout.PosW = mul(float4(vin.PosL, 1.0f), mtxVertexToBoneWorld).xyz;
 	vout.Normal = mul(vin.Normal, (float3x3)mtxVertexToBoneWorld).xyz;
 	vout.Tangent = mul(vin.Tangent, (float3x3)mtxVertexToBoneWorld).xyz;

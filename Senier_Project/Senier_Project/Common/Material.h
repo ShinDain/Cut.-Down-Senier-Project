@@ -34,7 +34,7 @@ protected:
 	std::vector<std::unique_ptr<Texture>> m_vpTextures;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
 
-	std::unique_ptr<UploadBuffer<tmpMatConstant>> m_pMatCB = nullptr;
+	std::unique_ptr<UploadBuffer<MatConstant>> m_pMatCB = nullptr;
 
 	XMFLOAT4 m_xmf4AlbedoColor;
 	XMFLOAT4 m_xmf4EmissiveColor;

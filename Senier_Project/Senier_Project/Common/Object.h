@@ -47,7 +47,7 @@ protected:
 	std::shared_ptr<Object> m_pChild = NULL;
 	std::shared_ptr<Object> m_pSibling = NULL;
 
-	std::unique_ptr<UploadBuffer<tmpObjConstant>> m_pObjectCB = nullptr;
+	std::unique_ptr<UploadBuffer<ObjConstant>> m_pObjectCB = nullptr;
 
 	std::shared_ptr<Mesh> m_pMesh = nullptr;
 
