@@ -28,6 +28,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	m_vpObjs.emplace_back(std::make_shared<Object>(pd3dDevice, pd3dCommandList, tmpModel, 1));
 	m_vpObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
+	m_vpObjs[0]->SetPosition(0.0f, 0.0f, 0.0f);
+	m_vpObjs[0]->SetScale(10.0f, 10.0f, 10.0f);
 
 	m_pCamera = std::make_unique<Camera>();
 	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -50.0f));
@@ -67,6 +69,7 @@ void Scene::Update(const GameTimer& gt)
 	for (int i = 0; i < m_vpObjs.size(); ++i)
 	{
 		m_vpObjs[i]->Animate(gt);
+		//m_vpObjs[i]->UpdateTransform(NULL);
 		m_vpObjs[i]->Update(gt);
 	}
 }
@@ -129,11 +132,10 @@ void Scene::OnMouseMove(WPARAM btnState, int x, int y)
 {
 	if ((btnState & MK_LBUTTON) != 0)
 	{
-		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - m_LastMousePos.x));
-		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - m_LastMousePos.y));
+		float dx = XMConvertToRadians(10.0f * static_cast<float>(x - m_LastMousePos.x));
+		float dy = XMConvertToRadians(10.0f * static_cast<float>(y - m_LastMousePos.y));
 
-		m_vpObjs[0]->SetPitch(m_vpObjs[0]->GetPitch() - dy);
-		m_vpObjs[0]->SetYaw(m_vpObjs[0]->GetYaw() - dx);
+		m_vpObjs[0]->SetRotate(m_vpObjs[0]->GetPitch() - dy, m_vpObjs[0]->GetYaw() - dx, 0);
 	}
 	else if ((btnState & MK_RBUTTON) != 0)
 	{

@@ -34,27 +34,32 @@ void Object::Animate(const GameTimer& gt)
 
 void Object::Update(const GameTimer& gt)
 {
-	//m_xmf4x4World = m_xmf4x4ParentWorld;
-	m_xmf4x4World = MathHelper::identity4x4();
-	XMMATRIX rotate = XMMatrixMultiply(XMMatrixRotationY(m_Yaw), XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), m_Pitch));
-
-	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixMultiply( rotate, XMLoadFloat4x4(&m_xmf4x4World)));
-	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixMultiply(XMLoadFloat4x4(&m_xmf4x4LocalTransform), XMLoadFloat4x4(&m_xmf4x4World)));
-	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixMultiply(XMLoadFloat4x4(&m_xmf4x4World), XMLoadFloat4x4(&m_xmf4x4ParentWorld)));
-	
-	XMMATRIX lastMat = XMLoadFloat4x4(&m_xmf4x4World);
-
 	tmpObjConstant objConstant;
-	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(lastMat));
+	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
 	if(m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
 
 	if (m_pSibling) {
-		m_pSibling->SetParentWorld(m_xmf4x4ParentWorld);
 		m_pSibling->Update(gt);
 	}
 	if (m_pChild) {
-		m_pChild->SetParentWorld(m_xmf4x4World);
 		m_pChild->Update(gt);
+	}
+}
+
+void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
+{
+	if (pxmf4x4Parent)
+	{
+		XMStoreFloat4x4(&m_xmf4x4World, XMMatrixMultiply(XMLoadFloat4x4(&m_xmf4x4LocalTransform), XMLoadFloat4x4(pxmf4x4Parent)));
+	}
+	else
+		m_xmf4x4World = m_xmf4x4LocalTransform;
+
+	if (m_pSibling) {
+		m_pSibling->UpdateTransform(pxmf4x4Parent);
+	}
+	if (m_pChild) {
+		m_pChild->UpdateTransform(&m_xmf4x4World);
 	}
 }
 

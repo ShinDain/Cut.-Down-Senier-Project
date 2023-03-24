@@ -174,17 +174,10 @@ protected:
 	UINT m_nBindPoseBoneOffsetCBByteSize = 0;
 	std::unique_ptr<UploadBuffer<XMFLOAT4X4>> m_BindPoseBoneOffsetCB = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> m_BindPoseBoneOffsetResource = nullptr;
-	std::vector<XMFLOAT4X4> m_vxmf4x4MappedBindPoseBoneOffset;
-
 	//---------------
 
 	std::vector<XMFLOAT4X4> m_vxmf4x4SkinningBoneTransforms;
-
 	std::shared_ptr<UploadBuffer<XMFLOAT4X4>> m_SkinningBoneTransformCB = nullptr;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> m_SkinningBoneTransformResource = nullptr;
-	std::vector<XMFLOAT4X4> m_vxmf4x4MappedSkinningBoneTransform;
 
 	//------------------
 

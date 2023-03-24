@@ -196,13 +196,15 @@ void AnimationController::AdvanceTime(float ElapsedTime, Object* pRootGameObject
 				{
 					XMFLOAT4X4 xmf4x4Transform = m_pAnimationSets->m_vpAnimatedBoneFrameCaches[j]->GetLocalTransform();
 					XMFLOAT4X4 xmf4x4TrackTransform = pAnimationSet->GetSRT(j, fPosition);
-					XMStoreFloat4x4(&xmf4x4Transform, XMLoadFloat4x4(&xmf4x4Transform) + XMLoadFloat4x4(&xmf4x4TrackTransform) * m_vpAnimationTracks[k]->m_Weight);
+					XMStoreFloat4x4(&xmf4x4TrackTransform, XMLoadFloat4x4(&xmf4x4TrackTransform) * m_vpAnimationTracks[k]->m_Weight);
+					XMStoreFloat4x4(&xmf4x4Transform, XMLoadFloat4x4(&xmf4x4Transform) + XMLoadFloat4x4(&xmf4x4TrackTransform));
 
 					m_pAnimationSets->m_vpAnimatedBoneFrameCaches[j]->SetLocalTransform(xmf4x4Transform);
 				}
 				m_vpAnimationTracks[k]->HandleCallback();
 			}
 		}
+		pRootGameObject->UpdateTransform(NULL);
 
 		OnRootMotion(pRootGameObject);
 	}

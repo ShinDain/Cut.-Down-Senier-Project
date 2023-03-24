@@ -57,6 +57,12 @@ public:
 		memcpy(&m_MappedData[elementidx * m_ElementByteSize], &data, sizeof(T));
 	}
 
+	void ViewData(int elementidx)
+	{
+		XMFLOAT4X4 tmp;
+		memcpy(&tmp, &m_MappedData[elementidx * m_ElementByteSize], sizeof(T));
+	}
+
 private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> m_UploadBuffer;
 	BYTE* m_MappedData = nullptr;

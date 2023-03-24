@@ -137,6 +137,13 @@ namespace MathHelper
 		return I;
 	}
 
+	inline XMFLOAT4X4 MatrixMultiply(XMMATRIX& xmmtxMatrix1, XMFLOAT4X4& xmmtx4x4Matrix2)
+	{
+		XMFLOAT4X4 xmf4x4Result;
+		XMStoreFloat4x4(&xmf4x4Result, xmmtxMatrix1 * XMLoadFloat4x4(&xmmtx4x4Matrix2));
+		return(xmf4x4Result);
+	}
+
 	inline XMVECTOR RandUnitVec3()
 	{
 		XMVECTOR One = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);

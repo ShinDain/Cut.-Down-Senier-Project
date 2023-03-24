@@ -90,7 +90,7 @@ SkinnedMeshVertexOut VSSkinnedMesh(SkinnedMeshVertexIn vin)
 	{
 		mtxVertexToBoneWorld += vin.Weight[i] * mul(gmtxBoneOffsets[vin.Indices[i]], gmtxBoneTransforms[vin.Indices[i]]);
 		//mtxVertexToBoneWorld += vin.Weight[i] * gmtxBoneTransforms[vin.Indices[i]];
-		//mtxVertexToBoneWorld += vin.Weight[i] * gmtxBoneOffsets[vin.Indices[i]];
+		//mtxVertexToBoneWorld += gmtxBoneOffsets[vin.Indices[i]];
 	}
 	//vout.PosW = vin.PosL;
 	//vout.PosW = mul(float4(vin.PosL, 1.0f), gWorld).xyz;

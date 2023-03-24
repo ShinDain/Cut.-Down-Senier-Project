@@ -29,6 +29,7 @@ public:
 	virtual void OnResize(float aspectRatio) {}
 	virtual void Animate(const GameTimer& gt);
 	virtual void Update(const GameTimer& gt);
+	virtual void UpdateTransform(XMFLOAT4X4 *pxmf4x4Parent = NULL);
 	virtual void PrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 
@@ -94,17 +95,35 @@ public:
 	void SetLocalTransform(XMFLOAT4X4 LocalTransform) { m_xmf4x4LocalTransform = LocalTransform; }
 
 	void SetName(char* pstrName) { strcpy_s(m_FrameName, pstrName); }
-	void SetPosition(float x, float y, float z) { m_xmf3Position = XMFLOAT3(x, y, z); }
-	void SetPosition(XMFLOAT3 Position) { m_xmf3Position = Position; }
-	void SetScale(XMFLOAT3 Scale) { m_xmf3Scale = Scale; }
+	void SetPosition(float x, float y, float z) 
+	{
+		m_xmf4x4LocalTransform._41 = x;
+		m_xmf4x4LocalTransform._42 = y;
+		m_xmf4x4LocalTransform._43 = z;
+
+		UpdateTransform(NULL);
+	}
+	void SetPosition(XMFLOAT3 Position) { SetPosition(Position.x, Position.y, Position.z); }
+	void SetScale(float x, float y, float z) 
+	{
+		XMMATRIX mtxScale = XMMatrixScaling(x, y, z);
+		m_xmf4x4LocalTransform = MathHelper::MatrixMultiply(mtxScale, m_xmf4x4LocalTransform);
+
+		UpdateTransform(NULL);
+	}
+	void SetRotate(float fPitch, float fYaw, float fRoll)
+	{
+		XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
+		m_xmf4x4LocalTransform = MathHelper::MatrixMultiply(mtxRotate, m_xmf4x4LocalTransform);
+
+		UpdateTransform(NULL);
+	}
+
 	void SetFriction(float fFriction) { m_Friction = fFriction; }
 	void SetGravity(const XMFLOAT3& Gravity) { m_xmf3Gravity = Gravity; }
 	void SetMaxVelocityXZ(float Velocity) { m_MaxVelocityXZ = Velocity; }
 	void SetMaxVelocityY(float Velocity) { m_MaxVelocityY = Velocity; }
 	void SetVelocity(const XMFLOAT3& Velocity) { m_xmf3Velocity = Velocity; }
-	void SetYaw(const float in) { m_Yaw = in; }
-	void SetPitch(const float in) { m_Pitch = in; }
-	void SetRoll(const float in) { m_Roll = in; }
 	void SetQuaternion(const XMFLOAT4& quaternion) { m_xmf4Quaternion = quaternion; }
 
 	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
