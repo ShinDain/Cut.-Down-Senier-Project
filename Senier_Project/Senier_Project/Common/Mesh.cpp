@@ -218,13 +218,13 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 				m_nType |= VERTEXT_COLOR;
 
 				m_vColors.resize(nColor);
-				nReads = (UINT)fread(&m_vColors[0], sizeof(XMFLOAT3), nColor, pInFile);
+				nReads = (UINT)fread(&m_vColors[0], sizeof(XMFLOAT4), nColor, pInFile);
 
-				UINT colorBufferByteSize = sizeof(XMFLOAT3) * nColor;
+				UINT colorBufferByteSize = sizeof(XMFLOAT4) * nColor;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_ColorBufferGPU, &m_ColorBufferUploader,
-					colorBufferByteSize, sizeof(XMFLOAT3),
+					colorBufferByteSize, sizeof(XMFLOAT4),
 					&m_ColorBufferView, m_vColors.data());
 			}
 		}
@@ -421,6 +421,13 @@ void Mesh::DisposeUploaders()
 
 SkinnedMesh::SkinnedMesh()
 {
+	m_BoneIndexBufferView.BufferLocation = NULL;
+	m_BoneIndexBufferView.SizeInBytes = 0;
+	m_BoneIndexBufferView.StrideInBytes = 0;
+
+	m_BoneWeightBufferView.BufferLocation = NULL;
+	m_BoneWeightBufferView.SizeInBytes = 0;
+	m_BoneWeightBufferView.StrideInBytes = 0;
 }
 
 SkinnedMesh::~SkinnedMesh()
@@ -429,7 +436,7 @@ SkinnedMesh::~SkinnedMesh()
 
 void SkinnedMesh::LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)
 {
-	char pstrToken[64] = { '\0' };
+	char pstrToken[128] = { '\0' };
 	UINT nReads = 0;
 
 	ReadStringFromFile(pInFile, pstrToken);
@@ -471,12 +478,13 @@ void SkinnedMesh::LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 
 				m_BindPoseBoneOffsetCB = std::make_unique<UploadBuffer<BoneBindPoseOffsetConstant>>(pd3dDevice, m_nSkinningBones, true);
 
-				BoneBindPoseOffsetConstant tmpBoneOffsetConstant;
+				BoneBindPoseOffsetConstant* tmpBoneOffsetConstant = new BoneBindPoseOffsetConstant;
 				for (int i = 0; i < m_nSkinningBones; ++i)
 				{
-					XMStoreFloat4x4(&tmpBoneOffsetConstant.BoneOffset[i], XMMatrixTranspose(XMLoadFloat4x4(&m_vxmf4x4BindPoseBoneOffsets[i])));
+					XMStoreFloat4x4(&tmpBoneOffsetConstant->BoneOffset[i], XMMatrixTranspose(XMLoadFloat4x4(&m_vxmf4x4BindPoseBoneOffsets[i])));
 				}
-				m_BindPoseBoneOffsetCB->CopyData(0, tmpBoneOffsetConstant);
+				m_BindPoseBoneOffsetCB->CopyData(0, *tmpBoneOffsetConstant);
+				delete tmpBoneOffsetConstant;
 			}
 		}
 		else if (!strcmp(pstrToken, "<BoneIndices>:"))
@@ -496,6 +504,8 @@ void SkinnedMesh::LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 					&m_BoneIndexBufferGPU, &m_BoneIndexBufferUploader,
 					boneIndexBufferByteSize, sizeof(XMINT4),
 					&m_BoneIndexBufferView, m_vxmn4BoneIndices.data());
+
+				m_vxmn4BoneIndices.clear();
 			}
 		}
 		else if (!strcmp(pstrToken, "<BoneWeights>:"))
@@ -506,6 +516,7 @@ void SkinnedMesh::LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 
 			if (m_nVertices > 0)
 			{
+				
 				m_vxmf4BoneWeights.resize(m_nVertices);
 
 				nReads = (UINT)fread(&m_vxmf4BoneWeights[0], sizeof(XMFLOAT4), m_nVertices, pInFile);
@@ -553,12 +564,13 @@ void SkinnedMesh::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandLi
 		// 루트 서명에 상수 버퍼 연결
 		pd3dCommandList->SetGraphicsRootConstantBufferView(4, SkinnginBoneTransformGpuVirtualAddress);
 
-		SkinningBoneTransformConstant tmpBoneTransformConstant;
+		SkinningBoneTransformConstant* tmpBoneTransformConstant = new SkinningBoneTransformConstant;
 		for (int i = 0; i < m_nSkinningBones; ++i)
 		{
-			XMStoreFloat4x4(&tmpBoneTransformConstant.BoneTransform[i], XMMatrixTranspose(XMLoadFloat4x4(&m_vpSkinningBoneFrameCaches[i]->GetWorld())));
+			XMStoreFloat4x4(&tmpBoneTransformConstant->BoneTransform[i], XMMatrixTranspose(XMLoadFloat4x4(&m_vpSkinningBoneFrameCaches[i]->GetWorld())));
 		}
-		if (m_SkinningBoneTransformCB) m_SkinningBoneTransformCB->CopyData(0, tmpBoneTransformConstant);
+		if (m_SkinningBoneTransformCB) m_SkinningBoneTransformCB->CopyData(0, *tmpBoneTransformConstant);
+		delete tmpBoneTransformConstant;
 	}
 }
 
@@ -566,7 +578,7 @@ void SkinnedMesh::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	UpdateShaderVariables(pd3dCommandList);
 
-	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[7] = 
+	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[7] =
 	{ m_PositionBufferView, m_TexC0BufferView, m_NormalBufferView, m_TangentBufferView,
 		m_BiTangentBufferView, m_BoneIndexBufferView, m_BoneWeightBufferView };
 	pd3dCommandList->IASetVertexBuffers(0, 7, pVertexBufferView);

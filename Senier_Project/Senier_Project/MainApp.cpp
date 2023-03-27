@@ -60,7 +60,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE previnstance, PSTR cmdLine, in
 	catch (DxException& e)
 	{
 		MessageBox(nullptr, e.ToString().c_str(), L"HR_Failed", MB_OK);
-		return 0;
+ 		return 0;
 	}
 
 	CoUninitialize();

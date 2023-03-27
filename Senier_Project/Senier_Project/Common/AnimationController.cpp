@@ -165,7 +165,7 @@ AnimationController::AnimationController(ID3D12Device* pd3dDevice, ID3D12Graphic
 	for (int i = 0; i < m_nSkinnedMeshes; ++i)
 	{
 		int nBoneCnt = m_vpSkinnedMeshes[i]->GetSkinningBones();
-		m_vSkinningBoneTransformCBs[i] = std::make_shared<UploadBuffer<SkinningBoneTransformConstant>>(pd3dDevice, nBoneCnt, true);
+		if(nBoneCnt) m_vSkinningBoneTransformCBs[i] = std::make_shared<UploadBuffer<SkinningBoneTransformConstant>>(pd3dDevice, nBoneCnt, true);
 	}
 }
 
