@@ -1,8 +1,33 @@
 #include "Shader.h"
+#include "Object.h"
 #include "Material.h"
 
 std::shared_ptr<Shader> Material::m_pStaticShader = nullptr;
 std::shared_ptr<Shader> Material::m_pSkinnedShader = nullptr;
+
+
+void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName)
+{
+	auto texMap = std::make_shared<Texture>();
+	wcscpy_s(texMap->FileName, texFileName);
+	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(
+		pd3dDevice, pd3dCommandList,
+		texMap->FileName,
+		texMap->Resource, texMap->UploadHeap));
+
+	g_CachingTexture.emplace_back(std::move(texMap));
+}
+
+std::shared_ptr<Texture> FindReplicatedTexture(const wchar_t* pstrTextureName)
+{
+	for (int i = 0; i < g_CachingTexture.size(); ++i)
+	{
+		if (!wcscmp(g_CachingTexture[i]->FileName, pstrTextureName))
+			return g_CachingTexture[i];
+	}
+
+	return NULL;
+}
 
 Material::Material()
 {
@@ -14,10 +39,16 @@ Material::~Material()
 
 bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 {
-	if (m_vpTextures.size() < 1)
+	if (m_strTextureName.size() < 1)
 		return false;
 
-	//mMatCB = std::make_unique<UploadBuffer<tmpMatConstant>>(pd3dDevice, 1, true);
+	for (int i = 0; i < m_strTextureName.size(); ++i)
+	{
+		m_vpTextures.emplace_back(FindReplicatedTexture(m_strTextureName[i].c_str()));
+	}
+
+	if (m_vpTextures.size() < 1)
+		return false;
 
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 	srvHeapDesc.NumDescriptors = m_vpTextures.size();
@@ -42,8 +73,8 @@ bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 		pd3dDevice->CreateShaderResourceView(tex.Get(), &srvDesc, hDescriptor);
 
 		hDescriptor.Offset(1, CbvSrvUavDescriptorSize);
-	}
 
+	}
 
 	return true;
 }
@@ -61,19 +92,7 @@ void Material::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 }
 
-void Material::LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::wstring texFileName)
-{
-	auto texMap = std::make_unique<Texture>();
-	texMap->FileName = texFileName;
-	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(
-		pd3dDevice, pd3dCommandList,
-		texMap->FileName.c_str(),
-		texMap->Resource, texMap->UploadHeap));
-
-	m_vpTextures.emplace_back(std::move(texMap));
-}
-
-void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)
+void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject)
 {
 	char pstrTextureName[64] = { '\0' };
 
@@ -96,37 +115,17 @@ void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		wchar_t conStr[64];
 		mbstowcs_s(&nConverted, conStr, 64, pstrFilePath, _TRUNCATE);
 
-		LoadTexture(pd3dDevice, pd3dCommandList, conStr);
+		m_strTextureName.push_back(conStr);
 
-
-		// 이미 로드한 텍스쳐의 경우 부모 객체로부터 텍스쳐를 가져올 수 있도록
-
-		/*if (!bDuplicated)
+		if (!bDuplicated)
 		{
-			LoadTextureFromDDSFile(pd3dDevice, pd3dCommandList, m_ppstrTextureNames[nIndex], RESOURCE_TEXTURE2D, nIndex);
-			pShader->CreateShaderResourceView(pd3dDevice, this, nIndex);
+			LoadTexture(pd3dDevice, pd3dCommandList, conStr);
 		}
 		else
 		{
-			if (pParent)
-			{
-				CGameObject* pRootGameObject = pParent;
-				while (pRootGameObject)
-				{
-					if (!pRootGameObject->m_pParent) break;
-					pRootGameObject = pRootGameObject->m_pParent;
-				}
-				D3D12_GPU_DESCRIPTOR_HANDLE d3dSrvGpuDescriptorHandle;
-				int nParameterIndex = pRootGameObject->FindReplicatedTexture(m_ppstrTextureNames[nIndex], &d3dSrvGpuDescriptorHandle);
-				if (nParameterIndex >= 0)
-				{
-					m_pd3dSrvGpuDescriptorHandles[nIndex] = d3dSrvGpuDescriptorHandle;
-					m_pnRootParameterIndices[nIndex] = nParameterIndex;
-				}
-			}
-		}*/
-	}
 
+		}
+	}
 }
 
 void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,ID3D12RootSignature* pd3dRootSignature, void* pData)

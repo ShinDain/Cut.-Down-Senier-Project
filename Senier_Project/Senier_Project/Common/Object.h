@@ -34,11 +34,13 @@ public:
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void BuildConstantBuffers(ID3D12Device* pd3dDevice);
+	virtual void BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice);
 
 	static std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, char* pstrFileName);
-	static std::shared_ptr<Object> LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, int* pnSkinnedMeshes);
+	static std::shared_ptr<Object> LoadFrameHierarchyFromFile
+	(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, int* pnSkinnedMeshes, Object* pRootObject);
 	static void LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData);
-	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
+	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject);
 
 
 protected:
@@ -61,6 +63,8 @@ public:
 
 	std::shared_ptr<Object> FindFrame(char* pstrFrameName);
 	void FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>>* vpSkinnedMeshes);
+	std::shared_ptr<Texture> FindReplicatedTexture(_TCHAR* pstrTextureName);
+	void ReplicateTexture(Object* pRootObject);
 
 protected:
 	UINT m_ObjCBByteSize = 0;

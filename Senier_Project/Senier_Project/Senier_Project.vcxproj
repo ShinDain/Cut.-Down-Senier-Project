@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\AnimationController.cpp" />
+    <ClCompile Include="Common\Bitmap.cpp" />
     <ClCompile Include="Common\Camera.cpp" />
     <ClCompile Include="Common\D3DApp.cpp" />
     <ClCompile Include="Common\D3DUtil.cpp" />
@@ -35,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AnimationController.h" />
+    <ClInclude Include="Common\Bitmap.h" />
     <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\D3DApp.h" />
     <ClInclude Include="Common\D3DUtil.h" />

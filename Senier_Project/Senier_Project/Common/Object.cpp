@@ -101,6 +101,17 @@ void Object::BuildConstantBuffers(ID3D12Device* pd3dDevice)
 	m_ObjCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjConstant));
 }
 
+void Object::BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice)
+{
+	for (int i = 0; i < m_vpMaterials.size(); ++i)
+	{
+		m_vpMaterials[i]->BuildDescriptorHeap(pd3dDevice);
+	}
+
+	if (m_pSibling) m_pSibling->BuildTextureDescriptorHeap(pd3dDevice);
+	if (m_pChild) m_pChild->BuildTextureDescriptorHeap(pd3dDevice);
+}
+
 std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)
 {
 	FILE* pInFile = NULL;
@@ -119,8 +130,10 @@ std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dD
 		{
 			if (!strcmp(pstrToken, "<Hierarchy>:"))
 			{
-				pModelData->m_pRootObject = Object::LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile, &nSkinnedMeshes);
+				pModelData->m_pRootObject = Object::LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile, &nSkinnedMeshes, NULL);
 				pModelData->m_nSkinnedMeshes = nSkinnedMeshes;
+
+				pModelData->m_pRootObject->BuildTextureDescriptorHeap(pd3dDevice);
 				::ReadStringFromFile(pInFile, pstrToken); //"</Hierarchy>"
 			}
 			else if (!strcmp(pstrToken, "<Animation>:"))
@@ -144,7 +157,7 @@ std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dD
 	return pModelData;
 }
 
-std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, int* pnSkinnedMeshes)
+std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, int* pnSkinnedMeshes, Object* pRootObject)
 {
 	char pstrToken[64] = { '\0' };
 	UINT nReads = 0;
@@ -202,7 +215,10 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 		}
 		else if (!strcmp(pstrToken, "<Materials>:"))
 		{
-			pObject->LoadMaterialsFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			if(pRootObject)
+				pObject->LoadMaterialsFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
+			else
+				pObject->LoadMaterialsFromFile(pd3dDevice, pd3dCommandList, pInFile, pObject.get());
 		}
 		else if (!strcmp(pstrToken, "<Children>:"))
 		{
@@ -212,15 +228,22 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 			{
 				for (int i = 0; i < nChild; ++i)
 				{
-					std::shared_ptr<Object> pChild = LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile, pnSkinnedMeshes);
-					if (pChild) pObject->SetChild(pChild);
+					if (pRootObject)
+					{
+						std::shared_ptr<Object> pChild = LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile, pnSkinnedMeshes, pRootObject);
+						if (pChild) pObject->SetChild(pChild);
+					}
+					else
+					{
+						std::shared_ptr<Object> pChild = LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile, pnSkinnedMeshes, pObject.get());
+						if (pChild) pObject->SetChild(pChild);
+					}
 
 #ifdef _WITH_DEBUG_FRAME_HIERARCHY
 					TCHAR pstrDebug[256] = { 0 };
 					_stprintf_s(pstrDebug, 256, "(Frame: %p) (Parent: %p)\n"), pChild, pGameObject);
 					OutputDebugString(pstrDebug);
 #endif
-
 				}
 			}
 
@@ -234,7 +257,7 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 	return pObject;
 }
 
-void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)
+void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject)
 {
 	char pstrToken[64] = { '\0' };
 
@@ -322,31 +345,31 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		}
 		else if (!strcmp(pstrToken, "<AlbedoMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
 		}
 		else if (!strcmp(pstrToken, "<SpecularMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
 		}
 		else if (!strcmp(pstrToken, "<NormalMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
 		}
 		else if (!strcmp(pstrToken, "<MetallicMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
 		}
 		else if (!strcmp(pstrToken, "<EmissionMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
 		}
 		else if (!strcmp(pstrToken, "<DetailAlbedoMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
 		}
 		else if (!strcmp(pstrToken, "<DetailNormalMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
 		}
 		else if (!strcmp(pstrToken, "</Materials>"))
 		{
@@ -354,8 +377,8 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		}
 	}
 
-	for (int i = 0; i < vpMat.size(); ++i)
-		vpMat[i]->BuildDescriptorHeap(pd3dDevice);
+	//for (int i = 0; i < vpMat.size(); ++i)
+	//	vpMat[i]->BuildDescriptorHeap(pd3dDevice);
 
 	SetMaterials(vpMat);
 }
@@ -486,6 +509,47 @@ std::shared_ptr<Object> Object::FindFrame(char* pstrFrameName)
 
 	if (m_pSibling) if (pObject = m_pSibling->FindFrame(pstrFrameName)) return pObject;
 	if (m_pChild) if (pObject = m_pChild->FindFrame(pstrFrameName)) return pObject;
+
+	return NULL;
+}
+
+void Object::ReplicateTexture(Object* pRootObject)
+{
+	for (int i = 0; i < pRootObject->m_vpMaterials.size(); ++i)
+	{
+		if (m_vpMaterials[i])
+		{
+			for (int k = 0; k < m_vpMaterials[i]->m_vpTextures.size(); ++k)
+			{
+				if (m_vpMaterials[i]->m_vpTextures[k]->Resource == nullptr)
+				{
+				//	m_vpMaterials[i]->m_vpTextures[k] = FindReplicatedTexture(m_vpMaterials[i]->m_vpTextures[k]->FileName.c_str());
+				}
+			}
+		}
+	}
+}
+
+std::shared_ptr<Texture> Object::FindReplicatedTexture(_TCHAR* pstrTextureName)
+{
+	for (int i = 0; i < m_vpMaterials.size(); ++i)
+	{
+		if (m_vpMaterials[i])
+		{
+			for (int k = 0; k < m_vpMaterials[i]->m_vpTextures.size(); ++k)
+			{
+				if (m_vpMaterials[i]->m_vpTextures[k])
+				{
+					if (!_tcsncmp(m_vpMaterials[i]->m_vpTextures[k]->FileName, pstrTextureName, _tcslen(pstrTextureName)))
+						return (m_vpMaterials[i]->m_vpTextures[k]);
+				}
+			}
+		}
+	}
+
+	std::shared_ptr<Texture> pTexture = NULL;
+	if (m_pSibling) if(pTexture = m_pSibling->FindReplicatedTexture(pstrTextureName)) return pTexture;
+	if (m_pChild) if (pTexture = m_pChild->FindReplicatedTexture(pstrTextureName)) return pTexture;
 
 	return NULL;
 }

@@ -1,21 +1,26 @@
 #pragma once
 
 #include "D3DUtil.h"
-//#include "Shader.h"
 #include "UploadBuffer.h"
 #include "Global.h"
 
 using namespace DirectX;
 
 class Shader;
+class Object;
 
 struct Texture
 {
-	std::wstring FileName;
+	__wchar_t FileName[64];
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> Resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> Resource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap = nullptr;
 };
+
+static std::vector<std::shared_ptr<Texture>> g_CachingTexture;
+
+void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName);
+std::shared_ptr<Texture> FindReplicatedTexture(wchar_t* pstrTextureName);
 
 class Material
 {
@@ -30,13 +35,13 @@ public:
 
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	
-	void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::wstring texFileName);
-	void LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
+	void LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject);
+
+	std::vector<std::wstring> m_strTextureName;
+	std::vector<std::shared_ptr<Texture>> m_vpTextures;
 
 protected:
-	std::vector<std::unique_ptr<Texture>> m_vpTextures;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
-
 	std::unique_ptr<UploadBuffer<MatConstant>> m_pMatCB = nullptr;
 
 	XMFLOAT4 m_xmf4AlbedoColor;

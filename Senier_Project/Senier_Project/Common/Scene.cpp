@@ -24,24 +24,35 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	// ModelData 로드 미완성
 	//char strFileName[64] = "Model/Ethan.bin";
-	char strFileName[64] = "Model/Angrybot.bin";
+	char strFileName1[64] = "Model/Angrybot.bin";
 	//char strFileName[64] = "Model/Zebra.bin";
 	//char strFileName[64] = "Model/Eagle.bin";
-	//char strFileName[64] = "Model/unitychan.bin";
+	char strFileName2[64] = "Model/unitychan.bin";
 	//char strFileName[64] = "Model/Cube.bin";
 	//char strFileName[64] = "Model/Humanoid.bin";
 
-	std::shared_ptr<ModelDataInfo> tmpModel; 
-	tmpModel = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName);
+	std::shared_ptr<ModelDataInfo> tmpModel1; 
+	tmpModel1 = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName1);
 
-	m_vpObjs.emplace_back(std::make_shared<Object>(pd3dDevice, pd3dCommandList, tmpModel, 1));
+	std::shared_ptr<ModelDataInfo> tmpModel2;
+	tmpModel2 = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName2);
+
+	m_vpObjs.emplace_back(std::make_shared<Object>(pd3dDevice, pd3dCommandList, tmpModel1, 1));
 	m_vpObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
 	m_vpObjs[0]->m_pAnimationController->SetTrackPosition(0, 0.2f);
 	m_vpObjs[0]->SetPosition(10.0f, 0.0f, 0.0f);
 	m_vpObjs[0]->SetScale(10.0f, 10.0f, 10.0f);
-	m_vpObjs.emplace_back(std::make_shared<Object>(pd3dDevice, pd3dCommandList, tmpModel, 1));
+	m_vpObjs.emplace_back(std::make_shared<Object>(pd3dDevice, pd3dCommandList, tmpModel2, 1));
 	m_vpObjs[1]->SetPosition(0.0f, 0.0f, 0.0f);
 	m_vpObjs[1]->SetScale(10.0f, 10.0f, 10.0f);
+	m_vpObjs.emplace_back(std::make_shared<Object>(pd3dDevice, pd3dCommandList, tmpModel1, 1));
+	m_vpObjs[2]->m_pAnimationController->SetTrackPosition(0, 0.5f);
+	m_vpObjs[2]->SetPosition(-10.0f, 0.0f, 0.0f);
+	m_vpObjs[2]->SetScale(10.0f, 10.0f, 10.0f);
+	m_vpObjs.emplace_back(std::make_shared<Object>(pd3dDevice, pd3dCommandList, tmpModel2, 1));
+	m_vpObjs[3]->m_pAnimationController->SetTrackPosition(0, 0.3f);
+	m_vpObjs[3]->SetPosition(-20.0f, 0.0f, 0.0f);
+	m_vpObjs[3]->SetScale(10.0f, 10.0f, 10.0f);
 
 
 	m_pCamera = std::make_unique<Camera>();
@@ -190,6 +201,7 @@ void Scene::OnMouseMove(WPARAM btnState, int x, int y)
 		float dy = XMConvertToRadians(10.0f * static_cast<float>(y - m_LastMousePos.y));
 
 		m_vpObjs[0]->SetRotate(m_vpObjs[0]->GetPitch() - dy, m_vpObjs[0]->GetYaw() - dx, 0);
+		m_vpObjs[1]->SetRotate(m_vpObjs[1]->GetPitch() + dy, m_vpObjs[1]->GetYaw() + dx, 0);
 	}
 	else if ((btnState & MK_RBUTTON) != 0)
 	{

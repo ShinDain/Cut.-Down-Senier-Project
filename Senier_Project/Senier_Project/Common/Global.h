@@ -3,6 +3,7 @@
 // 정점 구조체 정의
 // 상수 버퍼 구조체 정의
 
+#include <tchar.h>
 #include "MathHelper.h"
 #include "UploadBuffer.h"
 

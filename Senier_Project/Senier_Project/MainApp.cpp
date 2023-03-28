@@ -3,7 +3,6 @@
 #include "Common/Scene.h"
 
 
-
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -21,7 +20,7 @@ public:
 private:
 	virtual void OnResize() override;
 	virtual void Update(const GameTimer& gt) override;
-	virtual void Draw(const GameTimer& gt) override;
+	virtual void Render(const GameTimer& gt) override;
 	
 	virtual void OnMouseDown(WPARAM btnState, int x, int y) override;
 	virtual void OnMouseUp(WPARAM btnState, int x, int y) override;
@@ -113,7 +112,7 @@ void MainApp::Update(const GameTimer& gt)
 	}
 }
 
-void MainApp::Draw(const GameTimer& gt)
+void MainApp::Render(const GameTimer& gt)
 {
 	FlushCommandQueue();
 	
@@ -140,11 +139,13 @@ void MainApp::Draw(const GameTimer& gt)
 		1.0f, 0, 0, NULL);
 	m_CommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilBufferView);
 
-	// Render 함수 호출
+	// Render 함수 호출 //////////////////////////////////////////
 	if (mScene)
 	{
 		mScene->Render(gt, m_CommandList.Get());
 	}
+
+	// Render 함수 호출 //////////////////////////////////////////
 
 	// Resource State 변경
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier_Ren_Pre = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),

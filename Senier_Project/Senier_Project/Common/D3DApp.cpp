@@ -91,7 +91,7 @@ int D3DApp::Run()
 			{
 				CalculateFrameStats();
 				Update(m_Timer);
-				Draw(m_Timer);
+				Render(m_Timer);
 			}
 			else
 			{
