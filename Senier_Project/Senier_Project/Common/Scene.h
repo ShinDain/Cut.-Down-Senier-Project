@@ -20,6 +20,7 @@ public:
 	virtual ~Scene();
 
 	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void BuildRootSignature(ID3D12Device* pd3dDevice);
 
 	virtual void OnResize(float aspectRatio);
 	virtual void Update(const GameTimer& gt);
@@ -33,7 +34,11 @@ public:
 
 	// virtual void CreateRtvAndDsvDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
+	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 2> GetStaticSampler();
+
 private:
+	ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
+
 	std::vector<std::unique_ptr<Shader>> m_vpShaders;
 	std::unique_ptr<UploadBuffer<PassConstant>> m_pPassCB = nullptr;
 

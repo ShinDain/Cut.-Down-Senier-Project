@@ -1,4 +1,8 @@
+#include "Shader.h"
 #include "Material.h"
+
+std::shared_ptr<Shader> Material::m_pStaticShader = nullptr;
+std::shared_ptr<Shader> Material::m_pSkinnedShader = nullptr;
 
 Material::Material()
 {
@@ -123,4 +127,13 @@ void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		}*/
 	}
 
+}
+
+void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,ID3D12RootSignature* pd3dRootSignature, void* pData)
+{
+	m_pStaticShader = std::make_shared<Shader>();
+	m_pStaticShader->Initialize(pd3dDevice, pd3dCommandList, pd3dRootSignature, NULL);
+	
+	m_pSkinnedShader = std::make_shared<SkinnedMeshShader>();
+	m_pSkinnedShader->Initialize(pd3dDevice, pd3dCommandList, pd3dRootSignature, NULL);
 }

@@ -20,26 +20,21 @@ public:
 	Shader& operator=(const Shader& rhs) = delete;
 	virtual ~Shader();
 
-	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pContext);
 
 	virtual void OnResize(float aspectRatio) {};
 	virtual void Update(const GameTimer& gt) {};
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 
-
-	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
 	virtual bool BuildShadersAndInputLayout();
 
-	virtual bool BuildPSO(ID3D12Device* pd3dDevice);
+	virtual bool BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature);
 
 	virtual void OnWinKeyboardInput(WPARAM wParam) {};
 
-	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 2> GetStaticSampler();
 
 protected:
-	ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
-
 	ComPtr<ID3DBlob> m_vsByteCode = nullptr;
 	ComPtr<ID3DBlob> m_psByteCode = nullptr;
 
@@ -62,18 +57,16 @@ public:
 	SkinnedMeshShader& operator=(const SkinnedMeshShader& rhs) = delete;
 	virtual ~SkinnedMeshShader();
 
-	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pContext);
 
 	virtual void OnResize(float aspectRatio) {};
 	virtual void Update(const GameTimer& gt) {};
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 
-
-	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
 	virtual bool BuildShadersAndInputLayout();
 
-	virtual bool BuildPSO(ID3D12Device* pd3dDevice);
+	virtual bool BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature);
 
 	virtual void OnWinKeyboardInput(WPARAM wParam) {};
 

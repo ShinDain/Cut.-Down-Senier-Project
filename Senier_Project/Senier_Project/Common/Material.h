@@ -1,10 +1,13 @@
 #pragma once
 
 #include "D3DUtil.h"
+//#include "Shader.h"
 #include "UploadBuffer.h"
 #include "Global.h"
 
 using namespace DirectX;
+
+class Shader;
 
 struct Texture
 {
@@ -72,6 +75,17 @@ public:
 	void SetFresnelIOR(XMFLOAT3 in) { m_xmf3FresnelIOR = in; }
 	void SetRoughness(float in) { m_Roughness = in; }
 
+public:
+	std::shared_ptr<Shader> m_pShader = nullptr;
+
+	static std::shared_ptr<Shader> m_pStaticShader;
+	static std::shared_ptr<Shader> m_pSkinnedShader;
+
+	static void PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,ID3D12RootSignature* pd3dRootSignature, void* pData);
+
+	void SetShader(std::shared_ptr<Shader> pShader) { m_pShader = pShader; }
+	void SetStaticShader() { SetShader(m_pStaticShader); }
+	void SetSkinnedShader() { SetShader(m_pSkinnedShader); }
 };
 
 

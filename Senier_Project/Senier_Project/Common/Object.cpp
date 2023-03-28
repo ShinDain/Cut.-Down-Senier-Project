@@ -1,3 +1,4 @@
+#include "Shader.h"
 #include "Object.h"
 
 Object::Object()
@@ -76,12 +77,14 @@ void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandL
 	for (int i = 0; i < m_vpMaterials.size(); ++i)
 	{
 		m_vpMaterials[i]->OnPrepareRender(pd3dCommandList);
-	}
 
-	if (m_pMesh)
-	{
-		m_pMesh->OnPrepareRender(pd3dCommandList);
-		m_pMesh->Render(gt, pd3dCommandList);
+		if (m_vpMaterials[i]->m_pShader) m_vpMaterials[i]->m_pShader->OnPrepareRender(pd3dCommandList);
+
+		if (m_pMesh)
+		{
+			m_pMesh->OnPrepareRender(pd3dCommandList);
+			m_pMesh->Render(gt, pd3dCommandList);
+		}
 	}
 
 	if (m_pSibling) m_pSibling->Render(gt, pd3dCommandList);
@@ -243,7 +246,7 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	{
 		vpMat.emplace_back(std::make_shared<Material>());
 	}
-
+	
 	for (; ; )
 	{
 		ReadStringFromFile(pInFile, pstrToken);
@@ -251,6 +254,19 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		if (!strcmp(pstrToken, "<Material>:"))
 		{
 			nMatcnt = ReadintegerFromFile(pInFile);
+
+			int nType = m_pMesh->GetType();
+			if (nType & VERTEXT_NORMAL_TANGENT_TEXTURE)
+			{
+				if (nType & VERTEXT_BONE_INDEX_WEIGHT)
+				{
+					vpMat[nMatcnt]->SetSkinnedShader();
+				}
+				else
+				{
+					vpMat[nMatcnt]->SetStaticShader();
+				}
+			}
 		}
 		else if (!strcmp(pstrToken, "<AlbedoColor>:"))
 		{
