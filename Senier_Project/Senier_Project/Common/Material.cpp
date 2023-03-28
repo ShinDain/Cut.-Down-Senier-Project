@@ -5,30 +5,6 @@
 std::shared_ptr<Shader> Material::m_pStaticShader = nullptr;
 std::shared_ptr<Shader> Material::m_pSkinnedShader = nullptr;
 
-
-void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName)
-{
-	auto texMap = std::make_shared<Texture>();
-	wcscpy_s(texMap->FileName, texFileName);
-	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(
-		pd3dDevice, pd3dCommandList,
-		texMap->FileName,
-		texMap->Resource, texMap->UploadHeap));
-
-	g_CachingTexture.emplace_back(std::move(texMap));
-}
-
-std::shared_ptr<Texture> FindReplicatedTexture(const wchar_t* pstrTextureName)
-{
-	for (int i = 0; i < g_CachingTexture.size(); ++i)
-	{
-		if (!wcscmp(g_CachingTexture[i]->FileName, pstrTextureName))
-			return g_CachingTexture[i];
-	}
-
-	return NULL;
-}
-
 Material::Material()
 {
 }

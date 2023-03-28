@@ -63,8 +63,6 @@ public:
 
 	std::shared_ptr<Object> FindFrame(char* pstrFrameName);
 	void FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>>* vpSkinnedMeshes);
-	std::shared_ptr<Texture> FindReplicatedTexture(_TCHAR* pstrTextureName);
-	void ReplicateTexture(Object* pRootObject);
 
 protected:
 	UINT m_ObjCBByteSize = 0;
@@ -145,7 +143,6 @@ public:
 	const float& GetPitch() { return(m_Pitch); }
 	const float& GetRoll() { return(m_Roll); }
 	const XMFLOAT4& SetQuaternion() { return m_xmf4Quaternion; }
-
 
 };
 

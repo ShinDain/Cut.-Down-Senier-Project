@@ -513,47 +513,6 @@ std::shared_ptr<Object> Object::FindFrame(char* pstrFrameName)
 	return NULL;
 }
 
-void Object::ReplicateTexture(Object* pRootObject)
-{
-	for (int i = 0; i < pRootObject->m_vpMaterials.size(); ++i)
-	{
-		if (m_vpMaterials[i])
-		{
-			for (int k = 0; k < m_vpMaterials[i]->m_vpTextures.size(); ++k)
-			{
-				if (m_vpMaterials[i]->m_vpTextures[k]->Resource == nullptr)
-				{
-				//	m_vpMaterials[i]->m_vpTextures[k] = FindReplicatedTexture(m_vpMaterials[i]->m_vpTextures[k]->FileName.c_str());
-				}
-			}
-		}
-	}
-}
-
-std::shared_ptr<Texture> Object::FindReplicatedTexture(_TCHAR* pstrTextureName)
-{
-	for (int i = 0; i < m_vpMaterials.size(); ++i)
-	{
-		if (m_vpMaterials[i])
-		{
-			for (int k = 0; k < m_vpMaterials[i]->m_vpTextures.size(); ++k)
-			{
-				if (m_vpMaterials[i]->m_vpTextures[k])
-				{
-					if (!_tcsncmp(m_vpMaterials[i]->m_vpTextures[k]->FileName, pstrTextureName, _tcslen(pstrTextureName)))
-						return (m_vpMaterials[i]->m_vpTextures[k]);
-				}
-			}
-		}
-	}
-
-	std::shared_ptr<Texture> pTexture = NULL;
-	if (m_pSibling) if(pTexture = m_pSibling->FindReplicatedTexture(pstrTextureName)) return pTexture;
-	if (m_pChild) if (pTexture = m_pChild->FindReplicatedTexture(pstrTextureName)) return pTexture;
-
-	return NULL;
-}
-
 void Object::FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>>* ppSkinnedMeshes)
 {
 	if (m_pMesh && (m_pMesh->GetType() & VERTEXT_BONE_INDEX_WEIGHT)) 

@@ -9,19 +9,6 @@ using namespace DirectX;
 class Shader;
 class Object;
 
-struct Texture
-{
-	__wchar_t FileName[64];
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> Resource;
-	Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap = nullptr;
-};
-
-static std::vector<std::shared_ptr<Texture>> g_CachingTexture;
-
-void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName);
-std::shared_ptr<Texture> FindReplicatedTexture(wchar_t* pstrTextureName);
-
 class Material
 {
 public:

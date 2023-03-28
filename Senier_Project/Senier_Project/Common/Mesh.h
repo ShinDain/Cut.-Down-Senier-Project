@@ -109,19 +109,6 @@ protected:
 	XMFLOAT3 m_xmf3AABBCenter;
 	XMFLOAT3 m_xmf3AABBExtents;
 
-	void CreateVertexBuffer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
-		Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferGPU,
-		Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferUploader,
-		UINT bufferByteSize,
-		UINT strideInBytes,
-		D3D12_VERTEX_BUFFER_VIEW* pVertexBufferView, void* pData);
-
-	void CreateIndexBuffer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
-		Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferGPU,
-		Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferUploader,
-		UINT bufferByteSize,
-		D3D12_INDEX_BUFFER_VIEW* pVertexBufferView, void* pData);
-
 public:
 	void SetMeshName(const char* str)						{ strcpy_s(m_Name, str); }
 	void SetType(int nType)									{ m_nType = nType; }

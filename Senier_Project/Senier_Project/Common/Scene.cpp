@@ -10,9 +10,17 @@ Scene::~Scene()
 
 bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	// 루트 서명 생성
 	BuildRootSignature(pd3dDevice);
+	BuildImgObjRootSignature(pd3dDevice);
 
+	// 패스 버퍼 생성
 	m_pPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
+
+	// 셰이더 객체 생성
+	m_pImgObjShader = std::make_unique<ImageObjectShader>();
+	if (!m_pImgObjShader->Initialize(pd3dDevice, pd3dCommandList, m_ImgObjRootSignature.Get(), NULL))
+		return false;
 
 	//std::unique_ptr<Shader> defaultShader = std::make_unique<Shader>();
 	std::unique_ptr<Shader> defaultShader = std::make_unique<SkinnedMeshShader>();
@@ -101,11 +109,45 @@ void Scene::BuildRootSignature(ID3D12Device* pd3dDevice)
 		IID_PPV_ARGS(&m_RootSignature)));
 }
 
+void Scene::BuildImgObjRootSignature(ID3D12Device* pd3dDevice)
+{
+	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
+
+	CD3DX12_DESCRIPTOR_RANGE texTable;
+	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+
+	slotRootParameter[0].InitAsConstants(16, 0); // 변환 행렬 상수 
+	slotRootParameter[1].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
+
+	// 샘플러
+	auto staticSamplers = GetStaticSampler();
+
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(_countof(slotRootParameter), slotRootParameter,
+		(UINT)staticSamplers.size(), staticSamplers.data(),
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+	ComPtr<ID3DBlob> serializedRootSig = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+		serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+	if (errorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	}
+
+	ThrowIfFailed(hr);
+
+	ThrowIfFailed(pd3dDevice->CreateRootSignature(
+		0, serializedRootSig->GetBufferPointer(),
+		serializedRootSig->GetBufferSize(),
+		IID_PPV_ARGS(&m_ImgObjRootSignature)));
+}
+
 
 void Scene::OnResize(float aspectRatio)
 {
 	m_pCamera->SetLens(0.25f * MathHelper::Pi, aspectRatio, 1.0f, 10000.0f);
-
 }
 
 void Scene::Update(const GameTimer& gt)
@@ -121,17 +163,31 @@ void Scene::Update(const GameTimer& gt)
 
 	m_pCamera->LookAt(camPos3f, XMFLOAT3(0.0f, 0.0f, 0.0f), m_pCamera->GetUp3f());
 	m_pCamera->UpdateViewMatrix();
+	XMMATRIX view = m_pCamera->GetView();
 
-	XMMATRIX viewProj = XMMatrixMultiply(m_pCamera->GetView(), m_pCamera->GetProj());
+	XMMATRIX viewProj = XMMatrixMultiply(view, m_pCamera->GetProj());
 
 	PassConstant passConstant;
 	XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
 	m_pPassCB->CopyData(0, passConstant);
 
+	// img 렌더를 위해 투영 변환을 정사영 변환으로 대체
+	m_xmf4x4ImgObjMat = MathHelper::identity4x4();
+	XMStoreFloat4x4(&m_xmf4x4ImgObjMat, XMMatrixMultiply(view, XMMatrixOrthographicLH(CLIENT_WIDTH, CLIENT_HEIGHT, 1.0f, 10000.0f)));
+	
+
 	for (int i = 0; i < m_vpObjs.size(); ++i)
 	{
 		m_vpObjs[i]->Update(gt);
 	}
+}
+
+void Scene::ImgObjRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	pd3dCommandList->SetGraphicsRootSignature(m_ImgObjRootSignature.Get());
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &m_xmf4x4ImgObjMat, 0);
+
+	m_pImgObjShader->Render(gt, pd3dCommandList);
 }
 
 void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -141,8 +197,6 @@ void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandLi
 
 	/*for (int i = 0; i < m_vpShaders.size(); ++i)
 	{
-		m_vpShaders[i]->OnPrepareRender(pd3dCommandList);
-
 		m_vpShaders[i]->Render(gt, pd3dCommandList);
 	}*/
 

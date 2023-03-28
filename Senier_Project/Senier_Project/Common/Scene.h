@@ -21,9 +21,11 @@ public:
 
 	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void BuildRootSignature(ID3D12Device* pd3dDevice);
+	void BuildImgObjRootSignature(ID3D12Device* pd3dDevice);
 
 	virtual void OnResize(float aspectRatio);
 	virtual void Update(const GameTimer& gt);
+	virtual void ImgObjRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void OnKeyboardInput(const GameTimer& gt) {}
@@ -38,12 +40,14 @@ public:
 
 private:
 	ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
+	ComPtr<ID3D12RootSignature> m_ImgObjRootSignature = nullptr;
 
+	std::unique_ptr<ImageObjectShader> m_pImgObjShader = nullptr;
 	std::vector<std::unique_ptr<Shader>> m_vpShaders;
 	std::unique_ptr<UploadBuffer<PassConstant>> m_pPassCB = nullptr;
 
 	XMFLOAT4X4 m_xmf4x4ViewProj = MathHelper::identity4x4();
-
+	XMFLOAT4X4 m_xmf4x4ImgObjMat = MathHelper::identity4x4();
 
 	std::vector<std::shared_ptr<Object>> m_vpObjs;
 	std::unique_ptr<Camera> m_pCamera = nullptr;

@@ -142,7 +142,7 @@ void Mesh::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	
 	CreateIndexBuffer(pd3dDevice, pd3dCommandList,
 		&m_vIndexBufferGPU[0], &m_vIndexBufferUploader[0],
-		indexBufferByteSize,
+		indexBufferByteSize, m_IndexFormat,
 		&m_vIndexBufferView[0], Indices.data());
 
 	SubmeshGeometry subMesh;
@@ -358,7 +358,7 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 							m_vIndexBufferView.emplace_back(D3D12_INDEX_BUFFER_VIEW());
 							CreateIndexBuffer(pd3dDevice, pd3dCommandList,
 								&m_vIndexBufferGPU[nIndex], &m_vIndexBufferUploader[nIndex],
-								indexBufferByteSize,
+								indexBufferByteSize, m_IndexFormat,
 								&m_vIndexBufferView[nIndex], m_vvIndices[nIndex].data());
 						}
 					}
@@ -374,39 +374,6 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	}
 
 
-}
-
-void Mesh::CreateVertexBuffer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
-	Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferGPU,
-	Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferUploader,
-	UINT bufferByteSize,
-	UINT strideInBytes,
-	D3D12_VERTEX_BUFFER_VIEW* pVertexBufferView, void* pData)
-{
-	*pBufferGPU = d3dUtil::CreateDefaultBuffer(
-		pd3dDevice, pd3dCommandList,
-		pData, bufferByteSize,
-		*pBufferUploader);
-
-	pVertexBufferView->BufferLocation = (*pBufferGPU)->GetGPUVirtualAddress();
-	pVertexBufferView->StrideInBytes = strideInBytes;
-	pVertexBufferView->SizeInBytes = bufferByteSize;
-}
-
-void Mesh::CreateIndexBuffer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
-	Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferGPU,
-	Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferUploader,
-	UINT bufferByteSize,
-	D3D12_INDEX_BUFFER_VIEW* pIndexBufferView, void* pData)
-{
-	*pBufferGPU = d3dUtil::CreateDefaultBuffer(
-		pd3dDevice, pd3dCommandList,
-		pData, bufferByteSize,
-		*pBufferUploader);
-
-	pIndexBufferView->BufferLocation = (*pBufferGPU)->GetGPUVirtualAddress();
-	pIndexBufferView->Format = m_IndexFormat;
-	pIndexBufferView->SizeInBytes = bufferByteSize;
 }
 
 void Mesh::DisposeUploaders()

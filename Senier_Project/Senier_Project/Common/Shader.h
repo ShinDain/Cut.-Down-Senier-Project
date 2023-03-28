@@ -8,9 +8,12 @@
 #include "GameTimer.h"
 #include "Camera.h"
 #include "Object.h"
+#include "ImgObject.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
+
+// 일반 텍스쳐 셰이더
 
 class Shader
 {
@@ -49,6 +52,8 @@ public:
 
 };
 
+// 스키닝 메시 셰이더
+
 class SkinnedMeshShader : public Shader
 {
 public:
@@ -57,19 +62,30 @@ public:
 	SkinnedMeshShader& operator=(const SkinnedMeshShader& rhs) = delete;
 	virtual ~SkinnedMeshShader();
 
-	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pContext);
-
-	virtual void OnResize(float aspectRatio) {};
-	virtual void Update(const GameTimer& gt) {};
-	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
-
 	virtual bool BuildShadersAndInputLayout();
-
-	virtual bool BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature);
-
-	virtual void OnWinKeyboardInput(WPARAM wParam) {};
-
-
 };
 
+// 2D 이미지 렌더링 텍스쳐
+class ImageObjectShader :public Shader
+{
+public:
+	ImageObjectShader();
+	ImageObjectShader(const ImageObjectShader& rhs) = delete;
+	ImageObjectShader& operator=(const ImageObjectShader& rhs) = delete;
+	virtual ~ImageObjectShader();
+
+	virtual bool BuildShadersAndInputLayout();
+	virtual bool BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature);
+
+	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void OnResize(float aspectRatio);
+	virtual void Update(const GameTimer& gt);
+	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
+
+private:
+	std::vector<std::shared_ptr<ImgObject>> m_vpImgObjects;
+
+public:
+	bool CreateImgObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int nScreenWidth, int nScreenHeight,
+		const wchar_t* pstrTextureFileName, int nBitmapWidth, int nBitmapHeight);
+};

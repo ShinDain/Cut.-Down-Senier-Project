@@ -11,6 +11,7 @@
 
 #include "D3DUtil.h"
 #include "GameTimer.h"
+#include "Global.h"
 
 // d3d12 라이브러리
 #pragma comment(lib, "d3dcompiler.lib")
@@ -122,8 +123,8 @@ protected:
 	D3D_DRIVER_TYPE m_d3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
 	DXGI_FORMAT m_BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	DXGI_FORMAT m_DepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	int m_ClientWidth = 1920;
-	int m_ClientHeight = 1080;
+	int m_ClientWidth = CLIENT_WIDTH;
+	int m_ClientHeight = CLIENT_HEIGHT;
 
 };
 

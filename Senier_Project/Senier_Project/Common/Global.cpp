@@ -1,5 +1,28 @@
 #include "Global.h"
 
+void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName)
+{
+	auto texMap = std::make_shared<Texture>();
+	wcscpy_s(texMap->FileName, texFileName);
+	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(
+		pd3dDevice, pd3dCommandList,
+		texMap->FileName,
+		texMap->Resource, texMap->UploadHeap));
+
+	g_CachingTexture.emplace_back(std::move(texMap));
+}
+
+std::shared_ptr<Texture> FindReplicatedTexture(const wchar_t* pstrTextureName)
+{
+	for (int i = 0; i < g_CachingTexture.size(); ++i)
+	{
+		if (!wcscmp(g_CachingTexture[i]->FileName, pstrTextureName))
+			return g_CachingTexture[i];
+	}
+
+	return NULL;
+}
+
 int ReadintegerFromFile(FILE* pInFile)
 {
 	int nValue = 0;
@@ -23,6 +46,39 @@ BYTE ReadStringFromFile(FILE* pInFile, char* pstrToken)
 	pstrToken[nStrLength] = '\0';
 
 	return nStrLength;
+}
+
+void CreateVertexBuffer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferGPU,
+	Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferUploader,
+	UINT bufferByteSize,
+	UINT strideInBytes,
+	D3D12_VERTEX_BUFFER_VIEW* pVertexBufferView, void* pData)
+{
+	*pBufferGPU = d3dUtil::CreateDefaultBuffer(
+		pd3dDevice, pd3dCommandList,
+		pData, bufferByteSize,
+		*pBufferUploader);
+
+	pVertexBufferView->BufferLocation = (*pBufferGPU)->GetGPUVirtualAddress();
+	pVertexBufferView->StrideInBytes = strideInBytes;
+	pVertexBufferView->SizeInBytes = bufferByteSize;
+}
+
+void CreateIndexBuffer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferGPU,
+	Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferUploader,
+	UINT bufferByteSize,DXGI_FORMAT indexbufferFormat,
+	D3D12_INDEX_BUFFER_VIEW* pIndexBufferView, void* pData)
+{
+	*pBufferGPU = d3dUtil::CreateDefaultBuffer(
+		pd3dDevice, pd3dCommandList,
+		pData, bufferByteSize,
+		*pBufferUploader);
+
+	pIndexBufferView->BufferLocation = (*pBufferGPU)->GetGPUVirtualAddress();
+	pIndexBufferView->Format = indexbufferFormat;
+	pIndexBufferView->SizeInBytes = bufferByteSize;
 }
 
 void SynchronizeResourceTransition(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Resource* pd3dResource, D3D12_RESOURCE_STATES d3dStateBefore, D3D12_RESOURCE_STATES d3dStateAfter)

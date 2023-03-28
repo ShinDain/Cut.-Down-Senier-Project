@@ -1,13 +1,31 @@
 #pragma once
 
-// 정점 구조체 정의
-// 상수 버퍼 구조체 정의
-
 #include <tchar.h>
 #include "MathHelper.h"
 #include "UploadBuffer.h"
 
+
+#define CLIENT_WIDTH 1920
+#define CLIENT_HEIGHT 1080
+
 #define SKINNED_ANIMATION_BONES 256
+
+//////////////// Texture 구조체 //////////////////////
+
+struct Texture
+{
+	__wchar_t FileName[64];
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> Resource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap = nullptr;
+};
+
+static std::vector<std::shared_ptr<Texture>> g_CachingTexture;
+
+void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName);
+std::shared_ptr<Texture> FindReplicatedTexture(const wchar_t* pstrTextureName);
+
+//////////////// 상수 버퍼 구조체 //////////////////////
 
 struct ObjConstant
 {
@@ -32,6 +50,23 @@ struct SkinningBoneTransformConstant
 {
 	DirectX::XMFLOAT4X4 BoneTransform[SKINNED_ANIMATION_BONES];
 };
+
+//////////////// 정점, 인덱스 버퍼 생성 함수 //////////////////////
+
+void CreateVertexBuffer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferGPU,
+	Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferUploader,
+	UINT bufferByteSize,
+	UINT strideInBytes,
+	D3D12_VERTEX_BUFFER_VIEW* pVertexBufferView, void* pData);
+
+void CreateIndexBuffer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferGPU,
+	Microsoft::WRL::ComPtr<ID3D12Resource>* pBufferUploader,
+	UINT bufferByteSize, DXGI_FORMAT indexbufferFormat,
+	D3D12_INDEX_BUFFER_VIEW* pVertexBufferView, void* pData);
+
+//////////////// 파일 읽기 함수 //////////////////////
 
 int ReadintegerFromFile(FILE* pInFile);
 float ReadFloatFromFile(FILE* pInFile);
