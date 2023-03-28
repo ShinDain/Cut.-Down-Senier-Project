@@ -45,7 +45,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 
 	m_pCamera = std::make_unique<Camera>();
-	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -100.0f));
+	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, 100.0f));
 
 	m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
 
@@ -59,7 +59,7 @@ void Scene::BuildRootSignature(ID3D12Device* pd3dDevice)
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 
-	slotRootParameter[0].InitAsConstantBufferView(0);	// 오브젝트 상수 버퍼 (Material 상수 포함)
+	slotRootParameter[0].InitAsConstants(16, 0); // 월드 변환 행렬	// 오브젝트 상수 버퍼 (Material 상수 포함)
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
 	slotRootParameter[2].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
 	slotRootParameter[3].InitAsConstantBufferView(1);	// BoneOffsets 상수 버퍼 
@@ -116,6 +116,11 @@ void Scene::Update(const GameTimer& gt)
 	PassConstant passConstant;
 	XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
 	m_pPassCB->CopyData(0, passConstant);
+
+	for (int i = 0; i < m_vpObjs.size(); ++i)
+	{
+		m_vpObjs[i]->Update(gt);
+	}
 }
 
 void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -132,9 +137,9 @@ void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandLi
 
 	for (int i = 0; i < m_vpObjs.size(); ++i)
 	{
-		m_vpObjs[i]->Update(gt);
 		m_vpObjs[i]->Animate(gt);
-		//m_vpObjs[i]->UpdateTransform(NULL);
+		if(!m_vpObjs[i]->m_pAnimationController)
+			m_vpObjs[i]->UpdateTransform(NULL);
 		m_vpObjs[i]->Render(gt, pd3dCommandList);
 	}
 }

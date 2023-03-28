@@ -66,22 +66,26 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 
 void Object::PrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if (m_pObjectCB) pd3dCommandList->SetGraphicsRootConstantBufferView(0, m_pObjectCB->Resource()->GetGPUVirtualAddress());
 	if (m_pAnimationController) m_pAnimationController->UpdateShaderVariables(pd3dCommandList);
+	
 }
 
 void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	PrepareRender(gt, pd3dCommandList);
 
-	for (int i = 0; i < m_vpMaterials.size(); ++i)
+	if (m_pMesh)
 	{
-		m_vpMaterials[i]->OnPrepareRender(pd3dCommandList);
+		XMFLOAT4X4 xmf4x4World;
+		XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
 
-		if (m_vpMaterials[i]->m_pShader) m_vpMaterials[i]->m_pShader->OnPrepareRender(pd3dCommandList);
-
-		if (m_pMesh)
+		for (int i = 0; i < m_vpMaterials.size(); ++i)
 		{
+			m_vpMaterials[i]->OnPrepareRender(pd3dCommandList);
+
+			if (m_vpMaterials[i]->m_pShader) m_vpMaterials[i]->m_pShader->OnPrepareRender(pd3dCommandList);
+			
 			m_pMesh->OnPrepareRender(pd3dCommandList);
 			m_pMesh->Render(gt, pd3dCommandList);
 		}
