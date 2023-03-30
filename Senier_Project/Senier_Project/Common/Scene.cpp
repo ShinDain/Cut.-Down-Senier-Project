@@ -17,21 +17,16 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// 패스 버퍼 생성
 	m_pPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
 
-	// 셰이더 객체 생성
+	// ImageObject 셰이더 생성
 	m_pImgObjShader = std::make_unique<ImageObjectShader>();
 	if (!m_pImgObjShader->Initialize(pd3dDevice, pd3dCommandList, m_ImgObjRootSignature.Get(), NULL))
 		return false;
 	m_pImgObjShader->CreateImgObject(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/body_01.dds", 300, 300);
-
-	//std::unique_ptr<Shader> defaultShader = std::make_unique<Shader>();
-	std::unique_ptr<Shader> defaultShader = std::make_unique<SkinnedMeshShader>();
-	if (!defaultShader->Initialize(pd3dDevice, pd3dCommandList, m_RootSignature.Get(), NULL))
-		return false;
-	m_vpShaders.push_back(move(defaultShader));
-
+	
+	// static Shader 초기화
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_RootSignature.Get(), NULL);
 
-	// ModelData 로드 미완성
+	// 모델 데이터 로드
 	//char strFileName[64] = "Model/Ethan.bin";
 	char strFileName1[64] = "Model/Angrybot.bin";
 	//char strFileName[64] = "Model/Zebra.bin";
@@ -42,10 +37,11 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	std::shared_ptr<ModelDataInfo> tmpModel1; 
 	tmpModel1 = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName1);
-
 	std::shared_ptr<ModelDataInfo> tmpModel2;
 	tmpModel2 = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName2);
 
+
+	// 오브젝트 추가
 	m_vpObjs.emplace_back(std::make_shared<Object>(pd3dDevice, pd3dCommandList, tmpModel1, 1));
 	m_vpObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
 	m_vpObjs[0]->m_pAnimationController->SetTrackPosition(0, 0.2f);
@@ -64,9 +60,9 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_vpObjs[3]->SetScale(10.0f, 10.0f, 10.0f);
 
 
+	// 카메라 초기화
 	m_pCamera = std::make_unique<Camera>();
-	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -100.0f));
-
+	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, 100.0f));
 	m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
 
 	return true;
@@ -79,7 +75,7 @@ void Scene::BuildRootSignature(ID3D12Device* pd3dDevice)
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 
-	slotRootParameter[0].InitAsConstants(16, 0); // 월드 변환 행렬	// 오브젝트 상수 버퍼 (Material 상수 포함)
+	slotRootParameter[0].InitAsConstants(16, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
 	slotRootParameter[2].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
 	slotRootParameter[3].InitAsConstantBufferView(1);	// BoneOffsets 상수 버퍼 
@@ -158,26 +154,22 @@ void Scene::Update(const GameTimer& gt)
 		m_vpShaders[i]->Update(gt);
 	}
 
-	XMFLOAT3 camPos3f = XMFLOAT3(0.0f, 0.0f, -100.f);
+	XMFLOAT3 camPos3f = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMVECTOR camPos = m_pCamera->GetPosition();
 	XMStoreFloat3(&camPos3f, camPos);
 
 	m_pCamera->LookAt(camPos3f, XMFLOAT3(0.0f, 0.0f, 0.0f), m_pCamera->GetUp3f());
 	m_pCamera->UpdateViewMatrix();
 	XMMATRIX view = m_pCamera->GetView();
-
 	XMMATRIX viewProj = XMMatrixMultiply(view, m_pCamera->GetProj());
 
+	// 패스 버퍼 : 뷰 * 투영 변환 행렬 업데이트
 	PassConstant passConstant;
 	XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
 	m_pPassCB->CopyData(0, passConstant);
 
-	// img 렌더를 위해 투영 변환을 정사영 변환으로 대체
-	m_xmf4x4ImgObjMat = MathHelper::identity4x4();
-	XMStoreFloat4x4(&m_xmf4x4ImgObjMat, XMMatrixMultiply(XMMatrixOrthographicLH(CLIENT_WIDTH, CLIENT_HEIGHT, 1.0f, 10000.0f), XMLoadFloat4x4(&m_xmf4x4ImgObjMat)));
-	XMStoreFloat4x4(&m_xmf4x4ImgObjMat, XMMatrixMultiply(view, XMLoadFloat4x4(&m_xmf4x4ImgObjMat)));
-	
-	
+	// ImageObject 렌더를 위한  직교 투영행렬 업데이트
+	m_xmf4x4ImgObjMat = m_pCamera->GetOrtho4x4f();
 
 	for (int i = 0; i < m_vpObjs.size(); ++i)
 	{

@@ -126,6 +126,7 @@ void Camera::SetLens(float fovY, float aspect, float zn, float zf)
 
 	XMMATRIX P = XMMatrixPerspectiveFovLH(m_FovY, m_Aspect, m_NearZ, m_FarZ);
 	XMStoreFloat4x4(&m_xmf4x4Proj, P);
+	XMStoreFloat4x4(&m_xmf4x4Ortho, XMMatrixOrthographicLH(CLIENT_WIDTH, CLIENT_HEIGHT, m_NearZ, m_FarZ));
 }
 
 void Camera::LookAt(DirectX::FXMVECTOR pos, DirectX::FXMVECTOR target, DirectX::FXMVECTOR worldUp)
@@ -164,6 +165,11 @@ DirectX::XMMATRIX Camera::GetProj() const
 	return XMLoadFloat4x4(&m_xmf4x4Proj);
 }
 
+DirectX::XMMATRIX Camera::GetOrtho() const
+{
+	return XMLoadFloat4x4(&m_xmf4x4Ortho);
+}
+
 DirectX::XMFLOAT4X4 Camera::GetView4x4f() const
 {
 	assert(!m_bViewDirty);
@@ -173,6 +179,11 @@ DirectX::XMFLOAT4X4 Camera::GetView4x4f() const
 DirectX::XMFLOAT4X4 Camera::GetProj4x4f() const
 {
 	return m_xmf4x4Proj;
+}
+
+DirectX::XMFLOAT4X4 Camera::GetOrtho4x4f() const
+{
+	return m_xmf4x4Ortho;
 }
 
 void Camera::Strafe(float d)

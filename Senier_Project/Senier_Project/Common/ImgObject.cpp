@@ -27,7 +27,7 @@ bool ImgObject::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	if (!result)
 		return false;
 
-	UpdateBuffer(100, 0);
+	UpdateBuffer(CLIENT_WIDTH / 2, CLIENT_HEIGHT /2 );
 
 	return true;
 }

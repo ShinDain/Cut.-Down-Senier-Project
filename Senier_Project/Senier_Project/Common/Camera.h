@@ -5,6 +5,7 @@
 #pragma once
 
 #include "D3DUtil.h"
+#include "Global.h"
 
 class Camera
 {
@@ -44,9 +45,11 @@ public:
 
 	DirectX::XMMATRIX GetView()const;
 	DirectX::XMMATRIX GetProj()const;
+	DirectX::XMMATRIX GetOrtho()const;
 
 	DirectX::XMFLOAT4X4 GetView4x4f()const;
 	DirectX::XMFLOAT4X4 GetProj4x4f()const;
+	DirectX::XMFLOAT4X4 GetOrtho4x4f()const;
 
 	void Strafe(float d);
 	void Walk(float d);
@@ -74,6 +77,7 @@ protected:
 
 	DirectX::XMFLOAT4X4 m_xmf4x4View = MathHelper::identity4x4();
 	DirectX::XMFLOAT4X4 m_xmf4x4Proj = MathHelper::identity4x4();
+	DirectX::XMFLOAT4X4 m_xmf4x4Ortho = MathHelper::identity4x4();
 };
 
 class Third_Person_Camera : Camera

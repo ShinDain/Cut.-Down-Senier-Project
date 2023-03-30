@@ -142,8 +142,8 @@ void MainApp::Render(const GameTimer& gt)
 	// Render 함수 호출 //////////////////////////////////////////
 	if (mScene)
 	{
-		mScene->ImgObjRender(gt, m_CommandList.Get());
 		mScene->Render(gt, m_CommandList.Get());
+		mScene->ImgObjRender(gt, m_CommandList.Get());
 	}
 
 	// Render 함수 호출 //////////////////////////////////////////
