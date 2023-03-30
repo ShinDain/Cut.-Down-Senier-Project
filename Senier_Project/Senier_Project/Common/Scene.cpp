@@ -21,6 +21,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_pImgObjShader = std::make_unique<ImageObjectShader>();
 	if (!m_pImgObjShader->Initialize(pd3dDevice, pd3dCommandList, m_ImgObjRootSignature.Get(), NULL))
 		return false;
+	m_pImgObjShader->CreateImgObject(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/body_01.dds", 300, 300);
 
 	//std::unique_ptr<Shader> defaultShader = std::make_unique<Shader>();
 	std::unique_ptr<Shader> defaultShader = std::make_unique<SkinnedMeshShader>();
@@ -64,7 +65,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 
 	m_pCamera = std::make_unique<Camera>();
-	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, 100.0f));
+	m_pCamera->SetPosition(XMFLOAT3(0.0f, 0.0f, -100.0f));
 
 	m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
 
@@ -173,7 +174,9 @@ void Scene::Update(const GameTimer& gt)
 
 	// img 렌더를 위해 투영 변환을 정사영 변환으로 대체
 	m_xmf4x4ImgObjMat = MathHelper::identity4x4();
-	XMStoreFloat4x4(&m_xmf4x4ImgObjMat, XMMatrixMultiply(view, XMMatrixOrthographicLH(CLIENT_WIDTH, CLIENT_HEIGHT, 1.0f, 10000.0f)));
+	XMStoreFloat4x4(&m_xmf4x4ImgObjMat, XMMatrixMultiply(XMMatrixOrthographicLH(CLIENT_WIDTH, CLIENT_HEIGHT, 1.0f, 10000.0f), XMLoadFloat4x4(&m_xmf4x4ImgObjMat)));
+	XMStoreFloat4x4(&m_xmf4x4ImgObjMat, XMMatrixMultiply(view, XMLoadFloat4x4(&m_xmf4x4ImgObjMat)));
+	
 	
 
 	for (int i = 0; i < m_vpObjs.size(); ++i)

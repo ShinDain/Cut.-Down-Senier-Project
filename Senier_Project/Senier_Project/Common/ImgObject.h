@@ -27,7 +27,7 @@ public:
 
 protected:
 	bool BuildBufferResource(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-
+	bool BuildDescriptorHeap(ID3D12Device* pd3dDevice);
 
 private:
 	std::unique_ptr<UploadBuffer<XMFLOAT3>> m_DynamicPositionBuffer = nullptr;
@@ -44,14 +44,18 @@ private:
 
 	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R16_UINT;
 
+
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
 	std::wstring m_strTextureName;
 	std::shared_ptr<Texture> m_pTexture = nullptr;
+
+
 
 	D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 protected:
-	int m_nScreenWidth	= -1;
-	int m_nScreenHeight = -1;
+	int m_nScreenWidth	= CLIENT_WIDTH;
+	int m_nScreenHeight = CLIENT_HEIGHT;
 	int m_nBitmapWidth	= -1;
 	int m_nBitmapHeight = -1;
 	int m_nPreviousPosX = -1;

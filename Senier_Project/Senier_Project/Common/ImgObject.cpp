@@ -23,7 +23,11 @@ bool ImgObject::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	LoadTexture(pd3dDevice, pd3dCommandList, pstrTextureFileName);
 	m_pTexture = FindReplicatedTexture(m_strTextureName.c_str());
 
-	UpdateBuffer(0, 0);
+	result = BuildDescriptorHeap(pd3dDevice);
+	if (!result)
+		return false;
+
+	UpdateBuffer(100, 0);
 
 	return true;
 }
@@ -44,10 +48,16 @@ void ImgObject::PrePareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[2] =
 	{ m_DynamicPositionBufferView, m_DynamicTexC0BufferView };
-	pd3dCommandList->IASetVertexBuffers(0, 2, pVertexBufferView);
+	pd3dCommandList->IASetVertexBuffers(0, _countof(pVertexBufferView), pVertexBufferView);
 	pd3dCommandList->IASetPrimitiveTopology(m_PrimitiveTopology);
 
 	pd3dCommandList->IASetIndexBuffer(&m_IndexBufferView);
+
+	ID3D12DescriptorHeap* descriptorHeap[] = { m_DescriptorHeap.Get() };
+	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
+
+	D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	pd3dCommandList->SetGraphicsRootDescriptorTable(1, texHandle);
 }
 
 void ImgObject::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -90,6 +100,34 @@ bool ImgObject::BuildBufferResource(ID3D12Device* pd3dDevice, ID3D12GraphicsComm
 		nIndexBufferByteSize, m_IndexFormat,
 		&m_IndexBufferView, vIndices.data());
 
+
+	return true;
+}
+
+bool ImgObject::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
+{
+	if (m_pTexture == nullptr)
+		return false;
+
+	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	srvHeapDesc.NodeMask = 0;
+	srvHeapDesc.NumDescriptors = 1;
+	ThrowIfFailed(pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_DescriptorHeap)));
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+	auto texResource = m_pTexture->Resource;
+	
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = texResource->GetDesc().Format;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = texResource->GetDesc().MipLevels;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+	pd3dDevice->CreateShaderResourceView(texResource.Get(), &srvDesc, hDescriptor);
 
 	return true;
 }
