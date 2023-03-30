@@ -4,7 +4,7 @@
 // Descriptor Heap 초기화 및 관리
 // 셰이더 코드 컴파일
 
-#include "D3DApp.h"
+#include "DirectXApp.h"
 #include "GameTimer.h"
 #include "Camera.h"
 #include "Object.h"

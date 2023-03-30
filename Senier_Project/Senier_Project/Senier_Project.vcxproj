@@ -22,7 +22,7 @@
     <ClCompile Include="Common\AnimationController.cpp" />
     <ClCompile Include="Common\ImgObject.cpp" />
     <ClCompile Include="Common\Camera.cpp" />
-    <ClCompile Include="Common\D3DApp.cpp" />
+    <ClCompile Include="Common\DirectXApp.cpp" />
     <ClCompile Include="Common\D3DUtil.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
     <ClCompile Include="Common\GameTimer.cpp" />
@@ -38,7 +38,7 @@
     <ClInclude Include="Common\AnimationController.h" />
     <ClInclude Include="Common\ImgObject.h" />
     <ClInclude Include="Common\Camera.h" />
-    <ClInclude Include="Common\D3DApp.h" />
+    <ClInclude Include="Common\DirectXApp.h" />
     <ClInclude Include="Common\D3DUtil.h" />
     <ClInclude Include="Common\d3dx12.h" />
     <ClInclude Include="Common\DDSTextureLoader.h" />

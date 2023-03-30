@@ -1,9 +1,9 @@
 //***************************************************************************************
-// D3DApp.cpp by Frank Luna (C) 2015 All Rights Reserved.
+// DirectXApp.cpp by Frank Luna (C) 2015 All Rights Reserved.
 //***************************************************************************************
 
 
-#include "D3DApp.h"
+#include "DirectXApp.h"
 #include <windowsx.h>
 
 using Microsoft::WRL::ComPtr;
@@ -15,50 +15,53 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	// Forward hwnd on because we can get messages (e.g., WM_CREATE)
 	// before CreateWindow returns, and thus before m_hMainWnd is valid.
-	return D3DApp::GetApp()->MsgProc(hwnd, msg, wParam, lParam);
+	return DirectXApp::GetApp()->MsgProc(hwnd, msg, wParam, lParam);
 }
 
-D3DApp* D3DApp::m_App = nullptr;
-D3DApp* D3DApp::GetApp()
+DirectXApp* DirectXApp::m_App = nullptr;
+DirectXApp* DirectXApp::GetApp()
 {
 	return m_App;
 }
 
-D3DApp::D3DApp(HINSTANCE hInstance) : m_hAppInst(hInstance)
+DirectXApp::DirectXApp(HINSTANCE hInstance) : m_hAppInst(hInstance)
 {
-	// 오직 하나의 D3DApp만 생성
+	// 오직 하나의 DirectXApp만 생성
 	assert(m_App == nullptr);
 	m_App = this;
 }
 
-D3DApp::~D3DApp()
+DirectXApp::~DirectXApp()
 {
-	if (m_d3dDevice != nullptr)
+	// 정상 종료를 위해선 전체 화면 모드를 해제한 뒤 소멸해야 한다.
+	m_SwapChain->SetFullscreenState(false, NULL);
+
+	if (m_d3d12Device != nullptr)
 		FlushCommandQueue();
 }
 
 
-HINSTANCE D3DApp::AppInst() const
+HINSTANCE DirectXApp::AppInst() const
 {
 	return m_hAppInst;
 }
 
-HWND D3DApp::MainWnd() const
+HWND DirectXApp::MainWnd() const
 {
 	return m_hMainWnd;
 }
 
-float D3DApp::AspectRatio() const
+float DirectXApp::AspectRatio() const
 {
 	return static_cast<float>(m_ClientWidth) / m_ClientHeight;
 }
 
-bool D3DApp::Get4xMsaaState() const
+bool DirectXApp::Get4xMsaaState() const
 {
 	return m_4xMsaaState;
 }
 
-void D3DApp::Set4xMsaaState(bool value)
+void DirectXApp::Set4xMsaaState(bool value)
 {
 	if (m_4xMsaaState != value)
 	{
@@ -70,7 +73,7 @@ void D3DApp::Set4xMsaaState(bool value)
 	}
 }
 
-int D3DApp::Run()
+int DirectXApp::Run()
 {
 	MSG msg = { 0 };
 
@@ -103,9 +106,9 @@ int D3DApp::Run()
 	return (int)msg.wParam;
 }
 
-bool D3DApp::Initialize()
+bool DirectXApp::Initialize()
 {
-	if (!initMainWindow())
+	if (!InitMainWindow())
 		return false;
 
 	if (!InitDirect3D())
@@ -116,14 +119,14 @@ bool D3DApp::Initialize()
 	return true;
 }
 
-void D3DApp::CreateRtvAndDsvDescriptoHeaps()
+void DirectXApp::CreateRtvAndDsvDescriptoHeaps()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
 	rtvHeapDesc.NumDescriptors = SwapChainBufferCount;
 	rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	rtvHeapDesc.NodeMask = 0;
-	ThrowIfFailed(m_d3dDevice->CreateDescriptorHeap(
+	ThrowIfFailed(m_d3d12Device->CreateDescriptorHeap(
 		&rtvHeapDesc, IID_PPV_ARGS(m_RtvHeap.GetAddressOf())));
 
 	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
@@ -131,14 +134,14 @@ void D3DApp::CreateRtvAndDsvDescriptoHeaps()
 	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 	dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	dsvHeapDesc.NodeMask = 0;
-	ThrowIfFailed(m_d3dDevice->CreateDescriptorHeap(
+	ThrowIfFailed(m_d3d12Device->CreateDescriptorHeap(
 		&dsvHeapDesc, IID_PPV_ARGS(m_DsvHeap.GetAddressOf())));
 
 }
 
-void D3DApp::OnResize()
+void DirectXApp::OnResize()
 {
-	assert(m_d3dDevice);
+	assert(m_d3d12Device);
 	assert(m_SwapChain);
 	assert(m_DirectCmdListAlloc);
 
@@ -165,7 +168,7 @@ void D3DApp::OnResize()
 	for (int i = 0; i < SwapChainBufferCount; i++)
 	{
 		ThrowIfFailed(m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&m_SwapChainBuffer[i])));
-		m_d3dDevice->CreateRenderTargetView(m_SwapChainBuffer[i].Get(), nullptr, rtvHeapHandle);
+		m_d3d12Device->CreateRenderTargetView(m_SwapChainBuffer[i].Get(), nullptr, rtvHeapHandle);
 		rtvHeapHandle.Offset(1, m_RtvDescriptorSize);
 	}
 
@@ -189,7 +192,7 @@ void D3DApp::OnResize()
 	optClear.DepthStencil.Stencil = 0;
 
 	D3D12_HEAP_PROPERTIES defaultHeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-	ThrowIfFailed(m_d3dDevice->CreateCommittedResource(
+	ThrowIfFailed(m_d3d12Device->CreateCommittedResource(
 		&defaultHeapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&depthStencilDesc,
@@ -197,7 +200,7 @@ void D3DApp::OnResize()
 		&optClear,
 		IID_PPV_ARGS(m_DepthStencilBuffer.GetAddressOf())));
 
-	m_d3dDevice->CreateDepthStencilView(m_DepthStencilBuffer.Get(), nullptr, DepthStencilView());
+	m_d3d12Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), nullptr, DepthStencilView());
 
 	D3D12_RESOURCE_BARRIER resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(m_DepthStencilBuffer.Get(),
 		D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE);
@@ -221,7 +224,7 @@ void D3DApp::OnResize()
 	m_ScissorRect = { 0, 0, m_ClientWidth, m_ClientHeight };
 }
 
-LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT DirectXApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -243,7 +246,7 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_SIZE:
 		m_ClientWidth = LOWORD(lParam);
 		m_ClientHeight = HIWORD(lParam);
-		if (m_d3dDevice)
+		if (m_d3d12Device)
 		{
 			if (wParam == SIZE_MINIMIZED)
 			{
@@ -282,6 +285,23 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 		return 0;
+
+	case WM_WINDOWPOSCHANGED:
+		if (m_SwapChain)
+		{
+			BOOL bfullscreen;
+			m_SwapChain->GetFullscreenState(&bfullscreen, nullptr);
+			if (bfullscreen != m_FullscreenState)
+			{
+				m_AppPaused = true;
+				m_Timer.Stop();
+				OnResize();
+				m_Timer.Start();
+				m_AppPaused = false;
+				m_FullscreenState = bfullscreen;
+			}
+		}
+		return  0;
 
 	case WM_ENTERSIZEMOVE:
 		m_AppPaused = true;
@@ -340,7 +360,7 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-bool D3DApp::initMainWindow()
+bool DirectXApp::InitMainWindow()
 {
 	WNDCLASS wc;
 	wc.style = CS_HREDRAW | CS_VREDRAW;
@@ -366,7 +386,7 @@ bool D3DApp::initMainWindow()
 	int height = R.bottom - R.top;
 
 	m_hMainWnd = CreateWindow(L"MainWnd", m_MainWndCaption.c_str(),
-		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, m_hAppInst, 0);
+		WS_OVERLAPPEDWINDOW | WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, m_hAppInst, 0);
 	if (!m_hMainWnd)
 	{
 		MessageBox(0, L"createWindow Failed.", 0, 0);
@@ -379,7 +399,7 @@ bool D3DApp::initMainWindow()
 	return true;
 }
 
-bool D3DApp::InitDirect3D()
+bool DirectXApp::InitDirect3D()
 {
 #if defined(DEBUG) || defined(_DEBUG) 
 	// Enable the D3D12 debug layer.
@@ -394,9 +414,9 @@ bool D3DApp::InitDirect3D()
 
 	HRESULT hardwareResult = D3D12CreateDevice(
 		nullptr,
-		D3D_FEATURE_LEVEL_11_0,
-		IID_PPV_ARGS(&m_d3dDevice));
-
+		D3D_FEATURE_LEVEL_11_1,
+		IID_PPV_ARGS(&m_d3d12Device));
+	
 	if (FAILED(hardwareResult))
 	{
 		ComPtr<IDXGIAdapter> pWarpAdapter;
@@ -404,16 +424,16 @@ bool D3DApp::InitDirect3D()
 
 		ThrowIfFailed(D3D12CreateDevice(
 			pWarpAdapter.Get(),
-			D3D_FEATURE_LEVEL_11_0,
-			IID_PPV_ARGS(&m_d3dDevice)));
+			D3D_FEATURE_LEVEL_11_1,
+			IID_PPV_ARGS(&m_d3d12Device)));
 	}
 		
-	ThrowIfFailed(m_d3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE,
+	ThrowIfFailed(m_d3d12Device->CreateFence(0, D3D12_FENCE_FLAG_NONE,
 		IID_PPV_ARGS(&m_Fence)));
 	
-	m_RtvDescriptorSize = m_d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	m_DsvDescriptorSize = m_d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	m_CbvSrvUavDescriptorSize = m_d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	m_RtvDescriptorSize = m_d3d12Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	m_DsvDescriptorSize = m_d3d12Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	m_CbvSrvUavDescriptorSize = m_d3d12Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	// 후면 버퍼 포맷에 맞는 4x Msaa Quality 지원 여부 확인
 	// 모든 DirectX 지원 기기는 모든 포맷에 대한 4x Msaa를 지원하므로
@@ -423,7 +443,7 @@ bool D3DApp::InitDirect3D()
 	msQualityLevels.SampleCount = 4;
 	msQualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
 	msQualityLevels.NumQualityLevels = 0;
-	ThrowIfFailed(m_d3dDevice->CheckFeatureSupport(
+	ThrowIfFailed(m_d3d12Device->CheckFeatureSupport(
 		D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS,
 		&msQualityLevels,
 		sizeof(msQualityLevels)));
@@ -431,7 +451,7 @@ bool D3DApp::InitDirect3D()
 	m_4xMsaaQuality = msQualityLevels.NumQualityLevels;
 	assert(m_4xMsaaQuality > 0 && "Unexpected MSAA qualitu level.");
 
-#ifdef _DEBUG
+#if defined(DEBUG) || defined(_DEBUG) 
 	LogAdapters();
 #endif
 
@@ -442,18 +462,60 @@ bool D3DApp::InitDirect3D()
 	return true;
 }
 
-void D3DApp::CreateCommandObjects()
+bool DirectXApp::InitDirect3D11on12()
+{
+	ComPtr<ID3D11Device> d3d11Device;
+	UINT d3d11DeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+	
+#if defined(DEBUG) || defined(_DEBUG) 
+	// Enable the D3D11 debug layer.
+	d3d11DeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+	ThrowIfFailed(D3D11On12CreateDevice(
+		m_d3d12Device.Get(), d3d11DeviceFlags,
+		nullptr, 0,
+		reinterpret_cast<IUnknown**>(m_CommandQueue.GetAddressOf()), 1, 0,
+		&d3d11Device, &m_d3d11DeviceContext,
+		nullptr));
+
+	ThrowIfFailed(d3d11Device.As(&m_d3d11On12Device));
+		
+	return true;
+}
+
+bool DirectXApp::InitDirect2DAndDirectWrite()
+{
+	D2D1_FACTORY_OPTIONS d2dFactoryOptions = {};
+#if defined(_DEBUG)
+	// Enable the D2D debug layer.
+	d2dFactoryOptions.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
+#endif
+
+	D2D1_DEVICE_CONTEXT_OPTIONS deviceOptions = D2D1_DEVICE_CONTEXT_OPTIONS_NONE;
+	ThrowIfFailed(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED,
+		__uuidof(ID2D1Factory3), &d2dFactoryOptions, &m_d2dFactory));
+	ComPtr<IDXGIDevice> dxgiDevice;
+	ThrowIfFailed(m_d3d11On12Device.As(&dxgiDevice));
+	ThrowIfFailed(m_d2dFactory->CreateDevice(dxgiDevice.Get(), &m_d2dDevice));
+	ThrowIfFailed(m_d2dDevice->CreateDeviceContext(deviceOptions, &m_d2dDeviceContext));
+	ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), &m_dWriteFactory));
+
+	return true;
+}
+
+void DirectXApp::CreateCommandObjects()
 {
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-	ThrowIfFailed(m_d3dDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_CommandQueue)));
+	ThrowIfFailed(m_d3d12Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_CommandQueue)));
 
-	ThrowIfFailed(m_d3dDevice->CreateCommandAllocator(
+	ThrowIfFailed(m_d3d12Device->CreateCommandAllocator(
 		D3D12_COMMAND_LIST_TYPE_DIRECT,
 		IID_PPV_ARGS(m_DirectCmdListAlloc.GetAddressOf())));
 
-	ThrowIfFailed(m_d3dDevice->CreateCommandList(
+	ThrowIfFailed(m_d3d12Device->CreateCommandList(
 		0,
 		D3D12_COMMAND_LIST_TYPE_DIRECT,
 		m_DirectCmdListAlloc.Get(),
@@ -463,7 +525,7 @@ void D3DApp::CreateCommandObjects()
 	m_CommandList->Close();
 }
 
-void D3DApp::CreateSwapChain()
+void DirectXApp::CreateSwapChain()
 {
 	m_SwapChain.Reset();
 
@@ -488,9 +550,10 @@ void D3DApp::CreateSwapChain()
 		m_CommandQueue.Get(),
 			&sd,
 		m_SwapChain.GetAddressOf()));
+
 }
 
-void D3DApp::FlushCommandQueue()
+void DirectXApp::FlushCommandQueue()
 {
 	// 펜스를 전진시켜 표시
 	m_CurrentFence++;
@@ -511,14 +574,15 @@ void D3DApp::FlushCommandQueue()
 		WaitForSingleObject(eventHandle, INFINITE);
 		CloseHandle(eventHandle);
 	}
+
 }
 
-ID3D12Resource* D3DApp::CurrentBackBuffer() const
+ID3D12Resource* DirectXApp::CurrentBackBuffer() const
 {
 	return m_SwapChainBuffer[m_CurrBackBuffer].Get();
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE D3DApp::CurrentBackBufferView() const
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXApp::CurrentBackBufferView() const
 {
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE(
 		m_RtvHeap->GetCPUDescriptorHandleForHeapStart(),
@@ -526,12 +590,12 @@ D3D12_CPU_DESCRIPTOR_HANDLE D3DApp::CurrentBackBufferView() const
 		m_RtvDescriptorSize);
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE D3DApp::DepthStencilView() const
+D3D12_CPU_DESCRIPTOR_HANDLE DirectXApp::DepthStencilView() const
 {
 	return m_DsvHeap->GetCPUDescriptorHandleForHeapStart();
 }
 
-void D3DApp::CalculateFrameStats()
+void DirectXApp::CalculateFrameStats()
 {
 	static int frameCnt = 0;
 	static float timeElapsed = 0.0f;
@@ -558,7 +622,7 @@ void D3DApp::CalculateFrameStats()
 
 }
 
-void D3DApp::LogAdapters()
+void DirectXApp::LogAdapters()
 {
 	UINT i = 0;
 	IDXGIAdapter* adapter = nullptr;
@@ -586,7 +650,7 @@ void D3DApp::LogAdapters()
 	}
 }
 
-void D3DApp::LogAdapterOutputs(IDXGIAdapter* adapter)
+void DirectXApp::LogAdapterOutputs(IDXGIAdapter* adapter)
 {
 	UINT i = 0;
 	IDXGIOutput* output = nullptr;
@@ -608,7 +672,7 @@ void D3DApp::LogAdapterOutputs(IDXGIAdapter* adapter)
 	}
 }
 
-void D3DApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
+void DirectXApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 {
 	UINT count = 0;
 	UINT flags = 0;

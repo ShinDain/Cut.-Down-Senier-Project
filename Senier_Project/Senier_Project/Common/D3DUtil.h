@@ -30,6 +30,11 @@
 #include "DDSTextureLoader.h"
 #include "MathHelper.h"
 
+////////////////////////////////////////////////////////////////////////
+#include <d3d11on12.h>
+#include <d2d1_3.h>
+#include <dwrite.h>
+
 extern const int gNumFrameResources;
 
 inline void d3dSetDebugName(IDXGIObject* obj, const char* name)

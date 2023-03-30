@@ -1,6 +1,3 @@
-//***************************************************************************************
-// D3DApp.h by Frank Luna (C) 2015 All Rights Reserved.
-//***************************************************************************************
 #pragma once
 
 // 메모리 누수 탐지
@@ -18,18 +15,27 @@
 #pragma comment(lib, "D3D12.lib")	
 #pragma comment(lib, "dxgi.lib")
 
-class D3DApp
+// d3d11on12 라이브러리
+#pragma comment(lib, "D3D11.lib")
+
+// d2d1 라이브러리
+#pragma comment(lib, "D2D1.lib")
+
+// dWrite 라이브러리
+#pragma comment(lib, "Dwrite.lib")
+
+class DirectXApp
 {
 protected:
 
-	D3DApp(HINSTANCE hInstance);
-	D3DApp(const D3DApp& rhs) = delete;
-	D3DApp& operator=(const D3DApp& rhs) = delete;
-	virtual ~D3DApp();
+	DirectXApp(HINSTANCE hInstance);
+	DirectXApp(const DirectXApp& rhs) = delete;
+	DirectXApp& operator=(const DirectXApp& rhs) = delete;
+	virtual ~DirectXApp();
 
 public:
 
-	static D3DApp* GetApp();
+	static DirectXApp* GetApp();
 
 	HINSTANCE AppInst()const;
 	HWND MainWnd()const;
@@ -57,8 +63,10 @@ protected:
 
 protected:
 
-	bool initMainWindow();
+	bool InitMainWindow();
 	bool InitDirect3D();
+	bool InitDirect3D11on12();
+	bool InitDirect2DAndDirectWrite();
 	void CreateCommandObjects();
 	void CreateSwapChain();
 
@@ -76,7 +84,9 @@ protected:
 
 protected:
 	
-	static D3DApp* m_App;
+	/// /////////////////////////////////////////////	
+
+	static DirectXApp* m_App;
 
 	HINSTANCE m_hAppInst = nullptr;
 	HWND m_hMainWnd = nullptr;
@@ -92,9 +102,12 @@ protected:
 
 	GameTimer m_Timer;
 
+	/// /////////////////////////////////////////////	
+	// D3D12
+
 	Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_SwapChain;
-	Microsoft::WRL::ComPtr<ID3D12Device> m_d3dDevice;
+	Microsoft::WRL::ComPtr<ID3D12Device> m_d3d12Device;
 
 	Microsoft::WRL::ComPtr<ID3D12Fence> m_Fence;
 	UINT64 m_CurrentFence = 0;
@@ -118,8 +131,26 @@ protected:
 	UINT m_DsvDescriptorSize = 0;
 	UINT m_CbvSrvUavDescriptorSize = 0;
 
+	/// /////////////////////////////////////////////	
+	// D3D11on12
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_d3d11DeviceContext;
+	Microsoft::WRL::ComPtr<ID3D11On12Device> m_d3d11On12Device;
+
+	/// /////////////////////////////////////////////	
+	// D2D components
+	Microsoft::WRL::ComPtr<ID2D1Factory3> m_d2dFactory;
+	Microsoft::WRL::ComPtr<ID2D1Device> m_d2dDevice;
+	Microsoft::WRL::ComPtr<ID2D1DeviceContext> m_d2dDeviceContext;
+
+	/// /////////////////////////////////////////////	
+	// DWrite components
+	Microsoft::WRL::ComPtr<IDWriteFactory> m_dWriteFactory;
+
+
+
+
 	// 파생 클래스는 다음 파생 변수들을 초기화해줘야 한다.
-	std::wstring m_MainWndCaption = L"d3dd App";
+	std::wstring m_MainWndCaption = L"d3d App";
 	D3D_DRIVER_TYPE m_d3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
 	DXGI_FORMAT m_BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	DXGI_FORMAT m_DepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;

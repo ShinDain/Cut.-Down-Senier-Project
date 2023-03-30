@@ -1,4 +1,4 @@
-#include "Common/D3DApp.h"
+#include "Common/DirectXApp.h"
 #include "Common/MathHelper.h"
 #include "Common/Scene.h"
 
@@ -7,7 +7,7 @@ using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
-class MainApp : public D3DApp
+class MainApp : public DirectXApp
 {
 public:
 	MainApp(HINSTANCE hInstance);
@@ -66,20 +66,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE previnstance, PSTR cmdLine, in
 
 }
 
-MainApp::MainApp(HINSTANCE hInstance) : D3DApp(hInstance)
+MainApp::MainApp(HINSTANCE hInstance) : DirectXApp(hInstance)
 {
 	
 }
 
 MainApp::~MainApp()
 {
-	if (m_d3dDevice != nullptr)
+	if (m_d3d12Device != nullptr)
 		FlushCommandQueue();
 }
 
 bool MainApp::Initialize()
 {
-	if (!D3DApp::Initialize())
+	if (!DirectXApp::Initialize())
 		return false;
 
 	// 명령목록 초기화
@@ -87,7 +87,7 @@ bool MainApp::Initialize()
 
 	mScene = std::make_unique<Scene>();
 	// 각종 변수 초기화
-	if (!mScene->Initialize(m_d3dDevice.Get(), m_CommandList.Get()))
+	if (!mScene->Initialize(m_d3d12Device.Get(), m_CommandList.Get()))
 		return false;
 
 	// Execute
@@ -164,7 +164,7 @@ void MainApp::Render(const GameTimer& gt)
 
 void MainApp::OnResize()
 {
-	D3DApp::OnResize();
+	DirectXApp::OnResize();
 }
 
 void MainApp::OnMouseDown(WPARAM btnState, int x, int y)

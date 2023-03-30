@@ -4,7 +4,6 @@
 // General helper code.
 //***************************************************************************************
 
-
 #include "D3DUtil.h"
 #include <comdef.h>
 #include <fstream>
