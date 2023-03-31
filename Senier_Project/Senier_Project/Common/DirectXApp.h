@@ -71,6 +71,7 @@ protected:
 	void CreateSwapChain();
 
 	void FlushCommandQueue();
+	void FlushCommandQueueAndReleaseBuffer();
 
 	ID3D12Resource* CurrentBackBuffer()const;
 	D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView()const;
@@ -94,7 +95,7 @@ protected:
 	bool m_Minimized = false;
 	bool m_Maximized = false;
 	bool m_Resizing = false;
-	bool m_FullscreenState = false;
+	BOOL m_FullscreenState = false;
 
 	// 4x msaa 사용 여부, 기본은 false
 	bool m_4xMsaaState = false;
@@ -135,12 +136,14 @@ protected:
 	// D3D11on12
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_d3d11DeviceContext;
 	Microsoft::WRL::ComPtr<ID3D11On12Device> m_d3d11On12Device;
+	Microsoft::WRL::ComPtr<ID3D11Resource> m_d3d11On12WrappedResoruces[SwapChainBufferCount];
 
 	/// /////////////////////////////////////////////	
 	// D2D components
 	Microsoft::WRL::ComPtr<ID2D1Factory3> m_d2dFactory;
 	Microsoft::WRL::ComPtr<ID2D1Device> m_d2dDevice;
 	Microsoft::WRL::ComPtr<ID2D1DeviceContext> m_d2dDeviceContext;
+	Microsoft::WRL::ComPtr<ID2D1Bitmap1> m_d2dRenderTargets[SwapChainBufferCount];
 
 	/// /////////////////////////////////////////////	
 	// DWrite components

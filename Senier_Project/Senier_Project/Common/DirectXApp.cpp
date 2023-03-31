@@ -1,7 +1,3 @@
-//***************************************************************************************
-// DirectXApp.cpp by Frank Luna (C) 2015 All Rights Reserved.
-//***************************************************************************************
-
 
 #include "DirectXApp.h"
 #include <windowsx.h>
@@ -114,6 +110,12 @@ bool DirectXApp::Initialize()
 	if (!InitDirect3D())
 		return false;
 
+	if (!InitDirect3D11on12())
+		return false;
+
+	if (!InitDirect2DAndDirectWrite())
+		return false;
+
 	OnResize();
 
 	return true;
@@ -145,16 +147,9 @@ void DirectXApp::OnResize()
 	assert(m_SwapChain);
 	assert(m_DirectCmdListAlloc);
 
-	// 리소스 수정 전 명령 처리
-	FlushCommandQueue();
-
-	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
-
-	// 재생성 이전 리소스 해제
-	for (int i = 0; i < SwapChainBufferCount; ++i)
-		m_SwapChainBuffer[i].Reset();
-	m_DepthStencilBuffer.Reset();
-
+	// 리소스 수정 전 명령 처리 (Flush)
+	FlushCommandQueueAndReleaseBuffer();
+	
 	// swap chain 크기 조정
 	ThrowIfFailed(m_SwapChain->ResizeBuffers(
 		SwapChainBufferCount,
@@ -167,8 +162,33 @@ void DirectXApp::OnResize()
 	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandle(m_RtvHeap->GetCPUDescriptorHandleForHeapStart());
 	for (int i = 0; i < SwapChainBufferCount; i++)
 	{
+		// d3d RTV 생성
 		ThrowIfFailed(m_SwapChain->GetBuffer(i, IID_PPV_ARGS(&m_SwapChainBuffer[i])));
 		m_d3d12Device->CreateRenderTargetView(m_SwapChainBuffer[i].Get(), nullptr, rtvHeapHandle);
+
+		// 현재 백버퍼에 대한 d3d11on12 래핑 리소스를 생성
+		D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET };
+		ThrowIfFailed(m_d3d11On12Device->CreateWrappedResource(m_SwapChainBuffer[i].Get(), 
+			&d3d11Flags,
+			D3D12_RESOURCE_STATE_RENDER_TARGET,
+			D3D12_RESOURCE_STATE_PRESENT,
+			IID_PPV_ARGS(&m_d3d11On12WrappedResoruces[i])));
+
+		// 현재 백버퍼에 대한 d2d RenderTarget를 생성
+		ComPtr<IDXGISurface> surface;
+		ThrowIfFailed(m_d3d11On12WrappedResoruces[i].As(&surface));
+
+		float dpi =	GetDpiForWindow(m_hMainWnd);
+		D2D1_BITMAP_PROPERTIES1 bitmapProperties = D2D1::BitmapProperties1(
+			D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+			D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED),
+			dpi, dpi);
+
+		ThrowIfFailed(m_d2dDeviceContext->CreateBitmapFromDxgiSurface(
+			surface.Get(),
+			&bitmapProperties,
+			&m_d2dRenderTargets[i]));
+
 		rtvHeapHandle.Offset(1, m_RtvDescriptorSize);
 	}
 
@@ -476,7 +496,7 @@ bool DirectXApp::InitDirect3D11on12()
 		m_d3d12Device.Get(), d3d11DeviceFlags,
 		nullptr, 0,
 		reinterpret_cast<IUnknown**>(m_CommandQueue.GetAddressOf()), 1, 0,
-		&d3d11Device, &m_d3d11DeviceContext,
+		d3d11Device.GetAddressOf(), m_d3d11DeviceContext.GetAddressOf(),
 		nullptr));
 
 	ThrowIfFailed(d3d11Device.As(&m_d3d11On12Device));
@@ -575,6 +595,47 @@ void DirectXApp::FlushCommandQueue()
 		CloseHandle(eventHandle);
 	}
 
+}
+
+void DirectXApp::FlushCommandQueueAndReleaseBuffer()
+{
+	// 펜스를 전진시켜 표시
+	m_CurrentFence++;
+
+	// CommandQueue에 새로운 펜스 포인트를 세트
+	// Signal까지 명령이 처리되기를 대기하도록
+	ThrowIfFailed(m_CommandQueue->Signal(m_Fence.Get(), m_CurrentFence));
+
+	// GPU가 명령을 끝내기까지 대기
+	if (m_Fence->GetCompletedValue() < m_CurrentFence)
+	{
+		HANDLE eventHandle = CreateEventEx(nullptr, FALSE, FALSE, EVENT_ALL_ACCESS);
+
+		// GPU가 펜스에 도달시 이벤트를 발생시키도록
+		ThrowIfFailed(m_Fence->SetEventOnCompletion(m_CurrentFence, eventHandle));
+
+		// GPU가 도달하여 이벤트 발생까지 대기
+		WaitForSingleObject(eventHandle, INFINITE);
+		CloseHandle(eventHandle);
+	}
+
+	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
+
+	// d2dDeviceContext의 백버퍼 참조를 삭제
+	if(m_d2dDeviceContext) m_d2dDeviceContext->SetTarget(nullptr);
+
+	// 재생성 이전 리소스 해제
+	// SwapChain을 참조하는 (ex: wrappedResource ...) 모든 리소스를 Reset 해준다.
+	for (int i = 0; i < SwapChainBufferCount; ++i)
+	{
+		m_SwapChainBuffer[i].Reset();
+		m_d3d11On12WrappedResoruces[i].Reset();
+		m_d2dRenderTargets[i].Reset();
+	}
+	m_DepthStencilBuffer.Reset();
+
+	// DeviceContext도 Flush 해준다.
+	if(m_d3d11DeviceContext) m_d3d11DeviceContext->Flush();
 }
 
 ID3D12Resource* DirectXApp::CurrentBackBuffer() const
