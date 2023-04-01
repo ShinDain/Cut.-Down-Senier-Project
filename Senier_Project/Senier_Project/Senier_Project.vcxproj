@@ -33,7 +33,8 @@
     <ClCompile Include="Common\Object.cpp" />
     <ClCompile Include="Common\Scene.cpp" />
     <ClCompile Include="Common\Shader.cpp" />
-    <ClCompile Include="MainApp.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="SenierProjectApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AnimationController.h" />
@@ -53,6 +54,7 @@
     <ClInclude Include="Common\Scene.h" />
     <ClInclude Include="Common\Shader.h" />
     <ClInclude Include="Common\UploadBuffer.h" />
+    <ClInclude Include="SenierProjectApp.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\default.hlsl">

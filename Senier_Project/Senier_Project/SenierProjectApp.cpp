@@ -1,88 +1,17 @@
-#include "Common/DirectXApp.h"
-#include "Common/MathHelper.h"
-#include "Common/Scene.h"
-#include "Common/DWriteText.h"
+#include "SenierProjectApp.h"
 
-
-using Microsoft::WRL::ComPtr;
-using namespace DirectX;
-using namespace DirectX::PackedVector;
-
-class MainApp : public DirectXApp
-{
-public:
-	MainApp(HINSTANCE hInstance);
-	MainApp(const MainApp& rhs) = delete;
-	MainApp& operator=(const MainApp & rhs) = delete;
-	~MainApp();
-
-	virtual bool Initialize() override;
-
-private:
-	virtual void OnResize() override;
-	virtual void Update(const GameTimer& gt) override;
-	virtual void Render(const GameTimer& gt) override;
-	
-	virtual void OnMouseDown(WPARAM btnState, int x, int y) override;
-	virtual void OnMouseUp(WPARAM btnState, int x, int y) override;
-	virtual void OnMouseMove(WPARAM btnState, int x, int y) override;
-
-	virtual void OnWinKeyboardInput(WPARAM wParam);
-	void OnKeyboardInput(const GameTimer& gt);
-
-private:
-	
-	std::unique_ptr<Scene> m_Scene;
-	//std::unique_ptr<Player> m_Player;
-
-#if defined(_DEBUG) | defined(DEBUG)
-	std::unique_ptr<DWriteText> m_DebugText;
-	
-#endif
-
-	POINT mLastMousePos = { 0,0 };
-
-};
-
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE previnstance, PSTR cmdLine, int showCmd)
-{
-	// 메모리 누수 탐지
-#if defined(DEBUG) | defined(_DEBUG)
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
-
-	if(S_OK != CoInitializeEx(NULL, COINIT_MULTITHREADED))
-		return 0;
-
-	try
-	{
-		MainApp theApp(hInstance);
-		if (!theApp.Initialize())
-			return 0;
-		return theApp.Run();
-	}
-	catch (DxException& e)
-	{
-		MessageBox(nullptr, e.ToString().c_str(), L"HR_Failed", MB_OK);
- 		return 0;
-	}
-
-	CoUninitialize();
-
-}
-
-MainApp::MainApp(HINSTANCE hInstance) : DirectXApp(hInstance)
+SenierProjectApp::SenierProjectApp(HINSTANCE hInstance) : DirectXApp(hInstance)
 {
 	
 }
 
-MainApp::~MainApp()
+SenierProjectApp::~SenierProjectApp()
 {
 	if (m_d3d12Device != nullptr)
 		FlushCommandQueue();
 }
 
-bool MainApp::Initialize()
+bool SenierProjectApp::Initialize()
 {
 	if (!DirectXApp::Initialize())
 		return false;
@@ -121,7 +50,7 @@ bool MainApp::Initialize()
 	return true;
 }
 
-void MainApp::Update(const GameTimer& gt)
+void SenierProjectApp::Update(const GameTimer& gt)
 {
 	OnKeyboardInput(gt);
 
@@ -149,10 +78,9 @@ void MainApp::Update(const GameTimer& gt)
 		m_DebugText->UpdateTextUI(&totalTimeText[0], posX, posY, nIdx);
 	}	
 #endif
-	
 }
 
-void MainApp::Render(const GameTimer& gt)
+void SenierProjectApp::Render(const GameTimer& gt)
 {
 	FlushCommandQueue();
 	
@@ -213,12 +141,12 @@ void MainApp::Render(const GameTimer& gt)
 }
 
 
-void MainApp::OnResize()
+void SenierProjectApp::OnResize()
 {
 	DirectXApp::OnResize();
 }
 
-void MainApp::OnMouseDown(WPARAM btnState, int x, int y)
+void SenierProjectApp::OnMouseDown(WPARAM btnState, int x, int y)
 {
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
@@ -228,14 +156,14 @@ void MainApp::OnMouseDown(WPARAM btnState, int x, int y)
 	SetCapture(m_hMainWnd);
 }
 
-void MainApp::OnMouseUp(WPARAM btnState, int x, int y)
+void SenierProjectApp::OnMouseUp(WPARAM btnState, int x, int y)
 {
 	m_Scene->OnMouseUp(btnState, x, y);
 
 	ReleaseCapture();
 }
 
-void MainApp::OnMouseMove(WPARAM btnState, int x, int y)
+void SenierProjectApp::OnMouseMove(WPARAM btnState, int x, int y)
 {
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
@@ -243,12 +171,12 @@ void MainApp::OnMouseMove(WPARAM btnState, int x, int y)
 	m_Scene->OnMouseMove(btnState, x, y);
 }
 
-void MainApp::OnWinKeyboardInput(WPARAM wParam)
+void SenierProjectApp::OnWinKeyboardInput(WPARAM wParam)
 {
 	if (m_Scene) m_Scene->OnWinKeyboardInput(wParam);
 }
 
-void MainApp::OnKeyboardInput(const GameTimer& gt)
+void SenierProjectApp::OnKeyboardInput(const GameTimer& gt)
 {
 
 }

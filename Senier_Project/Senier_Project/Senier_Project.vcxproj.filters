@@ -24,7 +24,7 @@
     <ClCompile Include="Common\GameTimer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp.cpp">
+    <ClCompile Include="SenierProjectApp.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Common\D3DUtil.cpp">
@@ -58,6 +58,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Common\DWriteText.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -111,6 +114,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Common\DWriteText.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="SenierProjectApp.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
