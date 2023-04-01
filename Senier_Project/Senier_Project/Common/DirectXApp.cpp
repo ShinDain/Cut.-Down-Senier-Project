@@ -1,4 +1,3 @@
-
 #include "DirectXApp.h"
 #include <windowsx.h>
 
@@ -25,6 +24,14 @@ DirectXApp::DirectXApp(HINSTANCE hInstance) : m_hAppInst(hInstance)
 	// 오직 하나의 DirectXApp만 생성
 	assert(m_App == nullptr);
 	m_App = this;
+
+	m_ScissorRect = { 0, 0, CLIENT_WIDTH, CLIENT_HEIGHT };
+	m_ScreenViewport.TopLeftX = 0;
+	m_ScreenViewport.TopLeftY = 0;
+	m_ScreenViewport.Width = CLIENT_WIDTH;
+	m_ScreenViewport.Height = CLIENT_HEIGHT;
+	m_ScreenViewport.MinDepth = 0.0f;
+	m_ScreenViewport.MaxDepth = 1.0f;
 }
 
 DirectXApp::~DirectXApp()

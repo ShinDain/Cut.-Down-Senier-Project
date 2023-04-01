@@ -2,6 +2,9 @@
 
 ImgObject::ImgObject()
 {
+	m_DynamicPositionBufferView.BufferLocation = NULL;
+	m_DynamicTexC0BufferView.BufferLocation = NULL;
+	m_IndexBufferView.BufferLocation = NULL;
 }
 
 ImgObject::~ImgObject()
@@ -175,4 +178,6 @@ bool ImgObject::UpdateBuffer(int nPosX, int nPosY)
 		m_DynamicPositionBuffer->CopyData(i, vPositions[i]);
 		m_DynamicTexC0Buffer->CopyData(i, vTexC0[i]);
 	}
+
+	return true;
 }

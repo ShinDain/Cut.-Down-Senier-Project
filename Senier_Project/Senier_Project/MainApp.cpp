@@ -34,8 +34,12 @@ private:
 	
 	std::unique_ptr<Scene> m_Scene;
 	//std::unique_ptr<Player> m_Player;
-	std::unique_ptr<DWriteText> m_DWriteText;
+
+#if defined(_DEBUG) | defined(DEBUG)
+	std::unique_ptr<DWriteText> m_DebugText;
 	
+#endif
+
 	POINT mLastMousePos = { 0,0 };
 
 };
@@ -92,11 +96,20 @@ bool MainApp::Initialize()
 	if (!m_Scene->Initialize(m_d3d12Device.Get(), m_CommandList.Get()))
 		return false;
 
-	m_DWriteText = std::make_unique<DWriteText>();
-	if (!m_DWriteText->Initialize(m_d2dDeviceContext.Get(), m_dWriteFactory.Get(), 25, D2D1::ColorF::Black))
+	// 디버그 텍스트 객체 초기화
+#if defined(_DEBUG) | defined(DEBUG)
+	m_DebugText = std::make_unique<DWriteText>();
+	if (!m_DebugText->Initialize(m_d2dDeviceContext.Get(), m_dWriteFactory.Get(), 25, D2D1::ColorF::Black, 
+		DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING))
 		return false;
-	m_DWriteText->AddTextUI(L"안녕", 0, 0);
-	m_DWriteText->AddTextUI(L"Hello", -100, 200);
+	
+	// DWRITE_TEXT_ALIGNMENT_JUSTIFIED
+	// DWRITE_TEXT_ALIGNMENT_CENTER
+	// DWRITE_TEXT_ALIGNMENT_TRAILING
+	// DWRITE_TEXT_ALIGNMENT_LEADING
+
+	m_DebugText->AddTextUI(L"GameTimer : 0", 10, 0);
+#endif
 
 	// Execute
 	ThrowIfFailed(m_CommandList->Close());
@@ -118,6 +131,25 @@ void MainApp::Update(const GameTimer& gt)
 		//m_Scene->SetViewProjMatrix(viewProj4x4f);
 		m_Scene->Update(gt);
 	}
+
+	// 디버그를 위한 텍스트들 업데이트
+#if defined(_DEBUG) | defined(DEBUG)
+
+	// 전체 경과 시간 출력
+
+	float tTime = m_Timer.TotalTime();
+	int nIdx = 0;
+	if (m_DebugText->GetTextUICount() > nIdx)
+	{
+		float posX = m_DebugText->GetTextUIPosX(nIdx);
+		float posY = m_DebugText->GetTextUIPosY(nIdx);
+		wchar_t totalTimeText[64] = {};
+		wcscpy_s(totalTimeText, L"Total Time : ");
+		wcscat_s(totalTimeText, std::to_wstring(tTime).c_str());
+		m_DebugText->UpdateTextUI(&totalTimeText[0], posX, posY, nIdx);
+	}	
+#endif
+	
 }
 
 void MainApp::Render(const GameTimer& gt)
@@ -160,11 +192,14 @@ void MainApp::Render(const GameTimer& gt)
 
 	// D3D12 Render를 모두 종료한 후 
 	// D2D Render를 진행한다. D3D12 CommandList를 Execute한 후 진행해야 한다.
-	if (m_DWriteText)
+
+#if defined(_DEBUG) | defined(DEBUG)
+	if (m_DebugText)
 	{
-		m_DWriteText->Render(m_d3d11On12Device.Get(), m_d2dRenderTargets[m_CurrBackBuffer].Get(), m_d2dDeviceContext.Get(),
+		m_DebugText->Render(m_d3d11On12Device.Get(), m_d2dRenderTargets[m_CurrBackBuffer].Get(), m_d2dDeviceContext.Get(),
 			m_d3d11DeviceContext.Get(), m_d3d11On12WrappedResoruces[m_CurrBackBuffer].Get());
 	}
+#endif
 
 	// Resource State 변경
 	// D3D12_RESOURCE_BARRIER d3dResourceBarrier_Ren_Pre = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(),

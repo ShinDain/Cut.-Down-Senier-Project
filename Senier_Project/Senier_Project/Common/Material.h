@@ -31,14 +31,14 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
 	std::unique_ptr<UploadBuffer<MatConstant>> m_pMatCB = nullptr;
 
-	XMFLOAT4 m_xmf4AlbedoColor;
-	XMFLOAT4 m_xmf4EmissiveColor;
-	XMFLOAT4 m_xmf4SpecularColor;
-	float m_Glossiness;
-	float m_Metallic;
-	float m_Smoothness;
-	float m_SpecularHighlight;
-	float m_GlossyReflection;
+	XMFLOAT4 m_xmf4AlbedoColor = {0.0f, 0.0f, 0.0f, 0.0f};
+	XMFLOAT4 m_xmf4EmissiveColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+	XMFLOAT4 m_xmf4SpecularColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float m_Glossiness = 0.0f;
+	float m_Metallic = 0.0f;
+	float m_Smoothness = 0.0f;
+	float m_SpecularHighlight = 0.0f;
+	float m_GlossyReflection = 0.0f;
 
 	XMFLOAT3 m_xmf3FresnelIOR = { 0.01f, 0.01f, 0.01f };
 	float m_Roughness = 0.25f;
