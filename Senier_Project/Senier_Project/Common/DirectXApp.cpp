@@ -167,6 +167,7 @@ void DirectXApp::OnResize()
 		m_d3d12Device->CreateRenderTargetView(m_SwapChainBuffer[i].Get(), nullptr, rtvHeapHandle);
 
 		// 현재 백버퍼에 대한 d3d11on12 래핑 리소스를 생성
+		// ReleaseWrappedResources() 호출 시 D3D12_RESOURCE_STATE_PRESENT로 상태가 변경된다.
 		D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET };
 		ThrowIfFailed(m_d3d11On12Device->CreateWrappedResource(m_SwapChainBuffer[i].Get(), 
 			&d3d11Flags,
