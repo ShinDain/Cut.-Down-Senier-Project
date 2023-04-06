@@ -12,148 +12,6 @@ Mesh::~Mesh()
 {
 }
 
-void Mesh::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-    std::vector<XMFLOAT3> Positions;
-    std::vector<XMFLOAT2> TexC0;
-    std::vector<std::uint32_t> Indices;
-
-	Positions.resize(24);
-	TexC0.resize(24);
-
-    float w = 10.0f / 2;
-    float h = 10.0f / 2;
-    float d = 10.0f / 2;
-
-	Positions =
-	{
-		XMFLOAT3(-w, -h, -d),
-		XMFLOAT3(-w, +h, -d),
-		XMFLOAT3(+w, +h, -d),
-		XMFLOAT3(+w, -h, -d),
-
-		XMFLOAT3(-w, -h, +d),
-		XMFLOAT3(+w, -h, +d),
-		XMFLOAT3(+w, +h, +d),
-		XMFLOAT3(-w, +h, +d),
-
-		XMFLOAT3(-w, +h, -d),
-		XMFLOAT3(-w, +h, +d),
-		XMFLOAT3(+w, +h, +d),
-		XMFLOAT3(+w, +h, -d),
-
-		XMFLOAT3(-w, -h, -d),
-		XMFLOAT3(+w, -h, -d),
-		XMFLOAT3(+w, -h, +d),
-		XMFLOAT3(-w, -h, +d),
-
-		XMFLOAT3(-w, -h, +d),
-		XMFLOAT3(-w, +h, +d),
-		XMFLOAT3(-w, +h, -d),
-		XMFLOAT3(-w, -h, -d),
-
-		XMFLOAT3(+w, -h, -d),
-		XMFLOAT3(+w, +h, -d),
-		XMFLOAT3(+w, +h, +d),
-		XMFLOAT3(+w, -h, +d)
-	};
-	TexC0 =
-	{
-		XMFLOAT2(0.0f, 1.0f),
-		XMFLOAT2(0.0f, 0.0f),
-		XMFLOAT2(1.0f, 0.0f),
-		XMFLOAT2(1.0f, 1.0f),
-
-		XMFLOAT2(1.0f, 1.0f),
-		XMFLOAT2(0.0f, 1.0f),
-		XMFLOAT2(0.0f, 0.0f),
-		XMFLOAT2(1.0f, 0.0f),
-
-		XMFLOAT2(0.0f, 1.0f),
-		XMFLOAT2(0.0f, 0.0f),
-		XMFLOAT2(1.0f, 0.0f),
-		XMFLOAT2(1.0f, 1.0f),
-
-		XMFLOAT2(1.0f, 1.0f),
-		XMFLOAT2(0.0f, 1.0f),
-		XMFLOAT2(0.0f, 0.0f),
-		XMFLOAT2(1.0f, 0.0f),
-
-		XMFLOAT2(0.0f, 1.0f),
-		XMFLOAT2(0.0f, 0.0f),
-		XMFLOAT2(1.0f, 0.0f),
-		XMFLOAT2(1.0f, 1.0f),
-
-		XMFLOAT2(0.0f, 1.0f),
-		XMFLOAT2(0.0f, 0.0f),
-		XMFLOAT2(1.0f, 0.0f),
-		XMFLOAT2(1.0f, 1.0f)
-	};
-
-	Indices.resize(36);
-
-	Indices =
-	{
-		// ¾Õ¸é
-		0,1,2,
-		0,2,3,
-
-		// µÞ¸é
-		4,5,6,
-		4,6,7,
-
-		// ¿ÞÂÊ ¸é
-		8,9,10,
-		8,10,11,
-
-		// ¿À¸¥ÂÊ ¸é
-		12,13,14,
-		12,14,15,
-
-		// À­¸é
-		16,17,18,
-		16,18,19,
-
-		// ¾Æ·§¸é
-		20,21,22,
-		20,22,23
-	};
-
-	const UINT positionBufferByteSize = (UINT)Positions.size() * sizeof(XMFLOAT3);
-	const UINT texC0BufferByteSize = (UINT)TexC0.size() * sizeof(XMFLOAT2);
-	const UINT indexBufferByteSize = (UINT)Indices.size() * sizeof(std::uint_fast32_t);
-
-	const char* tmpStr = "boxGeo";
-	SetMeshName(tmpStr);
-
-	CreateVertexBuffer(pd3dDevice, pd3dCommandList,
-		&m_PositionBufferGPU, &m_PositionBufferUploader,
-		positionBufferByteSize, sizeof(XMFLOAT3),
-		&m_PositionBufferView, Positions.data());
-
-	CreateVertexBuffer(pd3dDevice, pd3dCommandList,
-		&m_TexC0BufferGPU, &m_TexC0BufferUploader,
-		texC0BufferByteSize, sizeof(XMFLOAT2),
-		&m_TexC0BufferView, TexC0.data());
-
-	m_vIndexBufferGPU.emplace_back(Microsoft::WRL::ComPtr<ID3D12Resource>());
-	m_vIndexBufferUploader.emplace_back(Microsoft::WRL::ComPtr<ID3D12Resource>());
-	m_vIndexBufferView.emplace_back(D3D12_INDEX_BUFFER_VIEW());
-	
-	CreateIndexBuffer(pd3dDevice, pd3dCommandList,
-		&m_vIndexBufferGPU[0], &m_vIndexBufferUploader[0],
-		indexBufferByteSize, m_IndexFormat,
-		&m_vIndexBufferView[0], Indices.data());
-
-	SubmeshGeometry subMesh;
-	subMesh.IndexCount = (UINT)Indices.size();
-	subMesh.StartIndexLocation = 0;
-	subMesh.BaseVertexLocation = 0;
-	// subMesh.Bounds = BoundingBox()
-
-	m_vDrawArgs.emplace_back(subMesh);
-}
-
 void Mesh::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[2] = { m_PositionBufferView, m_TexC0BufferView };
@@ -192,21 +50,23 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 		}
 		else if (!strcmp(pstrToken, "<Positions>:"))
 		{
-			m_nType |= VERTEXT_POSITION;
-
 			int nPosition = 0;
 			nPosition = ReadintegerFromFile(pInFile);
 			if (nPosition)
 			{
-				m_vPositions.resize(nPosition);
-				nReads = (UINT)fread(&m_vPositions[0], sizeof(XMFLOAT3), nPosition, pInFile);
+				m_nType |= VERTEXT_POSITION;
+
+				std::vector<XMFLOAT3> vPosition;
+				vPosition.resize(nPosition);
+
+				nReads = (UINT)fread(&vPosition[0], sizeof(XMFLOAT3), nPosition, pInFile);
 
 				UINT positionBufferByteSize = sizeof(XMFLOAT3) * nPosition;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_PositionBufferGPU, &m_PositionBufferUploader,
 					positionBufferByteSize, sizeof(XMFLOAT3),
-					&m_PositionBufferView, m_vPositions.data());
+					&m_PositionBufferView, vPosition.data());
 			}
 		}
 		else if (!strcmp(pstrToken, "<Colors>:"))
@@ -217,15 +77,16 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			{
 				m_nType |= VERTEXT_COLOR;
 
-				m_vColors.resize(nColor);
-				nReads = (UINT)fread(&m_vColors[0], sizeof(XMFLOAT4), nColor, pInFile);
+				std::vector<XMFLOAT4> vColor;
+				vColor.resize(nColor);
+				nReads = (UINT)fread(&vColor[0], sizeof(XMFLOAT4), nColor, pInFile);
 
 				UINT colorBufferByteSize = sizeof(XMFLOAT4) * nColor;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_ColorBufferGPU, &m_ColorBufferUploader,
 					colorBufferByteSize, sizeof(XMFLOAT4),
-					&m_ColorBufferView, m_vColors.data());
+					&m_ColorBufferView, vColor.data());
 			}
 		}
 		else if (!strcmp(pstrToken, "<TextureCoords0>:"))
@@ -236,15 +97,16 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			{
 				m_nType |= VERTEXT_TEXTURE_COORD0;
 
-				m_vTextureC0.resize(nTexC0);
-				nReads = (UINT)fread(&m_vTextureC0[0], sizeof(XMFLOAT2), nTexC0, pInFile);
+				std::vector<XMFLOAT2> vTextureC0;
+				vTextureC0.resize(nTexC0);
+				nReads = (UINT)fread(&vTextureC0[0], sizeof(XMFLOAT2), nTexC0, pInFile);
 
 				UINT TextureC0BufferByteSize = sizeof(XMFLOAT2) * nTexC0;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_TexC0BufferGPU, &m_TexC0BufferUploader,
 					TextureC0BufferByteSize, sizeof(XMFLOAT2),
-					&m_TexC0BufferView, m_vTextureC0.data());
+					&m_TexC0BufferView, vTextureC0.data());
 			}
 		}
 		else if (!strcmp(pstrToken, "<TextureCoords1>:"))
@@ -255,15 +117,16 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			{
 				m_nType |= VERTEXT_TEXTURE_COORD1;
 
-				m_vTextureC1.resize(nTexC1);
-				nReads = (UINT)fread(&m_vTextureC1[0], sizeof(XMFLOAT2), nTexC1, pInFile);
+				std::vector<XMFLOAT2> vTextureC1;
+				vTextureC1.resize(nTexC1);
+				nReads = (UINT)fread(&vTextureC1[0], sizeof(XMFLOAT2), nTexC1, pInFile);
 
 				UINT TextureC1BufferByteSize = sizeof(XMFLOAT2) * nTexC1;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_TexC1BufferGPU, &m_TexC1BufferUploader,
 					TextureC1BufferByteSize, sizeof(XMFLOAT2),
-					&m_TexC1BufferView, m_vTextureC1.data());
+					&m_TexC1BufferView, vTextureC1.data());
 			}
 		}
 		else if (!strcmp(pstrToken, "<Normals>:"))
@@ -274,15 +137,16 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			{
 				m_nType |= VERTEXT_NORMAL;
 
-				m_vNormals.resize(nNormal);
-				nReads = (UINT)fread(&m_vNormals[0], sizeof(XMFLOAT3), nNormal, pInFile);
+				std::vector<XMFLOAT3> vNormal;
+				vNormal.resize(nNormal);
+				nReads = (UINT)fread(&vNormal[0], sizeof(XMFLOAT3), nNormal, pInFile);
 
 				UINT normalBufferByteSize = sizeof(XMFLOAT3) * nNormal;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_NormalBufferGPU, &m_NormalBufferUploader,
 					normalBufferByteSize, sizeof(XMFLOAT3),
-					&m_NormalBufferView, m_vNormals.data());
+					&m_NormalBufferView, vNormal.data());
 			}
 		}
 		else if (!strcmp(pstrToken, "<Tangents>:"))
@@ -293,15 +157,16 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			{
 				m_nType |= VERTEXT_TANGENT;
 
-				m_vTangents.resize(nTangent);
-				nReads = (UINT)fread(&m_vTangents[0], sizeof(XMFLOAT3), nTangent, pInFile);
+				std::vector<XMFLOAT3> vTangent;
+				vTangent.resize(nTangent);
+				nReads = (UINT)fread(&vTangent[0], sizeof(XMFLOAT3), nTangent, pInFile);
 
 				UINT tangentBufferByteSize = sizeof(XMFLOAT3) * nTangent;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_TangentBufferGPU, &m_TangentBufferUploader,
 					tangentBufferByteSize, sizeof(XMFLOAT3),
-					&m_TangentBufferView, m_vTangents.data());
+					&m_TangentBufferView, vTangent.data());
 			}
 		}
 		else if (!strcmp(pstrToken, "<BiTangents>:"))
@@ -310,15 +175,16 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			nBiTangent = ReadintegerFromFile(pInFile);
 			if (nBiTangent)
 			{
-				m_vBiTangents.resize(nBiTangent);
-				nReads = (UINT)fread(&m_vBiTangents[0], sizeof(XMFLOAT3), nBiTangent, pInFile);
+				std::vector<XMFLOAT3> vBiTangent;
+				vBiTangent.resize(nBiTangent);
+				nReads = (UINT)fread(&vBiTangent[0], sizeof(XMFLOAT3), nBiTangent, pInFile);
 
 				UINT bitangentBufferByteSize = sizeof(XMFLOAT3) * nBiTangent;
 
 				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 					&m_BiTangentBufferGPU, &m_BiTangentBufferUploader,
 					bitangentBufferByteSize, sizeof(XMFLOAT3),
-					&m_BiTangentBufferView, m_vBiTangents.data());
+					&m_BiTangentBufferView, vBiTangent.data());
 			}
 		}
 		else if (!strcmp(pstrToken, "<SubMeshes>:"))
@@ -328,7 +194,8 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 			if (nSubMeshes > 0)
 			{
-				m_vvIndices.resize(nSubMeshes);
+				std::vector<std::vector<UINT>> vvIndices;
+				vvIndices.resize(nSubMeshes);
 				for (int i = 0; i < nSubMeshes; ++i)
 				{
 					nReads = ReadStringFromFile(pInFile, pstrToken);
@@ -341,8 +208,8 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 						if (nIdxCnt > 0)
 						{
-							m_vvIndices[nIndex].resize(nIdxCnt);
-							nReads = (UINT)fread(&m_vvIndices[nIndex][0], sizeof(UINT), nIdxCnt, pInFile);
+							vvIndices[nIndex].resize(nIdxCnt);
+							nReads = (UINT)fread(&vvIndices[nIndex][0], sizeof(UINT), nIdxCnt, pInFile);
 
 							SubmeshGeometry subMesh;
 							subMesh.IndexCount = nIdxCnt;
@@ -359,7 +226,7 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 							CreateIndexBuffer(pd3dDevice, pd3dCommandList,
 								&m_vIndexBufferGPU[nIndex], &m_vIndexBufferUploader[nIndex],
 								indexBufferByteSize, m_IndexFormat,
-								&m_vIndexBufferView[nIndex], m_vvIndices[nIndex].data());
+								&m_vIndexBufferView[nIndex], vvIndices[nIndex].data());
 						}
 					}
 				}

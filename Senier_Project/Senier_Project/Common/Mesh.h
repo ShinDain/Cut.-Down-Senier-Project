@@ -77,8 +77,6 @@ protected:
 	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R32_UINT;
 
 public:
-	void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 
@@ -96,16 +94,6 @@ protected:
 
 	int m_nVertices = 0;
 
-	std::vector<XMFLOAT3> m_vPositions;
-	std::vector<XMFLOAT4> m_vColors;
-	std::vector<XMFLOAT2> m_vTextureC0;
-	std::vector<XMFLOAT2> m_vTextureC1;
-	std::vector<XMFLOAT3> m_vNormals;
-	std::vector<XMFLOAT3> m_vTangents;
-	std::vector<XMFLOAT3> m_vBiTangents;
-
-	std::vector<std::vector<UINT>> m_vvIndices;
-	
 	XMFLOAT3 m_xmf3AABBCenter;
 	XMFLOAT3 m_xmf3AABBExtents;
 

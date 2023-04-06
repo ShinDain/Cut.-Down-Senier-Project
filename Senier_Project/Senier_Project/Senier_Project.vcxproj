@@ -20,7 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\AnimationController.cpp" />
+    <ClCompile Include="Common\Collider.cpp" />
     <ClCompile Include="Common\DWriteText.cpp" />
+    <ClCompile Include="Common\GeometryGenerator.cpp" />
     <ClCompile Include="Common\ImgObject.cpp" />
     <ClCompile Include="Common\Camera.cpp" />
     <ClCompile Include="Common\DirectXApp.cpp" />
@@ -38,7 +40,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\AnimationController.h" />
+    <ClInclude Include="Common\Collider.h" />
     <ClInclude Include="Common\DWriteText.h" />
+    <ClInclude Include="Common\GeometryGenerator.h" />
     <ClInclude Include="Common\ImgObject.h" />
     <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\DirectXApp.h" />
