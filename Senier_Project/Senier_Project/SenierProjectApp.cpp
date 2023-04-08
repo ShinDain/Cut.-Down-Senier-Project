@@ -52,7 +52,7 @@ bool SenierProjectApp::Initialize()
 
 void SenierProjectApp::Update(const GameTimer& gt)
 {
-	OnKeyboardInput(gt);
+	ProcessInput();
 
 	// 업데이트
 	if (m_Scene)
@@ -171,16 +171,14 @@ void SenierProjectApp::OnMouseMove(WPARAM btnState, int x, int y)
 	m_Scene->OnMouseMove(btnState, x, y);
 }
 
-void SenierProjectApp::OnWinKeyboardInput(WPARAM wParam)
+void SenierProjectApp::ProcessInput()
 {
-	if (m_Scene) m_Scene->OnWinKeyboardInput(wParam);
+	UCHAR keybuffer[256];
+	GetKeyboardState(keybuffer);
+
+	if(m_Scene) m_Scene->ProcessInput(keybuffer);
+
 }
-
-void SenierProjectApp::OnKeyboardInput(const GameTimer& gt)
-{
-
-}
-
 
 
 

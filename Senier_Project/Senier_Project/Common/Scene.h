@@ -28,11 +28,11 @@ public:
 	virtual void ImgObjRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 
-	void OnKeyboardInput(const GameTimer& gt) {}
-	void OnWinKeyboardInput(WPARAM wParam);
 	void OnMouseDown(WPARAM btnState, int x, int y);
 	void OnMouseUp(WPARAM btnState, int x, int y);
 	void OnMouseMove(WPARAM btnState, int x, int y);
+
+	void ProcessInput(UCHAR* pKeybuffer);
 
 	// virtual void CreateRtvAndDsvDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 

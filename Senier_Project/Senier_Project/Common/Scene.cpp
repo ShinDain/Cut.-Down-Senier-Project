@@ -43,7 +43,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	// 오브젝트 추가
 	m_vpObjs.emplace_back(std::make_shared<Object>(pd3dDevice, pd3dCommandList, tmpModel1, 1));
-	m_vpObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
+	m_vpObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 1);
 	m_vpObjs[0]->m_pAnimationController->SetTrackPosition(0, 0.2f);
 	m_vpObjs[0]->SetPosition(10.0f, 0.0f, 0.0f);
 	m_vpObjs[0]->SetScale(10.0f, 10.0f, 10.0f);
@@ -204,34 +204,6 @@ void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandLi
 	}
 }
 
-void Scene::OnWinKeyboardInput(WPARAM wParam)
-{
-	for (int i = 0; i < m_vpShaders.size(); ++i)
-		m_vpShaders[i]->OnWinKeyboardInput(wParam);
-
-	float delta = 1.0f;
-
-	if (wParam == 'W')
-	{
-		m_pCamera->Walk(delta);
-	}
-
-	if (wParam == 'S')
-	{
-		m_pCamera->Walk(-delta);
-	}
-
-	if (wParam == 'A')
-	{
-		m_pCamera->Strafe(-delta);
-	}
-
-	if (wParam == 'D')
-	{
-		m_pCamera->Strafe(delta);
-	}
-}
-
 void Scene::OnMouseDown(WPARAM btnState, int x, int y)
 {
 	m_LastMousePos.x = x;
@@ -259,6 +231,22 @@ void Scene::OnMouseMove(WPARAM btnState, int x, int y)
 
 	m_LastMousePos.x = x;
 	m_LastMousePos.y = y;
+}
+
+void Scene::ProcessInput(UCHAR* pKeybuffer)
+{
+	for (int i = 0; i < m_vpShaders.size(); ++i)
+		m_vpShaders[i]->ProcessInput(pKeybuffer);
+
+	float delta = 1;
+
+	DWORD dwDirection = 0;
+	if (pKeybuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
+	if (pKeybuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
+	if (pKeybuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
+	if (pKeybuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
+
+	m_vpObjs[0]->Move(dwDirection, m_vpObjs[0]->GetSpeed());
 }
 
 std::array<const CD3DX12_STATIC_SAMPLER_DESC, 2> Scene::GetStaticSampler()

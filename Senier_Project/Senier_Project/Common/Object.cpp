@@ -35,6 +35,38 @@ void Object::Animate(const GameTimer& gt)
 
 void Object::Update(const GameTimer& gt)
 {
+	// velocity의 크기 체크
+	// 1. MaxSpeed 이하 -> 그냥 적용
+	// 2. MaxSpeed 이상 -> MaxSpeed만큼만 적용
+	// velocity의 크기는 이동 방향의 반대로 매 프레임 
+	// Friction만큼 감소하도록
+	float Etime = gt.DeltaTime();
+	XMVECTOR Et = XMVectorReplicate(Etime);
+	XMVECTOR v = XMLoadFloat3(&m_xmf3Velocity);
+	XMFLOAT3 tmp = { 0.0f, 0.0f, 0.0f };
+	XMStoreFloat3(&tmp, XMVector3Length(v));
+	if (tmp.x > 100)
+	{
+	}
+	if (tmp.x < FLT_EPSILON)
+	{
+		m_xmf3Velocity = { 0.0f, 0.0f, 0.0f };
+	}
+	else
+	{
+		XMFLOAT3 addPos;
+		XMStoreFloat3(&addPos, XMVectorMultiply(v, Et));
+		AddPosition(addPos);
+		XMVECTOR Nv = XMVector3Normalize(v);
+		XMVECTOR f = XMVectorReplicate(m_Friction);
+		// -Nv * et * friction 역방향 마찰 -> vel 감소로
+		// 0에 가깝다면(Epsilon만큼) Vel을 0으로
+
+		v = XMVectorAdd(v, XMVectorMultiply(XMVectorMultiply(-Nv, Et), f));
+		XMStoreFloat3(&m_xmf3Velocity, v);
+	}
+	
+
 	ObjConstant objConstant;
 	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
 	if(m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
@@ -520,4 +552,78 @@ void Object::FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>>* pp
 
 	if (m_pSibling) m_pSibling->FindAndSetSkinnedMesh(ppSkinnedMeshes);
 	if (m_pChild) m_pChild->FindAndSetSkinnedMesh(ppSkinnedMeshes);
+}
+
+void Object::AddForce(XMVECTOR direction, float distance)
+{
+	XMVECTOR s = XMVectorReplicate(distance);
+	XMVECTOR v = XMLoadFloat3(&m_xmf3Velocity);
+
+	XMStoreFloat3(&m_xmf3Velocity, XMVectorMultiplyAdd(direction, s, v));
+}
+
+void Object::Move(DWORD dwDirection, float distance)
+{
+	XMVECTOR direction = XMVectorZero();
+	XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+	XMVECTOR r = XMLoadFloat3(&m_xmf3Right);
+
+	if (dwDirection & DIR_FORWARD)
+	{
+		direction = XMVectorAdd(direction, l);
+	}
+	if (dwDirection & DIR_BACKWARD)
+	{
+		direction = XMVectorAdd(direction, -l);
+	}
+	if (dwDirection & DIR_LEFT)
+	{
+		direction = XMVectorAdd(direction, -r);
+	}
+	if (dwDirection & DIR_RIGHT)
+	{
+		direction = XMVectorAdd(direction, r);
+	}
+
+	direction = XMVector3Normalize(direction);
+
+	AddForce(direction, distance);
+}
+
+void Object::Rotate(float x, float y, float z)
+{
+	// x : Pitch, y : Yaw, z : Roll
+
+	if (y != 0.0f)
+	{
+		XMMATRIX xmmatRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
+		XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+		XMVECTOR r = XMLoadFloat3(&m_xmf3Right);
+
+		XMStoreFloat3(&m_xmf3Look, XMVector3TransformNormal(l, xmmatRotate));
+		XMStoreFloat3(&m_xmf3Right, XMVector3TransformNormal(r, xmmatRotate));
+	}
+}
+
+void Object::Walk(float delta)
+{
+	// Look vec 획득 후 해당 방향으로 가속
+	XMVECTOR s = XMVectorReplicate(m_Speed * delta);
+	XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+	XMVECTOR v = XMLoadFloat3(&m_xmf3Velocity);
+	// Look 방향으로 Velocity 값을 더해주기만
+	// 실제 이동은 Update에서 처리될거임.
+	XMStoreFloat3(&m_xmf3Velocity, XMVectorMultiplyAdd(s, l, v));
+
+}
+
+void Object::Strafe(float delta)
+{
+	// Right vec 획득 후 해당 방향으로 가속
+	XMVECTOR s = XMVectorReplicate(m_Speed * delta);
+	XMVECTOR r = XMLoadFloat3(&m_xmf3Right);
+	XMVECTOR v = XMLoadFloat3(&m_xmf3Velocity);
+	// Look 방향으로 Velocity 값을 더해주기만
+	// 실제 이동은 Update에서 처리될거임.
+	XMStoreFloat3(&m_xmf3Velocity, XMVectorMultiplyAdd(s, r, v));
 }

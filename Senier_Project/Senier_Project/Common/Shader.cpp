@@ -68,6 +68,11 @@ bool Shader::BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSig
 	return true;
 }
 
+void Shader::ProcessInput(UCHAR* pKeybuffer)
+{
+
+}
+
 //////////////////////////////////////////////////////////
 
 SkinnedMeshShader::SkinnedMeshShader()

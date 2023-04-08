@@ -34,8 +34,7 @@ public:
 
 	virtual bool BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature);
 
-	virtual void OnWinKeyboardInput(WPARAM wParam) {};
-
+	virtual void ProcessInput(UCHAR* pKeybuffer);
 
 protected:
 	ComPtr<ID3DBlob> m_vsByteCode = nullptr;

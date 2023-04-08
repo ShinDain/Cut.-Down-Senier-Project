@@ -188,6 +188,7 @@ DirectX::XMFLOAT4X4 Camera::GetOrtho4x4f() const
 
 void Camera::Strafe(float d)
 {
+	// 좌표 변경 방식
 	XMVECTOR s = XMVectorReplicate(d);
 	XMVECTOR r = XMLoadFloat3(&m_xmf3Right);
 	XMVECTOR p = XMLoadFloat3(&m_xmf3Position);
@@ -198,6 +199,7 @@ void Camera::Strafe(float d)
 
 void Camera::Walk(float d)
 {
+	// 좌표 변경 방식
 	XMVECTOR s = XMVectorReplicate(d);
 	XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
 	XMVECTOR p = XMLoadFloat3(&m_xmf3Position);

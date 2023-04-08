@@ -12,6 +12,11 @@
 #include "Material.h"
 #include "AnimationController.h"
 
+#define DIR_FORWARD					0x01
+#define DIR_BACKWARD				0x02
+#define DIR_LEFT					0x04
+#define DIR_RIGHT					0x08
+
 using namespace DirectX;
 
 class Object : public std::enable_shared_from_this<Object>
@@ -80,6 +85,7 @@ protected:
 
 	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	float m_Speed = 1.0f;
 
 	float m_Pitch = 0.0f; // x
 	float m_Yaw = 0.0f;   // y
@@ -87,7 +93,31 @@ protected:
 
 	float m_MaxVelocityXZ = 0.0f;
 	float m_MaxVelocityY = 0.0f;
-	float m_Friction = 0.0f;
+	float m_Friction = 250.0f;
+
+public:
+	void AddForce(XMVECTOR direction, float distance);
+	void Move(DWORD dwDirection, float distance);
+	void Rotate(float x, float y, float z);
+	void Walk(float delta);
+	void Strafe(float delta);
+
+	void AddPosition(float x, float y, float z)
+	{
+		m_xmf4x4LocalTransform._41 += x;
+		m_xmf4x4LocalTransform._42 += y;
+		m_xmf4x4LocalTransform._43 += z;
+
+		UpdateTransform(NULL);
+	}
+	void AddPosition(XMFLOAT3 addPos)
+	{
+		m_xmf4x4LocalTransform._41 += addPos.x;
+		m_xmf4x4LocalTransform._42 += addPos.y;
+		m_xmf4x4LocalTransform._43 += addPos.z;
+
+		UpdateTransform(NULL);
+	}
 
 public:
 	std::unique_ptr<AnimationController> m_pAnimationController = nullptr;
@@ -127,6 +157,7 @@ public:
 	void SetMaxVelocityY(float Velocity) { m_MaxVelocityY = Velocity; }
 	void SetVelocity(const XMFLOAT3& Velocity) { m_xmf3Velocity = Velocity; }
 	void SetQuaternion(const XMFLOAT4& quaternion) { m_xmf4Quaternion = quaternion; }
+	void SetSpeed(const float Speed) { m_Speed = Speed; }
 
 	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
 	const XMFLOAT4X4& GetParentWorld() { return m_xmf4x4ParentWorld; }
@@ -143,6 +174,7 @@ public:
 	const float& GetPitch() { return(m_Pitch); }
 	const float& GetRoll() { return(m_Roll); }
 	const XMFLOAT4& SetQuaternion() { return m_xmf4Quaternion; }
+	const float& GetSpeed() { return m_Speed; }
 
 };
 

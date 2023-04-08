@@ -379,9 +379,10 @@ LRESULT DirectXApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 		else if ((int)wParam == VK_F2)
 			Set4xMsaaState(!m_4xMsaaState);
+		ProcessInput();
 		return 0;
 	case WM_KEYDOWN:
-		OnWinKeyboardInput(wParam);
+		ProcessInput();
 		return 0;
 	}
 

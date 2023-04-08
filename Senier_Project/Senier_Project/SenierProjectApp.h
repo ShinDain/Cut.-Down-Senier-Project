@@ -29,8 +29,7 @@ private:
 	virtual void OnMouseUp(WPARAM btnState, int x, int y) override;
 	virtual void OnMouseMove(WPARAM btnState, int x, int y) override;
 
-	virtual void OnWinKeyboardInput(WPARAM wParam);
-	void OnKeyboardInput(const GameTimer& gt);
+	virtual void ProcessInput() override;
 
 private:
 
