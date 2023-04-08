@@ -25,10 +25,6 @@ private:
 	virtual void Update(const GameTimer& gt) override;
 	virtual void Render(const GameTimer& gt) override;
 
-	virtual void OnMouseDown(WPARAM btnState, int x, int y) override;
-	virtual void OnMouseUp(WPARAM btnState, int x, int y) override;
-	virtual void OnMouseMove(WPARAM btnState, int x, int y) override;
-
 	virtual void ProcessInput() override;
 
 private:

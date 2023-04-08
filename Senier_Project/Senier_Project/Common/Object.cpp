@@ -65,7 +65,6 @@ void Object::Update(const GameTimer& gt)
 		v = XMVectorAdd(v, XMVectorMultiply(XMVectorMultiply(-Nv, Et), f));
 		XMStoreFloat3(&m_xmf3Velocity, v);
 	}
-	
 
 	ObjConstant objConstant;
 	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
@@ -86,7 +85,22 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 		XMStoreFloat4x4(&m_xmf4x4World, XMMatrixMultiply(XMLoadFloat4x4(&m_xmf4x4LocalTransform), XMLoadFloat4x4(pxmf4x4Parent)));
 	}
 	else
+	{
+		m_xmf4x4LocalTransform = MathHelper::identity4x4();
+		XMMATRIX xmmatTransform = XMMatrixIdentity();
+		// Scale
+		xmmatTransform = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
+		// Rotate
+		xmmatTransform = XMMatrixMultiply(xmmatTransform, 
+							XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_Pitch), XMConvertToRadians(m_Yaw), XMConvertToRadians(m_Roll)));
+		// Translate
+		xmmatTransform = XMMatrixMultiply(xmmatTransform, 
+							XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z));
+		XMStoreFloat4x4(&m_xmf4x4LocalTransform, xmmatTransform);
+
 		m_xmf4x4World = m_xmf4x4LocalTransform;
+	}
+		
 
 	if (m_pSibling) {
 		m_pSibling->UpdateTransform(pxmf4x4Parent);
@@ -593,7 +607,25 @@ void Object::Move(DWORD dwDirection, float distance)
 void Object::Rotate(float x, float y, float z)
 {
 	// x : Pitch, y : Yaw, z : Roll
-
+	// 3인칭 카메라 기준
+	if (x != 0.0f)
+	{
+		m_Pitch += x;
+		//if (m_Pitch > +89.0f) { x -= (m_Pitch - 89.0f); m_Pitch = +89.0f; }
+		//if (m_Pitch < -89.0f) { x -= (m_Pitch + 89.0f); m_Pitch = -89.0f; }
+	}
+	if (y != 0.0f)
+	{
+		m_Yaw += y;
+		//if (m_Yaw > 360.0f) m_Yaw -= 360.0f;
+		//if (m_Yaw < 0.0f) m_Yaw += 360.0f;
+	}
+	if (z != 0.0f)
+	{
+		m_Roll += z;
+		//if (m_Roll > +20.0f) { z -= (m_Roll - 20.0f); m_Roll = +20.0f; }
+		//if (m_Roll < -20.0f) { z -= (m_Roll + 20.0f); m_Roll = -20.0f; }
+	}
 	if (y != 0.0f)
 	{
 		XMMATRIX xmmatRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));

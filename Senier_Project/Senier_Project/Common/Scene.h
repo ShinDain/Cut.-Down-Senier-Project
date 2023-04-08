@@ -28,10 +28,6 @@ public:
 	virtual void ImgObjRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 
-	void OnMouseDown(WPARAM btnState, int x, int y);
-	void OnMouseUp(WPARAM btnState, int x, int y);
-	void OnMouseMove(WPARAM btnState, int x, int y);
-
 	void ProcessInput(UCHAR* pKeybuffer);
 
 	// virtual void CreateRtvAndDsvDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
@@ -52,9 +48,10 @@ private:
 	std::vector<std::shared_ptr<Object>> m_vpObjs;
 	std::unique_ptr<Camera> m_pCamera = nullptr;
 
-	POINT m_LastMousePos = { 0,0 };
+
 
 public:
+	POINT m_LastMousePos = { 0,0 };
 	void SetViewProjMatrix(XMFLOAT4X4 viewProj) { m_xmf4x4ViewProj = viewProj; }
 };
 

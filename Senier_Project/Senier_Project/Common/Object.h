@@ -104,19 +104,13 @@ public:
 
 	void AddPosition(float x, float y, float z)
 	{
-		m_xmf4x4LocalTransform._41 += x;
-		m_xmf4x4LocalTransform._42 += y;
-		m_xmf4x4LocalTransform._43 += z;
-
-		UpdateTransform(NULL);
+		m_xmf3Position.x += x;
+		m_xmf3Position.y += y;
+		m_xmf3Position.z += z;
 	}
 	void AddPosition(XMFLOAT3 addPos)
 	{
-		m_xmf4x4LocalTransform._41 += addPos.x;
-		m_xmf4x4LocalTransform._42 += addPos.y;
-		m_xmf4x4LocalTransform._43 += addPos.z;
-
-		UpdateTransform(NULL);
+		AddPosition(addPos.x, addPos.y, addPos.z);
 	}
 
 public:
@@ -129,27 +123,21 @@ public:
 	void SetName(char* pstrName) { strcpy_s(m_FrameName, pstrName); }
 	void SetPosition(float x, float y, float z) 
 	{
-		m_xmf4x4LocalTransform._41 = x;
-		m_xmf4x4LocalTransform._42 = y;
-		m_xmf4x4LocalTransform._43 = z;
-
-		UpdateTransform(NULL);
+		m_xmf3Position = { x, y, z };
 	}
 	void SetPosition(XMFLOAT3 Position) { SetPosition(Position.x, Position.y, Position.z); }
 	void SetScale(float x, float y, float z) 
 	{
-		XMMATRIX mtxScale = XMMatrixScaling(x, y, z);
-		m_xmf4x4LocalTransform = MathHelper::MatrixMultiply(mtxScale, m_xmf4x4LocalTransform);
-
-		UpdateTransform(NULL);
+		m_xmf3Scale = { x, y, z };
 	}
+	void SetScale(XMFLOAT3 Scale) { SetScale(Scale.x, Scale.y, Scale.z); }
 	void SetRotate(float fPitch, float fYaw, float fRoll)
 	{
-		XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(fPitch), XMConvertToRadians(fYaw), XMConvertToRadians(fRoll));
-		m_xmf4x4LocalTransform = MathHelper::MatrixMultiply(mtxRotate, m_xmf4x4LocalTransform);
-
-		UpdateTransform(NULL);
+		m_Pitch = fPitch;
+		m_Yaw = fYaw;
+		m_Roll = fRoll;
 	}
+	void SetRotate(XMFLOAT3 Rotate) { SetRotate(Rotate.x, Rotate.y, Rotate.z); }
 
 	void SetFriction(float fFriction) { m_Friction = fFriction; }
 	void SetGravity(const XMFLOAT3& Gravity) { m_xmf3Gravity = Gravity; }

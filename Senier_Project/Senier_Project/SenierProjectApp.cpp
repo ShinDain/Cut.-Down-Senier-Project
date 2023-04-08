@@ -146,31 +146,6 @@ void SenierProjectApp::OnResize()
 	DirectXApp::OnResize();
 }
 
-void SenierProjectApp::OnMouseDown(WPARAM btnState, int x, int y)
-{
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-
-	m_Scene->OnMouseDown(btnState, x, y);
-
-	SetCapture(m_hMainWnd);
-}
-
-void SenierProjectApp::OnMouseUp(WPARAM btnState, int x, int y)
-{
-	m_Scene->OnMouseUp(btnState, x, y);
-
-	ReleaseCapture();
-}
-
-void SenierProjectApp::OnMouseMove(WPARAM btnState, int x, int y)
-{
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-
-	m_Scene->OnMouseMove(btnState, x, y);
-}
-
 void SenierProjectApp::ProcessInput()
 {
 	UCHAR keybuffer[256];

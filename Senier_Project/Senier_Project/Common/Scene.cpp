@@ -43,7 +43,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	// 오브젝트 추가
 	m_vpObjs.emplace_back(std::make_shared<Object>(pd3dDevice, pd3dCommandList, tmpModel1, 1));
-	m_vpObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 1);
+	m_vpObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
 	m_vpObjs[0]->m_pAnimationController->SetTrackPosition(0, 0.2f);
 	m_vpObjs[0]->SetPosition(10.0f, 0.0f, 0.0f);
 	m_vpObjs[0]->SetScale(10.0f, 10.0f, 10.0f);
@@ -204,41 +204,26 @@ void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandLi
 	}
 }
 
-void Scene::OnMouseDown(WPARAM btnState, int x, int y)
-{
-	m_LastMousePos.x = x;
-	m_LastMousePos.y = y;
-}
-
-void Scene::OnMouseUp(WPARAM btnState, int x, int y)
-{
-}
-
-void Scene::OnMouseMove(WPARAM btnState, int x, int y)
-{
-	if ((btnState & MK_LBUTTON) != 0)
-	{
-		float dx = XMConvertToRadians(10.0f * static_cast<float>(x - m_LastMousePos.x));
-		float dy = XMConvertToRadians(10.0f * static_cast<float>(y - m_LastMousePos.y));
-
-		m_vpObjs[0]->SetRotate(m_vpObjs[0]->GetPitch() - dy, m_vpObjs[0]->GetYaw() - dx, 0);
-		m_vpObjs[1]->SetRotate(m_vpObjs[1]->GetPitch() + dy, m_vpObjs[1]->GetYaw() + dx, 0);
-	}
-	else if ((btnState & MK_RBUTTON) != 0)
-	{
-
-	}
-
-	m_LastMousePos.x = x;
-	m_LastMousePos.y = y;
-}
-
 void Scene::ProcessInput(UCHAR* pKeybuffer)
 {
 	for (int i = 0; i < m_vpShaders.size(); ++i)
 		m_vpShaders[i]->ProcessInput(pKeybuffer);
 
-	float delta = 1;
+	float dx, dy;
+	dx = dy = 0;
+
+	POINT ptCursorPos;
+
+	if (pKeybuffer[VK_LBUTTON] & 0xF0)
+	{
+		SetCursor(NULL);
+		GetCursorPos(&ptCursorPos);
+		SetCursorPos(CLIENT_WIDTH / 2, CLIENT_HEIGHT / 2);
+		dx = (float)(ptCursorPos.x - CLIENT_WIDTH / 2) / 3.0f;
+		dy = (float)(ptCursorPos.y - CLIENT_HEIGHT / 2) / 3.0f;
+		//m_LastMousePos = ptCursorPos;
+		SetCursorPos(CLIENT_WIDTH / 2, CLIENT_HEIGHT / 2);
+	}
 
 	DWORD dwDirection = 0;
 	if (pKeybuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
@@ -246,7 +231,16 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 	if (pKeybuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
 	if (pKeybuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
 
-	m_vpObjs[0]->Move(dwDirection, m_vpObjs[0]->GetSpeed());
+	if(dwDirection != 0 || dx != 0 || dy != 0)
+	{
+		if (dx != 0 || dy != 0)
+		{
+			m_vpObjs[0]->Rotate(0,-dx, 0);
+		}
+
+		m_vpObjs[0]->Move(dwDirection, m_vpObjs[0]->GetSpeed());
+	}
+
 }
 
 std::array<const CD3DX12_STATIC_SAMPLER_DESC, 2> Scene::GetStaticSampler()
