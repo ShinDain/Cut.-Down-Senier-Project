@@ -3,6 +3,7 @@
 //***************************************************************************************
 
 #include "Camera.h"
+#include "Object.h"
 
 using namespace DirectX;
 
@@ -280,13 +281,40 @@ void Camera::UpdateViewMatrix()
 // 3ÀÎÄª Ä«¸Þ¶ó
 //------------------------------------------------
 
-Third_Person_Camera::Third_Person_Camera()
+Third_Person_Camera::Third_Person_Camera(std::shared_ptr<Object> pObject)
 {
-	SetLens(0.25f * MathHelper::Pi, 1.0f, 1.0f, 1000.f);
+	SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
+
+	m_pObject = pObject;
 }
 
 Third_Person_Camera::~Third_Person_Camera()
 {
+}
+
+void Third_Person_Camera::Update(float Etime)
+{
+	XMVECTOR newPos = XMLoadFloat3(&m_pObject->GetPosition());
+	XMVECTOR objPos = XMLoadFloat3(&m_pObject->GetPosition());
+	XMVECTOR objLook = XMLoadFloat3(&m_pObject->GetLookVector());
+	XMVECTOR objUp = XMLoadFloat3(&m_pObject->GetUpVector());
+
+	XMVECTOR zOffset = XMVectorReplicate(m_xmf3Offset.z);
+	XMVECTOR yOffset = XMVectorReplicate(m_xmf3Offset.y);
+	XMVECTOR length = XMVectorReplicate(m_OffsetLength);
+
+	newPos = XMVectorMultiplyAdd(objLook, zOffset, newPos);
+	newPos = XMVectorMultiplyAdd(objUp, yOffset, newPos);
+	newPos = XMVector3Normalize(newPos - objPos);
+	newPos = XMVectorMultiplyAdd(newPos, length, objPos);
+
+	XMFLOAT3 xmf3NewPos = { 0,0,0 };
+	XMStoreFloat3(&xmf3NewPos, newPos);
+	SetPosition(xmf3NewPos);
+
+	LookAt(GetPosition3f(), m_pObject->GetPosition(), XMFLOAT3(0, 1, 0));
+
+	UpdateViewMatrix();
 }
 
 void Third_Person_Camera::UpdateViewMatrix()

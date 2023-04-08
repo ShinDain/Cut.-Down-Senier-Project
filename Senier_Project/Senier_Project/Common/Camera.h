@@ -7,10 +7,14 @@
 #include "D3DUtil.h"
 #include "Global.h"
 
+class Object;
+
 class Camera
 {
 public:
 	Camera();
+	Camera(const Camera& rhs) = delete;
+	Camera& operator=(const Camera& rhs) = delete;
 	virtual ~Camera();
 
 	DirectX::XMVECTOR GetPosition()const;
@@ -57,6 +61,7 @@ public:
 	void Pitch(float angle);
 	void RotateY(float angle);
 
+	virtual void Update(float Etime) {}
 	virtual void UpdateViewMatrix();
 
 
@@ -80,25 +85,28 @@ protected:
 	DirectX::XMFLOAT4X4 m_xmf4x4Ortho = MathHelper::identity4x4();
 };
 
-class Third_Person_Camera : Camera
+class Third_Person_Camera : public Camera
 {
 public:
-	Third_Person_Camera();
+	Third_Person_Camera() = delete;
+	Third_Person_Camera(std::shared_ptr<Object> pObject);
+	Third_Person_Camera(const Third_Person_Camera& rhs) = delete;
+	Third_Person_Camera& operator=(const Third_Person_Camera& rhs) = delete;
 	virtual ~Third_Person_Camera();
 
-	DirectX::XMFLOAT3 GetOffset() const { return m_xmf3Offset; }
-	DirectX::XMFLOAT3 GetPlayerPos()const { return m_xmf3PlayerPos; }
+	float GetOffsetLength() const { return m_OffsetLength; }
 
-	void SetOffset(const DirectX::XMFLOAT3& v) { m_xmf3Offset = v; }
-	void SetOffset(float x, float y, float z) { m_xmf3Offset = DirectX::XMFLOAT3(x, y ,z); }
-	void SetPlayerPos(const DirectX::XMFLOAT3& v) {	m_xmf3PlayerPos = v;	}
-	void SetPlayerPos(float x, float y, float z) {	m_xmf3PlayerPos = DirectX::XMFLOAT3(x, y, z);}
+	void SetOffsetLength(float value) { m_OffsetLength = value; }
+	void SetPlayer(const std::shared_ptr<Object> pObject) { m_pObject = pObject; }
 
+
+	virtual void Update(float Etime);
 	virtual void UpdateViewMatrix() override;
 
 protected:
-	DirectX::XMFLOAT3 m_xmf3Offset = { 0.0f, 0.0f, 0.0f };
-	DirectX::XMFLOAT3 m_xmf3PlayerPos = { 0.0f, 0.0f, 0.0f };
+	float m_OffsetLength = 100.f;
+	DirectX::XMFLOAT3 m_xmf3Offset = { 0.0f, -150.f, -100.0f };
+	std::shared_ptr<Object> m_pObject = nullptr;
 
 };
 

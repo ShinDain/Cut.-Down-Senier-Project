@@ -69,6 +69,9 @@
     <ClCompile Include="Common\Collider.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Common\PlayerController.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\DirectXApp.h">
@@ -129,6 +132,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Common\Collider.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\PlayerController.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

@@ -33,6 +33,7 @@
     <ClCompile Include="Common\Material.cpp" />
     <ClCompile Include="Common\Mesh.cpp" />
     <ClCompile Include="Common\Object.cpp" />
+    <ClCompile Include="Common\PlayerController.cpp" />
     <ClCompile Include="Common\Scene.cpp" />
     <ClCompile Include="Common\Shader.cpp" />
     <ClCompile Include="main.cpp" />
@@ -55,6 +56,7 @@
     <ClInclude Include="Common\MathHelper.h" />
     <ClInclude Include="Common\Mesh.h" />
     <ClInclude Include="Common\Object.h" />
+    <ClInclude Include="Common\PlayerController.h" />
     <ClInclude Include="Common\Scene.h" />
     <ClInclude Include="Common\Shader.h" />
     <ClInclude Include="Common\UploadBuffer.h" />
