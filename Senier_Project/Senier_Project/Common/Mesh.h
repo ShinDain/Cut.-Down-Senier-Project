@@ -1,4 +1,5 @@
 #pragma once
+#include "Collider.h"
 #include "D3DUtil.h"
 #include "GameTimer.h"
 #include "Global.h"
@@ -8,6 +9,7 @@
 using namespace DirectX;
 
 class Object;
+class ColliderShader;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -29,7 +31,6 @@ class Object;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-
 
 class Mesh
 {
@@ -94,23 +95,35 @@ protected:
 
 	int m_nVertices = 0;
 
-	XMFLOAT3 m_xmf3AABBCenter;
-	XMFLOAT3 m_xmf3AABBExtents;
+	XMFLOAT3 m_xmf3Center;
+	XMFLOAT3 m_xmf3Extents;
+
+	std::unique_ptr<Collider> m_pCollider = nullptr;
 
 public:
 	void SetMeshName(const char* str)						{ strcpy_s(m_Name, str); }
 	void SetType(int nType)									{ m_nType = nType; }
 	void SetIndexFormat(DXGI_FORMAT indexFormat)			{ m_IndexFormat = indexFormat; }
 	void SetVertexCnt(int nVertices)						{ m_nVertices = nVertices; }
-	void SetAABBCenter(XMFLOAT3 AABBCenter)					{ m_xmf3AABBCenter = AABBCenter; }
-	void SetAABBExtents(XMFLOAT3 AABBExtents)				{ m_xmf3AABBExtents = AABBExtents; }
+	void SetCenter(XMFLOAT3 AABBCenter)					{ m_xmf3Center = AABBCenter; }
+	void SetExtents(XMFLOAT3 AABBExtents)				{ m_xmf3Extents = AABBExtents; }
 
 	const char* GetMeshName()				{ return m_Name; }
 	const UINT GetType()					{ return m_nType; }
 	const DXGI_FORMAT GetIndexFormat()		{ return m_IndexFormat; }
 	const int GetVertexCnt()				{ return m_nVertices; }
-	const XMFLOAT3 GetAABBCenter()			{ return m_xmf3AABBCenter; }
-	const XMFLOAT3 GetAABBExtents()			{ return m_xmf3AABBExtents; }
+	const XMFLOAT3 GetCenter()			{ return m_xmf3Center; }
+	const XMFLOAT3 GetExtents()			{ return m_xmf3Extents; }
+
+#if defined(_DEBUG) | defined(DEBUG)
+
+	void SetColliderWorld(const XMFLOAT4X4& World) { m_pCollider->SetWorld(World); }
+
+	static std::unique_ptr<ColliderShader> m_pColliderShader;
+
+	static void PrepareColliderShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pData);
+
+#endif
 };
 
 ///////////////////////////////////////////////////////////////////////////

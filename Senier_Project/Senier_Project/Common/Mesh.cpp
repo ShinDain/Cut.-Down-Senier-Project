@@ -1,8 +1,10 @@
 #include "Mesh.h"
 #include "Object.h"
+#include "Shader.h"
 
 using namespace DirectX;
 
+std::unique_ptr<ColliderShader> Mesh::m_pColliderShader = nullptr;
 
 Mesh::Mesh()
 {
@@ -27,6 +29,13 @@ void Mesh::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandLis
         pd3dCommandList->DrawIndexedInstanced(
             m_vDrawArgs[i].IndexCount, 1, m_vDrawArgs[i].StartIndexLocation, m_vDrawArgs[i].BaseVertexLocation, 0);
     }
+
+#if defined(_DEBUG) | defined(DEBUG)
+
+	m_pColliderShader->OnPrepareRender(pd3dCommandList);
+	m_pCollider->Render(gt.DeltaTime(), pd3dCommandList);
+
+#endif
 }
 
 void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)
@@ -45,8 +54,11 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 		if (!strcmp(pstrToken, "<Bounds>:"))
 		{
-			nReads = (UINT)fread(&m_xmf3AABBCenter, sizeof(XMFLOAT3), 1, pInFile);
-			nReads = (UINT)fread(&m_xmf3AABBExtents, sizeof(XMFLOAT3), 1, pInFile);
+			nReads = (UINT)fread(&m_xmf3Center, sizeof(XMFLOAT3), 1, pInFile);
+			nReads = (UINT)fread(&m_xmf3Extents, sizeof(XMFLOAT3), 1, pInFile);
+
+			if(!m_pCollider) 
+				m_pCollider = std::make_unique<Collider>(m_xmf3Center, m_xmf3Extents, true, pd3dDevice, pd3dCommandList);
 		}
 		else if (!strcmp(pstrToken, "<Positions>:"))
 		{
@@ -251,6 +263,12 @@ void Mesh::DisposeUploaders()
 		m_vIndexBufferUploader[i] = nullptr;
 }
 
+void Mesh::PrepareColliderShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pData)
+{
+	m_pColliderShader = std::make_unique<ColliderShader>();
+	m_pColliderShader->Initialize(pd3dDevice, pd3dCommandList, pd3dRootSignature, NULL);
+}
+
 ////////////////////////////////////////////////////////////////////
 
 SkinnedMesh::SkinnedMesh()
@@ -284,8 +302,10 @@ void SkinnedMesh::LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		}
 		else if (!strcmp(pstrToken, "<Bounds>:"))
 		{
-			nReads = (UINT)fread(&m_xmf3AABBCenter, sizeof(XMFLOAT3), 1, pInFile);
-			nReads = (UINT)fread(&m_xmf3AABBExtents, sizeof(XMFLOAT3), 1, pInFile);
+			nReads = (UINT)fread(&m_xmf3Center, sizeof(XMFLOAT3), 1, pInFile);
+			nReads = (UINT)fread(&m_xmf3Extents, sizeof(XMFLOAT3), 1, pInFile);
+
+			m_pCollider = std::make_unique<Collider>(m_xmf3Center, m_xmf3Extents, true, pd3dDevice, pd3dCommandList);
 		}
 		else if (!strcmp(pstrToken, "<BoneNames>:"))
 		{

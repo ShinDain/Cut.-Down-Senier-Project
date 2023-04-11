@@ -19,7 +19,7 @@ Object::~Object()
 
 bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
-	BuildConstantBuffers(pd3dDevice);
+	//BuildConstantBuffers(pd3dDevice);
 
 	return true;
 }
@@ -125,6 +125,8 @@ void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandL
 		XMFLOAT4X4 xmf4x4World;
 		XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
 		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
+
+		m_pMesh->SetColliderWorld(m_xmf4x4World);
 
 		for (int i = 0; i < m_vpMaterials.size(); ++i)
 		{

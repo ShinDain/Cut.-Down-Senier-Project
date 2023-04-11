@@ -21,10 +21,11 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_pImgObjShader = std::make_unique<ImageObjectShader>();
 	if (!m_pImgObjShader->Initialize(pd3dDevice, pd3dCommandList, m_ImgObjRootSignature.Get(), NULL))
 		return false;
-	m_pImgObjShader->CreateImgObject(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/body_01.dds", 300, 300);
+	//m_pImgObjShader->CreateImgObject(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/body_01.dds", 300, 300);
 	
 	// static Shader 초기화
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_RootSignature.Get(), NULL);
+	Mesh::PrepareColliderShader(pd3dDevice, pd3dCommandList, m_RootSignature.Get(), NULL);
 
 	// 모델 데이터 로드
 	//char strFileName[64] = "Model/Ethan.bin";
@@ -73,8 +74,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_vpShaders.emplace_back(std::make_unique<ColliderShader>());
 	m_vpShaders[0]->Initialize(pd3dDevice, pd3dCommandList, m_RootSignature.Get() , NULL);
 
-	m_pCollider = std::make_shared<Collider>(XMFLOAT3(0, 0, 0), XMFLOAT3(3, 3, 3), true, pd3dDevice, pd3dCommandList);
-	m_pRay = std::make_shared<Ray>(XMFLOAT3(0, 0, 0), XMFLOAT3(3, 3, 3), 30, pd3dDevice, pd3dCommandList);
+	m_pCollider = std::make_shared<Collider>(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 2, 3), true, pd3dDevice, pd3dCommandList);
+	m_pRay = std::make_shared<Ray>(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0), 30, pd3dDevice, pd3dCommandList);
 	return true;
 }
 

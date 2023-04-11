@@ -6,6 +6,7 @@ Ray::Ray(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Direction, float Length, ID3D12Device
 {
 	m_xmf3Center = xmf3Center;
 	m_xmf3Direction = xmf3Direction;
+	m_Length = Length;
 
 #if defined(_DEBUG) | defined(DEBUG)
 	BuildMesh(pd3dDevice, pd3dCommandList);
@@ -24,14 +25,15 @@ void Ray::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCom
 
 	Positions.resize(24);
 
-	float w = 10.0f / 2;
-	float h = 10.0f / 2;
-	float d = 10.0f / 2;
+	XMFLOAT3 endPoint = m_xmf3Direction;
+	endPoint.x *= m_Length;
+	endPoint.y *= m_Length;
+	endPoint.z *= m_Length;
 
 	Positions =
 	{
 		XMFLOAT3(0.0f, 0.0f, 0.0f),
-		XMFLOAT3(0.0f, 0.0f, 10.0f)
+		XMFLOAT3(endPoint.x, endPoint.y, endPoint.z)
 	};
 
 	const UINT positionBufferByteSize = (UINT)Positions.size() * sizeof(XMFLOAT3);
@@ -98,10 +100,10 @@ void Collider::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 
 	Positions.resize(24);
 	Normal.resize(24);
-
-	float w = 10.0f / 2;
-	float h = 10.0f / 2;
-	float d = 10.0f / 2;
+	
+	float w = m_xmf3Extents.x / 2;
+	float h = m_xmf3Extents.y / 2;
+	float d = m_xmf3Extents.z / 2;
 
 	Positions =
 	{
