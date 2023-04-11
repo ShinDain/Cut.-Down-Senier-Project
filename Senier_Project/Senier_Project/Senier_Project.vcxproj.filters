@@ -145,5 +145,8 @@
     <FxCompile Include="Shader\ImageObjShader.hlsl">
       <Filter>리소스 파일</Filter>
     </FxCompile>
+    <FxCompile Include="Shader\ColliderShader.hlsl">
+      <Filter>리소스 파일</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -160,7 +160,6 @@ struct SubmeshGeometry
     UINT StartIndexLocation = 0;
     INT BaseVertexLocation = 0;
 
-    DirectX::BoundingBox Bounds;
 };
 
 struct Light

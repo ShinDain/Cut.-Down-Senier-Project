@@ -2,8 +2,16 @@
 
 ///////////////// Ray (±¤¼±) /////////////////
 
-Ray::Ray(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Direction)
+Ray::Ray(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Direction, float Length, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_xmf3Center = xmf3Center;
+	m_xmf3Direction = xmf3Direction;
+
+#if defined(_DEBUG) | defined(DEBUG)
+	BuildMesh(pd3dDevice, pd3dCommandList);
+
+#endif
+
 }
 
 Ray::~Ray()
@@ -12,16 +20,70 @@ Ray::~Ray()
 
 void Ray::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	std::vector<XMFLOAT3> Positions;
+
+	Positions.resize(24);
+
+	float w = 10.0f / 2;
+	float h = 10.0f / 2;
+	float d = 10.0f / 2;
+
+	Positions =
+	{
+		XMFLOAT3(0.0f, 0.0f, 0.0f),
+		XMFLOAT3(0.0f, 0.0f, 10.0f)
+	};
+
+	const UINT positionBufferByteSize = (UINT)Positions.size() * sizeof(XMFLOAT3);
+
+	CreateVertexBuffer(pd3dDevice, pd3dCommandList,
+		&m_PositionBufferGPU, &m_PositionBufferUploader,
+		positionBufferByteSize, sizeof(XMFLOAT3),
+		&m_PositionBufferView, Positions.data());
+}
+
+void Ray::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[] = { m_PositionBufferView };
+	pd3dCommandList->IASetVertexBuffers(0, 1, pVertexBufferView);
+	pd3dCommandList->IASetPrimitiveTopology(m_PrimitiveTopology);
 }
 
 void Ray::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	OnPrepareRender(pd3dCommandList);
+
+	XMFLOAT4X4 xmf4x4World;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
+
+	pd3dCommandList->DrawInstanced(2, 1, 0, 0);
 }
 
 ///////////////// Collider /////////////////
 
-Collider::Collider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents)
+Collider::Collider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, bool IsBox, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_xmf3Center = xmf3Center;
+	m_xmf3Extents = xmf3Extents;
+	m_bIsBox = IsBox;
+
+	if (IsBox)
+	{
+		m_BoundingOrientedBox = BoundingOrientedBox(m_xmf3Center, m_xmf3Extents, XMFLOAT4(0, 0, 0, 1));
+
+#if defined(_DEBUG) | defined(DEBUG)
+
+		BuildMesh(pd3dDevice, pd3dCommandList);
+
+#endif
+	}
+	else
+	{
+
+	}
+
+	
 }
 
 Collider::~Collider()
@@ -31,11 +93,11 @@ Collider::~Collider()
 void Collider::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	std::vector<XMFLOAT3> Positions;
-	std::vector<XMFLOAT2> TexC0;
-	std::vector<std::uint32_t> Indices;
+	std::vector<XMFLOAT3> Normal;
+	std::vector<std::uint16_t> Indices;
 
 	Positions.resize(24);
-	TexC0.resize(24);
+	Normal.resize(24);
 
 	float w = 10.0f / 2;
 	float h = 10.0f / 2;
@@ -73,37 +135,37 @@ void Collider::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 		XMFLOAT3(+w, +h, +d),
 		XMFLOAT3(+w, -h, +d)
 	};
-	TexC0 =
+	Normal =
 	{
-		XMFLOAT2(0.0f, 1.0f),
-		XMFLOAT2(0.0f, 0.0f),
-		XMFLOAT2(1.0f, 0.0f),
-		XMFLOAT2(1.0f, 1.0f),
-
-		XMFLOAT2(1.0f, 1.0f),
-		XMFLOAT2(0.0f, 1.0f),
-		XMFLOAT2(0.0f, 0.0f),
-		XMFLOAT2(1.0f, 0.0f),
-
-		XMFLOAT2(0.0f, 1.0f),
-		XMFLOAT2(0.0f, 0.0f),
-		XMFLOAT2(1.0f, 0.0f),
-		XMFLOAT2(1.0f, 1.0f),
-
-		XMFLOAT2(1.0f, 1.0f),
-		XMFLOAT2(0.0f, 1.0f),
-		XMFLOAT2(0.0f, 0.0f),
-		XMFLOAT2(1.0f, 0.0f),
-
-		XMFLOAT2(0.0f, 1.0f),
-		XMFLOAT2(0.0f, 0.0f),
-		XMFLOAT2(1.0f, 0.0f),
-		XMFLOAT2(1.0f, 1.0f),
-
-		XMFLOAT2(0.0f, 1.0f),
-		XMFLOAT2(0.0f, 0.0f),
-		XMFLOAT2(1.0f, 0.0f),
-		XMFLOAT2(1.0f, 1.0f)
+		XMFLOAT3(0.0f, 0.0f, -1.0f),
+		XMFLOAT3(0.0f, 0.0f, -1.0f),
+		XMFLOAT3(0.0f, 0.0f, -1.0f),
+		XMFLOAT3(0.0f, 0.0f, -1.0f),
+			   
+		XMFLOAT3(0.0f, 0.0f, 1.0f),
+		XMFLOAT3(0.0f, 0.0f, 1.0f),
+		XMFLOAT3(0.0f, 0.0f, 1.0f),
+		XMFLOAT3(0.0f, 0.0f, 1.0f),
+			   
+		XMFLOAT3( 0.0f, 1.0f, 0.0f),
+		XMFLOAT3( 0.0f, 1.0f, 0.0f),
+		XMFLOAT3( 0.0f, 1.0f, 0.0f),
+		XMFLOAT3( 0.0f, 1.0f, 0.0f),
+			   
+		XMFLOAT3(0.0f, -1.0f, 0.0f),
+		XMFLOAT3(0.0f, -1.0f, 0.0f),
+		XMFLOAT3(0.0f, -1.0f, 0.0f),
+		XMFLOAT3(0.0f, -1.0f, 0.0f),
+			   
+		XMFLOAT3(-1.0f, 0.0f, 0.0f),
+		XMFLOAT3(-1.0f, 0.0f, 0.0f),
+		XMFLOAT3(-1.0f, 0.0f, 0.0f),
+		XMFLOAT3(-1.0f, 0.0f, 0.0f),
+			   
+		XMFLOAT3(1.0f, 0.0f, 0.0f),
+		XMFLOAT3(1.0f, 0.0f, 0.0f),
+		XMFLOAT3(1.0f, 0.0f, 0.0f),
+		XMFLOAT3(1.0f, 0.0f, 0.0f)
 	};
 
 	Indices.resize(36);
@@ -136,7 +198,7 @@ void Collider::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 	};
 
 	const UINT positionBufferByteSize = (UINT)Positions.size() * sizeof(XMFLOAT3);
-	const UINT texC0BufferByteSize = (UINT)TexC0.size() * sizeof(XMFLOAT2);
+	const UINT NormalBufferByteSize = (UINT)Normal.size() * sizeof(XMFLOAT3);
 	const UINT indexBufferByteSize = (UINT)Indices.size() * sizeof(std::uint_fast32_t);
 
 
@@ -144,6 +206,11 @@ void Collider::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 		&m_PositionBufferGPU, &m_PositionBufferUploader,
 		positionBufferByteSize, sizeof(XMFLOAT3),
 		&m_PositionBufferView, Positions.data());
+
+	CreateVertexBuffer(pd3dDevice, pd3dCommandList,
+		&m_NormalBufferGPU, &m_NormalBufferUploader,
+		NormalBufferByteSize, sizeof(XMFLOAT3),
+		&m_NormalBufferView, Normal.data());
 
 	CreateIndexBuffer(pd3dDevice, pd3dCommandList,
 		&m_IndexBufferGPU, &m_IndexBufferUploader,
@@ -154,11 +221,26 @@ void Collider::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 	subMesh.IndexCount = (UINT)Indices.size();
 	subMesh.StartIndexLocation = 0;
 	subMesh.BaseVertexLocation = 0;
-	// subMesh.Bounds = BoundingBox()
 
 	m_SubmeshGeometry = subMesh;
 }
 
+void Collider::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[2] = { m_PositionBufferView, m_NormalBufferView };
+	pd3dCommandList->IASetVertexBuffers(0, 2, pVertexBufferView);
+	pd3dCommandList->IASetPrimitiveTopology(m_PrimitiveTopology);
+}
+
 void Collider::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	OnPrepareRender(pd3dCommandList);
+
+	XMFLOAT4X4 xmf4x4World;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
+
+	pd3dCommandList->IASetIndexBuffer(&m_IndexBufferView);
+	pd3dCommandList->DrawIndexedInstanced(
+		m_SubmeshGeometry.IndexCount, 1, m_SubmeshGeometry.StartIndexLocation, m_SubmeshGeometry.BaseVertexLocation, 0);
 }

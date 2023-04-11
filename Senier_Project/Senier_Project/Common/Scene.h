@@ -8,6 +8,9 @@
 #include "Shader.h"
 #include "Object.h"
 
+// Test
+#include "Collider.h"
+
 // descriptorheap 정의
 // rtv, dsv 생성
 
@@ -49,6 +52,9 @@ private:
 	std::unique_ptr<Camera> m_pCamera = nullptr;
 
 
+	// Test
+	std::shared_ptr<Collider> m_pCollider = nullptr;
+	std::shared_ptr<Ray> m_pRay = nullptr;
 
 public:
 	POINT m_LastMousePos = { 0,0 };

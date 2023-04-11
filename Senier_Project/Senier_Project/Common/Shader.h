@@ -88,3 +88,16 @@ public:
 	bool CreateImgObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int nScreenWidth, int nScreenHeight,
 		const wchar_t* pstrTextureFileName, int nBitmapWidth, int nBitmapHeight);
 };
+
+// Collider ∑ª¥ı∏µ ºŒ¿Ã¥ı
+class ColliderShader : public Shader
+{
+public:
+	ColliderShader();
+	ColliderShader(const ColliderShader& rhs) = delete;
+	ColliderShader& operator=(const ColliderShader& rhs) = delete;
+	virtual ~ColliderShader();
+
+	virtual bool BuildShadersAndInputLayout();
+	virtual bool BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature);
+};

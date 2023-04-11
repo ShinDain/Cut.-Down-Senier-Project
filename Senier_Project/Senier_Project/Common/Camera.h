@@ -105,7 +105,7 @@ public:
 
 protected:
 	float m_OffsetLength = 100.f;
-	DirectX::XMFLOAT3 m_xmf3Offset = { 0.0f, -150.f, -100.0f };
+	DirectX::XMFLOAT3 m_xmf3Offset = { 0.0f, 30.0f, -100.0f };
 	std::shared_ptr<Object> m_pObject = nullptr;
 
 };

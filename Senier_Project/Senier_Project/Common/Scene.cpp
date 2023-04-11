@@ -66,6 +66,15 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
 	m_pCamera = std::make_unique<Third_Person_Camera>(m_vpObjs[0]);
 
+
+
+
+	// Test
+	m_vpShaders.emplace_back(std::make_unique<ColliderShader>());
+	m_vpShaders[0]->Initialize(pd3dDevice, pd3dCommandList, m_RootSignature.Get() , NULL);
+
+	m_pCollider = std::make_shared<Collider>(XMFLOAT3(0, 0, 0), XMFLOAT3(3, 3, 3), true, pd3dDevice, pd3dCommandList);
+	m_pRay = std::make_shared<Ray>(XMFLOAT3(0, 0, 0), XMFLOAT3(3, 3, 3), 30, pd3dDevice, pd3dCommandList);
 	return true;
 }
 
@@ -155,13 +164,6 @@ void Scene::Update(const GameTimer& gt)
 		m_vpShaders[i]->Update(gt);
 	}
 
-	/*XMFLOAT3 camPos3f = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	XMVECTOR camPos = m_pCamera->GetPosition();
-	XMStoreFloat3(&camPos3f, camPos);
-
-	m_pCamera->LookAt(camPos3f, XMFLOAT3(0.0f, 0.0f, 0.0f), m_pCamera->GetUp3f());
-	m_pCamera->UpdateViewMatrix();*/
-
 	m_pCamera->Update(gt.DeltaTime());
 
 	XMMATRIX view = m_pCamera->GetView();
@@ -194,10 +196,12 @@ void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandLi
 	pd3dCommandList->SetGraphicsRootSignature(m_RootSignature.Get());
 	pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
 
-	/*for (int i = 0; i < m_vpShaders.size(); ++i)
+	for (int i = 0; i < m_vpShaders.size(); ++i)
 	{
 		m_vpShaders[i]->Render(gt, pd3dCommandList);
-	}*/
+		m_pCollider->Render(gt.DeltaTime(), pd3dCommandList);
+		m_pRay->Render(gt.DeltaTime(), pd3dCommandList);
+	}
 
 	for (int i = 0; i < m_vpObjs.size(); ++i)
 	{
@@ -206,6 +210,8 @@ void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandLi
 			m_vpObjs[i]->UpdateTransform(NULL);
 		m_vpObjs[i]->Render(gt, pd3dCommandList);
 	}
+
+
 }
 
 void Scene::ProcessInput(UCHAR* pKeybuffer)
