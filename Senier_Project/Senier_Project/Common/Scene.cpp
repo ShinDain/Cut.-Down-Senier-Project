@@ -25,7 +25,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	
 	// static Shader 초기화
 	Material::PrepareShaders(pd3dDevice, pd3dCommandList, m_RootSignature.Get(), NULL);
-	Mesh::PrepareColliderShader(pd3dDevice, pd3dCommandList, m_RootSignature.Get(), NULL);
+	//Mesh::PrepareColliderShader(pd3dDevice, pd3dCommandList, m_RootSignature.Get(), NULL);
+	Object::PrepareColliderShader(pd3dDevice, pd3dCommandList, m_RootSignature.Get(), NULL);
 
 	// 모델 데이터 로드
 	//char strFileName[64] = "Model/Ethan.bin";

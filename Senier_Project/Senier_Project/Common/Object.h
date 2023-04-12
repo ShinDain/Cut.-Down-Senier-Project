@@ -85,7 +85,7 @@ protected:
 
 	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	float m_Speed = 1.0f;
+	float m_Speed = 3.0f;
 
 	float m_Pitch = 0.0f; // x
 	float m_Yaw = 0.0f;   // y
@@ -163,6 +163,18 @@ public:
 	const float& GetRoll() { return(m_Roll); }
 	const XMFLOAT4& SetQuaternion() { return m_xmf4Quaternion; }
 	const float& GetSpeed() { return m_Speed; }
+
+
+#if defined(_DEBUG) | defined(DEBUG)
+public:
+	std::unique_ptr<Collider> m_pCollider = nullptr;
+
+	static std::unique_ptr<ColliderShader> m_pColliderShader;
+
+	static void PrepareColliderShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pData);
+
+#endif
+
 
 };
 

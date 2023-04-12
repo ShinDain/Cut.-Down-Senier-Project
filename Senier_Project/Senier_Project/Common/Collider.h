@@ -20,7 +20,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_PositionBufferUploader = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW				 m_PositionBufferView;
 
-	D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+	D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
 	
 public:
 	void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
@@ -77,7 +77,7 @@ private:
 	D3D12_INDEX_BUFFER_VIEW					 m_IndexBufferView;
 
 	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R16_UINT;
-	D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
 
 	SubmeshGeometry m_SubmeshGeometry;
 

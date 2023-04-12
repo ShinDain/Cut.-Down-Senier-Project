@@ -1,6 +1,8 @@
 #include "Shader.h"
 #include "Object.h"
 
+std::unique_ptr<ColliderShader> Object::m_pColliderShader = nullptr;
+
 Object::Object()
 {
 }
@@ -11,6 +13,8 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 
 	SetChild(pModelData->m_pRootObject);
 	m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
+
+	m_pCollider = std::make_unique<Collider>(GetPosition(), XMFLOAT3(0.5, 1.5, 0.5), true, pd3dDevice, pd3dCommandList);
 }
 
 Object::~Object()
@@ -99,6 +103,8 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 		XMStoreFloat4x4(&m_xmf4x4LocalTransform, xmmatTransform);
 
 		m_xmf4x4World = m_xmf4x4LocalTransform;
+
+		if(m_pCollider) m_pCollider->SetWorld(m_xmf4x4World);
 	}
 		
 
@@ -126,8 +132,6 @@ void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandL
 		XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
 		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
 
-		m_pMesh->SetColliderWorld(m_xmf4x4World);
-
 		for (int i = 0; i < m_vpMaterials.size(); ++i)
 		{
 			m_vpMaterials[i]->OnPrepareRender(pd3dCommandList);
@@ -138,6 +142,15 @@ void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandL
 			m_pMesh->Render(gt, pd3dCommandList);
 		}
 	}
+
+#if defined(_DEBUG) | defined(DEBUG)
+	if (m_pCollider != nullptr)
+	{
+		m_pColliderShader->OnPrepareRender(pd3dCommandList);
+		m_pCollider->Render(gt.DeltaTime(), pd3dCommandList);
+	}
+
+#endif
 
 	if (m_pSibling) m_pSibling->Render(gt, pd3dCommandList);
 	if (m_pChild) m_pChild->Render(gt, pd3dCommandList);
@@ -613,14 +626,14 @@ void Object::Rotate(float x, float y, float z)
 	if (x != 0.0f)
 	{
 		m_Pitch += x;
-		//if (m_Pitch > +89.0f) { x -= (m_Pitch - 89.0f); m_Pitch = +89.0f; }
-		//if (m_Pitch < -89.0f) { x -= (m_Pitch + 89.0f); m_Pitch = -89.0f; }
+		if (m_Pitch > +89.0f) { x -= (m_Pitch - 89.0f); m_Pitch = +89.0f; }
+		if (m_Pitch < -89.0f) { x -= (m_Pitch + 89.0f); m_Pitch = -89.0f; }
 	}
 	if (y != 0.0f)
 	{
 		m_Yaw += y;
-		//if (m_Yaw > 360.0f) m_Yaw -= 360.0f;
-		//if (m_Yaw < 0.0f) m_Yaw += 360.0f;
+		if (m_Yaw > 360.0f) m_Yaw -= 360.0f;
+		if (m_Yaw < 0.0f) m_Yaw += 360.0f;
 	}
 	if (z != 0.0f)
 	{
@@ -660,4 +673,10 @@ void Object::Strafe(float delta)
 	// Look 방향으로 Velocity 값을 더해주기만
 	// 실제 이동은 Update에서 처리될거임.
 	XMStoreFloat3(&m_xmf3Velocity, XMVectorMultiplyAdd(s, r, v));
+}
+
+void Object::PrepareColliderShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pData)
+{
+	m_pColliderShader = std::make_unique<ColliderShader>();
+	m_pColliderShader->Initialize(pd3dDevice, pd3dCommandList, pd3dRootSignature, NULL);
 }

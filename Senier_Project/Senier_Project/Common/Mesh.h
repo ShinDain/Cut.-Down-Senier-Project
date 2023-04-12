@@ -98,7 +98,7 @@ protected:
 	XMFLOAT3 m_xmf3Center;
 	XMFLOAT3 m_xmf3Extents;
 
-	std::unique_ptr<Collider> m_pCollider = nullptr;
+	//std::unique_ptr<Collider> m_pCollider = nullptr;
 
 public:
 	void SetMeshName(const char* str)						{ strcpy_s(m_Name, str); }
@@ -117,11 +117,11 @@ public:
 
 #if defined(_DEBUG) | defined(DEBUG)
 
-	void SetColliderWorld(const XMFLOAT4X4& World) { m_pCollider->SetWorld(World); }
+	/*void SetColliderWorld(const XMFLOAT4X4& World) { m_pCollider->SetWorld(World); }
 
 	static std::unique_ptr<ColliderShader> m_pColliderShader;
 
-	static void PrepareColliderShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pData);
+	static void PrepareColliderShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pData);*/
 
 #endif
 };

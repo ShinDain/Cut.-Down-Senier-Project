@@ -201,7 +201,7 @@ void Collider::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 
 	const UINT positionBufferByteSize = (UINT)Positions.size() * sizeof(XMFLOAT3);
 	const UINT NormalBufferByteSize = (UINT)Normal.size() * sizeof(XMFLOAT3);
-	const UINT indexBufferByteSize = (UINT)Indices.size() * sizeof(std::uint_fast32_t);
+	const UINT indexBufferByteSize = (UINT)Indices.size() * sizeof(std::uint_fast16_t);
 
 
 	CreateVertexBuffer(pd3dDevice, pd3dCommandList,
