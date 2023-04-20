@@ -24,7 +24,7 @@ XMFLOAT4X4 AnimationSet::GetSRT(int nBone, float Position)
 		if ((m_vKeyFrameTimes[i] <= Position) && (Position < m_vKeyFrameTimes[i + 1]))
 		{
 			float t = (Position - m_vKeyFrameTimes[i]) / (m_vKeyFrameTimes[i + 1] - m_vKeyFrameTimes[i]);
-			xmf4x4Transform = MathHelper::XMFloat4x4Interpolate(m_vvxmf4x4KeyFrameTransforms[i + 1][nBone], m_vvxmf4x4KeyFrameTransforms[i + 1][nBone], t);
+			xmf4x4Transform = MathHelper::XMFloat4x4Interpolate(m_vvxmf4x4KeyFrameTransforms[i][nBone], m_vvxmf4x4KeyFrameTransforms[i + 1][nBone], t);
 			break;
 		}
 	}

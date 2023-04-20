@@ -13,6 +13,9 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	if(nAnimationTracks > 0)
 		m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
 
+#if defined(_DEBUG)
+	m_pCollider = std::make_shared<RigidCollider>(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), Collider_Type_Box, pd3dDevice, pd3dCommandList);
+#endif
 }
 
 Object::~Object()
@@ -37,43 +40,10 @@ void Object::Animate(const GameTimer& gt)
 
 void Object::Update(const GameTimer& gt)
 {
-	// velocity의 크기 체크
-	// 1. MaxSpeed 이하 -> 그냥 적용
-	// 2. MaxSpeed 이상 -> MaxSpeed만큼만 적용
-	// velocity의 크기는 이동 방향의 반대로 매 프레임 
-	// Friction만큼 감소하도록
-	float Etime = gt.DeltaTime();
-	XMVECTOR Et = XMVectorReplicate(Etime);
-	XMVECTOR v = XMLoadFloat3(&m_xmf3Velocity);
-	XMFLOAT3 tmp = { 0.0f, 0.0f, 0.0f };
-	XMStoreFloat3(&tmp, XMVector3Length(v));
-	if (tmp.x > 100)
-	{
-	}
-	if (tmp.x < FLT_EPSILON)
-	{
-		m_xmf3Velocity = { 0.0f, 0.0f, 0.0f };
-	}
-	else
-	{
-		XMFLOAT3 addPos;
-		XMStoreFloat3(&addPos, XMVectorMultiply(v, Et));
-		AddPosition(addPos);
-		XMVECTOR Nv = XMVector3Normalize(v);
-		XMVECTOR f = XMVectorReplicate(m_Friction);
-		// -Nv * et * friction 역방향 마찰 -> vel 감소로
-		// 0에 가깝다면(Epsilon만큼) Vel을 0으로
+	// Object의 Value를 갱신
 
-		//=============================
-		// 역방향 마찰력이 더 크다면 v와 동일하게 변경하는 코드 추가 필요
-		//=============================
-		v = XMVectorAdd(v, XMVectorMultiply(XMVectorMultiply(-Nv, Et), f));
-		XMStoreFloat3(&m_xmf3Velocity, v);
-		if (XMVector3Length(XMLoadFloat3(&m_xmf3Velocity)).m128_f32[0] < 1)
-		{
-			m_xmf3Velocity = XMFLOAT3(0, 0, 0);
-		}
-	}
+	// 속도에 의한 위치변화 계산 후 갱신
+	CalculatePositionByVelocity(gt.DeltaTime());
 
 	ObjConstant objConstant;
 	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
@@ -89,6 +59,8 @@ void Object::Update(const GameTimer& gt)
 
 void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 {
+	// Animate 후에 호출되어 Bone 행렬을 갱신
+	// 
 	if (pxmf4x4Parent)
 	{
 		XMStoreFloat4x4(&m_xmf4x4World, XMMatrixMultiply(XMLoadFloat4x4(&m_xmf4x4LocalTransform), XMLoadFloat4x4(pxmf4x4Parent)));
@@ -139,21 +111,25 @@ void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandL
 		}
 	}
 
-	// 디버그 시 콜라이더 wireframe 렌더링 추가
+#if defined(_DEBUG)
+	if (m_pCollider)
+	{
+		char tmpstr[64] = "Character1_LeftUpLeg";
+		Object* tmpobj = FindFrame(tmpstr).get();
+
+		if (tmpobj)
+		{
+			m_pCollider->SetWorld(tmpobj->GetWorld());
+		}
+		m_pCollider->Update(gt.DeltaTime());
+
+		g_Shaders[RenderLayer::Collider]->ChangeShader(pd3dCommandList);
+		m_pCollider->Render(gt.DeltaTime(), pd3dCommandList);
+	}
+#endif
 
 	if (m_pSibling) m_pSibling->Render(gt, pd3dCommandList);
 	if (m_pChild) m_pChild->Render(gt, pd3dCommandList);
-}
-
-void Object::Delete()
-{
-	m_pObjectCB.reset();
-	m_pMesh.reset();
-
-	for (int i = 0; i < m_vpMaterials.size(); ++i)
-	{
-		m_vpMaterials[i].reset();
-	}
 }
 
 void Object::BuildConstantBuffers(ID3D12Device* pd3dDevice)
@@ -171,6 +147,47 @@ void Object::BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice)
 
 	if (m_pSibling) m_pSibling->BuildTextureDescriptorHeap(pd3dDevice);
 	if (m_pChild) m_pChild->BuildTextureDescriptorHeap(pd3dDevice);
+}
+
+void Object::CalculatePositionByVelocity(float Etime)
+{
+	// velocity의 크기 체크
+	// 1. MaxSpeed 이하 -> 그냥 적용
+	// 2. MaxSpeed 이상 -> MaxSpeed만큼만 적용
+	// velocity의 크기는 이동 방향의 반대로 매 프레임 
+	// Friction만큼 감소하도록
+
+	XMVECTOR Et = XMVectorReplicate(Etime);
+	XMVECTOR v = XMLoadFloat3(&m_xmf3Velocity);
+	XMFLOAT3 tmp = { 0.0f, 0.0f, 0.0f };
+	XMStoreFloat3(&tmp, XMVector3Length(v));
+	if (tmp.x > 100)
+	{
+	}
+	if (tmp.x < FLT_EPSILON)
+	{
+		m_xmf3Velocity = { 0.0f, 0.0f, 0.0f };
+	}
+	else
+	{
+		XMFLOAT3 addPos;
+		XMStoreFloat3(&addPos, XMVectorMultiply(v, Et));
+		AddPosition(addPos);
+		XMVECTOR Nv = XMVector3Normalize(v);
+		XMVECTOR f = XMVectorReplicate(m_Friction);
+		// -Nv * et * friction 역방향 마찰 -> vel 감소로
+		// 0에 가깝다면(Epsilon만큼) Vel을 0으로
+
+		//=============================
+		// 역방향 마찰력이 더 크다면 v와 동일하게 변경하는 코드 추가 필요
+		//=============================
+		v = XMVectorAdd(v, XMVectorMultiply(XMVectorMultiply(-Nv, Et), f));
+		XMStoreFloat3(&m_xmf3Velocity, v);
+		if (XMVector3Length(XMLoadFloat3(&m_xmf3Velocity)).m128_f32[0] < 1)
+		{
+			m_xmf3Velocity = XMFLOAT3(0, 0, 0);
+		}
+	}
 }
 
 std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName)

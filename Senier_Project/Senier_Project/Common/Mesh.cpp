@@ -58,7 +58,6 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 		{
 			nReads = (UINT)fread(&m_xmf3Center, sizeof(XMFLOAT3), 1, pInFile);
 			nReads = (UINT)fread(&m_xmf3Extents, sizeof(XMFLOAT3), 1, pInFile);
-
 		}
 		else if (!strcmp(pstrToken, "<Positions>:"))
 		{
@@ -282,8 +281,6 @@ void SkinnedMesh::LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		{
 			nReads = (UINT)fread(&m_xmf3Center, sizeof(XMFLOAT3), 1, pInFile);
 			nReads = (UINT)fread(&m_xmf3Extents, sizeof(XMFLOAT3), 1, pInFile);
-
-			//m_pCollider = std::make_unique<Collider>(m_xmf3Center, m_xmf3Extents, true, pd3dDevice, pd3dCommandList);
 		}
 		else if (!strcmp(pstrToken, "<BoneNames>:"))
 		{

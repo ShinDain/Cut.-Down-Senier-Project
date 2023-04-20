@@ -4,6 +4,14 @@
 #include "D3DUtil.h"
 #include "GeometryGenerator.h"
 
+enum ColliderType
+{
+	Collider_Type_Box,
+	Collider_Type_Sphere,
+	Collider_Type_Capsule,
+	Collider_Type_Count
+};
+
 class Ray
 {
 public:
@@ -54,14 +62,14 @@ public:
 
 };
 
-class Collider
+class RigidCollider
 {
 public:
-	Collider() = delete;
-	Collider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, bool IsBox, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-	Collider(const Collider& rhs) = delete;
-	Collider& operator=(const Collider& rhs) = delete;
-	virtual ~Collider();
+	RigidCollider() = delete;
+	RigidCollider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, ColliderType nType, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	RigidCollider(const RigidCollider& rhs) = delete;
+	RigidCollider& operator=(const RigidCollider& rhs) = delete;
+	virtual ~RigidCollider();
 
 
 private:
@@ -80,8 +88,11 @@ private:
 	D3D12_INDEX_BUFFER_VIEW					 m_IndexBufferView;
 
 	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R16_UINT;
-	D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
 
+	// 왜인지 오류가 뜨지만 큰 문제는 아니긴함
+	D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
+	//D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	
 	SubmeshGeometry m_SubmeshGeometry;
 
 public:
@@ -92,28 +103,29 @@ public:
 private:
 	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 #endif
+public:
 	void Update(float ETime);
 
 private:
+
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 	XMFLOAT3 m_xmf3Center = { 0.0f, 0.0f, 0.0f };
 	XMFLOAT3 m_xmf3Extents = { 0.0f, 0.0f, 0.0f };
 	BoundingOrientedBox m_BoundingOrientedBox;
 
-
-	bool m_bIsBox = true;
+	ColliderType m_nType = Collider_Type_Box;
 	bool m_bIsOverlapped = false;
 
 public:
 	void SetWorld(XMFLOAT4X4 World) { m_xmf4x4World = World; }
 	void SetCenter(XMFLOAT3 Center) { m_xmf3Center = Center; }	
 	void SetExtents(XMFLOAT3 Extents) { m_xmf3Extents = Extents; }
-	void SetIsBox(bool IsBox) { m_bIsBox = IsBox; }
+	void SetType(ColliderType nType) { m_nType = nType; }
 
 	XMFLOAT4X4 GetWorld() { return m_xmf4x4World; }
 	XMFLOAT3 GetCenter() { return m_xmf3Center; }
 	XMFLOAT3 GetExtents() { return m_xmf3Extents; }
-	bool GetIsBox() { return m_bIsBox; }
+	ColliderType GetType() { return m_nType; }
 	BoundingOrientedBox& GetOrientedBox() { return m_BoundingOrientedBox; }
 	bool GetIsOverlapped() { return m_bIsOverlapped; }
 

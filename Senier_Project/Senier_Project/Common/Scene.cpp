@@ -16,11 +16,18 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// static Shader 초기화
 
 	for(int i = 0 ; i < 5; ++i)
-		CreateObject(pd3dDevice, pd3dCommandList, "Model/Angrybot.bin", 1, RenderLayer::Static);
+		CreateObject(pd3dDevice, pd3dCommandList, "Model/unitychan.bin", 1, RenderLayer::Static);
 	
-
 	// 카메라 초기화
 	m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
+
+#if defined(_DEBUG)
+
+
+
+#endif
+
+
 
 	return true;
 }
@@ -34,7 +41,7 @@ void Scene::Update(const GameTimer& gt)
 {
 #if defined(_DEBUG)
 	ClearObjectLayer();
-	m_refCnt = m_LoadedModelData["Model/Angrybot.bin"]->m_pRootObject.use_count();
+	m_refCnt = m_LoadedModelData["Model/unitychan.bin"]->m_pRootObject.use_count();
 	m_size = m_vpAllObjs.size();
 #endif
 

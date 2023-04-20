@@ -63,6 +63,8 @@ public:
 	SkinnedMeshShader& operator=(const SkinnedMeshShader& rhs) = delete;
 	virtual ~SkinnedMeshShader();
 
+	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList) { Shader::ChangeShader(pd3dCommandList); }
+
 protected:
 	virtual bool BuildShadersAndInputLayout();
 	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
@@ -77,6 +79,7 @@ public:
 	ImageObjectShader& operator=(const ImageObjectShader& rhs) = delete;
 	virtual ~ImageObjectShader();
 
+	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList) { Shader::ChangeShader(pd3dCommandList); }
 	virtual void OnResize(float aspectRatio);
 
 protected:
@@ -94,6 +97,7 @@ public:
 	ColliderShader& operator=(const ColliderShader& rhs) = delete;
 	virtual ~ColliderShader();
 
+	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList) { Shader::ChangeShader(pd3dCommandList); }
 protected:
 	virtual bool BuildShadersAndInputLayout();
 	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);

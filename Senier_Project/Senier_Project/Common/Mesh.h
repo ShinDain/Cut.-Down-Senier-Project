@@ -1,15 +1,15 @@
 #pragma once
-#include "Collider.h"
+
 #include "D3DUtil.h"
 #include "GameTimer.h"
 #include "Global.h"
+
 
 // 메시 정점/인덱스 버퍼 저장
 
 using namespace DirectX;
 
 class Object;
-class ColliderShader;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -85,16 +85,15 @@ protected:
 
 	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R32_UINT;
 
-
-	char m_Name[64];
+	char m_Name[64] = {"\0"};
 	UINT m_nType = 0x00;
 
 	std::vector<SubmeshGeometry> m_vDrawArgs;
 
 	int m_nVertices = 0;
 
-	XMFLOAT3 m_xmf3Center;
-	XMFLOAT3 m_xmf3Extents;
+	XMFLOAT3 m_xmf3Center = XMFLOAT3(0,0,0);
+	XMFLOAT3 m_xmf3Extents = XMFLOAT3(0, 0, 0);
 
 public:
 	void SetMeshName(const char* str)						{ strcpy_s(m_Name, str); }
@@ -110,6 +109,7 @@ public:
 	const int GetVertexCnt()				{ return m_nVertices; }
 	const XMFLOAT3 GetCenter()			{ return m_xmf3Center; }
 	const XMFLOAT3 GetExtents()			{ return m_xmf3Extents; }
+
 };
 
 ///////////////////////////////////////////////////////////////////////////

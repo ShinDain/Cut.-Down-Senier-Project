@@ -1,4 +1,4 @@
-#include "Collider.h"
+#include "RigidCollider.h"
 
 ///////////////// Ray (±¤¼±) /////////////////
 
@@ -62,15 +62,19 @@ void Ray::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
 	pd3dCommandList->DrawInstanced(2, 1, 0, 0);
 }
 
-///////////////// Collider /////////////////
+///////////////// RigidCollider /////////////////
 
-Collider::Collider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, bool IsBox, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+RigidCollider::RigidCollider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, ColliderType nType, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	m_xmf3Center = xmf3Center;
 	m_xmf3Extents = xmf3Extents;
-	m_bIsBox = IsBox;
+	m_nType = nType;
 
-	if (IsBox)
+	m_PositionBufferView.BufferLocation = NULL;
+	m_NormalBufferView.BufferLocation = NULL;
+	m_IndexBufferView.BufferLocation = NULL;
+
+	if (nType == Collider_Type_Box)
 	{
 		m_BoundingOrientedBox = BoundingOrientedBox(m_xmf3Center, m_xmf3Extents, XMFLOAT4(0, 0, 0, 1));
 
@@ -84,17 +88,13 @@ Collider::Collider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, bool IsBox, ID3D12
 	{
 
 	}
-
-	m_PositionBufferView.BufferLocation = NULL;
-	m_NormalBufferView.BufferLocation = NULL;
-	m_IndexBufferView.BufferLocation = NULL;
 }
 
-Collider::~Collider()
+RigidCollider::~RigidCollider()
 {
 }
 
-void Collider::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+void RigidCollider::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	std::vector<XMFLOAT3> Positions;
 	std::vector<XMFLOAT3> Normal;
@@ -229,14 +229,20 @@ void Collider::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 	m_SubmeshGeometry = subMesh;
 }
 
-void Collider::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
+void RigidCollider::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[2] = { m_PositionBufferView, m_NormalBufferView };
 	pd3dCommandList->IASetVertexBuffers(0, 2, pVertexBufferView);
 	pd3dCommandList->IASetPrimitiveTopology(m_PrimitiveTopology);
+
+	XMFLOAT4X4 xmf4x4World;
+	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
+
+	pd3dCommandList->IASetIndexBuffer(&m_IndexBufferView);
 }
 
-void Collider::Update(float ETime)
+void RigidCollider::Update(float ETime)
 {
 	BoundingOrientedBox tmp =  BoundingOrientedBox(m_xmf3Center, m_xmf3Extents, XMFLOAT4(0,0,0,1));
 
@@ -246,17 +252,10 @@ void Collider::Update(float ETime)
 	m_bIsOverlapped = false;
 }
 
-void Collider::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
+void RigidCollider::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	OnPrepareRender(pd3dCommandList);
 
-	XMFLOAT4X4 xmf4x4World;
-	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
-	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
-	float IsOverlapped = GetIsOverlapped();
-	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 1, &IsOverlapped, 16);
-
-	pd3dCommandList->IASetIndexBuffer(&m_IndexBufferView);
 	pd3dCommandList->DrawIndexedInstanced(
 		m_SubmeshGeometry.IndexCount, 1, m_SubmeshGeometry.StartIndexLocation, m_SubmeshGeometry.BaseVertexLocation, 0);
 }

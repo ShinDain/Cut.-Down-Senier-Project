@@ -12,6 +12,8 @@
 #include "Material.h"
 #include "AnimationController.h"
 
+#include "RigidCollider.h"
+
 #define DIR_FORWARD					0x01
 #define DIR_BACKWARD				0x02
 #define DIR_LEFT					0x04
@@ -36,7 +38,6 @@ public:
 	virtual void Update(const GameTimer& gt);
 	virtual void UpdateTransform(XMFLOAT4X4 *pxmf4x4Parent = NULL);
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void Delete();
 
 	static std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, const char* pstrFileName);
 	static std::shared_ptr<Object> LoadFrameHierarchyFromFile
@@ -48,6 +49,8 @@ protected:
 	virtual void OnPrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void BuildConstantBuffers(ID3D12Device* pd3dDevice);
 	virtual void BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice);
+
+	void CalculatePositionByVelocity(float Etime);
 
 protected:
 	char m_FrameName[64];
@@ -170,6 +173,12 @@ public:
 	const float& GetSpeed() { return m_Speed; }
 	const bool GetIsAlive() { return m_bIsAlive; }
 
+#if defined(_DEBUG)
+public:
+	std::shared_ptr<RigidCollider> m_pCollider = nullptr;
+
+
+#endif
 };
 
 
