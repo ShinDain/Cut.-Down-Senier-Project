@@ -54,7 +54,7 @@ bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 
 void Material::MaterialSet(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	m_pShader->ChangeShader(pd3dCommandList);
+	if(m_pShader)m_pShader->ChangeShader(pd3dCommandList);
 
 	if (m_DescriptorHeap == NULL)
 		return;
@@ -83,8 +83,8 @@ void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		strcpy_s(pstrFilePath, 64, "Model/Textures/");
 
 		bDuplicated = (pstrTextureName[0] == '@');
-		strcpy_s(pstrFilePath + 15, 64 - 15, (bDuplicated) ? (pstrTextureName + 1) : pstrTextureName);
-		strcpy_s(pstrFilePath + 15 + ((bDuplicated) ? (nStrLength - 1) : nStrLength), 64 - 15 - ((bDuplicated) ? (nStrLength - 1) : nStrLength), ".dds");
+		strcat_s(pstrFilePath, (bDuplicated) ? (pstrTextureName + 1) : pstrTextureName);
+		strcat_s(pstrFilePath, ".dds");
 
 		size_t nConverted = 0;
 		wchar_t conStr[64];

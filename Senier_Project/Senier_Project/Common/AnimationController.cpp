@@ -143,7 +143,7 @@ void ModelDataInfo::PrepareSkinning()
 
 ////////////////////////////////////////////////////////////////
 
-AnimationController::AnimationController(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int nAnimationTracks, ModelDataInfo* pModel)
+AnimationController::AnimationController(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int nAnimationTracks, std::shared_ptr<ModelDataInfo> pModel)
 {
 	m_nAnimationTracks = nAnimationTracks;
 	for (int i = 0; i < nAnimationTracks; ++i)
@@ -207,7 +207,7 @@ void AnimationController::AdvanceTime(float ElapsedTime, Object* pRootGameObject
 	}
 }
 
-void AnimationController::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+void AnimationController::ChangeBoneTransformCB(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	for (int i = 0; i < m_nSkinnedMeshes; ++i)
 	{

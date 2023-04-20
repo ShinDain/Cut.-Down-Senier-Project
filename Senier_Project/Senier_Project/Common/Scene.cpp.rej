@@ -1,0 +1,27 @@
+diff a/Senier_Project/Senier_Project/Common/Scene.cpp b/Senier_Project/Senier_Project/Common/Scene.cpp	(rejected hunks)
+@@ -15,22 +15,7 @@
+ 
+-	// static Shader �ʱ�ȭ
+-
+-	// �� ������ �ε�
+-	char strFileName1[64] = "Model/Angrybot.bin";
+-	char strFileName2[64] = "Model/unitychan.bin";
+-
+-	std::shared_ptr<ModelDataInfo> tmpModel1; 
+-	tmpModel1 = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName1);
+-	//std::shared_ptr<ModelDataInfo> tmpModel2;
+-	//tmpModel2 = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName2);
+-
+-
+-	// ������Ʈ �߰�
+-	m_vpAllObjs.emplace_back(std::make_shared<Object>(pd3dDevice, pd3dCommandList, tmpModel1, 1));
+-	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
+-	m_vpAllObjs[0]->m_pAnimationController->SetTrackPosition(0, 0.2f);
+-	m_vpAllObjs[0]->SetPosition(10, 0.0f, 0.0f);
+-	m_vpAllObjs[0]->SetScale(10.0f, 10.0f, 10.0f);
++	CreateObject(pd3dDevice, pd3dCommandList, "Model/Angrybot.bin", 1, RenderLayer::Static);
++	CreateObject(pd3dDevice, pd3dCommandList, "Model/Angrybot.bin", 1, RenderLayer::Static);
+ 
+ 	// ī�޶� �ʱ�ȭ
++	// ���� Player�� ī�޶� ������ ���� (�Ű������� �޳�?)
+ 	m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);

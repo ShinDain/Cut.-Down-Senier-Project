@@ -247,14 +247,6 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 }
 
-void Mesh::DisposeUploaders()
-{
-	m_PositionBufferUploader = nullptr;
-	m_ColorBufferUploader = nullptr;
-	for(int i = 0 ; i< m_vIndexBufferUploader.size(); ++i)
-		m_vIndexBufferUploader[i] = nullptr;
-}
-
 ////////////////////////////////////////////////////////////////////
 
 SkinnedMesh::SkinnedMesh()
@@ -388,7 +380,7 @@ void SkinnedMesh::PrepareSkinning(Object* pModelRootObject)
 	}
 }
 
-void SkinnedMesh::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+void SkinnedMesh::UpdateBoneTransformBuffer(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	// BindPoseBoneOffset 상수 버퍼 연결
 	if (m_BindPoseBoneOffsetCB != nullptr)
@@ -416,7 +408,7 @@ void SkinnedMesh::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandLi
 
 void SkinnedMesh::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	UpdateShaderVariables(pd3dCommandList);
+	UpdateBoneTransformBuffer(pd3dCommandList);
 
 	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[7] =
 	{ m_PositionBufferView, m_TexC0BufferView, m_NormalBufferView, m_TangentBufferView,

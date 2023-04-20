@@ -36,8 +36,9 @@ public:
 	virtual void Update(const GameTimer& gt);
 	virtual void UpdateTransform(XMFLOAT4X4 *pxmf4x4Parent = NULL);
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void Delete();
 
-	static std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, char* pstrFileName);
+	static std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, const char* pstrFileName);
 	static std::shared_ptr<Object> LoadFrameHierarchyFromFile
 	(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, int* pnSkinnedMeshes, Object* pRootObject);
 	static void LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData);

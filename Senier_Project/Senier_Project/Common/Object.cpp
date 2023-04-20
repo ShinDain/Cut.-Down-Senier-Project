@@ -7,7 +7,7 @@ Object::Object()
 
 Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks)
 {
-	ModelDataInfo* pModelData = pModel.get();
+	std::shared_ptr<ModelDataInfo> pModelData = pModel;
 
 	SetChild(pModelData->m_pRootObject);
 	if(nAnimationTracks > 0)
@@ -95,25 +95,16 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 	}
 	else
 	{
-		// ==============================
-		// 여기 코드 깔끔하게 정리
-		// ==============================
-
+		// RootObject인 경우
 		m_xmf4x4LocalTransform = MathHelper::identity4x4();
-		XMMATRIX xmmatTransform = XMMatrixIdentity();
-		// Scale
-		xmmatTransform = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
-		// Rotate
-		xmmatTransform = XMMatrixMultiply(xmmatTransform, 
-							XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_Pitch), XMConvertToRadians(m_Yaw), XMConvertToRadians(m_Roll)));
-		// Translate
-		xmmatTransform = XMMatrixMultiply(xmmatTransform, 
-							XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z));
-		XMStoreFloat4x4(&m_xmf4x4LocalTransform, xmmatTransform);
+		XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
+		XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_Pitch), XMConvertToRadians(m_Yaw), XMConvertToRadians(m_Roll));
+		XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
+		// S * R * T
+		XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate)));
 
 		m_xmf4x4World = m_xmf4x4LocalTransform;
 	}
-		
 
 	if (m_pSibling) {
 		m_pSibling->UpdateTransform(pxmf4x4Parent);
@@ -126,7 +117,7 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 void Object::OnPrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	// 셰이더로 전달될 Bone 행렬 버퍼를 변경한다.
-	if (m_pAnimationController) m_pAnimationController->UpdateShaderVariables(pd3dCommandList);
+	if (m_pAnimationController) m_pAnimationController->ChangeBoneTransformCB(pd3dCommandList);
 	
 }
 
@@ -154,6 +145,13 @@ void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandL
 	if (m_pChild) m_pChild->Render(gt, pd3dCommandList);
 }
 
+void Object::Delete()
+{
+	if (m_pChild) m_pChild->Delete();
+	if (m_pSibling) m_pSibling->Delete();
+
+}
+
 void Object::BuildConstantBuffers(ID3D12Device* pd3dDevice)
 {
 	m_pObjectCB = std::make_unique<UploadBuffer<ObjConstant>>(pd3dDevice, 1, true);
@@ -171,7 +169,7 @@ void Object::BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice)
 	if (m_pChild) m_pChild->BuildTextureDescriptorHeap(pd3dDevice);
 }
 
-std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, char* pstrFileName)
+std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName)
 {
 	FILE* pInFile = NULL;
 	::fopen_s(&pInFile, pstrFileName, "rb");

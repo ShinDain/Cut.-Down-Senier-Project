@@ -20,7 +20,7 @@ public:
 
 	virtual bool Initialize() override;
 
-private:
+protected:
 	virtual void OnResize() override;
 	virtual void Update(const GameTimer& gt) override;
 	virtual void Render(const GameTimer& gt) override;

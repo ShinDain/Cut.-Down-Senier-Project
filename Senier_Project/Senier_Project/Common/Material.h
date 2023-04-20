@@ -30,6 +30,7 @@ public:
 protected:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
 	std::unique_ptr<UploadBuffer<MatConstant>> m_pMatCB = nullptr;
+	std::shared_ptr<Shader> m_pShader = nullptr;
 
 	XMFLOAT4 m_xmf4AlbedoColor = {0.0f, 0.0f, 0.0f, 0.0f};
 	XMFLOAT4 m_xmf4EmissiveColor = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -67,10 +68,8 @@ public:
 	void SetFresnelIOR(XMFLOAT3 in) { m_xmf3FresnelIOR = in; }
 	void SetRoughness(float in) { m_Roughness = in; }
 
-public:
-	std::shared_ptr<Shader> m_pShader = nullptr;
-
 	void SetShader(std::shared_ptr<Shader> pShader) { m_pShader = pShader; }
+
 };
 
 

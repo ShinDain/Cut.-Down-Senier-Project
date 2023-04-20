@@ -20,12 +20,13 @@ public:
 
 	void Update(const GameTimer& gt);
 	void OnResize();
-	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 
-	virtual bool UpdateBuffer(int nPosX, int nPosY);
+	virtual bool ChangePosition(int nPosX, int nPosY);
 
 protected:
+	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
+
 	bool BuildBufferResource(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	bool BuildDescriptorHeap(ID3D12Device* pd3dDevice);
 

@@ -43,7 +43,9 @@ bool SenierProjectApp::Initialize()
 		return false;
 	
 
-	m_DebugText->AddTextUI(L"GameTimer : 0", 10, 0);
+	m_DebugText->AddTextUI(L"Total Time : 0", 10, 0);
+	m_DebugText->AddTextUI(L"refCnt : 0", 10, 20);
+
 #endif
 
 	// Execute
@@ -74,15 +76,21 @@ void SenierProjectApp::Update(const GameTimer& gt)
 
 	float tTime = m_Timer.TotalTime();
 	int nIdx = 0;
-	if (m_DebugText->GetTextUICount() > nIdx)
-	{
-		float posX = m_DebugText->GetTextUIPosX(nIdx);
-		float posY = m_DebugText->GetTextUIPosY(nIdx);
-		wchar_t totalTimeText[64] = {};
-		wcscpy_s(totalTimeText, L"Total Time : ");
-		wcscat_s(totalTimeText, std::to_wstring(tTime).c_str());
-		m_DebugText->UpdateTextUI(&totalTimeText[0], posX, posY, nIdx);
-	}	
+	wchar_t totalTimeText[64] = {};
+	// 시간 측정
+	float posX = m_DebugText->GetTextUIPosX(nIdx);
+	float posY = m_DebugText->GetTextUIPosY(nIdx);
+	wcscpy_s(totalTimeText, L"Total Time : ");
+	wcscat_s(totalTimeText, std::to_wstring(tTime).c_str());
+	m_DebugText->UpdateTextUI(totalTimeText, posX, posY, nIdx);
+	
+	posX = m_DebugText->GetTextUIPosX(1);
+	posY = m_DebugText->GetTextUIPosY(1);
+	wcscpy_s(totalTimeText, L"refCnt : ");
+	int refCnt = m_Scene->m_refCnt;
+
+	wcscat_s(totalTimeText, std::to_wstring(refCnt).c_str());
+	m_DebugText->UpdateTextUI(totalTimeText, posX, posY, 1);
 #endif
 }
 

@@ -30,7 +30,7 @@ bool ImgObject::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	if (!result)
 		return false;
 
-	UpdateBuffer(CLIENT_WIDTH / 2, CLIENT_HEIGHT /2 );
+	ChangePosition(CLIENT_WIDTH / 2, CLIENT_HEIGHT /2 );
 
 	return true;
 }
@@ -135,7 +135,7 @@ bool ImgObject::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 	return true;
 }
 
-bool ImgObject::UpdateBuffer(int nPosX, int nPosY)
+bool ImgObject::ChangePosition(int nPosX, int nPosY)
 {
 	float left, right, top, bottom;
 

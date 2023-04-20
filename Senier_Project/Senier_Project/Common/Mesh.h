@@ -40,6 +40,14 @@ public:
 	Mesh& operator=(const Mesh& rhs) = delete;
 	virtual ~Mesh();
 
+	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
+
+protected:
+	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void OnPostRender() {};
+
+
 protected:
 	D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
@@ -77,18 +85,7 @@ protected:
 
 	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R32_UINT;
 
-protected:
-	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void OnPostRender() {};
 
-public:
-	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
-
-
-	void DisposeUploaders();
-
-protected:
 	char m_Name[64];
 	UINT m_nType = 0x00;
 
@@ -126,6 +123,15 @@ public:
 	virtual ~SkinnedMesh();
 
 protected:
+	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList) override;
+
+public:
+	void LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
+	void PrepareSkinning(Object* pModelRootObject);
+
+	void UpdateBoneTransformBuffer(ID3D12GraphicsCommandList* pd3dCommandList);
+
+protected:
 	std::vector<XMINT4>			m_vxmn4BoneIndices;
 	std::vector<XMFLOAT4>		m_vxmf4BoneWeights;
 
@@ -152,16 +158,6 @@ protected:
 
 	//------------------
 
-protected:
-	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList) override;
-
-public:
-	void LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
-	void PrepareSkinning(Object* pModelRootObject);
-
-	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
-
-protected:
 	int m_nBonesPerVertex = 4;
 	int m_nSkinningBones = 0;
 

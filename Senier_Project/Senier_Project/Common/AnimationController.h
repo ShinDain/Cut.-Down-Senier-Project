@@ -135,8 +135,11 @@ public:
 class AnimationController
 {
 public:
-	AnimationController(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int nAnimationTracks, ModelDataInfo* pModel);
+	AnimationController(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int nAnimationTracks, std::shared_ptr<ModelDataInfo> pModel);
 	~AnimationController();
+
+	void ChangeBoneTransformCB(ID3D12GraphicsCommandList* pd3dCommandList);
+	void AdvanceTime(float ElapsedTime, Object* pRootGameObject);
 
 public:
 	float m_Time = 0.0f;
@@ -155,10 +158,6 @@ public:
 
 	std::vector<std::shared_ptr<UploadBuffer<SkinningBoneTransformConstant>>> m_vSkinningBoneTransformCBs;
 	//---------------------
-
-public:
-	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
-	void AdvanceTime(float ElapsedTime, Object* pRootGameObject);
 
 public:
 	bool	m_bRootMotion = false;
