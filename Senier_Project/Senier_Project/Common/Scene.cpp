@@ -15,22 +15,9 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	// static Shader 초기화
 
-	// 모델 데이터 로드
-	char strFileName1[64] = "Model/Angrybot.bin";
-	char strFileName2[64] = "Model/unitychan.bin";
-
-	std::shared_ptr<ModelDataInfo> tmpModel1; 
-	tmpModel1 = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName1);
-	//std::shared_ptr<ModelDataInfo> tmpModel2;
-	//tmpModel2 = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, strFileName2);
-
-
-	// 오브젝트 추가
-	m_vpAllObjs.emplace_back(std::make_shared<Object>(pd3dDevice, pd3dCommandList, tmpModel1, 1));
-	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
-	m_vpAllObjs[0]->m_pAnimationController->SetTrackPosition(0, 0.2f);
-	m_vpAllObjs[0]->SetPosition(10, 0.0f, 0.0f);
-	m_vpAllObjs[0]->SetScale(10.0f, 10.0f, 10.0f);
+	for(int i = 0 ; i < 5; ++i)
+		CreateObject(pd3dDevice, pd3dCommandList, "Model/Angrybot.bin", 1, RenderLayer::Static);
+	
 
 	// 카메라 초기화
 	m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
@@ -45,6 +32,12 @@ void Scene::OnResize(float aspectRatio)
 
 void Scene::Update(const GameTimer& gt)
 {
+#if defined(_DEBUG)
+	ClearObjectLayer();
+	m_refCnt = m_LoadedModelData["Model/Angrybot.bin"]->m_pRootObject.use_count();
+	m_size = m_vpAllObjs.size();
+#endif
+
 	m_pCamera->Update(gt.DeltaTime());
 
 	XMMATRIX view = m_pCamera->GetView();
@@ -60,10 +53,7 @@ void Scene::Update(const GameTimer& gt)
 
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
-		m_vpAllObjs[i]->Animate(gt);
-		if (!m_vpAllObjs[i]->m_pAnimationController)
-			m_vpAllObjs[i]->UpdateTransform(NULL);
-		m_vpAllObjs[i]->Update(gt);
+		if (m_vpAllObjs[i]) m_vpAllObjs[i]->Update(gt);
 	}
 }
 
@@ -80,7 +70,14 @@ void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandLi
 
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
-		m_vpAllObjs[i]->Render(gt, pd3dCommandList);
+		if (m_vpAllObjs[i])
+		{
+			// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
+			m_vpAllObjs[i]->Animate(gt);
+			if (!m_vpAllObjs[i]->m_pAnimationController)
+				m_vpAllObjs[i]->UpdateTransform(NULL);
+			m_vpAllObjs[i]->Render(gt, pd3dCommandList);
+		}
 	}
 }
 
@@ -118,4 +115,70 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 		m_vpAllObjs[0]->Move(dwDirection, m_vpAllObjs[0]->GetSpeed());
 	}
 
+#if defined(_DEBUG)
+	if (pKeybuffer[VK_F1] & 0xF0)
+	{
+		if (m_vpAllObjs.size() > 1)
+		{
+			m_vpAllObjs[1]->SetIsAlive(false);
+		}
+	}
+
+#endif
+}
+
+
+std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	const char* pstrFileName, int nAnimationTracks, RenderLayer renderLayer)
+{
+	std::shared_ptr<ModelDataInfo> pModelData;
+	std::shared_ptr<Object> pObject;
+
+	if (m_LoadedModelData.find(pstrFileName) == m_LoadedModelData.end())
+	{
+		// 모델 로드
+		pModelData = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, pstrFileName);
+
+		m_LoadedModelData.insert({ pstrFileName, pModelData });
+	}
+	else	// 이미 로드한 모델인 경우
+	{
+		pModelData = m_LoadedModelData[pstrFileName];
+	}
+
+	// 오브젝트 생성
+	pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, pModelData, nAnimationTracks);
+
+#if defined(_DEBUG)
+	pObject->SetScale(10, 10, 10);
+#endif
+
+	m_vpAllObjs.emplace_back(pObject);
+	m_vObjectLayer[renderLayer].emplace_back(pObject);
+
+
+	return pObject;
+}
+
+void Scene::ClearObjectLayer()
+{
+	for (int i = 0; i < m_vpAllObjs.size(); ++i)
+	{
+		if (!m_vpAllObjs[i]->GetIsAlive())
+		{
+			m_vpAllObjs.erase(m_vpAllObjs.begin() + i);
+			return;
+		}
+	}
+	for (int i = 0; i < RenderLayer::Count; ++i)
+	{
+		for (int j = 0; j < m_vObjectLayer[i].size(); ++j)
+		{
+			if (!m_vObjectLayer[i][j]->GetIsAlive())
+			{
+				m_vObjectLayer[i].erase(m_vObjectLayer[i].begin() + j);
+				return;
+			}
+		}
+	}
 }

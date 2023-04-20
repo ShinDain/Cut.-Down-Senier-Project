@@ -27,6 +27,8 @@ public:
 
 	std::shared_ptr<Object> CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 										const char* pstrFileName, int nAnimationTracks, RenderLayer renderLayer);
+
+	void ClearObjectLayer();
 private:
 
 	XMFLOAT4X4 m_xmf4x4ViewProj = MathHelper::identity4x4();
@@ -56,6 +58,7 @@ private:
 public:
 
 	int m_refCnt = 0;
+	int m_size = 0;
 	
 #endif
 };

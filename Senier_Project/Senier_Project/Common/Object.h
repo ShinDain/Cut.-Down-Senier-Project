@@ -96,6 +96,8 @@ protected:
 	float m_MaxVelocityY = 0.0f;
 	float m_Friction = 250.0f;
 
+	bool m_bIsAlive = true;
+
 public:
 	void AddForce(XMVECTOR direction, float distance);
 	void Move(DWORD dwDirection, float distance);
@@ -147,6 +149,8 @@ public:
 	void SetVelocity(const XMFLOAT3& Velocity) { m_xmf3Velocity = Velocity; }
 	void SetQuaternion(const XMFLOAT4& quaternion) { m_xmf4Quaternion = quaternion; }
 	void SetSpeed(const float Speed) { m_Speed = Speed; }
+	void SetIsAlive(bool bIsAlive) { m_bIsAlive = bIsAlive; }
+
 
 	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
 	const XMFLOAT4X4& GetParentWorld() { return m_xmf4x4ParentWorld; }
@@ -164,6 +168,7 @@ public:
 	const float& GetRoll() { return(m_Roll); }
 	const XMFLOAT4& SetQuaternion() { return m_xmf4Quaternion; }
 	const float& GetSpeed() { return m_Speed; }
+	const bool GetIsAlive() { return m_bIsAlive; }
 
 };
 

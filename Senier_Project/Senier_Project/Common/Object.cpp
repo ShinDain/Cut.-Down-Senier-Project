@@ -147,9 +147,13 @@ void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandL
 
 void Object::Delete()
 {
-	if (m_pChild) m_pChild->Delete();
-	if (m_pSibling) m_pSibling->Delete();
+	m_pObjectCB.reset();
+	m_pMesh.reset();
 
+	for (int i = 0; i < m_vpMaterials.size(); ++i)
+	{
+		m_vpMaterials[i].reset();
+	}
 }
 
 void Object::BuildConstantBuffers(ID3D12Device* pd3dDevice)

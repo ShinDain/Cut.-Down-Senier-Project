@@ -45,6 +45,7 @@ bool SenierProjectApp::Initialize()
 
 	m_DebugText->AddTextUI(L"Total Time : 0", 10, 0);
 	m_DebugText->AddTextUI(L"refCnt : 0", 10, 20);
+	m_DebugText->AddTextUI(L"vecCnt : 0", 10, 40);
 
 #endif
 
@@ -88,9 +89,15 @@ void SenierProjectApp::Update(const GameTimer& gt)
 	posY = m_DebugText->GetTextUIPosY(1);
 	wcscpy_s(totalTimeText, L"refCnt : ");
 	int refCnt = m_Scene->m_refCnt;
-
 	wcscat_s(totalTimeText, std::to_wstring(refCnt).c_str());
 	m_DebugText->UpdateTextUI(totalTimeText, posX, posY, 1);
+
+	posX = m_DebugText->GetTextUIPosX(2);
+	posY = m_DebugText->GetTextUIPosY(2);
+	wcscpy_s(totalTimeText, L"vecCnt : ");
+	int vecCnt = m_Scene->m_size;
+	wcscat_s(totalTimeText, std::to_wstring(vecCnt).c_str());
+	m_DebugText->UpdateTextUI(totalTimeText, posX, posY, 2);
 #endif
 }
 
