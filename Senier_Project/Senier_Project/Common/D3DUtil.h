@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <vector>
 #include <array>
-#include <unordered_map>
+#include <map>
 #include <cstdint>
 #include <fstream>
 #include <sstream>
@@ -159,7 +159,6 @@ struct SubmeshGeometry
     UINT IndexCount = 0;
     UINT StartIndexLocation = 0;
     INT BaseVertexLocation = 0;
-
 };
 
 struct Light
@@ -173,11 +172,6 @@ struct Light
 };
 
 #define MaxLights 16
-
-struct MaterialConstants
-{
-
-};
 
 #ifndef ThrowIfFailed
 #define ThrowIfFailed(x)                                                \

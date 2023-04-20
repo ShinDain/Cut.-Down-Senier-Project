@@ -61,7 +61,7 @@ public:
 	void Pitch(float angle);
 	void RotateY(float angle);
 
-	virtual void Update(float Etime) {}
+	virtual void Update(float Etime) { UpdateViewMatrix(); }
 	virtual void UpdateViewMatrix();
 
 
@@ -94,19 +94,24 @@ public:
 	Third_Person_Camera& operator=(const Third_Person_Camera& rhs) = delete;
 	virtual ~Third_Person_Camera();
 
-	float GetOffsetLength() const { return m_OffsetLength; }
-
-	void SetOffsetLength(float value) { m_OffsetLength = value; }
-	void SetPlayer(const std::shared_ptr<Object> pObject) { m_pObject = pObject; }
-
-
-	virtual void Update(float Etime);
-	virtual void UpdateViewMatrix() override;
+	virtual void Update(float Etime) override;
 
 protected:
-	float m_OffsetLength = 100.f;
+	float m_OffsetLength = 100;
 	DirectX::XMFLOAT3 m_xmf3Offset = { 0.0f, 30.0f, -100.0f };
+
+	// 추적할 대상 오브젝트
 	std::shared_ptr<Object> m_pObject = nullptr;
+
+
+public:
+	float GetOffsetLength() const { return m_OffsetLength; }
+	DirectX::XMFLOAT3 GetOffset() const { return m_xmf3Offset; }
+	std::shared_ptr<Object> GetObject() const { return m_pObject; }
+
+	void SetOffsetLength(float value) { m_OffsetLength = value; }
+	void SetOffset(DirectX::XMFLOAT3 xmf3Offset) {	m_xmf3Offset = xmf3Offset;}
+	void SetPlayer(const std::shared_ptr<Object> pObject) { m_pObject = pObject; }
 
 };
 

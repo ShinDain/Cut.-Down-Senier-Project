@@ -21,6 +21,16 @@ bool SenierProjectApp::Initialize()
 
 	
 	// 각종 변수 초기화
+	g_Shaders.insert(std::make_pair<RenderLayer, std::shared_ptr<Shader>>(RenderLayer::Static, std::make_shared<Shader>()));
+	g_Shaders.insert(std::make_pair<RenderLayer, std::shared_ptr<Shader>>(RenderLayer::Skinned, std::make_shared<SkinnedMeshShader>()));
+	g_Shaders.insert(std::make_pair<RenderLayer, std::shared_ptr<Shader>>(RenderLayer::Image, std::make_shared<ImageObjectShader>()));
+	g_Shaders.insert(std::make_pair<RenderLayer, std::shared_ptr<Shader>>(RenderLayer::Collider, std::make_shared<ColliderShader>()));
+
+	for (auto iter = g_Shaders.begin(); iter != g_Shaders.end(); ++iter)
+	{
+		iter->second->Initialize(m_d3d12Device.Get(), m_CommandList.Get(), NULL);
+	}
+
 	m_Scene = std::make_unique<Scene>();
 	if (!m_Scene->Initialize(m_d3d12Device.Get(), m_CommandList.Get()))
 		return false;
@@ -32,10 +42,6 @@ bool SenierProjectApp::Initialize()
 		DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING))
 		return false;
 	
-	// DWRITE_TEXT_ALIGNMENT_JUSTIFIED
-	// DWRITE_TEXT_ALIGNMENT_CENTER
-	// DWRITE_TEXT_ALIGNMENT_TRAILING
-	// DWRITE_TEXT_ALIGNMENT_LEADING
 
 	m_DebugText->AddTextUI(L"GameTimer : 0", 10, 0);
 #endif
@@ -111,7 +117,6 @@ void SenierProjectApp::Render(const GameTimer& gt)
 	if (m_Scene)
 	{
 		m_Scene->Render(gt, m_CommandList.Get());
-		m_Scene->ImgObjRender(gt, m_CommandList.Get());
 	}
 
 	ThrowIfFailed(m_CommandList->Close());

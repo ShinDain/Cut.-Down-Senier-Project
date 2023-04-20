@@ -4,8 +4,6 @@
 
 using namespace DirectX;
 
-//std::unique_ptr<ColliderShader> Mesh::m_pColliderShader = nullptr;
-
 Mesh::Mesh()
 {
 }
@@ -23,19 +21,14 @@ void Mesh::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void Mesh::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	OnPrepareRender(pd3dCommandList);
+
     for (int i = 0 ; i< m_vDrawArgs.size(); ++i)
     {
 		pd3dCommandList->IASetIndexBuffer(&m_vIndexBufferView[i]);
         pd3dCommandList->DrawIndexedInstanced(
             m_vDrawArgs[i].IndexCount, 1, m_vDrawArgs[i].StartIndexLocation, m_vDrawArgs[i].BaseVertexLocation, 0);
     }
-
-//#if defined(_DEBUG) | defined(DEBUG)
-//
-//	m_pColliderShader->OnPrepareRender(pd3dCommandList);
-//	m_pCollider->Render(gt.DeltaTime(), pd3dCommandList);
-//
-//#endif
 }
 
 void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)
@@ -48,6 +41,15 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	nReads = ReadStringFromFile(pInFile, pstrToken);
 	SetMeshName(pstrToken);
 
+	std::vector<XMFLOAT3> vPosition;
+	std::vector<XMFLOAT4> vColor;
+	std::vector<XMFLOAT2> vTextureC0;
+	std::vector<XMFLOAT2> vTextureC1;
+	std::vector<XMFLOAT3> vNormal;
+	std::vector<XMFLOAT3> vTangent;
+	std::vector<XMFLOAT3> vBiTangent;
+	std::vector<std::vector<UINT>> vvIndices;
+
 	for (; ; )
 	{
 		nReads = ReadStringFromFile(pInFile, pstrToken);
@@ -57,8 +59,6 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			nReads = (UINT)fread(&m_xmf3Center, sizeof(XMFLOAT3), 1, pInFile);
 			nReads = (UINT)fread(&m_xmf3Extents, sizeof(XMFLOAT3), 1, pInFile);
 
-			/*if(!m_pCollider) 
-				m_pCollider = std::make_unique<Collider>(m_xmf3Center, m_xmf3Extents, true, pd3dDevice, pd3dCommandList);*/
 		}
 		else if (!strcmp(pstrToken, "<Positions>:"))
 		{
@@ -68,7 +68,6 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			{
 				m_nType |= VERTEXT_POSITION;
 
-				std::vector<XMFLOAT3> vPosition;
 				vPosition.resize(nPosition);
 
 				nReads = (UINT)fread(&vPosition[0], sizeof(XMFLOAT3), nPosition, pInFile);
@@ -89,7 +88,6 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			{
 				m_nType |= VERTEXT_COLOR;
 
-				std::vector<XMFLOAT4> vColor;
 				vColor.resize(nColor);
 				nReads = (UINT)fread(&vColor[0], sizeof(XMFLOAT4), nColor, pInFile);
 
@@ -109,7 +107,6 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			{
 				m_nType |= VERTEXT_TEXTURE_COORD0;
 
-				std::vector<XMFLOAT2> vTextureC0;
 				vTextureC0.resize(nTexC0);
 				nReads = (UINT)fread(&vTextureC0[0], sizeof(XMFLOAT2), nTexC0, pInFile);
 
@@ -129,7 +126,6 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			{
 				m_nType |= VERTEXT_TEXTURE_COORD1;
 
-				std::vector<XMFLOAT2> vTextureC1;
 				vTextureC1.resize(nTexC1);
 				nReads = (UINT)fread(&vTextureC1[0], sizeof(XMFLOAT2), nTexC1, pInFile);
 
@@ -149,7 +145,6 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			{
 				m_nType |= VERTEXT_NORMAL;
 
-				std::vector<XMFLOAT3> vNormal;
 				vNormal.resize(nNormal);
 				nReads = (UINT)fread(&vNormal[0], sizeof(XMFLOAT3), nNormal, pInFile);
 
@@ -169,7 +164,6 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			{
 				m_nType |= VERTEXT_TANGENT;
 
-				std::vector<XMFLOAT3> vTangent;
 				vTangent.resize(nTangent);
 				nReads = (UINT)fread(&vTangent[0], sizeof(XMFLOAT3), nTangent, pInFile);
 
@@ -187,7 +181,6 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 			nBiTangent = ReadintegerFromFile(pInFile);
 			if (nBiTangent)
 			{
-				std::vector<XMFLOAT3> vBiTangent;
 				vBiTangent.resize(nBiTangent);
 				nReads = (UINT)fread(&vBiTangent[0], sizeof(XMFLOAT3), nBiTangent, pInFile);
 
@@ -206,7 +199,6 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 			if (nSubMeshes > 0)
 			{
-				std::vector<std::vector<UINT>> vvIndices;
 				vvIndices.resize(nSubMeshes);
 				for (int i = 0; i < nSubMeshes; ++i)
 				{
@@ -262,12 +254,6 @@ void Mesh::DisposeUploaders()
 	for(int i = 0 ; i< m_vIndexBufferUploader.size(); ++i)
 		m_vIndexBufferUploader[i] = nullptr;
 }
-
-//void Mesh::PrepareColliderShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pData)
-//{
-//	m_pColliderShader = std::make_unique<ColliderShader>();
-//	m_pColliderShader->Initialize(pd3dDevice, pd3dCommandList, pd3dRootSignature, NULL);
-//}
 
 ////////////////////////////////////////////////////////////////////
 

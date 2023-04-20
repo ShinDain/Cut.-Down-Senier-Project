@@ -1,8 +1,6 @@
 #include "Shader.h"
 #include "Object.h"
 
-std::unique_ptr<ColliderShader> Object::m_pColliderShader = nullptr;
-
 Object::Object()
 {
 }
@@ -12,9 +10,9 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	ModelDataInfo* pModelData = pModel.get();
 
 	SetChild(pModelData->m_pRootObject);
-	m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
+	if(nAnimationTracks > 0)
+		m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
 
-	m_pCollider = std::make_unique<Collider>(GetPosition(), XMFLOAT3(0.5, 1.5, 0.5), true, pd3dDevice, pd3dCommandList);
 }
 
 Object::~Object()
@@ -23,7 +21,7 @@ Object::~Object()
 
 bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
-	//BuildConstantBuffers(pd3dDevice);
+	BuildConstantBuffers(pd3dDevice);
 
 	return true;
 }
@@ -66,8 +64,15 @@ void Object::Update(const GameTimer& gt)
 		// -Nv * et * friction 역방향 마찰 -> vel 감소로
 		// 0에 가깝다면(Epsilon만큼) Vel을 0으로
 
+		//=============================
+		// 역방향 마찰력이 더 크다면 v와 동일하게 변경하는 코드 추가 필요
+		//=============================
 		v = XMVectorAdd(v, XMVectorMultiply(XMVectorMultiply(-Nv, Et), f));
 		XMStoreFloat3(&m_xmf3Velocity, v);
+		if (XMVector3Length(XMLoadFloat3(&m_xmf3Velocity)).m128_f32[0] < 1)
+		{
+			m_xmf3Velocity = XMFLOAT3(0, 0, 0);
+		}
 	}
 
 	ObjConstant objConstant;
@@ -90,6 +95,10 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 	}
 	else
 	{
+		// ==============================
+		// 여기 코드 깔끔하게 정리
+		// ==============================
+
 		m_xmf4x4LocalTransform = MathHelper::identity4x4();
 		XMMATRIX xmmatTransform = XMMatrixIdentity();
 		// Scale
@@ -103,8 +112,6 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 		XMStoreFloat4x4(&m_xmf4x4LocalTransform, xmmatTransform);
 
 		m_xmf4x4World = m_xmf4x4LocalTransform;
-
-		if(m_pCollider) m_pCollider->SetWorld(m_xmf4x4World);
 	}
 		
 
@@ -116,15 +123,16 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 	}
 }
 
-void Object::PrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
+void Object::OnPrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	// 셰이더로 전달될 Bone 행렬 버퍼를 변경한다.
 	if (m_pAnimationController) m_pAnimationController->UpdateShaderVariables(pd3dCommandList);
 	
 }
 
 void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	PrepareRender(gt, pd3dCommandList);
+	OnPrepareRender(gt, pd3dCommandList);
 
 	if (m_pMesh)
 	{
@@ -134,23 +142,13 @@ void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandL
 
 		for (int i = 0; i < m_vpMaterials.size(); ++i)
 		{
-			m_vpMaterials[i]->OnPrepareRender(pd3dCommandList);
+			m_vpMaterials[i]->MaterialSet(pd3dCommandList);
 
-			if (m_vpMaterials[i]->m_pShader) m_vpMaterials[i]->m_pShader->OnPrepareRender(pd3dCommandList);
-			
-			m_pMesh->OnPrepareRender(pd3dCommandList);
 			m_pMesh->Render(gt, pd3dCommandList);
 		}
 	}
 
-#if defined(_DEBUG) | defined(DEBUG)
-	if (m_pCollider != nullptr)
-	{
-		m_pColliderShader->OnPrepareRender(pd3dCommandList);
-		m_pCollider->Render(gt.DeltaTime(), pd3dCommandList);
-	}
-
-#endif
+	// 디버그 시 콜라이더 wireframe 렌더링 추가
 
 	if (m_pSibling) m_pSibling->Render(gt, pd3dCommandList);
 	if (m_pChild) m_pChild->Render(gt, pd3dCommandList);
@@ -226,7 +224,7 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 	int nFrame = 0, nTextures = 0;
 
 	std::shared_ptr<Object> pObject = std::make_shared<Object>();
-	pObject->BuildConstantBuffers(pd3dDevice);
+	pObject->Initialize(pd3dDevice, pd3dCommandList, NULL);
 
 	for (; ; )
 	{
@@ -348,11 +346,11 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 			{
 				if (nType & VERTEXT_BONE_INDEX_WEIGHT)
 				{
-					vpMat[nMatcnt]->SetSkinnedShader();
+					vpMat[nMatcnt]->SetShader(g_Shaders[RenderLayer::Skinned]);
 				}
 				else
 				{
-					vpMat[nMatcnt]->SetStaticShader();
+					vpMat[nMatcnt]->SetShader(g_Shaders[RenderLayer::Static]);
 				}
 			}
 		}
@@ -673,10 +671,4 @@ void Object::Strafe(float delta)
 	// Look 방향으로 Velocity 값을 더해주기만
 	// 실제 이동은 Update에서 처리될거임.
 	XMStoreFloat3(&m_xmf3Velocity, XMVectorMultiplyAdd(s, r, v));
-}
-
-void Object::PrepareColliderShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pData)
-{
-	m_pColliderShader = std::make_unique<ColliderShader>();
-	m_pColliderShader->Initialize(pd3dDevice, pd3dCommandList, pd3dRootSignature, NULL);
 }

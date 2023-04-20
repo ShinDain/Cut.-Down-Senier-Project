@@ -23,24 +23,26 @@ public:
 	Shader& operator=(const Shader& rhs) = delete;
 	virtual ~Shader();
 
-	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pContext);
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
 
-	virtual void OnResize(float aspectRatio) {};
-	virtual void Update(const GameTimer& gt) {};
-	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void OnResize(float aspectRatio) {}
+	virtual void Update(const GameTimer& gt) {}
+	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void ProcessInput(UCHAR* pKeybuffer) {}
 
+protected:
 	virtual bool BuildShadersAndInputLayout();
+	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
+	virtual bool BuildPSO(ID3D12Device* pd3dDevice);
 
-	virtual bool BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature);
-
-	virtual void ProcessInput(UCHAR* pKeybuffer);
+	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 2> GetStaticSampler();
 
 protected:
 	ComPtr<ID3DBlob> m_vsByteCode = nullptr;
 	ComPtr<ID3DBlob> m_psByteCode = nullptr;
 
 	std::vector<D3D12_INPUT_ELEMENT_DESC> m_vInputLayout;
+	ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
 
 	ComPtr<ID3D12PipelineState> m_PSO = nullptr;
 
@@ -61,7 +63,9 @@ public:
 	SkinnedMeshShader& operator=(const SkinnedMeshShader& rhs) = delete;
 	virtual ~SkinnedMeshShader();
 
+protected:
 	virtual bool BuildShadersAndInputLayout();
+	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
 };
 
 // 2D ¿ÃπÃ¡ˆ ∑ª¥ı∏µ ≈ÿΩ∫√ƒ
@@ -73,20 +77,12 @@ public:
 	ImageObjectShader& operator=(const ImageObjectShader& rhs) = delete;
 	virtual ~ImageObjectShader();
 
-	virtual bool BuildShadersAndInputLayout();
-	virtual bool BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature);
-
-	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void OnResize(float aspectRatio);
-	virtual void Update(const GameTimer& gt);
-	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 
-private:
-	std::vector<std::shared_ptr<ImgObject>> m_vpImgObjects;
-
-public:
-	bool CreateImgObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int nScreenWidth, int nScreenHeight,
-		const wchar_t* pstrTextureFileName, int nBitmapWidth, int nBitmapHeight);
+protected:
+	virtual bool BuildShadersAndInputLayout();
+	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
+	virtual bool BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature);
 };
 
 // Collider ∑ª¥ı∏µ ºŒ¿Ã¥ı
@@ -98,6 +94,8 @@ public:
 	ColliderShader& operator=(const ColliderShader& rhs) = delete;
 	virtual ~ColliderShader();
 
+protected:
 	virtual bool BuildShadersAndInputLayout();
+	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
 	virtual bool BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature);
 };

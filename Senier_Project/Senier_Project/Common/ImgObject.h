@@ -20,7 +20,7 @@ public:
 
 	void Update(const GameTimer& gt);
 	void OnResize();
-	void PrePareRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual bool UpdateBuffer(int nPosX, int nPosY);

@@ -1,5 +1,8 @@
 #include "Global.h"
 
+std::vector<std::shared_ptr<Texture>> g_CachingTexture;
+std::map<RenderLayer, std::shared_ptr<Shader>> g_Shaders;
+
 void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName)
 {
 	auto texMap = std::make_shared<Texture>();

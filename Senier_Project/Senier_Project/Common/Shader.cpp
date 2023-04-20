@@ -8,22 +8,19 @@ Shader::~Shader()
 {
 }
 
-bool Shader::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pContext)
+bool Shader::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
 	BuildShadersAndInputLayout();
-	BuildPSO(pd3dDevice, pd3dRootSignature);
+	BuildRootSignature(pd3dDevice);
+	BuildPSO(pd3dDevice);
 
 	return true;
 }
 
-void Shader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
+void Shader::ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	pd3dCommandList->SetGraphicsRootSignature(m_RootSignature.Get());
 	pd3dCommandList->SetPipelineState(m_PSO.Get());
-}
-
-void Shader::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	OnPrepareRender(pd3dCommandList);
 }
 
 bool Shader::BuildShadersAndInputLayout()
@@ -41,12 +38,51 @@ bool Shader::BuildShadersAndInputLayout()
 	return true;
 }
 
-bool Shader::BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature)
+bool Shader::BuildRootSignature(ID3D12Device* pd3dDevice)
+{
+	CD3DX12_ROOT_PARAMETER slotRootParameter[5];
+
+	CD3DX12_DESCRIPTOR_RANGE texTable;
+	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+
+	slotRootParameter[0].InitAsConstants(16, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
+	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
+	slotRootParameter[2].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
+	slotRootParameter[3].InitAsConstantBufferView(1);	// BoneOffsets 상수 버퍼 
+	slotRootParameter[4].InitAsConstantBufferView(2);	// BoneTransforms 상수 버퍼 
+
+	// 샘플러
+	auto staticSamplers = GetStaticSampler();
+
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(_countof(slotRootParameter), slotRootParameter,
+		(UINT)staticSamplers.size(), staticSamplers.data(),
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+	ComPtr<ID3DBlob> serializedRootSig = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+		serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+	if (errorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	}
+
+	ThrowIfFailed(hr);
+
+	ThrowIfFailed(pd3dDevice->CreateRootSignature(
+		0, serializedRootSig->GetBufferPointer(),
+		serializedRootSig->GetBufferSize(),
+		IID_PPV_ARGS(&m_RootSignature)));
+	return true;
+}
+
+bool Shader::BuildPSO(ID3D12Device* pd3dDevice)
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 	ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 	psoDesc.InputLayout = { m_vInputLayout.data(), (UINT)m_vInputLayout.size() };
-	psoDesc.pRootSignature = pd3dRootSignature;
+	psoDesc.pRootSignature = m_RootSignature.Get();
 	psoDesc.VS = {
 		reinterpret_cast<BYTE*>(m_vsByteCode->GetBufferPointer()),
 		m_vsByteCode->GetBufferSize() };
@@ -68,9 +104,29 @@ bool Shader::BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSig
 	return true;
 }
 
-void Shader::ProcessInput(UCHAR* pKeybuffer)
-{
 
+std::array<const CD3DX12_STATIC_SAMPLER_DESC, 2> Shader::GetStaticSampler()
+{
+	const CD3DX12_STATIC_SAMPLER_DESC anisotropicWrap(
+		0, // shaderRegister
+		D3D12_FILTER_ANISOTROPIC, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressW
+		0.0f,                             // mipLODBias
+		8);                               // maxAnisotropy
+
+	const CD3DX12_STATIC_SAMPLER_DESC anisotropicClamp(
+		1, // shaderRegister
+		D3D12_FILTER_ANISOTROPIC, // filter
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressW
+		0.0f,                              // mipLODBias
+		8);                                // maxAnisotropy
+
+	return {
+		anisotropicWrap, anisotropicClamp };
 }
 
 //////////////////////////////////////////////////////////
@@ -103,6 +159,45 @@ bool SkinnedMeshShader::BuildShadersAndInputLayout()
 	return true;
 }
 
+bool SkinnedMeshShader::BuildRootSignature(ID3D12Device* pd3dDevice)
+{
+	CD3DX12_ROOT_PARAMETER slotRootParameter[5];
+
+	CD3DX12_DESCRIPTOR_RANGE texTable;
+	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+
+	slotRootParameter[0].InitAsConstants(16, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
+	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
+	slotRootParameter[2].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
+	slotRootParameter[3].InitAsConstantBufferView(1);	// BoneOffsets 상수 버퍼 
+	slotRootParameter[4].InitAsConstantBufferView(2);	// BoneTransforms 상수 버퍼 
+
+	// 샘플러
+	auto staticSamplers = GetStaticSampler();
+
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(_countof(slotRootParameter), slotRootParameter,
+		(UINT)staticSamplers.size(), staticSamplers.data(),
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+	ComPtr<ID3DBlob> serializedRootSig = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+		serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+	if (errorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	}
+
+	ThrowIfFailed(hr);
+
+	ThrowIfFailed(pd3dDevice->CreateRootSignature(
+		0, serializedRootSig->GetBufferPointer(),
+		serializedRootSig->GetBufferSize(),
+		IID_PPV_ARGS(&m_RootSignature)));
+	return true;
+}
+
 //////////////////////////////////////////////////////////
 
 ImageObjectShader::ImageObjectShader()
@@ -124,6 +219,43 @@ bool ImageObjectShader::BuildShadersAndInputLayout()
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
 		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
 	};
+
+	return true;
+}
+
+bool ImageObjectShader::BuildRootSignature(ID3D12Device* pd3dDevice)
+{
+	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
+
+	CD3DX12_DESCRIPTOR_RANGE texTable;
+	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+
+	slotRootParameter[0].InitAsConstants(16, 0); // 변환 행렬 상수 
+	slotRootParameter[1].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
+
+	// 샘플러
+	auto staticSamplers = GetStaticSampler();
+
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(_countof(slotRootParameter), slotRootParameter,
+		(UINT)staticSamplers.size(), staticSamplers.data(),
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+	ComPtr<ID3DBlob> serializedRootSig = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+		serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+	if (errorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	}
+
+	ThrowIfFailed(hr);
+
+	ThrowIfFailed(pd3dDevice->CreateRootSignature(
+		0, serializedRootSig->GetBufferPointer(),
+		serializedRootSig->GetBufferSize(),
+		IID_PPV_ARGS(&m_RootSignature)));
 
 	return true;
 }
@@ -160,58 +292,48 @@ bool ImageObjectShader::BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* 
 	return true;
 }
 
-void ImageObjectShader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
-{
-
-	pd3dCommandList->SetPipelineState(m_PSO.Get());
-}
-
 void ImageObjectShader::OnResize(float aspectRatio)
 {
-	if (m_vpImgObjects.size() > 0)
-	{
-		for (int i = 0; i < m_vpImgObjects.size(); ++i)
-		{
-			if (m_vpImgObjects[i])
-			{
-				m_vpImgObjects[i]->OnResize();
-			}
-		}
-	}
+	//if (m_vpImgObjects.size() > 0)
+	//{
+	//	for (int i = 0; i < m_vpImgObjects.size(); ++i)
+	//	{
+	//		if (m_vpImgObjects[i])
+	//		{
+	//			m_vpImgObjects[i]->OnResize();
+	//		}
+	//	}
+	//}
 }
 
-void ImageObjectShader::Update(const GameTimer& gt)
-{
-}
-
-void ImageObjectShader::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	if (m_vpImgObjects.size() > 0)
-	{
-		OnPrepareRender(pd3dCommandList);
-
-		for (int i = 0; i < m_vpImgObjects.size(); ++i)
-		{
-			if (m_vpImgObjects[i])
-			{
-				m_vpImgObjects[i]->Render(gt, pd3dCommandList);
-			}
-		}
-	}
-}
-
-bool ImageObjectShader::CreateImgObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int nScreenWidth, int nScreenHeight, const wchar_t* pstrTextureFileName, int nBitmapWidth, int nBitmapHeight)
-{
-	bool bResult;
-
-	m_vpImgObjects.emplace_back(std::make_shared<ImgObject>());
-	bResult = m_vpImgObjects.back()->Initialize(pd3dDevice, pd3dCommandList, 
-		nScreenWidth, nScreenHeight, pstrTextureFileName, nBitmapWidth, nBitmapHeight);
-	if (!bResult)
-		return false;
-
-	return true;
-}
+//void ImageObjectShader::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
+//{
+//	if (m_vpImgObjects.size() > 0)
+//	{
+//		OnPrepareRender(pd3dCommandList);
+//
+//		for (int i = 0; i < m_vpImgObjects.size(); ++i)
+//		{
+//			if (m_vpImgObjects[i])
+//			{
+//				m_vpImgObjects[i]->Render(gt, pd3dCommandList);
+//			}
+//		}
+//	}
+//}
+//
+//bool ImageObjectShader::CreateImgObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int nScreenWidth, int nScreenHeight, const wchar_t* pstrTextureFileName, int nBitmapWidth, int nBitmapHeight)
+//{
+//	bool bResult;
+//
+//	m_vpImgObjects.emplace_back(std::make_shared<ImgObject>());
+//	bResult = m_vpImgObjects.back()->Initialize(pd3dDevice, pd3dCommandList, 
+//		nScreenWidth, nScreenHeight, pstrTextureFileName, nBitmapWidth, nBitmapHeight);
+//	if (!bResult)
+//		return false;
+//
+//	return true;
+//}
 
 //////////////////////////////////////////////////////////
 
@@ -235,6 +357,45 @@ bool ColliderShader::BuildShadersAndInputLayout()
 		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
 	};
 
+	return true;
+}
+
+bool ColliderShader::BuildRootSignature(ID3D12Device* pd3dDevice)
+{
+	CD3DX12_ROOT_PARAMETER slotRootParameter[5];
+
+	CD3DX12_DESCRIPTOR_RANGE texTable;
+	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+
+	slotRootParameter[0].InitAsConstants(16, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
+	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
+	slotRootParameter[2].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
+	slotRootParameter[3].InitAsConstantBufferView(1);	// BoneOffsets 상수 버퍼 
+	slotRootParameter[4].InitAsConstantBufferView(2);	// BoneTransforms 상수 버퍼 
+
+	// 샘플러
+	auto staticSamplers = GetStaticSampler();
+
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(_countof(slotRootParameter), slotRootParameter,
+		(UINT)staticSamplers.size(), staticSamplers.data(),
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+	ComPtr<ID3DBlob> serializedRootSig = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+		serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+	if (errorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	}
+
+	ThrowIfFailed(hr);
+
+	ThrowIfFailed(pd3dDevice->CreateRootSignature(
+		0, serializedRootSig->GetBufferPointer(),
+		serializedRootSig->GetBufferSize(),
+		IID_PPV_ARGS(&m_RootSignature)));
 	return true;
 }
 

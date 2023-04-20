@@ -24,10 +24,13 @@ private:
 	
 public:
 	void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-
-	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	void Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList);
+
+private:
+	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 #endif
+
+
 
 private:
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
@@ -84,9 +87,12 @@ private:
 public:
 	void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
-	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 	void Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList);
+
+private:
+	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 #endif
+	void Update(float ETime);
 
 private:
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
@@ -108,5 +114,7 @@ public:
 	XMFLOAT3 GetCenter() { return m_xmf3Center; }
 	XMFLOAT3 GetExtents() { return m_xmf3Extents; }
 	bool GetIsBox() { return m_bIsBox; }
+	BoundingOrientedBox& GetOrientedBox() { return m_BoundingOrientedBox; }
+	bool GetIsOverlapped() { return m_bIsOverlapped; }
 
 };

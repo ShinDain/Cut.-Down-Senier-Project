@@ -35,11 +35,7 @@ public:
 	virtual void Animate(const GameTimer& gt);
 	virtual void Update(const GameTimer& gt);
 	virtual void UpdateTransform(XMFLOAT4X4 *pxmf4x4Parent = NULL);
-	virtual void PrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
-
-	virtual void BuildConstantBuffers(ID3D12Device* pd3dDevice);
-	virtual void BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice);
 
 	static std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, char* pstrFileName);
 	static std::shared_ptr<Object> LoadFrameHierarchyFromFile
@@ -47,6 +43,10 @@ public:
 	static void LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData);
 	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject);
 
+protected:
+	virtual void OnPrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void BuildConstantBuffers(ID3D12Device* pd3dDevice);
+	virtual void BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice);
 
 protected:
 	char m_FrameName[64];
@@ -85,7 +85,7 @@ protected:
 
 	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	float m_Speed = 3.0f;
+	float m_Speed = 2.0f;
 
 	float m_Pitch = 0.0f; // x
 	float m_Yaw = 0.0f;   // y
@@ -163,18 +163,6 @@ public:
 	const float& GetRoll() { return(m_Roll); }
 	const XMFLOAT4& SetQuaternion() { return m_xmf4Quaternion; }
 	const float& GetSpeed() { return m_Speed; }
-
-
-#if defined(_DEBUG) | defined(DEBUG)
-public:
-	std::unique_ptr<Collider> m_pCollider = nullptr;
-
-	static std::unique_ptr<ColliderShader> m_pColliderShader;
-
-	static void PrepareColliderShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pData);
-
-#endif
-
 
 };
 

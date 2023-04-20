@@ -20,7 +20,7 @@ public:
 public:
 	virtual bool BuildDescriptorHeap(ID3D12Device* pd3dDevice);
 
-	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void MaterialSet(ID3D12GraphicsCommandList* pd3dCommandList);
 	
 	void LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject);
 
@@ -70,14 +70,7 @@ public:
 public:
 	std::shared_ptr<Shader> m_pShader = nullptr;
 
-	static std::shared_ptr<Shader> m_pStaticShader;
-	static std::shared_ptr<Shader> m_pSkinnedShader;
-
-	static void PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,ID3D12RootSignature* pd3dRootSignature, void* pData);
-
 	void SetShader(std::shared_ptr<Shader> pShader) { m_pShader = pShader; }
-	void SetStaticShader() { SetShader(m_pStaticShader); }
-	void SetSkinnedShader() { SetShader(m_pSkinnedShader); }
 };
 
 

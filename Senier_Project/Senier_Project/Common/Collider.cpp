@@ -85,7 +85,9 @@ Collider::Collider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, bool IsBox, ID3D12
 
 	}
 
-	
+	m_PositionBufferView.BufferLocation = NULL;
+	m_NormalBufferView.BufferLocation = NULL;
+	m_IndexBufferView.BufferLocation = NULL;
 }
 
 Collider::~Collider()
@@ -101,9 +103,9 @@ void Collider::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd
 	Positions.resize(24);
 	Normal.resize(24);
 	
-	float w = m_xmf3Extents.x / 2;
-	float h = m_xmf3Extents.y / 2;
-	float d = m_xmf3Extents.z / 2;
+	float w = m_xmf3Extents.x;
+	float h = m_xmf3Extents.y;
+	float d = m_xmf3Extents.z;
 
 	Positions =
 	{
@@ -234,6 +236,16 @@ void Collider::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 	pd3dCommandList->IASetPrimitiveTopology(m_PrimitiveTopology);
 }
 
+void Collider::Update(float ETime)
+{
+	BoundingOrientedBox tmp =  BoundingOrientedBox(m_xmf3Center, m_xmf3Extents, XMFLOAT4(0,0,0,1));
+
+	tmp.Transform(tmp, XMLoadFloat4x4(&m_xmf4x4World));
+	m_BoundingOrientedBox = tmp;
+
+	m_bIsOverlapped = false;
+}
+
 void Collider::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	OnPrepareRender(pd3dCommandList);
@@ -241,6 +253,8 @@ void Collider::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
 	XMFLOAT4X4 xmf4x4World;
 	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
 	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
+	float IsOverlapped = GetIsOverlapped();
+	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 1, &IsOverlapped, 16);
 
 	pd3dCommandList->IASetIndexBuffer(&m_IndexBufferView);
 	pd3dCommandList->DrawIndexedInstanced(

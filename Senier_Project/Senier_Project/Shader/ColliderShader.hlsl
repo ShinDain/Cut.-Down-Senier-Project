@@ -1,6 +1,6 @@
 cbuffer cbPerObject : register(b0)
 {
-	float4x4 gWorld : packoffset(c0);
+	float4x4 gWorld;
 };
 
 cbuffer cbPerPass : register(b3)

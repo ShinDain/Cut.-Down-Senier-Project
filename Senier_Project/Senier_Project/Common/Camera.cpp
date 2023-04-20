@@ -317,7 +317,3 @@ void Third_Person_Camera::Update(float Etime)
 	UpdateViewMatrix();
 }
 
-void Third_Person_Camera::UpdateViewMatrix()
-{
-	Camera::UpdateViewMatrix();
-}

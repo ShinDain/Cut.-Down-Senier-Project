@@ -147,8 +147,6 @@ protected:
 	Microsoft::WRL::ComPtr<IDWriteFactory> m_dWriteFactory;
 
 
-
-
 	// 파생 클래스는 다음 파생 변수들을 초기화해줘야 한다.
 	std::wstring m_MainWndCaption = L"d3d App";
 	D3D_DRIVER_TYPE m_d3dDriverType = D3D_DRIVER_TYPE_HARDWARE;

@@ -77,13 +77,14 @@ protected:
 
 	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R32_UINT;
 
-public:
+protected:
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void OnPostRender() {};
 
+public:
+	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
 
-	virtual void OnPostRender() {};
 
 	void DisposeUploaders();
 
@@ -97,8 +98,6 @@ protected:
 
 	XMFLOAT3 m_xmf3Center;
 	XMFLOAT3 m_xmf3Extents;
-
-	//std::unique_ptr<Collider> m_pCollider = nullptr;
 
 public:
 	void SetMeshName(const char* str)						{ strcpy_s(m_Name, str); }
@@ -114,16 +113,6 @@ public:
 	const int GetVertexCnt()				{ return m_nVertices; }
 	const XMFLOAT3 GetCenter()			{ return m_xmf3Center; }
 	const XMFLOAT3 GetExtents()			{ return m_xmf3Extents; }
-
-#if defined(_DEBUG) | defined(DEBUG)
-
-	/*void SetColliderWorld(const XMFLOAT4X4& World) { m_pCollider->SetWorld(World); }
-
-	static std::unique_ptr<ColliderShader> m_pColliderShader;
-
-	static void PrepareColliderShader(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dRootSignature, void* pData);*/
-
-#endif
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -163,12 +152,14 @@ protected:
 
 	//------------------
 
+protected:
+	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList) override;
+
 public:
 	void LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
 	void PrepareSkinning(Object* pModelRootObject);
 
 	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList) override;
 
 protected:
 	int m_nBonesPerVertex = 4;

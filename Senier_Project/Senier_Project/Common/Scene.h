@@ -8,12 +8,6 @@
 #include "Shader.h"
 #include "Object.h"
 
-// Test
-#include "Collider.h"
-
-// descriptorheap 정의
-// rtv, dsv 생성
-
 class Scene
 {
 public:
@@ -23,38 +17,26 @@ public:
 	virtual ~Scene();
 
 	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-	void BuildRootSignature(ID3D12Device* pd3dDevice);
-	void BuildImgObjRootSignature(ID3D12Device* pd3dDevice);
-
 	virtual void OnResize(float aspectRatio);
 	virtual void Update(const GameTimer& gt);
-	virtual void ImgObjRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void ProcessInput(UCHAR* pKeybuffer);
 
-	// virtual void CreateRtvAndDsvDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-
-	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 2> GetStaticSampler();
-
 private:
-	ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
-	ComPtr<ID3D12RootSignature> m_ImgObjRootSignature = nullptr;
-
-	std::unique_ptr<ImageObjectShader> m_pImgObjShader = nullptr;
-	std::vector<std::unique_ptr<Shader>> m_vpShaders;
-	std::unique_ptr<UploadBuffer<PassConstant>> m_pPassCB = nullptr;
 
 	XMFLOAT4X4 m_xmf4x4ViewProj = MathHelper::identity4x4();
 	XMFLOAT4X4 m_xmf4x4ImgObjMat = MathHelper::identity4x4();
 
-	std::vector<std::shared_ptr<Object>> m_vpObjs;
+	// 프레임마다 넘겨줄 상수 버퍼
+	std::unique_ptr<UploadBuffer<PassConstant>> m_pPassCB = nullptr;
+
+	// 오브젝트 객체들
+	std::vector<std::shared_ptr<Object>> m_vpAllObjs;
+	//std::vector<std::shared_ptr<Object>> m_vObjectLayer[(int)RenderLayer::Count];
+
+	// 씬을 렌더링할 메인 카메라
 	std::unique_ptr<Camera> m_pCamera = nullptr;
-
-
-	// Test
-	std::shared_ptr<Collider> m_pCollider = nullptr;
-	std::shared_ptr<Ray> m_pRay = nullptr;
 
 public:
 	POINT m_LastMousePos = { 0,0 };

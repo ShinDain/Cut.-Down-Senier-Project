@@ -10,8 +10,9 @@
 
 #define SKINNED_ANIMATION_BONES 256
 
-//////////////// Texture 구조체 //////////////////////
+class Shader;
 
+//////////////// Texture 구조체 //////////////////////
 struct Texture
 {
 	__wchar_t FileName[64];
@@ -20,7 +21,19 @@ struct Texture
 	Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap = nullptr;
 };
 
-static std::vector<std::shared_ptr<Texture>> g_CachingTexture;
+// 다음에 이것도 map으로 변경
+extern std::vector<std::shared_ptr<Texture>> g_CachingTexture;
+
+enum RenderLayer : int
+{
+	Static,
+	Skinned,
+	Image,
+	Collider,
+	Count
+};
+
+extern std::map<RenderLayer, std::shared_ptr<Shader>> g_Shaders;
 
 void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName);
 std::shared_ptr<Texture> FindReplicatedTexture(const wchar_t* pstrTextureName);

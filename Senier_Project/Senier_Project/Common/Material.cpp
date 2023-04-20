@@ -2,9 +2,6 @@
 #include "Object.h"
 #include "Material.h"
 
-std::shared_ptr<Shader> Material::m_pStaticShader = nullptr;
-std::shared_ptr<Shader> Material::m_pSkinnedShader = nullptr;
-
 Material::Material()
 {
 }
@@ -55,8 +52,10 @@ bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 	return true;
 }
 
-void Material::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
+void Material::MaterialSet(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_pShader->ChangeShader(pd3dCommandList);
+
 	if (m_DescriptorHeap == NULL)
 		return;
 
@@ -97,18 +96,5 @@ void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		{
 			LoadTexture(pd3dDevice, pd3dCommandList, conStr);
 		}
-		else
-		{
-
-		}
 	}
-}
-
-void Material::PrepareShaders(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,ID3D12RootSignature* pd3dRootSignature, void* pData)
-{
-	m_pStaticShader = std::make_shared<Shader>();
-	m_pStaticShader->Initialize(pd3dDevice, pd3dCommandList, pd3dRootSignature, NULL);
-	
-	m_pSkinnedShader = std::make_shared<SkinnedMeshShader>();
-	m_pSkinnedShader->Initialize(pd3dDevice, pd3dCommandList, pd3dRootSignature, NULL);
 }

@@ -47,7 +47,7 @@ void ImgObject::OnResize()
 
 }
 
-void ImgObject::PrePareRender(ID3D12GraphicsCommandList* pd3dCommandList)
+void ImgObject::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[2] =
 	{ m_DynamicPositionBufferView, m_DynamicTexC0BufferView };
@@ -65,7 +65,7 @@ void ImgObject::PrePareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 void ImgObject::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	PrePareRender(pd3dCommandList);
+	OnPrepareRender(pd3dCommandList);
 	pd3dCommandList->DrawIndexedInstanced(m_nIndexCnt, 1, 0, 0, 0);
 }
 
