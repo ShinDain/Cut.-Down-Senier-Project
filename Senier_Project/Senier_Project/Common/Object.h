@@ -50,7 +50,9 @@ protected:
 	virtual void BuildConstantBuffers(ID3D12Device* pd3dDevice);
 	virtual void BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice);
 
+	// 속도 적용
 	void CalculatePositionByVelocity(float Etime);
+	void CalculateRotateByAngleVelocity(float Etime);
 
 protected:
 	char m_FrameName[64];
@@ -95,16 +97,18 @@ protected:
 
 	// 속도 및 물리 연산 관련
 	// 연산에 활용되어 Obj의 좌표를 업데이트
-	float m_mass = 1.0f;
+	float m_Mass = 1.0f;
 	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 m_xmf3AngleVelocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 
 	XMFLOAT3 m_xmf3Gravity = XMFLOAT3(0.0f, -1.0f, 0.0f);
 	float m_Acceleration = 3.0f;
 
-	float m_MaxVelocityXZ = 60.0f;
-	float m_MaxVelocityY = 50.0f;
+	float m_MaxSpeedXZ = 60.0f;
+	float m_MaxSpeedY = 50.0f;
+	float m_MaxAngleSpeed = 200.0f;
 	float m_Friction = 250.0f;
+	float m_AngleDamping = 2000.f;
 	
 
 	bool m_bIsAlive = true;
@@ -126,41 +130,56 @@ public:
 	{
 		AddPosition(addPos.x, addPos.y, addPos.z);
 	}
+	void AddRotate(float x, float y, float z)
+	{
+		m_Pitch += x;
+		m_Yaw	+= y;
+		m_Roll	+= z;
+	}
+	void AddRotate(XMFLOAT3 addRotate)
+	{
+		AddRotate(addRotate.x, addRotate.y, addRotate.z);
+	}
 
 public:
 	std::unique_ptr<AnimationController> m_pAnimationController = nullptr;
 
-	void SetWorld(XMFLOAT4X4 World) { m_xmf4x4World = World; }
-	void SetParentWorld(XMFLOAT4X4 ParentWorld) { m_xmf4x4ParentWorld = ParentWorld; }
-	void SetLocalTransform(XMFLOAT4X4 LocalTransform) { m_xmf4x4LocalTransform = LocalTransform; }
+	void SetWorld(const XMFLOAT4X4& World) { m_xmf4x4World = World; }
+	void SetParentWorld(const XMFLOAT4X4& ParentWorld) { m_xmf4x4ParentWorld = ParentWorld; }
+	void SetLocalTransform(const XMFLOAT4X4& LocalTransform) { m_xmf4x4LocalTransform = LocalTransform; }
 
 	void SetName(char* pstrName) { strcpy_s(m_FrameName, pstrName); }
 	void SetPosition(float x, float y, float z) 
 	{
 		m_xmf3Position = { x, y, z };
 	}
-	void SetPosition(XMFLOAT3 Position) { SetPosition(Position.x, Position.y, Position.z); }
+	void SetPosition(const XMFLOAT3& Position) { SetPosition(Position.x, Position.y, Position.z); }
 	void SetScale(float x, float y, float z) 
 	{
 		m_xmf3Scale = { x, y, z };
 	}
-	void SetScale(XMFLOAT3 Scale) { SetScale(Scale.x, Scale.y, Scale.z); }
+	void SetScale(const XMFLOAT3& Scale) { SetScale(Scale.x, Scale.y, Scale.z); }
 	void SetRotate(float fPitch, float fYaw, float fRoll)
 	{
 		m_Pitch = fPitch;
 		m_Yaw = fYaw;
 		m_Roll = fRoll;
 	}
-	void SetRotate(XMFLOAT3 Rotate) { SetRotate(Rotate.x, Rotate.y, Rotate.z); }
+	void SetRotate(const XMFLOAT3& Rotate) { SetRotate(Rotate.x, Rotate.y, Rotate.z); }
 	void SetQuaternion(const XMFLOAT4& quaternion) { m_xmf4Quaternion = quaternion; }
 
 
-	void SetAcceleration(const float Acceleration) { m_Acceleration = Acceleration; }
+	void SetMass(float Mass) { m_Mass = Mass; }
+	void SetAcceleration(float Acceleration) { m_Acceleration = Acceleration; }
 	void SetVelocity(const XMFLOAT3& Velocity) { m_xmf3Velocity = Velocity; }
-	void SetFriction(float fFriction) { m_Friction = fFriction; }
+	void SetAngleVelocity(const XMFLOAT3& AngleVelocity) { m_xmf3AngleVelocity = AngleVelocity; }
 	void SetGravity(const XMFLOAT3& Gravity) { m_xmf3Gravity = Gravity; }
-	void SetMaxVelocityXZ(float Velocity) { m_MaxVelocityXZ = Velocity; }
-	void SetMaxVelocityY(float Velocity) { m_MaxVelocityY = Velocity; }
+	void SetMaxSpeedXZ(float MaxSpeedXZ) { m_MaxSpeedXZ = MaxSpeedXZ; }
+	void SetMaxSpeedY(float MaxSpeedY) { m_MaxSpeedY = MaxSpeedY; }
+	void SetFriction(float Friction) { m_Friction = Friction; }
+	void SetMaxAngleSpeed(float MaxAngleSpeed) { m_MaxAngleSpeed = MaxAngleSpeed; }
+	void SetAngleDamping(float AngleDamping) { m_AngleDamping = AngleDamping; }
+	
 	
 	void SetIsAlive(bool bIsAlive) { m_bIsAlive = bIsAlive; }
 
@@ -181,13 +200,17 @@ public:
 	const XMFLOAT4& GetQuaternion() { return m_xmf4Quaternion; }
 
 
-	const XMFLOAT3& GetVelocity() { return(m_xmf3Velocity); }
+	const float& GetMass() { return m_Mass; }
 	const float& GetAcceleration() { return m_Acceleration; }
-	
-	const float& GetFriction() { return m_Friction; }
+	const XMFLOAT3& GetVelocity() { return(m_xmf3Velocity); }
+	const XMFLOAT3& GetAngleVelocity() { return m_xmf3AngleVelocity; }
 	const XMFLOAT3& GetGravity() { return m_xmf3Gravity; }
-	const float& GetMaxVelocityXZ() { return m_MaxVelocityXZ; }
-	const float& GetMaxVelocityY() { return m_MaxVelocityY; }
+	const float& GetMaxSpeedXZ() { return m_MaxSpeedXZ; }
+	const float& GetMaxSpeedY() { return m_MaxSpeedY; }
+	const float& GetFriction() { return m_Friction; }
+	const float& GetMaxAngleSpeed() { return m_MaxAngleSpeed; }
+	const float& GetAngleDamping() { return m_AngleDamping; }
+
 	
 	
 	const bool GetIsAlive() { return m_bIsAlive; }

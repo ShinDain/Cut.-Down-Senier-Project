@@ -44,6 +44,7 @@ void Object::Update(const GameTimer& gt)
 
 	// 속도에 의한 위치변화 계산 후 갱신
 	CalculatePositionByVelocity(gt.DeltaTime());
+	CalculateRotateByAngleVelocity(gt.DeltaTime());
 
 	ObjConstant objConstant;
 	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
@@ -574,7 +575,7 @@ void Object::Move(DWORD dwDirection, float distance)
 	XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
 	XMVECTOR r = XMLoadFloat3(&m_xmf3Right);
 
-	if (dwDirection & DIR_FORWARD)
+	/*if (dwDirection & DIR_FORWARD)
 	{
 		direction = XMVectorAdd(direction, l);
 	}
@@ -593,7 +594,24 @@ void Object::Move(DWORD dwDirection, float distance)
 
 	direction = XMVector3Normalize(direction);
 
-	AddForce(direction, distance);
+	AddForce(direction, distance);*/
+
+	if (dwDirection & DIR_FORWARD)
+	{
+		m_xmf3AngleVelocity.x += 150;
+	}
+	if (dwDirection & DIR_BACKWARD)
+	{
+		m_xmf3AngleVelocity.x -= 150;
+	}
+	if (dwDirection & DIR_LEFT)
+	{
+		m_xmf3AngleVelocity.y += 150;
+	}
+	if (dwDirection & DIR_RIGHT)
+	{
+		m_xmf3AngleVelocity.y -= 150;
+	}
 }
 
 void Object::Rotate(float x, float y, float z)
@@ -670,15 +688,16 @@ void Object::CalculatePositionByVelocity(float Etime)
 	XMStoreFloat3(&xmf3SpeedXZ, XMVector3Length(velXZ));									// XZ - 속력
 	XMStoreFloat3(&xmf3SpeedY, XMVector3Length(velY));										// Y - 속력
 
-	if (xmf3SpeedXZ.x > m_MaxVelocityXZ)	// XZ - 속력이 MaxSpeedXZ 초과
+	if (xmf3SpeedXZ.x > m_MaxSpeedXZ)	// XZ - 속력이 MaxSpeedXZ 초과
 	{
 		velXZ = XMVector3Normalize(velXZ);
-		velXZ = velXZ * m_MaxVelocityXZ;
+		velXZ = velXZ * m_MaxSpeedXZ;
+		//XMStoreFloat3(&m_xmf3Velocity, velXZ);
 	}
-	if (xmf3SpeedY.x > m_MaxVelocityY)		// Y - 속력이 MaxSpeedY 초과
+	if (xmf3SpeedY.x > m_MaxSpeedY)		// Y - 속력이 MaxSpeedY 초과
 	{
 		velY = XMVector3Normalize(velY);
-		velY = velY * m_MaxVelocityY;
+		velY = velY * m_MaxSpeedY;
 	}
 
 	if (xmf3SpeedXZ.x <= FLT_EPSILON)		// XZ - 속력이 EPSILON 이하
@@ -715,6 +734,52 @@ void Object::CalculatePositionByVelocity(float Etime)
 	{
 		XMStoreFloat3(&m_xmf3Velocity, (velocity + friction));
 	}
+}
 
+void Object::CalculateRotateByAngleVelocity(float Etime)
+{
+	// AngleVelocity의 크기 체크
+	XMVECTOR EtimeVec = XMVectorReplicate(Etime);					// 경과 시간
+	XMVECTOR AngleVelocity = XMLoadFloat3(&m_xmf3AngleVelocity);	// 각속도
+	XMVECTOR AngleSpeed = XMVector3Length(AngleVelocity);			// 각속력
+
+	XMFLOAT3 xmf3AngleSpeed = XMFLOAT3(0, 0, 0);
+	XMStoreFloat3(&xmf3AngleSpeed, AngleSpeed);						// 각속력
+
+	if (xmf3AngleSpeed.x > m_MaxAngleSpeed)							// 각속력이 MaxAngleSpeed 초과
+	{
+		AngleVelocity = XMVector3Normalize(AngleVelocity);
+		AngleVelocity = AngleVelocity * m_MaxAngleSpeed;
+		XMStoreFloat3(&m_xmf3AngleVelocity, AngleVelocity);
+	}
+
+	if (xmf3AngleSpeed.x <= FLT_EPSILON)							// 각속력이 EPSILON 이하
+	{
+		AngleVelocity = XMVectorZero();
+		m_xmf3AngleVelocity = XMFLOAT3(0, 0, 0);
+	}
+
+	// 경과 시간 비례 이동 거리 계산, 적용
+	XMFLOAT3 xmf3Rotate;
+	XMStoreFloat3(&xmf3Rotate, XMVectorMultiply(AngleVelocity, EtimeVec));
+	XMStoreFloat3(&xmf3Rotate, XMVectorMultiplyAdd(AngleVelocity, EtimeVec, XMLoadFloat3(&xmf3Rotate)));
+	this->AddRotate(xmf3Rotate);
+
+	// 마찰에 따른 각속도 감소
+	XMVECTOR dirRotate = XMVector3Normalize(AngleVelocity);
+	XMVECTOR damping = XMVectorReplicate(m_AngleDamping);
+
+	damping = XMVectorMultiply(XMVectorMultiply(-dirRotate, damping), EtimeVec);		 // 반대 방향을 향하는 마찰력 비례 속도
+	XMVECTOR dampingLength = XMVector3Length(damping);
+
+	// 감소하는 속력보다 기존 속력이 작은 경우
+	if (XMVector3LessOrEqual(AngleSpeed, dampingLength))
+	{
+		m_xmf3AngleVelocity = XMFLOAT3(0, 0, 0);
+	}
+	else
+	{
+		XMStoreFloat3(&m_xmf3AngleVelocity, (AngleVelocity + damping));
+	}
 
 }

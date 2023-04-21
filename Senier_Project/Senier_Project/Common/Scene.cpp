@@ -17,12 +17,15 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	// static Shader 초기화
 
-	for(int i = 0 ; i < 5; ++i)
-		CreateObject(pd3dDevice, pd3dCommandList, TEST_MODEL_NAME, 0, RenderLayer::Static);
+	//for(int i = 0 ; i < 5; ++i)
+	CreateObject(pd3dDevice, pd3dCommandList, TEST_MODEL_NAME, 0, RenderLayer::Static);
 	
 	// 카메라 초기화
-	m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
-
+	//m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
+	m_pCamera = std::make_unique<Camera>();
+	m_pCamera->SetPosition(0, 0, -100);
+	m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
+	
 #if defined(_DEBUG)
 
 
