@@ -41,6 +41,11 @@ float4 PS(VertexOut pin) : SV_Target
 {
 	float4 diffuseAlbedo = gDiffuseMap.Sample(gSamLinear, pin.TexC);
 
+	if (length(diffuseAlbedo) < 0.1)
+	{
+		diffuseAlbedo = float4(1, 1, 1, 1);
+	}
+
 	return diffuseAlbedo;
 }
 

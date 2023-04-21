@@ -74,6 +74,8 @@ public:
 	void FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>>* vpSkinnedMeshes);
 
 protected:
+	// 좌표 관련
+
 	UINT m_ObjCBByteSize = 0;
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 	XMFLOAT4X4 m_xmf4x4ParentWorld = MathHelper::identity4x4();
@@ -86,18 +88,24 @@ protected:
 
 	XMFLOAT3 m_xmf3Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	XMFLOAT4 m_xmf4Quaternion = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-
-	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	XMFLOAT3 m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	float m_Speed = 2.0f;
-
 	float m_Pitch = 0.0f; // x
 	float m_Yaw = 0.0f;   // y
 	float m_Roll = 0.0f;  // z
 
-	float m_MaxVelocityXZ = 0.0f;
-	float m_MaxVelocityY = 0.0f;
+
+	// 속도 및 물리 연산 관련
+	// 연산에 활용되어 Obj의 좌표를 업데이트
+	float m_mass = 1.0f;
+	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT3 m_xmf3AngleVelocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+
+	XMFLOAT3 m_xmf3Gravity = XMFLOAT3(0.0f, -1.0f, 0.0f);
+	float m_Acceleration = 3.0f;
+
+	float m_MaxVelocityXZ = 60.0f;
+	float m_MaxVelocityY = 50.0f;
 	float m_Friction = 250.0f;
+	
 
 	bool m_bIsAlive = true;
 
@@ -144,14 +152,16 @@ public:
 		m_Roll = fRoll;
 	}
 	void SetRotate(XMFLOAT3 Rotate) { SetRotate(Rotate.x, Rotate.y, Rotate.z); }
+	void SetQuaternion(const XMFLOAT4& quaternion) { m_xmf4Quaternion = quaternion; }
 
+
+	void SetAcceleration(const float Acceleration) { m_Acceleration = Acceleration; }
+	void SetVelocity(const XMFLOAT3& Velocity) { m_xmf3Velocity = Velocity; }
 	void SetFriction(float fFriction) { m_Friction = fFriction; }
 	void SetGravity(const XMFLOAT3& Gravity) { m_xmf3Gravity = Gravity; }
 	void SetMaxVelocityXZ(float Velocity) { m_MaxVelocityXZ = Velocity; }
 	void SetMaxVelocityY(float Velocity) { m_MaxVelocityY = Velocity; }
-	void SetVelocity(const XMFLOAT3& Velocity) { m_xmf3Velocity = Velocity; }
-	void SetQuaternion(const XMFLOAT4& quaternion) { m_xmf4Quaternion = quaternion; }
-	void SetSpeed(const float Speed) { m_Speed = Speed; }
+	
 	void SetIsAlive(bool bIsAlive) { m_bIsAlive = bIsAlive; }
 
 
@@ -165,12 +175,21 @@ public:
 	const XMFLOAT3& GetLookVector() { return(m_xmf3Look); }
 	const XMFLOAT3& GetUpVector() { return(m_xmf3Up); }
 	const XMFLOAT3& GetRightVector() { return(m_xmf3Right); }
-	const XMFLOAT3& GetVelocity() { return(m_xmf3Velocity); }
 	const float& GetYaw() { return(m_Yaw); }
 	const float& GetPitch() { return(m_Pitch); }
 	const float& GetRoll() { return(m_Roll); }
-	const XMFLOAT4& SetQuaternion() { return m_xmf4Quaternion; }
-	const float& GetSpeed() { return m_Speed; }
+	const XMFLOAT4& GetQuaternion() { return m_xmf4Quaternion; }
+
+
+	const XMFLOAT3& GetVelocity() { return(m_xmf3Velocity); }
+	const float& GetAcceleration() { return m_Acceleration; }
+	
+	const float& GetFriction() { return m_Friction; }
+	const XMFLOAT3& GetGravity() { return m_xmf3Gravity; }
+	const float& GetMaxVelocityXZ() { return m_MaxVelocityXZ; }
+	const float& GetMaxVelocityY() { return m_MaxVelocityY; }
+	
+	
 	const bool GetIsAlive() { return m_bIsAlive; }
 
 #if defined(_DEBUG)

@@ -14,7 +14,7 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 		m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
 
 #if defined(_DEBUG)
-	m_pCollider = std::make_shared<RigidCollider>(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), Collider_Type_Box, pd3dDevice, pd3dCommandList);
+	m_pCollider = std::make_shared<RigidCollider>(XMFLOAT3(0, 0, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), Collider_Type_Box, pd3dDevice, pd3dCommandList);
 #endif
 }
 
@@ -114,13 +114,14 @@ void Object::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandL
 #if defined(_DEBUG)
 	if (m_pCollider)
 	{
-		char tmpstr[64] = "Character1_LeftUpLeg";
+		/*char tmpstr[64] = "Character1_LeftUpLeg";
 		Object* tmpobj = FindFrame(tmpstr).get();
 
 		if (tmpobj)
 		{
 			m_pCollider->SetWorld(tmpobj->GetWorld());
-		}
+		}*/
+		m_pCollider->SetWorld(this->GetWorld());
 		m_pCollider->Update(gt.DeltaTime());
 
 		g_Shaders[RenderLayer::Collider]->ChangeShader(pd3dCommandList);
@@ -147,47 +148,6 @@ void Object::BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice)
 
 	if (m_pSibling) m_pSibling->BuildTextureDescriptorHeap(pd3dDevice);
 	if (m_pChild) m_pChild->BuildTextureDescriptorHeap(pd3dDevice);
-}
-
-void Object::CalculatePositionByVelocity(float Etime)
-{
-	// velocity의 크기 체크
-	// 1. MaxSpeed 이하 -> 그냥 적용
-	// 2. MaxSpeed 이상 -> MaxSpeed만큼만 적용
-	// velocity의 크기는 이동 방향의 반대로 매 프레임 
-	// Friction만큼 감소하도록
-
-	XMVECTOR Et = XMVectorReplicate(Etime);
-	XMVECTOR v = XMLoadFloat3(&m_xmf3Velocity);
-	XMFLOAT3 tmp = { 0.0f, 0.0f, 0.0f };
-	XMStoreFloat3(&tmp, XMVector3Length(v));
-	if (tmp.x > 100)
-	{
-	}
-	if (tmp.x < FLT_EPSILON)
-	{
-		m_xmf3Velocity = { 0.0f, 0.0f, 0.0f };
-	}
-	else
-	{
-		XMFLOAT3 addPos;
-		XMStoreFloat3(&addPos, XMVectorMultiply(v, Et));
-		AddPosition(addPos);
-		XMVECTOR Nv = XMVector3Normalize(v);
-		XMVECTOR f = XMVectorReplicate(m_Friction);
-		// -Nv * et * friction 역방향 마찰 -> vel 감소로
-		// 0에 가깝다면(Epsilon만큼) Vel을 0으로
-
-		//=============================
-		// 역방향 마찰력이 더 크다면 v와 동일하게 변경하는 코드 추가 필요
-		//=============================
-		v = XMVectorAdd(v, XMVectorMultiply(XMVectorMultiply(-Nv, Et), f));
-		XMStoreFloat3(&m_xmf3Velocity, v);
-		if (XMVector3Length(XMLoadFloat3(&m_xmf3Velocity)).m128_f32[0] < 1)
-		{
-			m_xmf3Velocity = XMFLOAT3(0, 0, 0);
-		}
-	}
 }
 
 std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName)
@@ -672,7 +632,7 @@ void Object::Rotate(float x, float y, float z)
 void Object::Walk(float delta)
 {
 	// Look vec 획득 후 해당 방향으로 가속
-	XMVECTOR s = XMVectorReplicate(m_Speed * delta);
+	XMVECTOR s = XMVectorReplicate(m_Acceleration * delta);
 	XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
 	XMVECTOR v = XMLoadFloat3(&m_xmf3Velocity);
 	// Look 방향으로 Velocity 값을 더해주기만
@@ -684,10 +644,77 @@ void Object::Walk(float delta)
 void Object::Strafe(float delta)
 {
 	// Right vec 획득 후 해당 방향으로 가속
-	XMVECTOR s = XMVectorReplicate(m_Speed * delta);
+	XMVECTOR s = XMVectorReplicate(m_Acceleration * delta);
 	XMVECTOR r = XMLoadFloat3(&m_xmf3Right);
 	XMVECTOR v = XMLoadFloat3(&m_xmf3Velocity);
 	// Look 방향으로 Velocity 값을 더해주기만
 	// 실제 이동은 Update에서 처리될거임.
 	XMStoreFloat3(&m_xmf3Velocity, XMVectorMultiplyAdd(s, r, v));
+}
+
+
+void Object::CalculatePositionByVelocity(float Etime)
+{
+	// velocity의 크기 체크
+	XMVECTOR EtimeVec = XMVectorReplicate(Etime);											// 경과 시간
+	XMVECTOR velocity = XMLoadFloat3(&m_xmf3Velocity);										// 속도
+	XMVECTOR speed = XMVector3Length(velocity);												// 속력
+
+	XMFLOAT3 xmf3VelXZ = XMFLOAT3(m_xmf3Velocity.x, 0, m_xmf3Velocity.z);
+	XMFLOAT3 xmf3VelY = XMFLOAT3(0, m_xmf3Velocity.y, 0);
+	XMVECTOR velXZ = XMLoadFloat3(&xmf3VelXZ);												// XZ - 속도
+	XMVECTOR velY = XMLoadFloat3(&xmf3VelY);												// Y - 속도
+
+	XMFLOAT3 xmf3SpeedXZ = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 xmf3SpeedY = XMFLOAT3(0, 0, 0);
+	XMStoreFloat3(&xmf3SpeedXZ, XMVector3Length(velXZ));									// XZ - 속력
+	XMStoreFloat3(&xmf3SpeedY, XMVector3Length(velY));										// Y - 속력
+
+	if (xmf3SpeedXZ.x > m_MaxVelocityXZ)	// XZ - 속력이 MaxSpeedXZ 초과
+	{
+		velXZ = XMVector3Normalize(velXZ);
+		velXZ = velXZ * m_MaxVelocityXZ;
+	}
+	if (xmf3SpeedY.x > m_MaxVelocityY)		// Y - 속력이 MaxSpeedY 초과
+	{
+		velY = XMVector3Normalize(velY);
+		velY = velY * m_MaxVelocityY;
+	}
+
+	if (xmf3SpeedXZ.x <= FLT_EPSILON)		// XZ - 속력이 EPSILON 이하
+	{
+		velXZ = XMVectorZero();
+		m_xmf3Velocity.x = 0;
+		m_xmf3Velocity.z = 0;
+	}
+	if (xmf3SpeedY.x <= FLT_EPSILON)		// Y - 속력이 EPSILON 이하
+	{
+		velY = XMVectorZero();
+		m_xmf3Velocity.y = 0;
+	}
+
+	// 경과 시간 비례 이동 거리 계산, 적용
+	XMFLOAT3 xmf3TranslatePos;
+	XMStoreFloat3(&xmf3TranslatePos, XMVectorMultiply(velXZ, EtimeVec));
+	XMStoreFloat3(&xmf3TranslatePos, XMVectorMultiplyAdd(velY, EtimeVec,XMLoadFloat3(&xmf3TranslatePos)));
+	AddPosition(xmf3TranslatePos);
+
+	// 마찰에 따른 속도 감소
+	XMVECTOR dirXZ = XMVector3Normalize(velXZ);
+	XMVECTOR friction = XMVectorReplicate(m_Friction);
+
+	friction = XMVectorMultiply(XMVectorMultiply(-dirXZ, friction), EtimeVec);		 // 반대 방향을 향하는 마찰력 비례 속도
+	XMVECTOR frictionLength = XMVector3Length(friction);
+
+	// 감소하는 속력보다 기존 속력이 작은 경우
+	if (XMVector3LessOrEqual(speed, frictionLength))
+	{
+		m_xmf3Velocity = XMFLOAT3(0, m_xmf3Velocity.y, 0);
+	}
+	else
+	{
+		XMStoreFloat3(&m_xmf3Velocity, (velocity + friction));
+	}
+
+
 }

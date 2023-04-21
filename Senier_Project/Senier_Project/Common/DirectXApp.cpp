@@ -101,7 +101,7 @@ int DirectXApp::Run()
 			}
 			else
 			{
-				Sleep(100);
+				Sleep(10);
 			}
 		}
 	}

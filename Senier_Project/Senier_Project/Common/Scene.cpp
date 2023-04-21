@@ -1,5 +1,7 @@
 #include "Scene.h"
 
+#define TEST_MODEL_NAME "Model/Cube.bin"
+
 Scene::Scene()
 {
 }
@@ -16,7 +18,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// static Shader 초기화
 
 	for(int i = 0 ; i < 5; ++i)
-		CreateObject(pd3dDevice, pd3dCommandList, "Model/unitychan.bin", 1, RenderLayer::Static);
+		CreateObject(pd3dDevice, pd3dCommandList, TEST_MODEL_NAME, 0, RenderLayer::Static);
 	
 	// 카메라 초기화
 	m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
@@ -41,7 +43,7 @@ void Scene::Update(const GameTimer& gt)
 {
 #if defined(_DEBUG)
 	ClearObjectLayer();
-	m_refCnt = m_LoadedModelData["Model/unitychan.bin"]->m_pRootObject.use_count();
+	m_refCnt = m_LoadedModelData[TEST_MODEL_NAME]->m_pRootObject.use_count();
 	m_size = m_vpAllObjs.size();
 #endif
 
@@ -119,17 +121,17 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 			m_vpAllObjs[0]->Rotate(0,-dx, 0);
 		}
 
-		m_vpAllObjs[0]->Move(dwDirection, m_vpAllObjs[0]->GetSpeed());
+		m_vpAllObjs[0]->Move(dwDirection, m_vpAllObjs[0]->GetAcceleration());
 	}
 
 #if defined(_DEBUG)
-	if (pKeybuffer[VK_F1] & 0xF0)
+	/*if (pKeybuffer[VK_F1] & 0xF0)
 	{
 		if (m_vpAllObjs.size() > 1)
 		{
 			m_vpAllObjs[1]->SetIsAlive(false);
 		}
-	}
+	}*/
 
 #endif
 }
