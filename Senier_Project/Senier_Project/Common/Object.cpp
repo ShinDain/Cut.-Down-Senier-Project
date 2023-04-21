@@ -422,6 +422,13 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	SetMaterials(vpMat);
 }
 
+void Object::Impulse(XMFLOAT3 xmf3Impulse, XMFLOAT3 xmf3CollisionDir, float collisionDepth)
+{
+	// 충격량에 따른 속도 변화 갱신
+	CalculateDeltaVelocityByImpulse(xmf3Impulse);
+	CalculateDeltaAngleVelocityByImpulse(xmf3Impulse, xmf3CollisionDir);
+}
+
 void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData)
 {
 	char pstrToken[64] = { '\0' };
@@ -598,19 +605,19 @@ void Object::Move(DWORD dwDirection, float distance)
 
 	if (dwDirection & DIR_FORWARD)
 	{
-		m_xmf3AngleVelocity.x += 150;
+		Impulse(XMFLOAT3(0, 1, 0), XMFLOAT3(0, 0, 0), 0);
 	}
 	if (dwDirection & DIR_BACKWARD)
 	{
-		m_xmf3AngleVelocity.x -= 150;
+		Impulse(XMFLOAT3(0, -1, 0), XMFLOAT3(0, 0, 0), 0);
 	}
 	if (dwDirection & DIR_LEFT)
 	{
-		m_xmf3AngleVelocity.y += 150;
+		Impulse(XMFLOAT3(-30, 0, 0), XMFLOAT3(0, 0, 0), 0);
 	}
 	if (dwDirection & DIR_RIGHT)
 	{
-		m_xmf3AngleVelocity.y -= 150;
+		Impulse(XMFLOAT3(30, 0, 0), XMFLOAT3(0, 0, 0), 0);
 	}
 }
 
@@ -675,29 +682,33 @@ void Object::CalculatePositionByVelocity(float Etime)
 {
 	// velocity의 크기 체크
 	XMVECTOR EtimeVec = XMVectorReplicate(Etime);											// 경과 시간
-	XMVECTOR velocity = XMLoadFloat3(&m_xmf3Velocity);										// 속도
-	XMVECTOR speed = XMVector3Length(velocity);												// 속력
 
 	XMFLOAT3 xmf3VelXZ = XMFLOAT3(m_xmf3Velocity.x, 0, m_xmf3Velocity.z);
 	XMFLOAT3 xmf3VelY = XMFLOAT3(0, m_xmf3Velocity.y, 0);
 	XMVECTOR velXZ = XMLoadFloat3(&xmf3VelXZ);												// XZ - 속도
 	XMVECTOR velY = XMLoadFloat3(&xmf3VelY);												// Y - 속도
 
+	XMVECTOR speedXZ = XMVector3Length(velXZ);
+	XMVECTOR speedY = XMVector3Length(velY);
 	XMFLOAT3 xmf3SpeedXZ = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 xmf3SpeedY = XMFLOAT3(0, 0, 0);
-	XMStoreFloat3(&xmf3SpeedXZ, XMVector3Length(velXZ));									// XZ - 속력
-	XMStoreFloat3(&xmf3SpeedY, XMVector3Length(velY));										// Y - 속력
+	XMStoreFloat3(&xmf3SpeedXZ, speedXZ);									// XZ - 속력
+	XMStoreFloat3(&xmf3SpeedY, speedY);										// Y - 속력
 
 	if (xmf3SpeedXZ.x > m_MaxSpeedXZ)	// XZ - 속력이 MaxSpeedXZ 초과
 	{
 		velXZ = XMVector3Normalize(velXZ);
 		velXZ = velXZ * m_MaxSpeedXZ;
-		//XMStoreFloat3(&m_xmf3Velocity, velXZ);
+		XMStoreFloat3(&xmf3VelXZ, velXZ);
+		m_xmf3Velocity.x = xmf3VelXZ.x;
+		m_xmf3Velocity.z = xmf3VelXZ.z;
 	}
 	if (xmf3SpeedY.x > m_MaxSpeedY)		// Y - 속력이 MaxSpeedY 초과
 	{
 		velY = XMVector3Normalize(velY);
 		velY = velY * m_MaxSpeedY;
+		XMStoreFloat3(&xmf3VelY, velY);
+		m_xmf3Velocity.y = xmf3VelY.y;
 	}
 
 	if (xmf3SpeedXZ.x <= FLT_EPSILON)		// XZ - 속력이 EPSILON 이하
@@ -718,6 +729,29 @@ void Object::CalculatePositionByVelocity(float Etime)
 	XMStoreFloat3(&xmf3TranslatePos, XMVectorMultiplyAdd(velY, EtimeVec,XMLoadFloat3(&xmf3TranslatePos)));
 	AddPosition(xmf3TranslatePos);
 
+	// 멤버 변수 수정 후의 속도 계산
+	XMVECTOR velocity = XMLoadFloat3(&m_xmf3Velocity);
+
+	// 중력에 따른 하락
+	XMVECTOR gravity = XMLoadFloat3(&m_xmf3Gravity);
+	gravity = XMVectorMultiply(gravity, EtimeVec);
+	XMVECTOR gravityLength = XMVector3Length(gravity);
+
+	// 중력의 경우 높이가 지형보다 높다면 항상 작용한다.
+	// 
+	//if (XMVector3LessOrEqual(speedY, gravityLength))
+	if (m_xmf3Position.y <= 0)
+	{
+		m_xmf3Velocity = XMFLOAT3(m_xmf3Velocity.x, 0, m_xmf3Velocity.z);
+	}
+	else if (m_xmf3Position.y > 0)
+	{
+		XMStoreFloat3(&m_xmf3Velocity, (velocity + gravity));
+
+		// 지면에서 떨어져 있는 경우
+		return;
+	}
+
 	// 마찰에 따른 속도 감소
 	XMVECTOR dirXZ = XMVector3Normalize(velXZ);
 	XMVECTOR friction = XMVectorReplicate(m_Friction);
@@ -726,7 +760,7 @@ void Object::CalculatePositionByVelocity(float Etime)
 	XMVECTOR frictionLength = XMVector3Length(friction);
 
 	// 감소하는 속력보다 기존 속력이 작은 경우
-	if (XMVector3LessOrEqual(speed, frictionLength))
+	if (XMVector3LessOrEqual(speedXZ, frictionLength))
 	{
 		m_xmf3Velocity = XMFLOAT3(0, m_xmf3Velocity.y, 0);
 	}
@@ -760,7 +794,7 @@ void Object::CalculateRotateByAngleVelocity(float Etime)
 	}
 
 	// 경과 시간 비례 이동 거리 계산, 적용
-	XMFLOAT3 xmf3Rotate;
+	XMFLOAT3 xmf3Rotate; 
 	XMStoreFloat3(&xmf3Rotate, XMVectorMultiply(AngleVelocity, EtimeVec));
 	XMStoreFloat3(&xmf3Rotate, XMVectorMultiplyAdd(AngleVelocity, EtimeVec, XMLoadFloat3(&xmf3Rotate)));
 	this->AddRotate(xmf3Rotate);
@@ -782,4 +816,18 @@ void Object::CalculateRotateByAngleVelocity(float Etime)
 		XMStoreFloat3(&m_xmf3AngleVelocity, (AngleVelocity + damping));
 	}
 
+}
+
+void Object::CalculateDeltaVelocityByImpulse(XMFLOAT3 xmf3Impulse)
+{
+	XMFLOAT3 deltavelocity = xmf3Impulse;
+	deltavelocity.x /= m_Mass;
+	deltavelocity.y /= m_Mass;
+	deltavelocity.z /= m_Mass;
+
+	AddVelocity(deltavelocity);
+}
+
+void Object::CalculateDeltaAngleVelocityByImpulse(XMFLOAT3 xmf3Impulse, XMFLOAT3 xmf3CollisionDir)
+{
 }

@@ -45,14 +45,20 @@ public:
 	static void LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData);
 	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject);
 
+	void Impulse(XMFLOAT3 xmf3Impulse, XMFLOAT3 xmf3CollisionDir, float collisionDepth);
+
 protected:
 	virtual void OnPrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void BuildConstantBuffers(ID3D12Device* pd3dDevice);
 	virtual void BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice);
 
-	// 속도 적용
+	// 속도에 따른 갱신
 	void CalculatePositionByVelocity(float Etime);
 	void CalculateRotateByAngleVelocity(float Etime);
+
+	// 속도 변화 갱신
+	void CalculateDeltaVelocityByImpulse(XMFLOAT3 xmf3Impulse);
+	void CalculateDeltaAngleVelocityByImpulse(XMFLOAT3 xmf3Impulse, XMFLOAT3 xmf3CollisionDir);
 
 protected:
 	char m_FrameName[64];
@@ -101,11 +107,11 @@ protected:
 	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 m_xmf3AngleVelocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 
-	XMFLOAT3 m_xmf3Gravity = XMFLOAT3(0.0f, -1.0f, 0.0f);
+	XMFLOAT3 m_xmf3Gravity = XMFLOAT3(0.0f, -90.0f, 0.0f);
 	float m_Acceleration = 3.0f;
 
 	float m_MaxSpeedXZ = 60.0f;
-	float m_MaxSpeedY = 50.0f;
+	float m_MaxSpeedY = 100.f;
 	float m_MaxAngleSpeed = 200.0f;
 	float m_Friction = 250.0f;
 	float m_AngleDamping = 2000.f;
@@ -125,6 +131,15 @@ public:
 		m_xmf3Position.x += x;
 		m_xmf3Position.y += y;
 		m_xmf3Position.z += z;
+
+
+#if defined (_DEBUG)
+		// 임시로 0 미만인 경우 position 조정
+		if (m_xmf3Position.y < 0)
+		{
+			m_xmf3Position.y = 0;
+		}
+#endif
 	}
 	void AddPosition(XMFLOAT3 addPos)
 	{
@@ -139,6 +154,26 @@ public:
 	void AddRotate(XMFLOAT3 addRotate)
 	{
 		AddRotate(addRotate.x, addRotate.y, addRotate.z);
+	}
+	void AddVelocity(float x, float y, float z)
+	{
+		m_xmf3Velocity.x += x;
+		m_xmf3Velocity.y += y;
+		m_xmf3Velocity.z += z;
+	}
+	void AddVelocity(XMFLOAT3 addVelocity)
+	{
+		AddVelocity(addVelocity.x, addVelocity.y, addVelocity.z);
+	}
+	void AddAngleVelocity(float x, float y, float z)
+	{
+		m_xmf3AngleVelocity.x += x;
+		m_xmf3AngleVelocity.y += y;
+		m_xmf3AngleVelocity.z += z;
+	}
+	void AddAngleVelocity(XMFLOAT3 addAngleVelocity)
+	{
+		AddAngleVelocity(addAngleVelocity.x, addAngleVelocity.y, addAngleVelocity.z);
 	}
 
 public:

@@ -121,7 +121,10 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 	{
 		if (dx != 0 || dy != 0)
 		{
-			m_vpAllObjs[0]->Rotate(0,-dx, 0);
+			//m_vpAllObjs[0]->Rotate(0,-dx, 0);
+
+			m_pCamera->Pitch(dy / 1000);
+			m_pCamera->RotateY(dx / 1000);
 		}
 
 		m_vpAllObjs[0]->Move(dwDirection, m_vpAllObjs[0]->GetAcceleration());
