@@ -106,7 +106,6 @@ protected:
 	XMFLOAT3 m_xmf3ColliderCenter = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 m_xmf3ColliderExtents = XMFLOAT3(0.5f, 0.5f, 0.5f);
 
-	float m_Mass = 1.0f;
 	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 m_xmf3AngleVelocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 
@@ -207,7 +206,6 @@ public:
 	void SetQuaternion(const XMFLOAT4& quaternion) { m_xmf4Quaternion = quaternion; }
 
 
-	void SetMass(float Mass) { m_Mass = Mass; }
 	void SetAcceleration(float Acceleration) { m_Acceleration = Acceleration; }
 	void SetVelocity(const XMFLOAT3& Velocity) { m_xmf3Velocity = Velocity; }
 	void SetAngleVelocity(const XMFLOAT3& AngleVelocity) { m_xmf3AngleVelocity = AngleVelocity; }
@@ -238,7 +236,7 @@ public:
 	const XMFLOAT4& GetQuaternion() { return m_xmf4Quaternion; }
 
 
-	const float& GetMass() { return m_Mass; }
+	const float& GetMass() { return m_pCollider->GetMass(); }
 	const float& GetAcceleration() { return m_Acceleration; }
 	const XMFLOAT3& GetVelocity() { return(m_xmf3Velocity); }
 	const XMFLOAT3& GetAngleVelocity() { return m_xmf3AngleVelocity; }
@@ -248,7 +246,7 @@ public:
 	const float& GetFriction() { return m_Friction; }
 	const float& GetMaxAngleSpeed() { return m_MaxAngleSpeed; }
 	const float& GetAngleDamping() { return m_AngleDamping; }
-
+	const XMMATRIX& GetRotateInertia() { return m_pCollider->GetRotateInertiaMatrix(); }
 	
 	
 	const bool GetIsAlive() { return m_bIsAlive; }

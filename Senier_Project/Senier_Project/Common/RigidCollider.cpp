@@ -64,11 +64,13 @@ void Ray::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
 
 ///////////////// RigidCollider /////////////////
 
-RigidCollider::RigidCollider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, ColliderType colliderType, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+RigidCollider::RigidCollider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, ColliderType colliderType, float mass, 
+	ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	m_xmf3Center = xmf3Center;
 	m_xmf3Extents = xmf3Extents;
 	m_ColliderType = colliderType;
+	m_Mass = mass;
 
 	m_PositionBufferView.BufferLocation = NULL;
 	m_NormalBufferView.BufferLocation = NULL;
@@ -86,6 +88,8 @@ RigidCollider::RigidCollider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, Collider
 	{
 
 	}
+
+	CalculateRotateInertiaMatrix();
 }
 
 RigidCollider::~RigidCollider()
@@ -249,6 +253,14 @@ void RigidCollider::Update(float ETime)
 	m_bIsOverlapped = false;
 }
 
+void RigidCollider::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	OnPrepareRender(pd3dCommandList);
+
+	pd3dCommandList->DrawIndexedInstanced(
+		m_SubmeshGeometry.IndexCount, 1, m_SubmeshGeometry.StartIndexLocation, m_SubmeshGeometry.BaseVertexLocation, 0);
+}
+
 void RigidCollider::CalculateRotateInertiaMatrix()
 {
 	if (m_ColliderType == Collider_Type_Box)
@@ -263,12 +275,4 @@ void RigidCollider::CalculateRotateInertiaMatrix()
 
 		m_xmmatRotateInertia = XMLoadFloat4x4(&xmf4x4RotateInertia);
 	}
-}
-
-void RigidCollider::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	OnPrepareRender(pd3dCommandList);
-
-	pd3dCommandList->DrawIndexedInstanced(
-		m_SubmeshGeometry.IndexCount, 1, m_SubmeshGeometry.StartIndexLocation, m_SubmeshGeometry.BaseVertexLocation, 0);
 }

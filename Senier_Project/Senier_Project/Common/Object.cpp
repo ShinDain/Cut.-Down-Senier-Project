@@ -14,7 +14,7 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 		m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
 
 #if defined(_DEBUG)
-	m_pCollider = std::make_shared<RigidCollider>(m_xmf3ColliderCenter, m_xmf3ColliderExtents, Collider_Type_Box, pd3dDevice, pd3dCommandList);
+	m_pCollider = std::make_shared<RigidCollider>(m_xmf3ColliderCenter, m_xmf3ColliderExtents, Collider_Type_Box, 1, pd3dDevice, pd3dCommandList);
 #endif
 }
 
@@ -603,9 +603,15 @@ void Object::Move(DWORD dwDirection, float distance)
 
 	AddForce(direction, distance);*/
 
+	XMFLOAT3 xmf3PositionB = { -5.0f, -5.0f, 5.0f };
+	XMFLOAT3 xmf3VelocityB = XMFLOAT3(0, 10, 0);
+
 	if (dwDirection & DIR_FORWARD)
 	{
-		Impulse(XMFLOAT3(0, 1, 0), XMFLOAT3(0, -1, 0), XMFLOAT3(-5.0f, -5.0f, 5.0f));
+		XMFLOAT3 collisionPoint = { -5.0f, -5.0f, 5.0f };
+		XMFLOAT3 collisionNormal = { 0, -1, 0 };
+
+		//Impulse(xmf3Impulse, collisionNormal, collisionPoint);
 	}
 	if (dwDirection & DIR_BACKWARD)
 	{
@@ -821,9 +827,9 @@ void Object::CalculateRotateByAngleVelocity(float Etime)
 void Object::CalculateDeltaVelocityByImpulse(XMFLOAT3 xmf3Impulse)
 {
 	XMFLOAT3 deltavelocity = xmf3Impulse;
-	deltavelocity.x /= m_Mass;
-	deltavelocity.y /= m_Mass;
-	deltavelocity.z /= m_Mass;
+	deltavelocity.x /= this->GetMass();
+	deltavelocity.y /= this->GetMass();
+	deltavelocity.z /= this->GetMass();
 
 	AddVelocity(deltavelocity);
 }
@@ -836,7 +842,7 @@ void Object::CalculateDeltaAngleVelocityByImpulse(XMFLOAT3 xmf3Impulse, XMFLOAT3
 	XMMATRIX inverseRotateInertia = XMMatrixInverse(nullptr, rotateInertia);
 
 	XMVECTOR collisionPoint = XMLoadFloat3(&xmf3CollisionPoint);
-	XMVECTOR dirImpulse = XMVector3Normalize(XMLoadFloat3(&xmf3Impulse));
+	XMVECTOR dirImpulse = XMLoadFloat3(&xmf3CollisionNormal);
 
 	// 각속도 변화 계산
 	XMVECTOR deltaAngleVelocity = XMVector3TransformCoord(XMVector3Cross(collisionPoint, dirImpulse), inverseRotateInertia);

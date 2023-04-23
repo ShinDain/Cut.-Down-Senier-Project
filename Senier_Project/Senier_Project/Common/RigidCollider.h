@@ -66,12 +66,13 @@ class RigidCollider
 {
 public:
 	RigidCollider() = delete;
-	RigidCollider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, ColliderType colliderType, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	RigidCollider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, ColliderType colliderType, float mass,
+		ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	RigidCollider(const RigidCollider& rhs) = delete;
 	RigidCollider& operator=(const RigidCollider& rhs) = delete;
 	virtual ~RigidCollider();
 
-
+	void Update(float ETime);
 private:
 
 #if defined(_DEBUG) | defined(DEBUG)
@@ -89,7 +90,7 @@ private:
 
 	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R16_UINT;
 
-	// 왜인지 오류가 뜨지만 큰 문제는 아니긴함
+	// 왜인지 오류가 발생
 	D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
 	//D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	
@@ -99,13 +100,9 @@ public:
 	void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList);
 
-
 private:
 	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
 #endif
-public:
-	void Update(float ETime);
-
 private:
 	void CalculateRotateInertiaMatrix();
 
@@ -116,6 +113,7 @@ private:
 	XMFLOAT3 m_xmf3Extents = { 0.5f, 0.5f, 0.5f };
 
 	XMMATRIX m_xmmatRotateInertia = XMMatrixIdentity();
+	float m_Restitution = 0.5f;
 
 	ColliderType m_ColliderType = Collider_Type_Box;
 	bool m_bIsOverlapped = false;
@@ -127,6 +125,8 @@ public:
 	void SetExtents(const XMFLOAT3& Extents) { m_xmf3Extents = Extents; }
 	void SetColliderType(ColliderType nType) { m_ColliderType = nType; }
 
+
+	const float& GetMass() { return m_Mass; }
 	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
 	const XMFLOAT3& GetCenter() { return m_xmf3Center; }
 	const XMFLOAT3& GetExtents() { return m_xmf3Extents; }
