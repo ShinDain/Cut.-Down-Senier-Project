@@ -45,7 +45,7 @@ public:
 	static void LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData);
 	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject);
 
-	void Impulse(XMFLOAT3 xmf3Impulse, XMFLOAT3 xmf3CollisionDir, float collisionDepth);
+	void Impulse(XMFLOAT3 xmf3Impulse, XMFLOAT3 xmf3CollisionNormal, XMFLOAT3 xmf3CollisionPoint);
 
 protected:
 	virtual void OnPrepareRender(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList);
@@ -58,7 +58,7 @@ protected:
 
 	// 속도 변화 갱신
 	void CalculateDeltaVelocityByImpulse(XMFLOAT3 xmf3Impulse);
-	void CalculateDeltaAngleVelocityByImpulse(XMFLOAT3 xmf3Impulse, XMFLOAT3 xmf3CollisionDir);
+	void CalculateDeltaAngleVelocityByImpulse(XMFLOAT3 xmf3Impulse, XMFLOAT3 xmf3CollisionNormal, XMFLOAT3 xmf3CollisionPoint);
 
 protected:
 	char m_FrameName[64];
@@ -103,6 +103,9 @@ protected:
 
 	// 속도 및 물리 연산 관련
 	// 연산에 활용되어 Obj의 좌표를 업데이트
+	XMFLOAT3 m_xmf3ColliderCenter = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT3 m_xmf3ColliderExtents = XMFLOAT3(0.5f, 0.5f, 0.5f);
+
 	float m_Mass = 1.0f;
 	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 m_xmf3AngleVelocity = XMFLOAT3(0.0f, 0.0f, 0.0f);

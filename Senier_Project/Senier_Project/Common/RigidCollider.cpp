@@ -64,20 +64,18 @@ void Ray::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
 
 ///////////////// RigidCollider /////////////////
 
-RigidCollider::RigidCollider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, ColliderType nType, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+RigidCollider::RigidCollider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, ColliderType colliderType, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	m_xmf3Center = xmf3Center;
 	m_xmf3Extents = xmf3Extents;
-	m_nType = nType;
+	m_ColliderType = colliderType;
 
 	m_PositionBufferView.BufferLocation = NULL;
 	m_NormalBufferView.BufferLocation = NULL;
 	m_IndexBufferView.BufferLocation = NULL;
 
-	if (nType == Collider_Type_Box)
+	if (colliderType == Collider_Type_Box)
 	{
-		m_BoundingOrientedBox = BoundingOrientedBox(m_xmf3Center, m_xmf3Extents, XMFLOAT4(0, 0, 0, 1));
-
 #if defined(_DEBUG) | defined(DEBUG)
 
 		BuildMesh(pd3dDevice, pd3dCommandList);
@@ -247,9 +245,24 @@ void RigidCollider::Update(float ETime)
 	BoundingOrientedBox tmp =  BoundingOrientedBox(m_xmf3Center, m_xmf3Extents, XMFLOAT4(0,0,0,1));
 
 	tmp.Transform(tmp, XMLoadFloat4x4(&m_xmf4x4World));
-	m_BoundingOrientedBox = tmp;
 
 	m_bIsOverlapped = false;
+}
+
+void RigidCollider::CalculateRotateInertiaMatrix()
+{
+	if (m_ColliderType == Collider_Type_Box)
+	{
+		XMFLOAT4X4 xmf4x4RotateInertia = MathHelper::identity4x4();
+		XMFLOAT3 colliderExtents = m_xmf3Extents;
+		float objectMass = m_Mass;
+
+		xmf4x4RotateInertia._11 = objectMass * (colliderExtents.y * colliderExtents.y) + (colliderExtents.z * colliderExtents.z) / 12;
+		xmf4x4RotateInertia._22 = objectMass * (colliderExtents.x * colliderExtents.x) + (colliderExtents.z * colliderExtents.z) / 12;
+		xmf4x4RotateInertia._33 = objectMass * (colliderExtents.y * colliderExtents.y) + (colliderExtents.x * colliderExtents.x) / 12;
+
+		m_xmmatRotateInertia = XMLoadFloat4x4(&xmf4x4RotateInertia);
+	}
 }
 
 void RigidCollider::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)

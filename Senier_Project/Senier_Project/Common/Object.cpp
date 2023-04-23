@@ -14,7 +14,7 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 		m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
 
 #if defined(_DEBUG)
-	m_pCollider = std::make_shared<RigidCollider>(XMFLOAT3(0, 0, 0), XMFLOAT3(0.5f, 0.5f, 0.5f), Collider_Type_Box, pd3dDevice, pd3dCommandList);
+	m_pCollider = std::make_shared<RigidCollider>(m_xmf3ColliderCenter, m_xmf3ColliderExtents, Collider_Type_Box, pd3dDevice, pd3dCommandList);
 #endif
 }
 
@@ -422,11 +422,11 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	SetMaterials(vpMat);
 }
 
-void Object::Impulse(XMFLOAT3 xmf3Impulse, XMFLOAT3 xmf3CollisionDir, float collisionDepth)
+void Object::Impulse(XMFLOAT3 xmf3Impulse, XMFLOAT3 xmf3CollisionNormal, XMFLOAT3 xmf3CollisionPoint)
 {
 	// 충격량에 따른 속도 변화 갱신
 	CalculateDeltaVelocityByImpulse(xmf3Impulse);
-	CalculateDeltaAngleVelocityByImpulse(xmf3Impulse, xmf3CollisionDir);
+	CalculateDeltaAngleVelocityByImpulse(xmf3Impulse, xmf3CollisionNormal, xmf3CollisionPoint);
 }
 
 void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData)
@@ -605,19 +605,19 @@ void Object::Move(DWORD dwDirection, float distance)
 
 	if (dwDirection & DIR_FORWARD)
 	{
-		Impulse(XMFLOAT3(0, 1, 0), XMFLOAT3(0, 0, 0), 0);
+		Impulse(XMFLOAT3(0, 1, 0), XMFLOAT3(0, -1, 0), XMFLOAT3(-5.0f, -5.0f, 5.0f));
 	}
 	if (dwDirection & DIR_BACKWARD)
 	{
-		Impulse(XMFLOAT3(0, -1, 0), XMFLOAT3(0, 0, 0), 0);
+		Impulse(XMFLOAT3(0, -1, 0), XMFLOAT3(0, 1, 0), XMFLOAT3(-5.0f, 5.0f, 5.0f));
 	}
 	if (dwDirection & DIR_LEFT)
 	{
-		Impulse(XMFLOAT3(-30, 0, 0), XMFLOAT3(0, 0, 0), 0);
+		Impulse(XMFLOAT3(-10, 0, 0), XMFLOAT3(-1, 0, 0),XMFLOAT3(5, 5, -5));
 	}
 	if (dwDirection & DIR_RIGHT)
 	{
-		Impulse(XMFLOAT3(30, 0, 0), XMFLOAT3(0, 0, 0), 0);
+		Impulse(XMFLOAT3(10, 0, 0), XMFLOAT3(1, 0, 0), XMFLOAT3(-5, 5, -5));
 	}
 }
 
@@ -828,6 +828,21 @@ void Object::CalculateDeltaVelocityByImpulse(XMFLOAT3 xmf3Impulse)
 	AddVelocity(deltavelocity);
 }
 
-void Object::CalculateDeltaAngleVelocityByImpulse(XMFLOAT3 xmf3Impulse, XMFLOAT3 xmf3CollisionDir)
+void Object::CalculateDeltaAngleVelocityByImpulse(XMFLOAT3 xmf3Impulse, XMFLOAT3 xmf3CollisionNormal, XMFLOAT3 xmf3CollisionPoint)
 {
+	// 회전 관성(관성 모멘트) 행렬을 획득
+	XMMATRIX rotateInertia = m_pCollider->GetRotateInertiaMatrix();
+	// 행렬의 역
+	XMMATRIX inverseRotateInertia = XMMatrixInverse(nullptr, rotateInertia);
+
+	XMVECTOR collisionPoint = XMLoadFloat3(&xmf3CollisionPoint);
+	XMVECTOR dirImpulse = XMVector3Normalize(XMLoadFloat3(&xmf3Impulse));
+
+	// 각속도 변화 계산
+	XMVECTOR deltaAngleVelocity = XMVector3TransformCoord(XMVector3Cross(collisionPoint, dirImpulse), inverseRotateInertia);
+	XMFLOAT3 xmf3DeltaAngleVelocity = XMFLOAT3(0, 0, 0);
+	XMStoreFloat3(&xmf3DeltaAngleVelocity, deltaAngleVelocity);
+
+	AddAngleVelocity(xmf3DeltaAngleVelocity);
+
 }

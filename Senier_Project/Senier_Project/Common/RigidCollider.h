@@ -66,7 +66,7 @@ class RigidCollider
 {
 public:
 	RigidCollider() = delete;
-	RigidCollider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, ColliderType nType, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	RigidCollider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, ColliderType colliderType, ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	RigidCollider(const RigidCollider& rhs) = delete;
 	RigidCollider& operator=(const RigidCollider& rhs) = delete;
 	virtual ~RigidCollider();
@@ -97,8 +97,8 @@ private:
 
 public:
 	void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-
 	void Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList);
+
 
 private:
 	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
@@ -107,26 +107,32 @@ public:
 	void Update(float ETime);
 
 private:
+	void CalculateRotateInertiaMatrix();
 
+private:
+	float m_Mass = 1.0f;
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 	XMFLOAT3 m_xmf3Center = { 0.0f, 0.0f, 0.0f };
-	XMFLOAT3 m_xmf3Extents = { 0.0f, 0.0f, 0.0f };
-	BoundingOrientedBox m_BoundingOrientedBox;
+	XMFLOAT3 m_xmf3Extents = { 0.5f, 0.5f, 0.5f };
 
-	ColliderType m_nType = Collider_Type_Box;
+	XMMATRIX m_xmmatRotateInertia = XMMatrixIdentity();
+
+	ColliderType m_ColliderType = Collider_Type_Box;
 	bool m_bIsOverlapped = false;
 
 public:
-	void SetWorld(XMFLOAT4X4 World) { m_xmf4x4World = World; }
-	void SetCenter(XMFLOAT3 Center) { m_xmf3Center = Center; }	
-	void SetExtents(XMFLOAT3 Extents) { m_xmf3Extents = Extents; }
-	void SetType(ColliderType nType) { m_nType = nType; }
+	void SetMass(float Mass) { m_Mass = Mass; }
+	void SetWorld(const XMFLOAT4X4& World) { m_xmf4x4World = World; }
+	void SetCenter(const XMFLOAT3& Center) { m_xmf3Center = Center; }	
+	void SetExtents(const XMFLOAT3& Extents) { m_xmf3Extents = Extents; }
+	void SetColliderType(ColliderType nType) { m_ColliderType = nType; }
 
-	XMFLOAT4X4 GetWorld() { return m_xmf4x4World; }
-	XMFLOAT3 GetCenter() { return m_xmf3Center; }
-	XMFLOAT3 GetExtents() { return m_xmf3Extents; }
-	ColliderType GetType() { return m_nType; }
-	BoundingOrientedBox& GetOrientedBox() { return m_BoundingOrientedBox; }
-	bool GetIsOverlapped() { return m_bIsOverlapped; }
+	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
+	const XMFLOAT3& GetCenter() { return m_xmf3Center; }
+	const XMFLOAT3& GetExtents() { return m_xmf3Extents; }
+	const ColliderType& GetColliderType() { return m_ColliderType; }
+	const bool& GetIsOverlapped() { return m_bIsOverlapped; }
+	const XMMATRIX& GetRotateInertiaMatrix() {	return m_xmmatRotateInertia;}
+
 
 };
