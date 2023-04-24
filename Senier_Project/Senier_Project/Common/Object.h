@@ -122,7 +122,6 @@ protected:
 	bool m_bIsAlive = true;
 
 public:
-	void AddForce(XMVECTOR direction, float distance);
 	void Move(DWORD dwDirection, float distance);
 	void Rotate(float x, float y, float z);
 	void Walk(float delta);

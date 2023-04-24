@@ -40,9 +40,8 @@ void Object::Animate(const GameTimer& gt)
 
 void Object::Update(const GameTimer& gt)
 {
-	// Object의 Value를 갱신
+	UpdateTransform(NULL);
 
-	// 속도에 의한 위치변화 계산 후 갱신
 	CalculatePositionByVelocity(gt.DeltaTime());
 	CalculateRotateByAngleVelocity(gt.DeltaTime());
 
@@ -568,21 +567,13 @@ void Object::FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>>* pp
 	if (m_pChild) m_pChild->FindAndSetSkinnedMesh(ppSkinnedMeshes);
 }
 
-void Object::AddForce(XMVECTOR direction, float distance)
-{
-	XMVECTOR s = XMVectorReplicate(distance);
-	XMVECTOR v = XMLoadFloat3(&m_xmf3Velocity);
-
-	XMStoreFloat3(&m_xmf3Velocity, XMVectorMultiplyAdd(direction, s, v));
-}
-
 void Object::Move(DWORD dwDirection, float distance)
 {
 	XMVECTOR direction = XMVectorZero();
 	XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
 	XMVECTOR r = XMLoadFloat3(&m_xmf3Right);
 
-	/*if (dwDirection & DIR_FORWARD)
+	if (dwDirection & DIR_FORWARD)
 	{
 		direction = XMVectorAdd(direction, l);
 	}
@@ -600,31 +591,12 @@ void Object::Move(DWORD dwDirection, float distance)
 	}
 
 	direction = XMVector3Normalize(direction);
+	XMVECTOR deltaVelocity = direction * distance;
 
-	AddForce(direction, distance);*/
+	XMFLOAT3 xmf3DeltaVelocity;
+	XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 
-	XMFLOAT3 xmf3PositionB = { -5.0f, -5.0f, 5.0f };
-	XMFLOAT3 xmf3VelocityB = XMFLOAT3(0, 10, 0);
-
-	if (dwDirection & DIR_FORWARD)
-	{
-		XMFLOAT3 collisionPoint = { -5.0f, -5.0f, 5.0f };
-		XMFLOAT3 collisionNormal = { 0, -1, 0 };
-
-		//Impulse(xmf3Impulse, collisionNormal, collisionPoint);
-	}
-	if (dwDirection & DIR_BACKWARD)
-	{
-		Impulse(XMFLOAT3(0, -1, 0), XMFLOAT3(0, 1, 0), XMFLOAT3(-5.0f, 5.0f, 5.0f));
-	}
-	if (dwDirection & DIR_LEFT)
-	{
-		Impulse(XMFLOAT3(-10, 0, 0), XMFLOAT3(-1, 0, 0),XMFLOAT3(5, 5, -5));
-	}
-	if (dwDirection & DIR_RIGHT)
-	{
-		Impulse(XMFLOAT3(10, 0, 0), XMFLOAT3(1, 0, 0), XMFLOAT3(-5, 5, -5));
-	}
+	AddVelocity(xmf3DeltaVelocity);
 }
 
 void Object::Rotate(float x, float y, float z)
@@ -683,6 +655,7 @@ void Object::Strafe(float delta)
 	XMStoreFloat3(&m_xmf3Velocity, XMVectorMultiplyAdd(s, r, v));
 }
 
+//=============================================
 
 void Object::CalculatePositionByVelocity(float Etime)
 {

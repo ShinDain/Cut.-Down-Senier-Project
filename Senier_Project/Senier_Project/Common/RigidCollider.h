@@ -39,7 +39,6 @@ private:
 #endif
 
 
-
 private:
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 	XMFLOAT3 m_xmf3Center = { 0.0f, 0.0f, 0.0f };
@@ -59,7 +58,6 @@ public:
 	XMFLOAT3 GetCenter() { return m_xmf3Center; }
 	XMFLOAT3 GetDirection() { return m_xmf3Direction; }
 	float GetLength() { return m_Length; }
-
 };
 
 class RigidCollider
@@ -74,36 +72,6 @@ public:
 
 	void Update(float ETime);
 private:
-
-#if defined(_DEBUG) | defined(DEBUG)
-	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_PositionBufferGPU = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_PositionBufferUploader = nullptr;
-	D3D12_VERTEX_BUFFER_VIEW				 m_PositionBufferView;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource>   m_NormalBufferGPU = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_NormalBufferUploader = nullptr;
-	D3D12_VERTEX_BUFFER_VIEW				 m_NormalBufferView;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_IndexBufferGPU = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_IndexBufferUploader = nullptr;
-	D3D12_INDEX_BUFFER_VIEW					 m_IndexBufferView;
-
-	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R16_UINT;
-
-	// 왜인지 오류가 발생
-	D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
-	//D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	
-	SubmeshGeometry m_SubmeshGeometry;
-
-public:
-	void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-	void Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList);
-
-private:
-	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
-#endif
-private:
 	void CalculateRotateInertiaMatrix();
 
 private:
@@ -117,6 +85,8 @@ private:
 
 	ColliderType m_ColliderType = Collider_Type_Box;
 	bool m_bIsOverlapped = false;
+
+	std::vector<XMFLOAT3> m_vXmf3ColliderVertices;
 
 public:
 	void SetMass(float Mass) { m_Mass = Mass; }
@@ -134,5 +104,35 @@ public:
 	const bool& GetIsOverlapped() { return m_bIsOverlapped; }
 	const XMMATRIX& GetRotateInertiaMatrix() {	return m_xmmatRotateInertia;}
 
+	const std::vector<XMFLOAT3>& GetColliderVertices() { return m_vXmf3ColliderVertices; }
 
+#if defined(_DEBUG) | defined(DEBUG)
+private:
+	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_PositionBufferGPU = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_PositionBufferUploader = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW				 m_PositionBufferView;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource>   m_NormalBufferGPU = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_NormalBufferUploader = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW				 m_NormalBufferView;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_IndexBufferGPU = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_IndexBufferUploader = nullptr;
+	D3D12_INDEX_BUFFER_VIEW					 m_IndexBufferView;
+
+	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R16_UINT;
+
+	// 왜인지 오류가 발생
+	D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
+	//D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+	SubmeshGeometry m_SubmeshGeometry;
+
+public:
+	void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList);
+
+private:
+	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
+#endif
 };

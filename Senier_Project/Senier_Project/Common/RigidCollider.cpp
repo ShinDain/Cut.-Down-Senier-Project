@@ -83,6 +83,26 @@ RigidCollider::RigidCollider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, Collider
 		BuildMesh(pd3dDevice, pd3dCommandList);
 
 #endif
+		std::vector<XMFLOAT3> Positions;
+
+		float w = m_xmf3Extents.x;
+		float h = m_xmf3Extents.y;
+		float d = m_xmf3Extents.z;
+
+		Positions =
+		{
+			XMFLOAT3(-w, +h, +d),
+			XMFLOAT3(+w, +h, +d),
+			XMFLOAT3(+w, +h, -d),
+			XMFLOAT3(-w, +h, -d),
+
+			XMFLOAT3(-w, -h, +d),
+			XMFLOAT3(+w, -h, +d),
+			XMFLOAT3(+w, -h, -d),
+			XMFLOAT3(-w, -h, -d)
+		};
+
+		m_vXmf3ColliderVertices = Positions;
 	}
 	else
 	{
@@ -95,6 +115,33 @@ RigidCollider::RigidCollider(XMFLOAT3 xmf3Center, XMFLOAT3 xmf3Extents, Collider
 RigidCollider::~RigidCollider()
 {
 }
+
+void RigidCollider::Update(float ETime)
+{
+	BoundingOrientedBox tmp = BoundingOrientedBox(m_xmf3Center, m_xmf3Extents, XMFLOAT4(0, 0, 0, 1));
+
+	tmp.Transform(tmp, XMLoadFloat4x4(&m_xmf4x4World));
+
+	m_bIsOverlapped = false;
+}
+
+void RigidCollider::CalculateRotateInertiaMatrix()
+{
+	if (m_ColliderType == Collider_Type_Box)
+	{
+		XMFLOAT4X4 xmf4x4RotateInertia = MathHelper::identity4x4();
+		XMFLOAT3 colliderExtents = m_xmf3Extents;
+		float objectMass = m_Mass;
+
+		xmf4x4RotateInertia._11 = objectMass * (colliderExtents.y * colliderExtents.y) + (colliderExtents.z * colliderExtents.z) / 12;
+		xmf4x4RotateInertia._22 = objectMass * (colliderExtents.x * colliderExtents.x) + (colliderExtents.z * colliderExtents.z) / 12;
+		xmf4x4RotateInertia._33 = objectMass * (colliderExtents.y * colliderExtents.y) + (colliderExtents.x * colliderExtents.x) / 12;
+
+		m_xmmatRotateInertia = XMLoadFloat4x4(&xmf4x4RotateInertia);
+	}
+}
+
+#if defined(_DEBUG)
 
 void RigidCollider::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
@@ -207,7 +254,6 @@ void RigidCollider::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	const UINT NormalBufferByteSize = (UINT)Normal.size() * sizeof(XMFLOAT3);
 	const UINT indexBufferByteSize = (UINT)Indices.size() * sizeof(std::uint_fast16_t);
 
-
 	CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 		&m_PositionBufferGPU, &m_PositionBufferUploader,
 		positionBufferByteSize, sizeof(XMFLOAT3),
@@ -244,15 +290,6 @@ void RigidCollider::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 	pd3dCommandList->IASetIndexBuffer(&m_IndexBufferView);
 }
 
-void RigidCollider::Update(float ETime)
-{
-	BoundingOrientedBox tmp =  BoundingOrientedBox(m_xmf3Center, m_xmf3Extents, XMFLOAT4(0,0,0,1));
-
-	tmp.Transform(tmp, XMLoadFloat4x4(&m_xmf4x4World));
-
-	m_bIsOverlapped = false;
-}
-
 void RigidCollider::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	OnPrepareRender(pd3dCommandList);
@@ -261,18 +298,4 @@ void RigidCollider::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandLi
 		m_SubmeshGeometry.IndexCount, 1, m_SubmeshGeometry.StartIndexLocation, m_SubmeshGeometry.BaseVertexLocation, 0);
 }
 
-void RigidCollider::CalculateRotateInertiaMatrix()
-{
-	if (m_ColliderType == Collider_Type_Box)
-	{
-		XMFLOAT4X4 xmf4x4RotateInertia = MathHelper::identity4x4();
-		XMFLOAT3 colliderExtents = m_xmf3Extents;
-		float objectMass = m_Mass;
-
-		xmf4x4RotateInertia._11 = objectMass * (colliderExtents.y * colliderExtents.y) + (colliderExtents.z * colliderExtents.z) / 12;
-		xmf4x4RotateInertia._22 = objectMass * (colliderExtents.x * colliderExtents.x) + (colliderExtents.z * colliderExtents.z) / 12;
-		xmf4x4RotateInertia._33 = objectMass * (colliderExtents.y * colliderExtents.y) + (colliderExtents.x * colliderExtents.x) / 12;
-
-		m_xmmatRotateInertia = XMLoadFloat4x4(&xmf4x4RotateInertia);
-	}
-}
+#endif

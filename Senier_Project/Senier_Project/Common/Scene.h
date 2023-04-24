@@ -8,6 +8,7 @@
 #include "Global.h"
 #include "Shader.h"
 #include "Object.h"
+#include "Physics.h"
 
 
 class Scene

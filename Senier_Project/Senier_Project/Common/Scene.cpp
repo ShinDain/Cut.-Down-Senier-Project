@@ -19,7 +19,16 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	//for(int i = 0 ; i < 5; ++i)
 	CreateObject(pd3dDevice, pd3dCommandList, TEST_MODEL_NAME, 0, RenderLayer::Static);
+	CreateObject(pd3dDevice, pd3dCommandList, TEST_MODEL_NAME, 0, RenderLayer::Static);
+	m_vpAllObjs[1]->SetPosition(0, 15, 0);
+	m_vpAllObjs[1]->SetRotate(0, 0, 0);
+
 	
+	for (int i = 0; i < m_vpAllObjs.size(); ++i)
+	{
+		if (m_vpAllObjs[i]) m_vpAllObjs[i]->UpdateTransform(NULL);
+	}
+
 	// 카메라 초기화
 	//m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
 	m_pCamera = std::make_unique<Camera>();
@@ -31,8 +40,6 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 
 #endif
-
-
 
 	return true;
 }
@@ -50,6 +57,8 @@ void Scene::Update(const GameTimer& gt)
 	m_size = m_vpAllObjs.size();
 #endif
 
+	Physics::SAT(m_vpAllObjs[0].get(), m_vpAllObjs[1].get());
+	
 	m_pCamera->Update(gt.DeltaTime());
 
 	XMMATRIX view = m_pCamera->GetView();
@@ -131,14 +140,18 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 	}
 
 #if defined(_DEBUG)
-	/*if (pKeybuffer[VK_F1] & 0xF0)
-	{
-		if (m_vpAllObjs.size() > 1)
-		{
-			m_vpAllObjs[1]->SetIsAlive(false);
-		}
+	/*if (pKeybuffer[VK_UP] & 0xF0) {
+		Physics::CalculateImpulse(m_vpAllObjs[0].get(), m_vpAllObjs[1].get(), XMFLOAT3(0, 1, 0), XMFLOAT3(0, -5, 0), XMFLOAT3(0, -5, 0), 1, 0.5f);
+	}
+	if (pKeybuffer[VK_DOWN] & 0xF0) {
+		Physics::CalculateImpulse(m_vpAllObjs[0].get(), m_vpAllObjs[1].get(), XMFLOAT3(0, -1, 0), XMFLOAT3(0, 5, 0), XMFLOAT3(0, 5, 0), 1, 0.5f);
+	}
+	if (pKeybuffer[VK_LEFT] & 0xF0) {
+		Physics::CalculateImpulse(m_vpAllObjs[0].get(), m_vpAllObjs[1].get(), XMFLOAT3(-1, 0, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), 1, 0.5f);
+	}
+	if (pKeybuffer[VK_RIGHT] & 0xF0) {
+		Physics::CalculateImpulse(m_vpAllObjs[0].get(), m_vpAllObjs[1].get(), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), 1, 0.5f);
 	}*/
-
 #endif
 }
 
