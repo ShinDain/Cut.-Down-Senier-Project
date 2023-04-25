@@ -111,6 +111,7 @@ protected:
 
 	XMFLOAT3 m_xmf3Gravity = XMFLOAT3(0.0f, -90.0f, 0.0f);
 	float m_Acceleration = 3.0f;
+	XMFLOAT3 m_xmf3LastFrameAccel = XMFLOAT3(0, 0, 0);
 
 	float m_MaxSpeedXZ = 60.0f;
 	float m_MaxSpeedY = 100.f;
@@ -120,6 +121,7 @@ protected:
 	
 
 	bool m_bIsAlive = true;
+	bool m_bPhysics = true;
 
 public:
 	void Move(DWORD dwDirection, float distance);
@@ -217,6 +219,7 @@ public:
 	
 	
 	void SetIsAlive(bool bIsAlive) { m_bIsAlive = bIsAlive; }
+	void SetPhysics(bool bPhysics) { m_bPhysics = bPhysics; }
 
 
 	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
@@ -247,8 +250,10 @@ public:
 	const float& GetAngleDamping() { return m_AngleDamping; }
 	const XMMATRIX& GetRotateInertia() { return m_pCollider->GetRotateInertiaMatrix(); }
 	
+	const XMFLOAT3& GetLastFrameAccel() { return m_xmf3LastFrameAccel; }
 	
 	const bool GetIsAlive() { return m_bIsAlive; }
+	const bool GetPhysics() { return m_bPhysics; }
 
 #if defined(_DEBUG)
 public:

@@ -423,9 +423,12 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 void Object::Impulse(XMFLOAT3 xmf3Impulse, XMFLOAT3 xmf3CollisionNormal, XMFLOAT3 xmf3CollisionPoint)
 {
-	// 충격량에 따른 속도 변화 갱신
-	CalculateDeltaVelocityByImpulse(xmf3Impulse);
-	CalculateDeltaAngleVelocityByImpulse(xmf3Impulse, xmf3CollisionNormal, xmf3CollisionPoint);
+	if (m_bPhysics)
+	{
+		// 충격량에 따른 속도 변화 갱신
+		CalculateDeltaVelocityByImpulse(xmf3Impulse);
+		CalculateDeltaAngleVelocityByImpulse(xmf3Impulse, xmf3CollisionNormal, xmf3CollisionPoint);
+	}
 }
 
 void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData)
@@ -596,6 +599,7 @@ void Object::Move(DWORD dwDirection, float distance)
 	XMFLOAT3 xmf3DeltaVelocity;
 	XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 
+	m_xmf3LastFrameAccel = xmf3DeltaVelocity;
 	AddVelocity(xmf3DeltaVelocity);
 }
 
@@ -809,6 +813,10 @@ void Object::CalculateDeltaVelocityByImpulse(XMFLOAT3 xmf3Impulse)
 
 void Object::CalculateDeltaAngleVelocityByImpulse(XMFLOAT3 xmf3Impulse, XMFLOAT3 xmf3CollisionNormal, XMFLOAT3 xmf3CollisionPoint)
 {
+	// 바닥에 붙어있는 경우
+	if (m_xmf3Position.y < m_xmf3ColliderExtents.y * 10)
+		return;
+
 	// 회전 관성(관성 모멘트) 행렬을 획득
 	XMMATRIX rotateInertia = m_pCollider->GetRotateInertiaMatrix();
 	// 행렬의 역

@@ -20,8 +20,22 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//for(int i = 0 ; i < 5; ++i)
 	CreateObject(pd3dDevice, pd3dCommandList, TEST_MODEL_NAME, 0, RenderLayer::Static);
 	CreateObject(pd3dDevice, pd3dCommandList, TEST_MODEL_NAME, 0, RenderLayer::Static);
-	m_vpAllObjs[1]->SetPosition(0, 15, 0);
-	m_vpAllObjs[1]->SetRotate(0, 0, 0);
+	
+	m_vpAllObjs[0]->SetPosition(0, 0, 0);
+	m_vpAllObjs[0]->SetScale(100, 1, 100);
+	m_vpAllObjs[0]->SetPhysics(false);
+
+//	m_vpAllObjs[0]->SetRotate(0, 0, 20);
+	m_vpAllObjs[1]->SetPosition(0, 20, 0);
+
+	//CreateObject(pd3dDevice, pd3dCommandList, TEST_MODEL_NAME, 0, RenderLayer::Static);
+	//CreateObject(pd3dDevice, pd3dCommandList, TEST_MODEL_NAME, 0, RenderLayer::Static);
+	//CreateObject(pd3dDevice, pd3dCommandList, TEST_MODEL_NAME, 0, RenderLayer::Static);
+	//m_vpAllObjs[2]->SetPosition(0, 35, 0);
+	//m_vpAllObjs[3]->SetPosition(0, 50, 0);
+	//m_vpAllObjs[4]->SetPosition(0, 65, 0);
+
+
 
 	
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
@@ -57,7 +71,13 @@ void Scene::Update(const GameTimer& gt)
 	m_size = m_vpAllObjs.size();
 #endif
 
-	Physics::SAT(m_vpAllObjs[0].get(), m_vpAllObjs[1].get());
+	for (int i = 0; i < m_vpAllObjs.size() - 1; ++i)
+	{
+		for (int j = i + 1; j < m_vpAllObjs.size(); ++j)
+		{
+			Physics::SAT(m_vpAllObjs[i].get(), m_vpAllObjs[j].get(), gt.DeltaTime());
+		}
+	}
 	
 	m_pCamera->Update(gt.DeltaTime());
 
@@ -76,6 +96,7 @@ void Scene::Update(const GameTimer& gt)
 	{
 		if (m_vpAllObjs[i]) m_vpAllObjs[i]->Update(gt);
 	}
+
 }
 
 void Scene::Render(const GameTimer& gt, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -136,7 +157,7 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 			m_pCamera->RotateY(dx / 1000);
 		}
 
-		m_vpAllObjs[0]->Move(dwDirection, m_vpAllObjs[0]->GetAcceleration());
+		m_vpAllObjs[1]->Move(dwDirection, m_vpAllObjs[0]->GetAcceleration());
 	}
 
 #if defined(_DEBUG)

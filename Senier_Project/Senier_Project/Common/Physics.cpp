@@ -1,6 +1,6 @@
 #include "Physics.h"
 
-bool Physics::SAT(Object* pObjectA, Object* pObjectB)
+bool Physics::SAT(Object* pObjectA, Object* pObjectB, float elapsedTime)
 {
 	// 두 충돌체 모두 육면체인 경우
 	XMFLOAT4X4 xmf4x4ObjWorldA = pObjectA->GetWorld();
@@ -29,11 +29,11 @@ bool Physics::SAT(Object* pObjectA, Object* pObjectB)
 	XMVECTOR collisionNormal = XMLoadFloat3(&xmf3CollisionNormal);
 
 	// 3. Collision Point를 얻어야 한다.
-	XMFLOAT3 xmf3CollisionPointA = CalculateCollisionPoint(pObjectA, collisionNormal, squareNormals);
-	XMFLOAT3 xmf3CollisionPointB = CalculateCollisionPoint(pObjectB, -collisionNormal, squareNormals);
+	XMFLOAT3 xmf3CollisionPointA = CalculateCollisionPoint(pObjectA, collisionNormal, squareNormals, objWorldA);
+	XMFLOAT3 xmf3CollisionPointB = CalculateCollisionPoint(pObjectB, -collisionNormal, squareNormals, objWorldB);
 	
 	// 4. 충돌 정보를 통해 충격량을 계산 후 물체에 적용
-	CalculateImpulseAndApply(pObjectA, pObjectB, xmf3CollisionNormal, xmf3CollisionPointA, xmf3CollisionPointB, depth, 0);
+	CalculateImpulseAndApply(pObjectA, pObjectB, xmf3CollisionNormal, xmf3CollisionPointA, xmf3CollisionPointB, depth, 0.5f, elapsedTime);
 
 	return true;
 }
@@ -131,16 +131,20 @@ bool Physics::CheckIntersect(Object* pObjectA, Object* pObjectB, std::vector<XMV
 			if (maxVa < maxVb) // A - B
 			{
 				length = maxVa - minVb;
+				if (depth > length)
+				{
+					depth = length;
+					smallestAxis = axis;
+				}
 			}
 			else			   // B - A
 			{
 				length = maxVb - minVa;
-			}
-
-			if (depth > length)
-			{
-				depth = length;
-				smallestAxis = axis;
+				if (depth > length)
+				{
+					depth = length;
+					smallestAxis = -axis;
+				}
 			}
 		}
 	}
@@ -150,7 +154,7 @@ bool Physics::CheckIntersect(Object* pObjectA, Object* pObjectB, std::vector<XMV
 	return true;
 }
 
-XMFLOAT3 Physics::CalculateCollisionPoint(Object* pObject, XMVECTOR collisionNormal, XMVECTOR* squareNormals)
+XMFLOAT3 Physics::CalculateCollisionPoint(Object* pObject, XMVECTOR collisionNormal, XMVECTOR* squareNormals, XMMATRIX objWorld)
 {
 	float maxDot = 0;
 	XMFLOAT3 xmf3CollisionFaceNormal = XMFLOAT3(0, 0, 0);
@@ -178,6 +182,9 @@ XMFLOAT3 Physics::CalculateCollisionPoint(Object* pObject, XMVECTOR collisionNor
 	XMFLOAT3 xmf3CollisionNormal;
 	XMStoreFloat3(&xmf3CollisionNormal, collisionNormal);	// Collision Normal
 	XMFLOAT3 xmf3CollisionPoint = XMFLOAT3(t * xmf3CollisionNormal.x, t * xmf3CollisionNormal.y, t * xmf3CollisionNormal.z);
+	XMVECTOR collisionPoint = XMLoadFloat3(&xmf3CollisionPoint);
+	collisionPoint = XMVector3TransformCoord(collisionPoint, objWorld);
+	XMStoreFloat3(&xmf3CollisionPoint, collisionPoint);
 
 	return xmf3CollisionPoint;
 }
@@ -188,7 +195,7 @@ void Physics::CalculateImpulseAndApply(
 	Object* pObjectA, Object* pObjectB,
 	XMFLOAT3 xmf3CollisionNormal,
 	XMFLOAT3 xmf3CollisionPointA, XMFLOAT3 xmf3CollisionPointB,
-	float depth, float restitution)
+	float depth, float restitution, float elapsedTime)
 {
 	// 1. 단위 충격량당 속도 변화 계산
 	float deltaVelocityByUnitImpulse = CalculateDeltaVelocityByUnitImpulse(pObjectA, pObjectB, xmf3CollisionNormal, 
@@ -196,26 +203,20 @@ void Physics::CalculateImpulseAndApply(
 
 	// 2. 충돌 후 기대되는 속도 변화량 계산, 오브젝트의 각속도도 선속도로 통합시켜주어야 한다.
 	float desiredDeltaVelocity = CalculateDesiredDeltaVelocity(pObjectA, pObjectB, xmf3CollisionNormal,
-																xmf3CollisionPointA, xmf3CollisionPointB, restitution);
+																xmf3CollisionPointA, xmf3CollisionPointB, depth, restitution, elapsedTime);
 
 	// 3. 기대 속도 변화 / 단위 충격량당 속도 변화를 계산하여 각 물체에 적용될 충격량 계산
 	XMMATRIX xmmatContactToWorld = CalculateContactMatrix(xmf3CollisionNormal);
 
 	XMFLOAT3 xmf3Impulse = XMFLOAT3(desiredDeltaVelocity / deltaVelocityByUnitImpulse, 0, 0);
 	// Contact 좌표계를 World 좌표게로 변환
-	XMVECTOR impulse = XMVector3TransformCoord(XMLoadFloat3(&xmf3Impulse), xmmatContactToWorld);
+	XMVECTOR impulse = XMLoadFloat3(&xmf3Impulse);
+
+	/*if (XMVectorGetX(XMVector3Dot(XMLoadFloat3(&xmf3CollisionNormal), impulse)) > 0)
+		impulse = -impulse;*/
+	impulse = XMVector3TransformCoord(impulse, xmmatContactToWorld);
 
 	// 4. Object에 Impulse 적용
-#if defined(_DEBUG)
-	/*XMFLOAT3 deltaPosition;
-	XMStoreFloat3(&deltaPosition, XMLoadFloat3(&xmf3CollisionNormal) * depth);
-	pObjectA->AddPosition(deltaPosition);
-
-	XMStoreFloat3(&deltaPosition, -1 * XMLoadFloat3(&xmf3CollisionNormal) * depth);
-	pObjectB->AddPosition(deltaPosition);*/
-#endif
-
-
 	XMStoreFloat3(&xmf3Impulse, impulse);
 	pObjectA->Impulse(xmf3Impulse, xmf3CollisionNormal, xmf3CollisionPointA);
 	impulse = -impulse;
@@ -264,7 +265,7 @@ float Physics::CalculateDeltaVelocityByUnitImpulse(Object* pObjectA, Object* pOb
 {
 	XMVECTOR collisionNormal = XMLoadFloat3(&xmf3CollisionNormal);
 	// 물체 A의 단위 충격량당 속도 변화량
-	XMVECTOR collisionPointA = XMLoadFloat3(&xmf3CollisionPointA);
+	XMVECTOR collisionPointA = XMLoadFloat3(&xmf3CollisionPointA) - XMLoadFloat3(&pObjectA->GetPosition());
 	XMMATRIX inverseRotateInertia = XMMatrixInverse(nullptr, pObjectA->GetRotateInertia());
 	XMVECTOR deltaVelWorld = XMVector3Cross(collisionPointA, collisionNormal);
 	deltaVelWorld = XMVector3TransformNormal(deltaVelWorld, inverseRotateInertia);
@@ -275,7 +276,7 @@ float Physics::CalculateDeltaVelocityByUnitImpulse(Object* pObjectA, Object* pOb
 	deltaVelocityByUnitImpulse += (1 / pObjectA->GetMass());
 
 	// 물체 B의 단위 충격량당 속도 변화량
-	XMVECTOR collisionPointB = XMLoadFloat3(&xmf3CollisionPointB);
+	XMVECTOR collisionPointB = XMLoadFloat3(&xmf3CollisionPointB) - XMLoadFloat3(&pObjectB->GetPosition());
 	inverseRotateInertia = XMMatrixInverse(nullptr, pObjectB->GetRotateInertia());
 	deltaVelWorld = XMVector3Cross(collisionPointB, collisionNormal);
 	deltaVelWorld = XMVector3TransformNormal(deltaVelWorld, inverseRotateInertia);
@@ -288,33 +289,78 @@ float Physics::CalculateDeltaVelocityByUnitImpulse(Object* pObjectA, Object* pOb
 }
 
 float Physics::CalculateDesiredDeltaVelocity(Object* pObjectA, Object* pObjectB, XMFLOAT3 xmf3CollisionNormal,
-											 XMFLOAT3 xmf3CollisionPointA, XMFLOAT3 xmf3CollisionPointB, float restitution)
+											 XMFLOAT3 xmf3CollisionPointA, XMFLOAT3 xmf3CollisionPointB,
+											 float depth, float restitution, float elapsedTime)
 {
 	XMVECTOR collisionPointA = XMLoadFloat3(&xmf3CollisionPointA);
 	XMVECTOR collisionPointB = XMLoadFloat3(&xmf3CollisionPointB);
+	XMVECTOR collisionNormal = XMLoadFloat3(&xmf3CollisionNormal);
 
 	XMVECTOR velocityA = XMLoadFloat3(&pObjectA->GetVelocity());
 	XMVECTOR velocityB = XMLoadFloat3(&pObjectB->GetVelocity());
 	XMVECTOR angleVelocityA = XMLoadFloat3(&pObjectA->GetAngleVelocity());
 	XMVECTOR angleVelocityB = XMLoadFloat3(&pObjectB->GetAngleVelocity());
+	XMVECTOR accelA = XMLoadFloat3(&pObjectA->GetLastFrameAccel()) * elapsedTime;
+	XMVECTOR accelB = XMLoadFloat3(&pObjectB->GetLastFrameAccel()) * elapsedTime;
 
 	XMMATRIX xmmatContactToWorld = CalculateContactMatrix(xmf3CollisionNormal);
 
 	// 물체 A
-	XMVECTOR contactVelWorldA = XMVector3Cross(angleVelocityA, collisionPointA);
+	XMVECTOR contactVelWorldA = XMVector3Cross(angleVelocityA, collisionPointA - XMLoadFloat3(&pObjectA->GetPosition()));
 	contactVelWorldA += velocityA;
 	XMVECTOR contactVelA = XMVector3TransformNormal(contactVelWorldA, XMMatrixTranspose(xmmatContactToWorld));
+	XMVECTOR contactAccelA = XMVector3TransformNormal(accelA, XMMatrixTranspose(xmmatContactToWorld));
+	XMFLOAT3 xmf3ContactAccelA;
+	XMStoreFloat3(&xmf3ContactAccelA, contactAccelA);
+	xmf3ContactAccelA.x = 0;
+	contactAccelA = XMLoadFloat3(&xmf3ContactAccelA);
+	contactVelA += contactAccelA;
 
 	// 물체 B
-	XMVECTOR contactVelWorldB = XMVector3Cross(angleVelocityB, collisionPointB);
+	XMVECTOR contactVelWorldB = XMVector3Cross(angleVelocityB, collisionPointB - XMLoadFloat3(&pObjectB->GetPosition()));
 	contactVelWorldB += velocityB;
 	XMVECTOR contactVelB = XMVector3TransformNormal(contactVelWorldB, XMMatrixTranspose(xmmatContactToWorld));
+	XMVECTOR contactAccelB = XMVector3TransformNormal(accelB, XMMatrixTranspose(xmmatContactToWorld));
+	XMFLOAT3 xmf3ContactAccelB;
+	XMStoreFloat3(&xmf3ContactAccelB, contactAccelB);
+	xmf3ContactAccelB.x = 0;
+	contactAccelB = XMLoadFloat3(&xmf3ContactAccelB);
+	contactVelB += contactAccelB;
+
+	// 물체 A 가속도(다음 프레임에 더해질)
+	float velocityFromAcc = 0;
+	velocityFromAcc += XMVectorGetX(XMVector3Dot(accelA, collisionNormal));
+
+	// 물체 B  가속도(다음 프레임에 더해질)
+	velocityFromAcc -= XMVectorGetX(XMVector3Dot(accelB, collisionNormal));
+
+	// 물체 A 마찰력(다음 프레임에 더해질)
+	float frictionA = pObjectA->GetFriction();
+
+	// 물체 B 마찰력(다음 프레임에 더해질)
+	float frictionB = pObjectB->GetFriction();
+	float frictionAccum = frictionB - frictionA;
 
 	// 분리 속도
 	XMVECTOR contactVelocity = contactVelA - contactVelB;
 	XMFLOAT3 xmf3ContactVelocity = XMFLOAT3(0, 0, 0);
 	XMStoreFloat3(&xmf3ContactVelocity, contactVelocity);
-	float desiredDeltaVelocity = -xmf3ContactVelocity.x - restitution * (xmf3ContactVelocity.x);
+
+	float applyRestitution = restitution;
+	// 속도가 매우 작은 경우 반발 계수 0 (떨림 방지)
+	if (fabsf(xmf3ContactVelocity.x) < 0.25f)
+		applyRestitution = 0;
+
+	float desiredDeltaVelocity = -applyRestitution * (xmf3ContactVelocity.x - velocityFromAcc);
+
+	// 교차를 해결하기 위한 최소 분리 속도
+	float minSeparateVelocity = (depth)  / elapsedTime + 0.1;
+	if (minSeparateVelocity > fabsf(desiredDeltaVelocity))
+	{
+		desiredDeltaVelocity = -minSeparateVelocity;
+	}
+
+	desiredDeltaVelocity -= xmf3ContactVelocity.x;
 
 	return desiredDeltaVelocity;
 }
