@@ -1,4 +1,4 @@
-#include "SenierProjectApp.h"
+#include "DirectXRendering/SenierProjectApp.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE previnstance, PSTR cmdLine, int showCmd)
 {

@@ -1,0 +1,178 @@
+#include "../Header/CollisionResolver.h"
+
+CollisionResolver::CollisionResolver(unsigned int Iteration) : m_nIteration(Iteration)
+{
+}
+
+CollisionResolver::~CollisionResolver()
+{
+}
+
+void CollisionResolver::ResolveContacts(std::vector<std::shared_ptr<Contact>> pContacts, float elapsedTime)
+{
+	if (pContacts.size() == 0) return;
+	if (!IsValid()) return;
+
+	// Contact 데이터 사전 준비
+	PrepareContacts(pContacts, elapsedTime);
+
+	// 교차 해결을 위한 Position 조정
+	AdjustPositions(pContacts, elapsedTime);
+
+	// Collision으로 인한 Velocity 조정
+	AdjustVelocities(pContacts, elapsedTime);
+}
+
+void CollisionResolver::PrepareContacts(std::vector<std::shared_ptr<Contact>> pContacts, float elapsedTime)
+{
+	// Contact를 순회하며 데이터 준비
+
+	for (auto iter = pContacts.begin(); iter != pContacts.end(); ++iter)
+	{
+		Contact* thisContact = iter->get();
+
+		thisContact->CalcInternals(elapsedTime);
+	}
+}
+
+void CollisionResolver::AdjustVelocities(std::vector<std::shared_ptr<Contact>> pContacts, float elapsedTime)
+{
+	float max;
+	int index;
+
+	XMVECTOR velocityDelta[2];
+	XMVECTOR angularDelta[2];
+	XMVECTOR deltaVelocity = XMVectorZero();
+
+	m_nVelocityIterationCnt = 0;
+	while (m_nVelocityIterationCnt < m_nIteration)
+	{
+		max = VELOCITY_EPSILON;
+		index = pContacts.size();
+		// 가장 (기대 속도 변화량)이 큰 Contact를 찾는다.
+		for (int i = 0; i < pContacts.size(); ++i)
+		{
+			if (pContacts[i]->GetDesiredDeltaVelocity() > max)
+			{
+				max = pContacts[i]->GetDesiredDeltaVelocity();
+				index = i;
+			}
+		}
+		if (index == pContacts.size()) break;
+
+		// 연산을 위해 관련 body Awake 
+		pContacts[index]->MatchAwakeState();
+
+		// Contact, 속도 변화 연산 및 적용
+		pContacts[index]->ApplyVelocityChange(velocityDelta[0], velocityDelta[1], angularDelta[0], angularDelta[1]);
+
+		// index Contact 속도 연산 적용 후 연관 Contact의 데이터 수정
+		// 속도 변화로 인해 DesiredVelocity가 수정된다.
+		// 모든 Contact를 순회	(개선 가능)
+		for (int i = 0; i < pContacts.size(); ++i)
+		{
+			for (int b = 0; b < 2; ++b)
+			{
+				if (pContacts[i]->GetBody(b))
+				{
+					for (int d = 0; d < 2; ++d)
+					{
+						if (pContacts[i]->GetBody(b) == pContacts[index]->GetBody(d))
+						{
+							XMVECTOR relativePosition = XMLoadFloat3(&pContacts[i]->GetRelativeContactPosition(b));
+
+							// World 좌표계 기준 속도 변화량
+							deltaVelocity = velocityDelta[d] + XMVector3Cross(angularDelta[d], relativePosition);
+
+							XMMATRIX worldToContact = XMLoadFloat4x4(&pContacts[i]->GetContactToWorld());
+							worldToContact = XMMatrixTranspose(worldToContact);
+							deltaVelocity = XMVector3TransformNormal(deltaVelocity, worldToContact);
+							// b = 1 이면 Contact Normal의 반대 방향이므로
+							deltaVelocity *= b ? -1 : 1;
+
+							XMVECTOR bodyContactVelocity = XMLoadFloat3(&pContacts[i]->GetContactVelocity());
+							bodyContactVelocity += deltaVelocity;
+							XMFLOAT3 xmf3ResultContactVelocity;
+							XMStoreFloat3(&xmf3ResultContactVelocity, bodyContactVelocity);
+
+							pContacts[i]->SetContactVelocity(xmf3ResultContactVelocity);
+
+							// ContactVelocity 수정 후 기대 속도 변화도 재연산
+							pContacts[i]->CalcDesiredDeltaVelocity(elapsedTime);
+						}
+					}
+				}
+			}
+		}
+
+		++m_nVelocityIterationCnt;
+	}
+}
+
+void CollisionResolver::AdjustPositions(std::vector<std::shared_ptr<Contact>> pContacts, float elapsedTime)
+{
+	float max;
+	int index;
+	XMVECTOR linearDelta[2];
+	XMVECTOR angularDelta[2];
+	XMVECTOR deltaPosition;
+
+	m_nPositionIterationCnt = 0;
+	while (m_nPositionIterationCnt < m_nIteration)
+	{
+		max = POSITION_EPSILON;
+		index = pContacts.size();
+		for (int i = 0; i < pContacts.size(); ++i)
+		{
+			// 가장 교차된 깊이가 큰 index를 탐색한다.
+			if (pContacts[i]->GetDepth() > max)
+			{
+				max = pContacts[i]->GetDepth();
+				index = i;
+			}
+		}
+		if (index == pContacts.size()) break;
+
+		// 연산을 위해 관련 body Awake 
+		pContacts[index]->MatchAwakeState();
+
+		// 교차 해결을 위한 위치 이동
+		pContacts[index]->ApplyPositionChange(linearDelta[0], linearDelta[1], angularDelta[0], angularDelta[1], max);
+
+		// 위치 이동이 일어난 이후 연관된 Contact 데이터도 수정되어야 한다.
+		// 모든 Contact를 순회	(개선 가능)
+		for (int i = 0; i < pContacts.size(); ++i)
+		{
+			for (int b = 0; b < 2; ++b)
+			{
+				if (pContacts[i]->GetBody(b))
+				{
+					for (int d = 0; d < 2; ++d)
+					{
+						if (pContacts[i]->GetBody(b) == pContacts[index]->GetBody(d))
+						{
+							XMVECTOR relativePosition = XMLoadFloat3(&pContacts[i]->GetRelativeContactPosition(b));
+
+							// 이동 변화량
+							deltaPosition = linearDelta[d] + XMVector3Cross(angularDelta[d], relativePosition);
+
+							// 해당 Contact의 Contact Normal 방향으로 사영시킨 크기를 적용하여
+							// Depth를 새롭게 구한다.
+							XMVECTOR contactNormal = XMLoadFloat3(&pContacts[i]->GetContactNormal());
+							deltaPosition = XMVector3Dot(deltaPosition, contactNormal);
+							float newDepth = pContacts[i]->GetDepth();
+							newDepth = newDepth + XMVectorGetX(deltaPosition);
+							pContacts[i]->SetDepth(newDepth);
+
+						}
+					}
+				}
+			}
+		}
+
+		++m_nPositionIterationCnt;
+	}
+
+
+
+}

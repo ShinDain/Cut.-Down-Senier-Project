@@ -1,158 +1,199 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="DirectXRendering">
+      <UniqueIdentifier>{88c2d909-04ee-4f8e-b4ad-2e6a8d5f95ea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{0988f462-7ca9-4629-b9ba-c3e6f04d4d14}</UniqueIdentifier>
     </Filter>
-    <Filter Include="리소스 파일">
+    <Filter Include="Shaders">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="DirectXRendering\Src">
+      <UniqueIdentifier>{40a4e82a-b2ce-44d2-b86d-747accba2e24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectXRendering\Header">
+      <UniqueIdentifier>{fdde8e3c-9394-42e2-8215-e354a6d75739}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{8ce4fe8e-e351-45d0-a6bb-fd369276b3ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Src">
+      <UniqueIdentifier>{e284ce2e-1a21-457b-bb54-de0eaa6954fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Header">
+      <UniqueIdentifier>{bf496e5d-98ea-4059-a85b-f0cd68aac561}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics\Src">
+      <UniqueIdentifier>{7c0c3895-1cad-408a-aecc-bfca65b7b557}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics\Header">
+      <UniqueIdentifier>{737091aa-a083-4b92-a7d5-cf4187b79139}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Common\DirectXApp.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="Physics\Src\Contact.cpp">
+      <Filter>Physics\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\DDSTextureLoader.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="Physics\Src\RigidBody.cpp">
+      <Filter>Physics\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\GameTimer.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="Physics\Src\Collider.cpp">
+      <Filter>Physics\Src</Filter>
     </ClCompile>
-    <ClCompile Include="SenierProjectApp.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="Common\Src\D3DUtil.cpp">
+      <Filter>Common\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\D3DUtil.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="Common\Src\DDSTextureLoader.cpp">
+      <Filter>Common\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Camera.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="Common\Src\GameTimer.cpp">
+      <Filter>Common\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Shader.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="Common\Src\GeometryGenerator.cpp">
+      <Filter>Common\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Mesh.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="DirectXRendering\Src\AnimationController.cpp">
+      <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Object.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="DirectXRendering\Src\Camera.cpp">
+      <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Global.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="DirectXRendering\Src\DirectXApp.cpp">
+      <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Scene.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="DirectXRendering\Src\DWriteText.cpp">
+      <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Material.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="DirectXRendering\Src\Global.cpp">
+      <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\AnimationController.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="DirectXRendering\Src\ImgObject.cpp">
+      <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\ImgObject.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="DirectXRendering\Src\Material.cpp">
+      <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\DWriteText.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="DirectXRendering\Src\Mesh.cpp">
+      <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="DirectXRendering\Src\Object.cpp">
+      <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\GeometryGenerator.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="DirectXRendering\Src\PlayerController.cpp">
+      <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\RigidCollider.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="DirectXRendering\Src\Scene.cpp">
+      <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\PlayerController.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="DirectXRendering\Src\Shader.cpp">
+      <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Physics.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="DirectXRendering\SenierProjectApp.cpp">
+      <Filter>DirectXRendering\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Physics\Src\CollisionDetact.cpp">
+      <Filter>Physics\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Src\CollisionResolver.cpp">
+      <Filter>Physics\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Src\Physics.cpp">
+      <Filter>Physics\Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Common\DirectXApp.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Physics\Header\Contact.h">
+      <Filter>Physics\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\D3DUtil.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Physics\Header\RigidBody.h">
+      <Filter>Physics\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\d3dx12.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Physics\Header\Collider.h">
+      <Filter>Physics\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\DDSTextureLoader.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Common\Header\D3DUtil.h">
+      <Filter>Common\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\GameTimer.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Common\Header\d3dx12.h">
+      <Filter>Common\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\MathHelper.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Common\Header\DDSTextureLoader.h">
+      <Filter>Common\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\UploadBuffer.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Common\Header\GameTimer.h">
+      <Filter>Common\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Camera.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Common\Header\GeometryGenerator.h">
+      <Filter>Common\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Object.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Common\Header\MathHelper.h">
+      <Filter>Common\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Mesh.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Common\Header\UploadBuffer.h">
+      <Filter>Common\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Shader.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="DirectXRendering\Header\AnimationController.h">
+      <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Global.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="DirectXRendering\Header\Camera.h">
+      <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Scene.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="DirectXRendering\Header\DirectXApp.h">
+      <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Material.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="DirectXRendering\Header\DWriteText.h">
+      <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\AnimationController.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="DirectXRendering\Header\Global.h">
+      <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\ImgObject.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="DirectXRendering\Header\ImgObject.h">
+      <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\DWriteText.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="DirectXRendering\Header\Material.h">
+      <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="SenierProjectApp.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="DirectXRendering\Header\Mesh.h">
+      <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\GeometryGenerator.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="DirectXRendering\Header\Object.h">
+      <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\RigidCollider.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="DirectXRendering\Header\PlayerController.h">
+      <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\PlayerController.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="DirectXRendering\Header\Scene.h">
+      <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Physics.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="DirectXRendering\Header\Shader.h">
+      <Filter>DirectXRendering\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXRendering\SenierProjectApp.h">
+      <Filter>DirectXRendering\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Header\CollisionDetact.h">
+      <Filter>Physics\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Header\CollisionResolver.h">
+      <Filter>Physics\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Header\Physics.h">
+      <Filter>Physics\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\default.hlsl">
-      <Filter>리소스 파일</Filter>
+      <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shader\ImageObjShader.hlsl">
-      <Filter>리소스 파일</Filter>
+      <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shader\ColliderShader.hlsl">
-      <Filter>리소스 파일</Filter>
+      <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
