@@ -75,7 +75,7 @@ public:
 
 	void SetContactPoint(XMFLOAT3 xmf3ContactPoint) { m_xmf3ContactPoint = xmf3ContactPoint; };
 	void SetContactNormal(XMFLOAT3 xmf3ContactNormal) { m_xmf3ContactNormal = xmf3ContactNormal; };
-	void SetContactVelocity(XMFLOAT3 xmf3ContactVelocity) { m_xmf3ContactVelocity = m_xmf3ContactVelocity;} 
+	void SetContactVelocity(XMFLOAT3 xmf3ContactVelocity) { m_xmf3ContactVelocity = xmf3ContactVelocity;}
 
 	void SetDepth(float depth) { m_Depth = depth; }
 

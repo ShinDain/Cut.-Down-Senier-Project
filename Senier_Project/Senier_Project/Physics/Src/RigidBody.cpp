@@ -4,10 +4,11 @@ RigidBody::RigidBody()
 {
 }
 
-RigidBody::RigidBody(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotate, float mass)
+RigidBody::RigidBody(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotate, XMFLOAT3 xmf3Scale, float mass)
 {
 	m_xmf3Position = xmf3Position;
 	m_xmf3Rotate = xmf3Rotate;
+	m_xmf3Scale = xmf3Scale;
 	m_Mass = mass;
 }
 
@@ -32,6 +33,9 @@ void RigidBody::Update(float elapsedTime)
 	// damping Àû¿ë
 	velocity *= pow(m_LinearDamping, elapsedTime);
 	angularVelocity *= pow(m_AngularDamping, elapsedTime);
+
+	XMStoreFloat3(&m_xmf3Velocity, velocity);
+	XMStoreFloat3(&m_xmf3AngularVelocity, angularVelocity);
 
 	XMVECTOR position = XMLoadFloat3(&m_xmf3Position);
 	XMVECTOR rotation = XMLoadFloat3(&m_xmf3Rotate);
@@ -61,8 +65,11 @@ void RigidBody::UpdateWorldTransform()
 {
 	XMMATRIX World = XMMatrixIdentity();
 	XMMATRIX Translation = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
-	XMMATRIX Rotate = XMMatrixRotationRollPitchYaw(m_xmf3Rotate.x, m_xmf3Rotate.y, m_xmf3Rotate.z);
-	World = XMMatrixMultiply(XMMatrixMultiply(Rotate, Translation), World);
+	XMMATRIX Rotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotate.x),
+												   XMConvertToRadians(m_xmf3Rotate.y),
+												   XMConvertToRadians(m_xmf3Rotate.z));
+	XMMATRIX Scale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
+	World = XMMatrixMultiply(Scale, XMMatrixMultiply(Rotate, Translation));
 
 	XMStoreFloat4x4(&m_xmf4x4World, World);
 }

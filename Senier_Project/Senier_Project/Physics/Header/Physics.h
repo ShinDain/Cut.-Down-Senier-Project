@@ -10,7 +10,7 @@ using namespace DirectX;
 namespace Physics
 {
 	static float sleepEpsilon = 0.3f;
-	static const XMFLOAT3 xmf3Gravity = XMFLOAT3(0, -98.1f, 0);
+	static const XMFLOAT3 xmf3Gravity = XMFLOAT3(0, -9.81f, 0);
 }
 
 #endif // !

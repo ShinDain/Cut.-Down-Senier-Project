@@ -21,16 +21,17 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	//for(int i = 0 ; i < 5; ++i)
 	CreateObject(pd3dDevice, pd3dCommandList, TEST_MODEL_NAME, 0, RenderLayer::Static);
-	//CreateObject(pd3dDevice, pd3dCommandList, TEST_MODEL_NAME, 0, RenderLayer::Static);
+	CreateObject(pd3dDevice, pd3dCommandList, TEST_MODEL_NAME, -1, RenderLayer::Static);
 	
 	// object Collider È¹µæ
-	for (int i = 0; i < m_vpAllObjs.size(); ++i)
+	/*for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
 		m_ppColliders.push_back(m_vpAllObjs[i]->GetCollider());
-	}
+	}*/
+	m_ppColliders.push_back(m_vpAllObjs[0]->GetCollider());
 
-	//m_vpAllObjs[1]->SetPosition(5, -20, 0);
-	//m_vpAllObjs[1]->SetScale(10, 1, 10);
+	m_vpAllObjs[1]->SetPosition(0, 0, 0);
+	m_vpAllObjs[1]->SetScale(100, 0.1f, 100);
 
 	//m_vpAllObjs[0]->SetRotate(-10, 0, 20);
 	m_vpAllObjs[0]->SetPosition(0, 100, 0);
@@ -206,7 +207,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, pModelData, nAnimationTracks);
 
 #if defined(_DEBUG)
-	pObject->SetScale(10, 10, 10);
+	//pObject->SetScale(10, 10, 10);
 #endif
 
 	m_vpAllObjs.emplace_back(pObject);

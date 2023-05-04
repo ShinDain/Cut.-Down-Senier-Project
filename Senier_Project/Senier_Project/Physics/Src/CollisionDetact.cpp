@@ -189,7 +189,7 @@ bool IntersectTests::BoxAndHalfSpace(const ColliderBox& box, const ColliderPlane
 	// 평면과 박스 사이의 거리 획득
 	XMVECTOR boxPosition = box.GetAxis(3);
 	float boxDistance = XMVectorGetX(XMVector3Dot(direction, boxPosition)) - projectLength;
-	
+
 	return boxDistance <= plane.GetDistance();
 }
 
@@ -266,6 +266,9 @@ int CollisionDetector::BoxAndHalfSpace(const ColliderBox& box, const ColliderPla
 	{
 		XMFLOAT3 xmf3VertexPos = XMFLOAT3(vertices[i][0], vertices[i][1], vertices[i][2]);
 		XMVECTOR vertexPos = XMLoadFloat3(&xmf3VertexPos);
+		XMVECTOR boxExtent = XMLoadFloat3(&box.GetExtents());
+		vertexPos = XMVectorMultiply(vertexPos, boxExtent);
+
 		XMMATRIX world = XMLoadFloat4x4(&box.GetWorld());
 		vertexPos = XMVector3TransformCoord(vertexPos, world);
 

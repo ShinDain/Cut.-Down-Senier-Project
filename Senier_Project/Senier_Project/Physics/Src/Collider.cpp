@@ -70,6 +70,8 @@ void Collider::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 	pd3dCommandList->IASetVertexBuffers(0, 2, pVertexBufferView);
 	pd3dCommandList->IASetPrimitiveTopology(m_PrimitiveTopology);
 
+	XMFLOAT4X4 tmp = m_pRigidBody->GetWorld();
+
 	XMFLOAT4X4 xmf4x4World;
 	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
 	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
@@ -129,9 +131,9 @@ void ColliderPlane::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	Positions.resize(24);
 	Normal.resize(24);
 
-	float w = m_distance;
+	float w = 100.0f;
 	float h = 0.1f;
-	float d = m_distance;
+	float d = 100.0f;
 
 	Positions =
 	{

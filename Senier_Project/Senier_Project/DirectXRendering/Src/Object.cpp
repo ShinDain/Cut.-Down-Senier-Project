@@ -13,12 +13,16 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	if(nAnimationTracks > 0)
 		m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
 
-	m_xmf3Position = XMFLOAT3(0, 10, 0);
-	//
-	m_pBody = std::make_shared<RigidBody>(m_xmf3Position, m_xmf3Rotate, 1);
+	m_xmf3Position = XMFLOAT3(0, 50, 0);
+	m_xmf3Scale = XMFLOAT3(10, 10, 10);
+
+	if (nAnimationTracks == -1)
+		return;
+
+	m_pBody = std::make_shared<RigidBody>(m_xmf3Position, m_xmf3Rotate, m_xmf3Scale, 1);
 
 #if defined(_DEBUG)
-	m_pCollider = std::make_shared<ColliderBox>(this->m_pBody.get(), XMFLOAT3(0,0,0), XMFLOAT3(0,0,0), XMFLOAT3(5,5,5));
+	m_pCollider = std::make_shared<ColliderBox>(this->m_pBody.get(), XMFLOAT3(0,0,0), XMFLOAT3(0,0,0), XMFLOAT3(0.5,0.5,0.5));
 
 	m_pCollider->BuildMesh(pd3dDevice, pd3dCommandList);
 	
@@ -56,6 +60,7 @@ void Object::Update(float elapsedTime)
 		m_pCollider->UpdateWorldTransform();
 		m_xmf3Position = m_pBody->GetPosition();
 		m_xmf3Rotate = m_pBody->GetRotate();
+		m_xmf4x4World = m_pBody->GetWorld();
 	}
 
 	ObjConstant objConstant;

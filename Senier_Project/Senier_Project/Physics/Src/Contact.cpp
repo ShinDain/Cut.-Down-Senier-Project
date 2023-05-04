@@ -49,7 +49,9 @@ void Contact::ApplyVelocityChange(XMVECTOR& deltaLinearVel_0, XMVECTOR& deltaLin
 {
 	// World 좌표계에 적용될 InverseInertia 행렬
 	XMMATRIX inverseInertia_0 = XMLoadFloat4x4(&m_pBody[0]->GetInverseRotateInertiaForWorld());
-	XMMATRIX inverseInertia_1 = XMLoadFloat4x4(&m_pBody[1]->GetInverseRotateInertiaForWorld());
+	XMMATRIX inverseInertia_1 = XMMatrixIdentity();
+	if (m_pBody[1])
+		inverseInertia_1 = XMLoadFloat4x4(&m_pBody[1]->GetInverseRotateInertiaForWorld());
 
 	// Contact 좌표계의 Impulse
 	XMVECTOR impulseContact;
@@ -70,7 +72,7 @@ void Contact::ApplyVelocityChange(XMVECTOR& deltaLinearVel_0, XMVECTOR& deltaLin
 	// 충격량을 이용해 선성분과 각성분 변화량 계산
 	XMVECTOR angularResult = XMLoadFloat3(&m_pxmf3RelativePosition[0]);
 	angularResult = XMVector3Cross(angularResult, impulse);
-	angularResult = XMVector3TransformNormal(angularResult, inverseInertia_0);
+	angularResult = XMVector3TransformCoord(angularResult, inverseInertia_0);
 	deltaAngularVel_0 = angularResult;
 	XMVECTOR mass = XMVectorReplicate(m_pBody[0]->GetMass());
 	XMVECTOR linearResult = impulse / mass;
@@ -344,10 +346,17 @@ void Contact::CalcContactToWorld()
 	contactTangentY = XMVector3Cross(contactTangentZ, contactNormal);
 	contactTangentY = XMVector3Normalize(contactTangentY);
 
-	XMMATRIX contactToWorld = XMMatrixIdentity();
-	contactToWorld.r[0] = contactNormal;
-	contactToWorld.r[1] = contactTangentY;
-	contactToWorld.r[2] = contactTangentZ;
+	XMFLOAT3 xmf3ContactNormal;
+	XMFLOAT3 xmf3ContactTangentY;
+	XMFLOAT3 xmf3ContactTangentZ;
+	XMStoreFloat3(&xmf3ContactNormal, contactNormal);
+	XMStoreFloat3(&xmf3ContactTangentY, contactTangentY);
+	XMStoreFloat3(&xmf3ContactTangentZ, contactTangentZ);
+
+	m_xmf4x4ContactToWorld = XMFLOAT4X4(xmf3ContactNormal.x, xmf3ContactNormal.y, xmf3ContactNormal.z, 0,
+										xmf3ContactTangentY.x, xmf3ContactTangentY.y, xmf3ContactTangentY.z, 0,
+										xmf3ContactTangentZ.x, xmf3ContactTangentZ.y, xmf3ContactTangentZ.z, 0,
+										0, 0, 0, 1);
 }
 
 XMVECTOR Contact::CalcFrictionlessImpulse(FXMMATRIX InverseInertia_0, CXMMATRIX InverseInertia_1)
@@ -437,7 +446,11 @@ XMVECTOR Contact::CalcFrictionImpulse(FXMMATRIX InverseInertia_0, CXMMATRIX Inve
 	deltaVelPerImpulse = XMLoadFloat4x4(&xmf4x4DeltaVelPerImpulse);
 
 	// 단위 속도 변화량당 충격량
-	XMMATRIX impulsePerDeltaVel = XMMatrixInverse(nullptr, deltaVelPerImpulse);
+	XMVECTOR determinant;
+	XMMATRIX impulsePerDeltaVel = XMMatrixInverse(&determinant, deltaVelPerImpulse);
+	if (XMVectorGetX(determinant) == 0)
+		impulsePerDeltaVel = XMMatrixIdentity();
+
 
 	// 처리를 위한 속도
 	XMFLOAT3 xmf3VelKill = XMFLOAT3(m_DesiredDeltaVelocity, -m_xmf3ContactVelocity.y, -m_xmf3ContactVelocity.z);

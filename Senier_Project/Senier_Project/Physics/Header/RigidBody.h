@@ -9,7 +9,7 @@ class RigidBody
 {
 public:
 	RigidBody();
-	RigidBody(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotate, float mass);
+	RigidBody(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotate, XMFLOAT3 xmf3Scale, float mass);
 	RigidBody(const RigidBody& rhs) = delete;
 	RigidBody& operator=(const RigidBody& rhs) = delete;
 	virtual ~RigidBody();
@@ -17,6 +17,7 @@ public:
 protected:
 	XMFLOAT3 m_xmf3Position = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 m_xmf3Rotate = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 m_xmf3Scale = XMFLOAT3(0, 0, 0);
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 
 	float m_Mass = 1.0f;

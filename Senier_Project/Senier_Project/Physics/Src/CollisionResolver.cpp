@@ -86,12 +86,12 @@ void CollisionResolver::AdjustVelocities(std::vector<std::shared_ptr<Contact>> p
 
 							XMMATRIX worldToContact = XMLoadFloat4x4(&pContacts[i]->GetContactToWorld());
 							worldToContact = XMMatrixTranspose(worldToContact);
-							deltaVelocity = XMVector3TransformNormal(deltaVelocity, worldToContact);
-							// b = 1 이면 Contact Normal의 반대 방향이므로
-							deltaVelocity *= b ? -1 : 1;
+							deltaVelocity = XMVector3TransformNormal(deltaVelocity, worldToContact) * (b ? -1 : 1);
 
 							XMVECTOR bodyContactVelocity = XMLoadFloat3(&pContacts[i]->GetContactVelocity());
 							bodyContactVelocity += deltaVelocity;
+
+
 							XMFLOAT3 xmf3ResultContactVelocity;
 							XMStoreFloat3(&xmf3ResultContactVelocity, bodyContactVelocity);
 
@@ -161,7 +161,7 @@ void CollisionResolver::AdjustPositions(std::vector<std::shared_ptr<Contact>> pC
 							XMVECTOR contactNormal = XMLoadFloat3(&pContacts[i]->GetContactNormal());
 							deltaPosition = XMVector3Dot(deltaPosition, contactNormal);
 							float newDepth = pContacts[i]->GetDepth();
-							newDepth = newDepth + XMVectorGetX(deltaPosition);
+							newDepth = newDepth + XMVectorGetX(deltaPosition) * (b ? 1:-1);
 							pContacts[i]->SetDepth(newDepth);
 
 						}
