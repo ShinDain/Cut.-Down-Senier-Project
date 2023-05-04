@@ -4,11 +4,11 @@ RigidBody::RigidBody()
 {
 }
 
-RigidBody::RigidBody(XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotate, XMFLOAT3 xmf3Scale, float mass)
+RigidBody::RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, float mass)
 {
 	m_xmf3Position = xmf3Position;
-	m_xmf3Rotate = xmf3Rotate;
-	m_xmf3Scale = xmf3Scale;
+	m_xmf4Orientation = xmf4Orientation;
+	//m_xmf3Scale = xmf3Scale;
 	m_Mass = mass;
 }
 
@@ -38,14 +38,16 @@ void RigidBody::Update(float elapsedTime)
 	XMStoreFloat3(&m_xmf3AngularVelocity, angularVelocity);
 
 	XMVECTOR position = XMLoadFloat3(&m_xmf3Position);
-	XMVECTOR rotation = XMLoadFloat3(&m_xmf3Rotate);
 	position += velocity * elapsedTime;
-	rotation += angularVelocity * elapsedTime;
 	XMStoreFloat3(&m_xmf3Position, position);
-	XMStoreFloat3(&m_xmf3Rotate, rotation);
 
-	UpdateWorldTransform();
-	UpdateInverseRotateInertiaForWorld();
+	XMVECTOR prevOrientation = XMLoadFloat4(&m_xmf4Orientation);
+	XMVECTOR dq = angularVelocity * elapsedTime;
+	dq = XMQuaternionMultiply(prevOrientation, dq) * 0.5f;
+	XMStoreFloat4(&m_xmf4Orientation, prevOrientation + dq);
+
+	// 파생 데이터 갱신
+	CalcDerivedData();
 
 	// Sleep 체크를 위해 motion 수치를 조정한다.
 	if (m_bCanSleep)
@@ -61,15 +63,21 @@ void RigidBody::Update(float elapsedTime)
 	}
 }
 
+void RigidBody::CalcDerivedData()
+{
+	// 쿼터니언 정규화
+	XMStoreFloat4(&m_xmf4Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmf4Orientation)));
+	UpdateWorldTransform();
+	UpdateInverseRotateInertiaForWorld();
+}
+
 void RigidBody::UpdateWorldTransform()
 {
 	XMMATRIX World = XMMatrixIdentity();
 	XMMATRIX Translation = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
-	XMMATRIX Rotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotate.x),
-												   XMConvertToRadians(m_xmf3Rotate.y),
-												   XMConvertToRadians(m_xmf3Rotate.z));
-	XMMATRIX Scale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
-	World = XMMatrixMultiply(Scale, XMMatrixMultiply(Rotate, Translation));
+	XMMATRIX Rotate = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
+	//XMMATRIX Scale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
+	World = XMMatrixMultiply(Rotate, Translation);
 
 	XMStoreFloat4x4(&m_xmf4x4World, World);
 }
@@ -79,15 +87,25 @@ void RigidBody::UpdateInverseRotateInertiaForWorld()
 	// World(-1) * Inertia(-1) * World 순서로 행렬 갱신
 	// World 좌표계의 데이터에 곱해질 Inertia 행렬
 
-	XMMATRIX inverseRotateInertia = XMLoadFloat4x4(&m_xmf4x4RotateInertia);
-	inverseRotateInertia = XMMatrixInverse(nullptr, inverseRotateInertia);
+	XMMATRIX inverseRotateInertia = XMLoadFloat4x4(&m_xmf4x4InverseRotateInertia);
 
 	XMMATRIX world = XMLoadFloat4x4(&m_xmf4x4World);
-	XMMATRIX inverseWorld = XMMatrixInverse(nullptr, world);
-	XMMATRIX rotateInertiaForWorld = XMMatrixIdentity();
-
-	rotateInertiaForWorld = XMMatrixMultiply(inverseWorld, inverseRotateInertia);
+	XMMATRIX transposeWorld = XMMatrixTranspose(world);
+	XMMATRIX rotateInertiaForWorld = XMMatrixMultiply(transposeWorld, inverseRotateInertia);
 	rotateInertiaForWorld = XMMatrixMultiply(rotateInertiaForWorld, world);
 
 	XMStoreFloat4x4(&m_xmf4x4InverseRotateInertiaForWorld, rotateInertiaForWorld);
+}
+
+void RigidBody::SetRotateInertia(XMFLOAT4X4 xmf4x4RotateInertia)
+{
+	m_xmf4x4RotateInertia = xmf4x4RotateInertia;
+
+	XMMATRIX inverseinertia = XMMatrixInverse(nullptr, XMLoadFloat4x4(&xmf4x4RotateInertia));
+
+	if (XMMatrixIsNaN(inverseinertia))
+		m_xmf4x4InverseRotateInertia = XMFLOAT4X4();
+	else
+		XMStoreFloat4x4(&m_xmf4x4InverseRotateInertia, inverseinertia);
+	
 }

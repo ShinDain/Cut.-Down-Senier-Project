@@ -11,7 +11,7 @@ CollisionResolver::~CollisionResolver()
 void CollisionResolver::ResolveContacts(std::vector<std::shared_ptr<Contact>> pContacts, float elapsedTime)
 {
 	if (pContacts.size() == 0) return;
-	if (!IsValid()) return;
+	//if (!IsValid()) return;
 
 	// Contact 데이터 사전 준비
 	PrepareContacts(pContacts, elapsedTime);
@@ -20,7 +20,7 @@ void CollisionResolver::ResolveContacts(std::vector<std::shared_ptr<Contact>> pC
 	AdjustPositions(pContacts, elapsedTime);
 
 	// Collision으로 인한 Velocity 조정
-	AdjustVelocities(pContacts, elapsedTime);
+	//AdjustVelocities(pContacts, elapsedTime);
 }
 
 void CollisionResolver::PrepareContacts(std::vector<std::shared_ptr<Contact>> pContacts, float elapsedTime)
@@ -151,19 +151,18 @@ void CollisionResolver::AdjustPositions(std::vector<std::shared_ptr<Contact>> pC
 					{
 						if (pContacts[i]->GetBody(b) == pContacts[index]->GetBody(d))
 						{
+							
 							XMVECTOR relativePosition = XMLoadFloat3(&pContacts[i]->GetRelativeContactPosition(b));
 
 							// 이동 변화량
-							deltaPosition = linearDelta[d] + XMVector3Cross(angularDelta[d], relativePosition);
+							deltaPosition = XMVector3Cross(angularDelta[d], relativePosition) + linearDelta[d];
 
 							// 해당 Contact의 Contact Normal 방향으로 사영시킨 크기를 적용하여
 							// Depth를 새롭게 구한다.
 							XMVECTOR contactNormal = XMLoadFloat3(&pContacts[i]->GetContactNormal());
-							deltaPosition = XMVector3Dot(deltaPosition, contactNormal);
 							float newDepth = pContacts[i]->GetDepth();
-							newDepth = newDepth + XMVectorGetX(deltaPosition) * (b ? 1:-1);
+							newDepth += XMVectorGetX(XMVector3Dot(contactNormal, deltaPosition)) * (b ? 1:-1);
 							pContacts[i]->SetDepth(newDepth);
-
 						}
 					}
 				}

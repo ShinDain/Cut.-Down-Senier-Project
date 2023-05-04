@@ -26,15 +26,18 @@ void Contact::CalcInternals(float elapsedTime)
 	XMVECTOR bodyPos_0 = XMLoadFloat3(&m_pBody[0]->GetPosition());
 	XMStoreFloat3(&m_pxmf3RelativePosition[0], contactPoint - bodyPos_0);
 
+	if (m_pBody[1])
+	{
+		XMVECTOR bodyPos_1 = XMLoadFloat3(&m_pBody[1]->GetPosition());
+		XMStoreFloat3(&m_pxmf3RelativePosition[1], contactPoint - bodyPos_1);
+	}
+
 	// 물체의 접근 속도 계산
 	XMVECTOR contactVelocity = CalcLocalVelocity(0, elapsedTime);
 
 	// 물체 1이 존재 시, 유사 과정 진행
 	if (m_pBody[1])
 	{
-		XMVECTOR bodyPos_1 = XMLoadFloat3(&m_pBody[1]->GetPosition());
-		XMStoreFloat3(&m_pxmf3RelativePosition[1], contactPoint - bodyPos_1);
-	
 		// 기존 접근 속도의 반대 방향이므로 빼준다.
 		// ContactVelocity = (분리 속도)
 		contactVelocity -= CalcLocalVelocity(1, elapsedTime);
@@ -67,14 +70,15 @@ void Contact::ApplyVelocityChange(XMVECTOR& deltaLinearVel_0, XMVECTOR& deltaLin
 
 	// World 좌표계로 변환
 	XMMATRIX contactToWorld = XMLoadFloat4x4(&m_xmf4x4ContactToWorld);
-	XMVECTOR impulse = XMVector3TransformNormal(impulseContact, contactToWorld);
+	XMVECTOR impulse = XMVector3TransformCoord(impulseContact, contactToWorld);
 
 	// 충격량을 이용해 선성분과 각성분 변화량 계산
 	XMVECTOR angularResult = XMLoadFloat3(&m_pxmf3RelativePosition[0]);
 	angularResult = XMVector3Cross(angularResult, impulse);
 	angularResult = XMVector3TransformCoord(angularResult, inverseInertia_0);
 	deltaAngularVel_0 = angularResult;
-	XMVECTOR mass = XMVectorReplicate(m_pBody[0]->GetMass());
+	//XMVECTOR mass = XMVectorReplicate(m_pBody[0]->GetMass());
+	float mass = m_pBody[0]->GetMass();
 	XMVECTOR linearResult = impulse / mass;
 	deltaLinearVel_0 = linearResult;
 	XMFLOAT3 xmf3LinearResult;
@@ -94,7 +98,7 @@ void Contact::ApplyVelocityChange(XMVECTOR& deltaLinearVel_0, XMVECTOR& deltaLin
 		angularResult = XMVector3TransformNormal(angularResult, inverseInertia_1);
 		deltaAngularVel_1 = angularResult;
 
-		mass = XMVectorReplicate(m_pBody[1]->GetMass());
+		mass = m_pBody[1]->GetMass();
 
 		// 충격량 방향을 반대로
 		linearResult = -impulse / mass;
@@ -107,8 +111,8 @@ void Contact::ApplyVelocityChange(XMVECTOR& deltaLinearVel_0, XMVECTOR& deltaLin
 	}
 }
 
-void Contact::ApplyPositionChange(XMVECTOR& deltaLinearVel_0, XMVECTOR& deltaLinearVel_1, 
-								  XMVECTOR& deltaAngularVel_0, XMVECTOR& deltaAngularVel_1, float depth)
+void Contact::ApplyPositionChange(XMVECTOR& deltaLinearPos_0, XMVECTOR& deltaLinearPos_1,
+								  XMVECTOR& deltaAngularPos_0, XMVECTOR& deltaAngularPos_1, float depth)
 {
 	const float angularLimit = 0.2f;
 
@@ -133,8 +137,7 @@ void Contact::ApplyPositionChange(XMVECTOR& deltaLinearVel_0, XMVECTOR& deltaLin
 			XMVECTOR relativePosition = XMLoadFloat3(&m_pxmf3RelativePosition[i]);
 
 			// 각성분
-			XMVECTOR angularInertiaWorld = relativePosition;
-			angularInertiaWorld = XMVector3Cross(angularInertiaWorld, contactNormal);
+			XMVECTOR angularInertiaWorld = XMVector3Cross(relativePosition, contactNormal);
 			angularInertiaWorld = XMVector3TransformNormal(angularInertiaWorld, inverseInertiaForWorld);
 			angularInertiaWorld = XMVector3Cross(angularInertiaWorld, relativePosition);
 			angularInertia[i] = XMVectorGetX(XMVector3Dot(angularInertiaWorld, contactNormal));
@@ -143,7 +146,7 @@ void Contact::ApplyPositionChange(XMVECTOR& deltaLinearVel_0, XMVECTOR& deltaLin
 			linearInertia[i] = ((float)1) / m_pBody[i]->GetMass();
 
 			// 모든 각/선성분 관성의 합
-			totalInertia += angularInertia[i] + linearInertia[i];
+			totalInertia += linearInertia[i] + angularInertia[i];
 		}
 	}
 
@@ -153,60 +156,52 @@ void Contact::ApplyPositionChange(XMVECTOR& deltaLinearVel_0, XMVECTOR& deltaLin
 		{
 			// 관성에 따라 취할 Position 변화의 비율
 			float sign = (i == 0) ? 1 : -1;
-			angularMove[i] = sign * m_Depth * (angularInertia[i] / totalInertia);
-			linearMove[i] = sign * m_Depth * (linearInertia[i] / totalInertia);
+			angularMove[i] = sign * depth * (angularInertia[i] / totalInertia);
+			linearMove[i] = sign * depth * (linearInertia[i] / totalInertia);
 
 			// 물체의 무게중심을 넘어 교차된 경우, 과하게 회전하는 경우를 방지하기 위해서
 			// Contact Normal을 법선으로 하는 평면에 사영시킨 
 			// 크기를 참조하여 회전을 조절한다. => Relative Point에 따라 값이 조절
 			XMVECTOR relativePosition = XMLoadFloat3(&m_pxmf3RelativePosition[i]);
 
-			XMVECTOR projection = relativePosition;
-			XMVECTOR amountContact = XMVector3Dot(projection, contactNormal);
-			amountContact *= contactNormal;
-			projection -= amountContact;
+			XMVECTOR projection = contactNormal * -XMVectorGetX(XMVector3Dot(relativePosition, contactNormal)) + relativePosition;
 
 			float maxMagnitude = angularLimit * XMVectorGetX(XMVector3Length(projection));
 
+			float totalMove = angularMove[i] + linearMove[i];
 			if (angularMove[i] < -maxMagnitude)
 			{
-				float totalMove = angularMove[i] + linearMove[i];
 				angularMove[i] = -maxMagnitude;
 				linearMove[i] = totalMove - angularMove[i];
 			}
 			else if (angularMove[i] > maxMagnitude)
 			{
-				float totalMove = angularMove[i] + linearMove[i];
 				angularMove[i] = maxMagnitude;
 				linearMove[i] = totalMove - angularMove[i];
 			}
-
+			
 			if (angularMove[i] == 0)
 			{
 				if (i == 0)
-					deltaAngularVel_0 = XMVectorZero();
+					deltaAngularPos_0 = XMVectorZero();
 				else if(i == 1)
-					deltaAngularVel_1 = XMVectorZero();
+					deltaAngularPos_1 = XMVectorZero();
 			}
 			else
 			{
-				XMVECTOR rotatePerMove = relativePosition;
-				rotatePerMove = XMVector3Cross(rotatePerMove, contactNormal);
+				XMVECTOR targetAngularDirection = XMVector3Cross(relativePosition, contactNormal);
 				XMMATRIX inverseInertia = XMLoadFloat4x4(&m_pBody[i]->GetInverseRotateInertiaForWorld());
 
-				rotatePerMove = XMVector3TransformNormal(rotatePerMove, inverseInertia);
-				rotatePerMove /= angularInertia[i];
-				
 				if (i == 0)
-					deltaAngularVel_0 = angularMove[i] * rotatePerMove;
+					deltaAngularPos_0 = XMVector3TransformNormal(targetAngularDirection, inverseInertia) * (angularMove[i] / angularInertia[i]);
 				else if (i == 1)
-					deltaAngularVel_1 = angularMove[i] * rotatePerMove;
+					deltaAngularPos_1 = XMVector3TransformNormal(targetAngularDirection, inverseInertia) * (angularMove[i] / angularInertia[i]);
 			}
 
 			if (i == 0)
-				deltaLinearVel_0 = contactNormal * linearMove[i];
+				deltaLinearPos_0 = contactNormal * linearMove[i];
 			else if (i == 1)
-				deltaLinearVel_1 = contactNormal * linearMove[i];
+				deltaLinearPos_1 = contactNormal * linearMove[i];
 
 			XMVECTOR position = XMLoadFloat3(&m_pBody[i]->GetPosition());
 			position += contactNormal * linearMove[i];
@@ -214,20 +209,23 @@ void Contact::ApplyPositionChange(XMVECTOR& deltaLinearVel_0, XMVECTOR& deltaLin
 			XMStoreFloat3(&xmf3Position, position);
 			m_pBody[i]->SetPosition(xmf3Position);
 
-			XMVECTOR rotate = XMLoadFloat3(&m_pBody[i]->GetRotate());
+			XMVECTOR dq = XMVectorZero();
+			XMVECTOR q = XMLoadFloat4(&m_pBody[i]->GetOrientation());
 			if (i == 0)
-				rotate += deltaLinearVel_0;
+				dq = deltaAngularPos_0;
 			else if (i == 1)
-				rotate += deltaLinearVel_1;
-			XMFLOAT3 xmf3Rotate;
-			XMStoreFloat3(&xmf3Rotate, rotate);
-			m_pBody[i]->SetRotate(xmf3Rotate);
+				dq = deltaAngularPos_1;
+			dq = XMQuaternionMultiply(q, dq) * 0.5f;
+			q += dq;
+
+			XMFLOAT4 xmf4Orientation;
+			XMStoreFloat4(&xmf4Orientation, q);
+			m_pBody[i]->SetOrientation(xmf4Orientation);
 
 
 			if (!m_pBody[i]->GetIsAwake())
 			{
-				m_pBody[i]->UpdateWorldTransform();
-				m_pBody[i]->UpdateInverseRotateInertiaForWorld();
+				m_pBody[i]->CalcDerivedData();
 			}
 		}
 	}
@@ -285,7 +283,7 @@ void Contact::CalcDesiredDeltaVelocity(float elapsedTime)
 		lastFrameAccel = lastFrameAccel * elapsedTime;
 		lastFrameAccel = XMVector3Dot(lastFrameAccel, contactNormal);
 
-		velocityFromAcc += XMVectorGetX(lastFrameAccel);
+		velocityFromAcc -= XMVectorGetX(lastFrameAccel);
 	}
 
 	// 속도가 너무 작다면 탄성 계수를 0으로,
@@ -334,7 +332,7 @@ void Contact::CalcContactToWorld()
 	// Contact Normal을 X축으로 하는 좌표계를 Contact 좌표계라 정의,
 	// 책에 나온 내용과 조금 다름
 
-	XMVECTOR contactNormal = XMLoadFloat3(&m_xmf3ContactNormal);
+	/*XMVECTOR contactNormal = XMLoadFloat3(&m_xmf3ContactNormal);
 	XMVECTOR contactTangentY = XMVectorZero();
 	XMVECTOR contactTangentZ = XMVectorZero();
 	XMFLOAT3 xmf3WorldY = XMFLOAT3(0, 1, 0);
@@ -356,7 +354,39 @@ void Contact::CalcContactToWorld()
 	m_xmf4x4ContactToWorld = XMFLOAT4X4(xmf3ContactNormal.x, xmf3ContactNormal.y, xmf3ContactNormal.z, 0,
 										xmf3ContactTangentY.x, xmf3ContactTangentY.y, xmf3ContactTangentY.z, 0,
 										xmf3ContactTangentZ.x, xmf3ContactTangentZ.y, xmf3ContactTangentZ.z, 0,
-										0, 0, 0, 1);
+										0, 0, 0, 1);*/
+
+	XMFLOAT3 contactTangent[2];
+
+	if (fabsf(m_xmf3ContactNormal.x) > fabsf(m_xmf3ContactNormal.y))
+	{
+		float s = 1.f / sqrtf(m_xmf3ContactNormal.z * m_xmf3ContactNormal.z + m_xmf3ContactNormal.x * m_xmf3ContactNormal.x);
+
+		contactTangent[0].x = m_xmf3ContactNormal.z * s;
+		contactTangent[0].y = 0.f;
+		contactTangent[0].z = -m_xmf3ContactNormal.x * s;
+
+		contactTangent[1].x = m_xmf3ContactNormal.y * contactTangent[0].z;
+		contactTangent[1].y = m_xmf3ContactNormal.z * contactTangent[0].x - m_xmf3ContactNormal.x * contactTangent[0].z;
+		contactTangent[1].z = -m_xmf3ContactNormal.y * contactTangent[0].x;
+	}
+	else
+	{
+		float s = 1.f / sqrtf(m_xmf3ContactNormal.y * m_xmf3ContactNormal.y + m_xmf3ContactNormal.z * m_xmf3ContactNormal.z);
+
+		contactTangent[0].x = 0.f;
+		contactTangent[0].y = -m_xmf3ContactNormal.z * s;
+		contactTangent[0].z = m_xmf3ContactNormal.y * s;
+
+		contactTangent[1].x = m_xmf3ContactNormal.y * contactTangent[0].z - m_xmf3ContactNormal.z * contactTangent[0].y;
+		contactTangent[1].y = -m_xmf3ContactNormal.x * contactTangent[0].z;
+		contactTangent[1].z = m_xmf3ContactNormal.x * contactTangent[0].y;
+	}
+
+	m_xmf4x4ContactToWorld = XMFLOAT4X4(m_xmf3ContactNormal.x, m_xmf3ContactNormal.y, m_xmf3ContactNormal.z, 0,
+										contactTangent[0].x, contactTangent[0].y, contactTangent[0].z, 0,
+										contactTangent[1].x, contactTangent[1].y, contactTangent[1].z, 0,
+										0,0,0,1);
 }
 
 XMVECTOR Contact::CalcFrictionlessImpulse(FXMMATRIX InverseInertia_0, CXMMATRIX InverseInertia_1)
@@ -411,10 +441,14 @@ XMVECTOR Contact::CalcFrictionImpulse(FXMMATRIX InverseInertia_0, CXMMATRIX Inve
 	XMMATRIX impulseToToque = MathHelper::MakeSkewSymmetric(m_pxmf3RelativePosition[0]);
 
 	// 단위 충격량당 각속도 변화량을 반환하는 행렬, World 좌표계
-	XMMATRIX deltaVelPerImpulseWorld = impulseToToque;
+	XMMATRIX deltaVelPerImpulseWorld = XMMatrixSet(-1,0,0,0,
+													0,-1,0,0,
+													0,0,-1,0,
+													0,0,0,0);
+	deltaVelPerImpulseWorld = XMMatrixMultiply(deltaVelPerImpulseWorld, impulseToToque);
 	deltaVelPerImpulseWorld = XMMatrixMultiply(deltaVelPerImpulseWorld, InverseInertia_0);
 	deltaVelPerImpulseWorld = XMMatrixMultiply(deltaVelPerImpulseWorld, impulseToToque);
-	deltaVelPerImpulseWorld *= -1;
+
 
 	if (m_pBody[1])
 	{

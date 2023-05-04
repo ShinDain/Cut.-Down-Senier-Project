@@ -13,16 +13,17 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	if(nAnimationTracks > 0)
 		m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
 
-	m_xmf3Position = XMFLOAT3(0, 50, 0);
-	m_xmf3Scale = XMFLOAT3(10, 10, 10);
-
 	if (nAnimationTracks == -1)
 		return;
 
-	m_pBody = std::make_shared<RigidBody>(m_xmf3Position, m_xmf3Rotate, m_xmf3Scale, 1);
+	m_xmf3Position = XMFLOAT3(0, 20, 0);
+	m_xmf4Orientation = XMFLOAT4(0.2, 0, 0,1);
+	m_xmf3Scale = XMFLOAT3(10, 10, 10);
+
+	m_pBody = std::make_shared<RigidBody>(m_xmf3Position, m_xmf4Orientation, 1);
 
 #if defined(_DEBUG)
-	m_pCollider = std::make_shared<ColliderBox>(this->m_pBody.get(), XMFLOAT3(0,0,0), XMFLOAT3(0,0,0), XMFLOAT3(0.5,0.5,0.5));
+	m_pCollider = std::make_shared<ColliderBox>(this->m_pBody.get(), XMFLOAT3(0,0,0), XMFLOAT3(0,0,0), XMFLOAT3(5,5,5));
 
 	m_pCollider->BuildMesh(pd3dDevice, pd3dCommandList);
 	
@@ -59,7 +60,7 @@ void Object::Update(float elapsedTime)
 		m_pBody->Update(elapsedTime);
 		m_pCollider->UpdateWorldTransform();
 		m_xmf3Position = m_pBody->GetPosition();
-		m_xmf3Rotate = m_pBody->GetRotate();
+		m_xmf4Orientation = m_pBody->GetOrientation();
 		m_xmf4x4World = m_pBody->GetWorld();
 	}
 
@@ -89,10 +90,7 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 		m_xmf4x4LocalTransform = MathHelper::identity4x4();
 		XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
 
-		// 이부분 추후 쿼터니언 연산으로 수정
-		XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotate.x),
-															XMConvertToRadians(m_xmf3Rotate.y),
-															XMConvertToRadians(m_xmf3Rotate.z));
+		XMMATRIX xmmatRotate = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
 		XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
 		// S * R * T
 		XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate)));
@@ -239,7 +237,7 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 			nReads = (UINT)fread(&pObject->m_xmf3Rotate.y, sizeof(float), 1, pInFile);
 			nReads = (UINT)fread(&pObject->m_xmf3Rotate.z, sizeof(float), 1, pInFile);
 			nReads = (UINT)fread(&pObject->m_xmf3Scale, sizeof(float), 3, pInFile);
-			nReads = (UINT)fread(&pObject->m_xmf4Quaternion, sizeof(float), 4, pInFile);
+			nReads = (UINT)fread(&pObject->m_xmf4Orientation, sizeof(float), 4, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<TransformMatrix>:"))
 		{

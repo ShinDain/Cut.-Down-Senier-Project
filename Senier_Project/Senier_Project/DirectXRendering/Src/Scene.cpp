@@ -5,7 +5,7 @@
 Scene::Scene()
 {
 	m_CollisionData.Reset(MAX_CONTACT_CNT);
-	m_pCollisionResolver = std::make_unique<CollisionResolver>(256);
+	m_pCollisionResolver = std::make_unique<CollisionResolver>(MAX_CONTACT_CNT * 8);
 }
 
 Scene::~Scene()

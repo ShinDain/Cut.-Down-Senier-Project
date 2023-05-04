@@ -87,7 +87,7 @@ protected:
 	XMFLOAT3 m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 	XMFLOAT3 m_xmf3Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
-	XMFLOAT4 m_xmf4Quaternion = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	XMFLOAT4 m_xmf4Orientation = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	XMFLOAT3 m_xmf3Rotate = XMFLOAT3(0, 0, 0);
 
 	// 물리 연산 관련
@@ -148,7 +148,8 @@ public:
 		m_xmf3Rotate.z = fRoll;
 	}
 	void SetRotate(const XMFLOAT3& Rotate) { SetRotate(Rotate.x, Rotate.y, Rotate.z); }
-	void SetQuaternion(const XMFLOAT4& quaternion) { m_xmf4Quaternion = quaternion; }
+	void SetOrientation(const XMFLOAT4& Orientation) { m_xmf4Orientation = Orientation;
+													   XMStoreFloat4(&m_xmf4Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmf4Orientation)));}
 	void SetIsAlive(bool IsAlive) { m_bIsAlive = IsAlive; }
 
 
@@ -165,7 +166,7 @@ public:
 	const float& GetYaw() { return(m_xmf3Rotate.y); }
 	const float& GetPitch() { return(m_xmf3Rotate.x); }
 	const float& GetRoll() { return(m_xmf3Rotate.z); }
-	const XMFLOAT4& GetQuaternion() { return m_xmf4Quaternion; }
+	const XMFLOAT4& GetOrientation() { return m_xmf4Orientation; }
 
 	RigidBody* GetBody() { return m_pBody.get(); }
 	ColliderBox* GetCollider() { return m_pCollider.get(); }
