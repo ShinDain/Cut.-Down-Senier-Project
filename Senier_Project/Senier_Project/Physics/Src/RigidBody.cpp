@@ -4,11 +4,11 @@ RigidBody::RigidBody()
 {
 }
 
-RigidBody::RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, float mass)
+RigidBody::RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Scale, float mass)
 {
 	m_xmf3Position = xmf3Position;
 	m_xmf4Orientation = xmf4Orientation;
-	//m_xmf3Scale = xmf3Scale;
+	m_xmf3Scale = xmf3Scale;
 	m_Mass = mass;
 }
 
@@ -67,32 +67,21 @@ void RigidBody::CalcDerivedData()
 {
 	// 쿼터니언 정규화
 	XMStoreFloat4(&m_xmf4Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmf4Orientation)));
-	UpdateWorldTransform();
-	UpdateInverseRotateInertiaForWorld();
-}
 
-void RigidBody::UpdateWorldTransform()
-{
 	XMMATRIX World = XMMatrixIdentity();
 	XMMATRIX Translation = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
 	XMMATRIX Rotate = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
-	//XMMATRIX Scale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
-	World = XMMatrixMultiply(Rotate, Translation);
+	XMMATRIX Scale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
+	World = XMMatrixMultiply(Scale, XMMatrixMultiply(Rotate, Translation));
 
 	XMStoreFloat4x4(&m_xmf4x4World, World);
-}
 
-void RigidBody::UpdateInverseRotateInertiaForWorld()
-{
-	// World(-1) * Inertia(-1) * World 순서로 행렬 갱신
-	// World 좌표계의 데이터에 곱해질 Inertia 행렬
+	// World(-1) * Inertia(-1) * World 순서로 행렬곱
+	/*XMMATRIX inverseRotateInertia = XMLoadFloat4x4(&m_xmf4x4InverseRotateInertia);
+	XMMATRIX rotateInertiaForWorld = XMMatrixMultiply(XMMatrixTranspose(World), inverseRotateInertia);
+	rotateInertiaForWorld = XMMatrixMultiply(rotateInertiaForWorld, World);*/
 
-	XMMATRIX inverseRotateInertia = XMLoadFloat4x4(&m_xmf4x4InverseRotateInertia);
-
-	XMMATRIX world = XMLoadFloat4x4(&m_xmf4x4World);
-	XMMATRIX transposeWorld = XMMatrixTranspose(world);
-	XMMATRIX rotateInertiaForWorld = XMMatrixMultiply(transposeWorld, inverseRotateInertia);
-	rotateInertiaForWorld = XMMatrixMultiply(rotateInertiaForWorld, world);
+	XMMATRIX rotateInertiaForWorld = XMLoadFloat4x4(&m_xmf4x4InverseRotateInertia);
 
 	XMStoreFloat4x4(&m_xmf4x4InverseRotateInertiaForWorld, rotateInertiaForWorld);
 }

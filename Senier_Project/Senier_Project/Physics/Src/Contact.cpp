@@ -68,6 +68,8 @@ void Contact::ApplyVelocityChange(XMVECTOR& deltaLinearVel_0, XMVECTOR& deltaLin
 		impulseContact = CalcFrictionImpulse(inverseInertia_0, inverseInertia_1);
 	}
 
+	impulseContact = CalcFrictionlessImpulse(inverseInertia_0, inverseInertia_1);
+
 	// World 좌표계로 변환
 	XMMATRIX contactToWorld = XMLoadFloat4x4(&m_xmf4x4ContactToWorld);
 	XMVECTOR impulse = XMVector3TransformCoord(impulseContact, contactToWorld);
@@ -77,7 +79,7 @@ void Contact::ApplyVelocityChange(XMVECTOR& deltaLinearVel_0, XMVECTOR& deltaLin
 	angularResult = XMVector3Cross(angularResult, impulse);
 	angularResult = XMVector3TransformCoord(angularResult, inverseInertia_0);
 	deltaAngularVel_0 = angularResult;
-	//XMVECTOR mass = XMVectorReplicate(m_pBody[0]->GetMass());
+
 	float mass = m_pBody[0]->GetMass();
 	XMVECTOR linearResult = impulse / mass;
 	deltaLinearVel_0 = linearResult;
@@ -441,10 +443,10 @@ XMVECTOR Contact::CalcFrictionImpulse(FXMMATRIX InverseInertia_0, CXMMATRIX Inve
 	XMMATRIX impulseToToque = MathHelper::MakeSkewSymmetric(m_pxmf3RelativePosition[0]);
 
 	// 단위 충격량당 각속도 변화량을 반환하는 행렬, World 좌표계
-	XMMATRIX deltaVelPerImpulseWorld = XMMatrixSet(-1,0,0,0,
-													0,-1,0,0,
-													0,0,-1,0,
-													0,0,0,0);
+	XMMATRIX deltaVelPerImpulseWorld = XMMatrixSet(-1,  0,  0, 0,
+												    0, -1,  0, 0,
+												    0,  0, -1, 0,
+												    0,  0,  0, 0);
 	deltaVelPerImpulseWorld = XMMatrixMultiply(deltaVelPerImpulseWorld, impulseToToque);
 	deltaVelPerImpulseWorld = XMMatrixMultiply(deltaVelPerImpulseWorld, InverseInertia_0);
 	deltaVelPerImpulseWorld = XMMatrixMultiply(deltaVelPerImpulseWorld, impulseToToque);
@@ -454,10 +456,13 @@ XMVECTOR Contact::CalcFrictionImpulse(FXMMATRIX InverseInertia_0, CXMMATRIX Inve
 	{
 		impulseToToque = MathHelper::MakeSkewSymmetric(m_pxmf3RelativePosition[1]);
 
-		XMMATRIX deltaVelPerImpulseWorld2 = impulseToToque;
+		XMMATRIX deltaVelPerImpulseWorld2 = XMMatrixSet(-1, 0, 0, 0,
+														0, -1, 0, 0,
+														0, 0, -1, 0,
+														0, 0, 0, 0);
+		deltaVelPerImpulseWorld2 = XMMatrixMultiply(deltaVelPerImpulseWorld2, impulseToToque);
 		deltaVelPerImpulseWorld2 = XMMatrixMultiply(deltaVelPerImpulseWorld2, InverseInertia_1);
 		deltaVelPerImpulseWorld2 = XMMatrixMultiply(deltaVelPerImpulseWorld2, impulseToToque);
-		deltaVelPerImpulseWorld2 *= -1;
 
 		// 속도의 총량에 추가
 		deltaVelPerImpulseWorld += deltaVelPerImpulseWorld2;

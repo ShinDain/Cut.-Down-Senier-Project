@@ -20,7 +20,7 @@ void CollisionResolver::ResolveContacts(std::vector<std::shared_ptr<Contact>> pC
 	AdjustPositions(pContacts, elapsedTime);
 
 	// Collision으로 인한 Velocity 조정
-	//AdjustVelocities(pContacts, elapsedTime);
+	AdjustVelocities(pContacts, elapsedTime);
 }
 
 void CollisionResolver::PrepareContacts(std::vector<std::shared_ptr<Contact>> pContacts, float elapsedTime)
@@ -80,22 +80,15 @@ void CollisionResolver::AdjustVelocities(std::vector<std::shared_ptr<Contact>> p
 						if (pContacts[i]->GetBody(b) == pContacts[index]->GetBody(d))
 						{
 							XMVECTOR relativePosition = XMLoadFloat3(&pContacts[i]->GetRelativeContactPosition(b));
-
-							// World 좌표계 기준 속도 변화량
-							deltaVelocity = velocityDelta[d] + XMVector3Cross(angularDelta[d], relativePosition);
-
 							XMMATRIX worldToContact = XMLoadFloat4x4(&pContacts[i]->GetContactToWorld());
 							worldToContact = XMMatrixTranspose(worldToContact);
-							deltaVelocity = XMVector3TransformNormal(deltaVelocity, worldToContact) * (b ? -1 : 1);
 
-							XMVECTOR bodyContactVelocity = XMLoadFloat3(&pContacts[i]->GetContactVelocity());
-							bodyContactVelocity += deltaVelocity;
-
-
-							XMFLOAT3 xmf3ResultContactVelocity;
-							XMStoreFloat3(&xmf3ResultContactVelocity, bodyContactVelocity);
-
-							pContacts[i]->SetContactVelocity(xmf3ResultContactVelocity);
+							deltaVelocity = XMVector3Cross(angularDelta[d], relativePosition) + velocityDelta[d];
+							XMVECTOR tmp = XMLoadFloat3(&pContacts[i]->GetContactVelocity());
+							tmp += XMVector3TransformNormal(deltaVelocity, worldToContact) * (b ? -1 : 1);
+							XMFLOAT3 xmf3Result;
+							XMStoreFloat3(&xmf3Result, tmp);
+							pContacts[i]->SetContactVelocity(xmf3Result);
 
 							// ContactVelocity 수정 후 기대 속도 변화도 재연산
 							pContacts[i]->CalcDesiredDeltaVelocity(elapsedTime);

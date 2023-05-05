@@ -8,15 +8,15 @@ float TransformToAxis(const ColliderBox& box, FXMVECTOR direction)
 
 	// Extent X
 	XMVECTOR Axis_0 = box.GetAxis(0);
-	projectLength += XMVectorGetX(boxExtent.x * XMVector3Dot(Axis_0, direction));
+	projectLength += fabs(XMVectorGetX(boxExtent.x * XMVector3Dot(Axis_0, direction)));
 
 	// Extent Y
 	XMVECTOR Axis_1 = box.GetAxis(1);
-	projectLength += XMVectorGetX(boxExtent.y * XMVector3Dot(Axis_1, direction));
+	projectLength += fabs(XMVectorGetX(boxExtent.y * XMVector3Dot(Axis_1, direction)));
 
 	// Extent Z
 	XMVECTOR Axis_2 = box.GetAxis(2);
-	projectLength += XMVectorGetX(boxExtent.z * XMVector3Dot(Axis_2, direction));
+	projectLength += fabs(XMVectorGetX(boxExtent.z * XMVector3Dot(Axis_2, direction)));
 
 	return projectLength;
 }

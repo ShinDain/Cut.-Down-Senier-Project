@@ -17,13 +17,13 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 		return;
 
 	m_xmf3Position = XMFLOAT3(0, 20, 0);
-	m_xmf4Orientation = XMFLOAT4(0.2, 0, 0,1);
+	m_xmf4Orientation = XMFLOAT4(0, 0, 0.2,1);
 	m_xmf3Scale = XMFLOAT3(10, 10, 10);
 
-	m_pBody = std::make_shared<RigidBody>(m_xmf3Position, m_xmf4Orientation, 1);
+	m_pBody = std::make_shared<RigidBody>(m_xmf3Position, m_xmf4Orientation, m_xmf3Scale, 1);
 
 #if defined(_DEBUG)
-	m_pCollider = std::make_shared<ColliderBox>(this->m_pBody.get(), XMFLOAT3(0,0,0), XMFLOAT3(0,0,0), XMFLOAT3(5,5,5));
+	m_pCollider = std::make_shared<ColliderBox>(this->m_pBody.get(), XMFLOAT3(0,0,0), XMFLOAT3(0,0,0), XMFLOAT3(0.5f,0.5f,0.5f));
 
 	m_pCollider->BuildMesh(pd3dDevice, pd3dCommandList);
 	

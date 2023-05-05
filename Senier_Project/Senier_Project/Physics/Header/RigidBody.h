@@ -9,7 +9,7 @@ class RigidBody
 {
 public:
 	RigidBody();
-	RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, float mass);
+	RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Scale, float mass);
 	RigidBody(const RigidBody& rhs) = delete;
 	RigidBody& operator=(const RigidBody& rhs) = delete;
 	virtual ~RigidBody();
@@ -17,6 +17,7 @@ public:
 protected:
 	XMFLOAT3 m_xmf3Position = XMFLOAT3(0, 0, 0);
 	XMFLOAT4 m_xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
+	XMFLOAT3 m_xmf3Scale = XMFLOAT3(1,1,1);
 
 	//XMFLOAT3 m_xmf3Scale = XMFLOAT3(0, 0, 0);
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
@@ -45,9 +46,6 @@ public:
 	void Update(float elapsedTime);
 	void CalcDerivedData();
 
-	void UpdateWorldTransform();
-	void UpdateInverseRotateInertiaForWorld();
-
 public:
 	void AddVelocity(float x, float y, float z)
 	{
@@ -75,6 +73,7 @@ public:
 	void SetPosition(XMFLOAT3 xmf3Position) { m_xmf3Position = xmf3Position; }
 	void SetOrientation(XMFLOAT4 xmf4Orientation) { m_xmf4Orientation = xmf4Orientation; 
 													XMStoreFloat4(&m_xmf4Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmf4Orientation))); }
+	void SetScale(XMFLOAT3 xmf3Scale) { m_xmf3Scale = xmf3Scale; }
 	void SetWorld(XMFLOAT4X4 xmf4x4World) { m_xmf4x4World = xmf4x4World; }
 
 	void SetMass(float Mass) { m_Mass = Mass; }
@@ -98,6 +97,7 @@ public:
 
 	const XMFLOAT3& GetPosition() { return m_xmf3Position; }
 	const XMFLOAT4& GetOrientation() { return m_xmf4Orientation; }
+	const XMFLOAT3& GetScale() { return m_xmf3Scale; }
 	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
 		 
 	float GetMass() { return m_Mass; }

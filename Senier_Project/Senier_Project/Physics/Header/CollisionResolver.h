@@ -5,7 +5,7 @@
 #include "Contact.h"
 
 #define VELOCITY_EPSILON 0.01f;
-#define POSITION_EPSILON 0.009f;
+#define POSITION_EPSILON 0.01f;
 
 class CollisionResolver
 {
