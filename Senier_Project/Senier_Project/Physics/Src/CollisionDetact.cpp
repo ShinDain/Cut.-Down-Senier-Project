@@ -62,7 +62,8 @@ bool tryAxis(
 	int& smallestCase
 )
 {
-	if (XMVectorGetX(XMVectorSum(axis * axis)) < 0.0001f) return true;
+	if (XMVectorGetX(XMVectorSum(axis * axis)) < 0.0001f)
+		return true;
 	XMVECTOR axisDir = XMVector3Normalize(axis);
 
 	float penetration = PenetrationOnAxis(box1, box2, axisDir, toCentre);
@@ -105,7 +106,17 @@ void fillPointFaceBoxBox(
 	XMFLOAT3 xmf3ContactNormal;
 	XMStoreFloat3(&xmf3ContactNormal, normal);
 
-	pData.addContact(box1.GetBody(), box2.GetBody(), pData.friction, pData.restitution, xmf3ContactPoint, xmf3ContactNormal, depth);
+	// 물리 연산을 하지 않는 경우 NULL로 전달
+	RigidBody* pBody1 = box1.GetBody();
+	RigidBody* pBody2 = box2.GetBody();
+	if (!pBody1->GetPhysics())
+		pBody1 = nullptr;
+	if (!pBody2->GetPhysics())
+		pBody2 = nullptr;
+
+	assert(pBody1 != nullptr || pBody2 != nullptr);
+
+	pData.addContact(pBody1, pBody2, pData.friction, pData.restitution, xmf3ContactPoint, xmf3ContactNormal, depth);
 }
 
 XMFLOAT3 CalcEdgeContactPoint(
@@ -252,6 +263,10 @@ int CollisionDetector::SphereAndSphere(const ColliderSphere& sphere1, const Coll
 
 int CollisionDetector::BoxAndHalfSpace(const ColliderBox& box, const ColliderPlane& plane, CollisionData& pData)
 {
+	// 박스가 물리 연산을 하지 않는 경우 return;
+	if (!box.GetPhysics() && box.GetBody()->GetInvalid())
+		return 0;
+
 	if (pData.ContactCnt() > pData.maxContacts) return 0;
 	
 	if (!IntersectTests::BoxAndHalfSpace(box, plane)) return 0;
@@ -285,7 +300,7 @@ int CollisionDetector::BoxAndHalfSpace(const ColliderBox& box, const ColliderPla
 			XMFLOAT3 xmf3ContactNormal = plane.GetDirection();
 			float depth = plane.GetDistance() - distance;
 
-			pData.addContact(box.GetBody(), NULL, pData.friction, pData.restitution, xmf3ContactPoint, xmf3ContactNormal, depth);
+			pData.addContact(box.GetBody(), nullptr, pData.friction, pData.restitution, xmf3ContactPoint, xmf3ContactNormal, depth);
 
 			++contactCnt;
 
@@ -298,6 +313,16 @@ int CollisionDetector::BoxAndHalfSpace(const ColliderBox& box, const ColliderPla
 
 int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box2, CollisionData& pData)
 {
+	if (box1.GetBody()->GetInvalid() || box2.GetBody()->GetInvalid())
+		return 0;
+	
+	if (!box1.GetBody()->GetIsAwake() && !box2.GetBody()->GetIsAwake())
+		return 0;
+
+	// 두 물체 모두 물리 연산을 하지 않는 경우 return;
+	if (!box1.GetPhysics() && !box2.GetPhysics())
+		return 0;
+
 	XMVECTOR toCentre = box2.GetAxis(3) - box1.GetAxis(3);
 
 	float pen = FLT_MAX;
@@ -395,9 +420,17 @@ int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box
 		XMFLOAT3 xmf3ContactNormal;
 		XMStoreFloat3(&xmf3ContactNormal, axis);
 
-		pData.addContact(box1.GetBody(), box2.GetBody(), pData.friction, pData.restitution, xmf3ContactPoint, xmf3ContactNormal, pen);
+		// 물리 연산을 하지 않는 경우 NULL로 전달
+		RigidBody* pBody1 = box1.GetBody();
+		RigidBody* pBody2 = box2.GetBody();
+		if (!pBody1->GetPhysics())
+			pBody1 = nullptr;
+		if (!pBody2->GetPhysics())
+			pBody2 = nullptr;
 
+		assert(pBody1 != nullptr || pBody2 != nullptr);
 
+		pData.addContact(pBody1, pBody2, pData.friction, pData.restitution, xmf3ContactPoint, xmf3ContactNormal, pen);
 	}
 
 

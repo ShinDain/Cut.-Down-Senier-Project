@@ -31,10 +31,9 @@ public:
 	void ProcessInput(UCHAR* pKeybuffer);
 
 	std::shared_ptr<Object> CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
-										const char* pstrFileName, int nAnimationTracks, RenderLayer renderLayer);
+										const ObjectInitData& objInitData, int nAnimationTracks, RenderLayer renderLayer);
 
 	void GenerateContact();
-
 	void ClearObjectLayer();
 private:
 
@@ -63,7 +62,11 @@ private:
 	CollisionData m_CollisionData;
 	std::unique_ptr<CollisionResolver> m_pCollisionResolver = nullptr;
 
-	std::vector<ColliderBox*> m_ppColliders;
+	std::vector<std::shared_ptr<ColliderPlane>> m_ppColliderPlanes;
+	std::vector<std::shared_ptr<ColliderBox>> m_ppColliderBoxs;
+	std::vector<std::shared_ptr<ColliderSphere>> m_ppColliderSpheres;
+
+	
 
 #if defined(_DEBUG) | defined(DEBUG)
 public:
@@ -71,6 +74,7 @@ public:
 	int m_refCnt = 0;
 	int m_size = 0;
 	
+	float m_tTime = 0;
 #endif
 };
 

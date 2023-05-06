@@ -39,6 +39,8 @@ public:
 
 	RigidBody* GetBody() const { return m_pRigidBody; }
 
+	bool GetPhysics() const { return m_pRigidBody->GetPhysics(); }
+
 #if defined(_DEBUG) | defined(DEBUG)
 protected:
 	Microsoft::WRL::ComPtr<ID3D12Resource>	 m_PositionBufferGPU = nullptr;
@@ -74,7 +76,7 @@ class ColliderPlane : public Collider
 {
 public:
 	ColliderPlane() = delete;
-	ColliderPlane(XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Direction, float distance);
+	ColliderPlane(RigidBody* pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Direction, float distance);
 	ColliderPlane(const ColliderPlane& rhs) = delete;
 	ColliderPlane& operator=(const ColliderPlane& rhs) = delete;
 	virtual ~ColliderPlane();
@@ -118,7 +120,8 @@ public:
 class ColliderSphere : public Collider
 {
 public:
-	ColliderSphere();
+	ColliderSphere() = delete;
+	ColliderSphere(RigidBody* pBody, XMFLOAT3 xmf3OffsetPosition, float radius);
 	ColliderSphere(const ColliderSphere& rhs) = delete;
 	ColliderSphere& operator=(const ColliderSphere& rhs) = delete;
 	virtual ~ColliderSphere();

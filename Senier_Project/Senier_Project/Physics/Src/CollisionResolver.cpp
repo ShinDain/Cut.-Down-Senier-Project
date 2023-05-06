@@ -47,7 +47,7 @@ void CollisionResolver::AdjustVelocities(std::vector<std::shared_ptr<Contact>> p
 	m_nVelocityIterationCnt = 0;
 	while (m_nVelocityIterationCnt < m_nIteration)
 	{
-		max = VELOCITY_EPSILON;
+		max = Physics::velocityEpsilon;
 		index = pContacts.size();
 		// 가장 (기대 속도 변화량)이 큰 Contact를 찾는다.
 		for (int i = 0; i < pContacts.size(); ++i)
@@ -113,7 +113,7 @@ void CollisionResolver::AdjustPositions(std::vector<std::shared_ptr<Contact>> pC
 	m_nPositionIterationCnt = 0;
 	while (m_nPositionIterationCnt < m_nIteration)
 	{
-		max = POSITION_EPSILON;
+		max = Physics::positionEpsilon;;
 		index = pContacts.size();
 		for (int i = 0; i < pContacts.size(); ++i)
 		{

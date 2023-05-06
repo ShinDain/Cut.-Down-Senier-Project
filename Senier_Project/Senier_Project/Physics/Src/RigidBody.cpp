@@ -18,18 +18,24 @@ RigidBody::~RigidBody()
 
 void RigidBody::Update(float elapsedTime)
 {
-	if (!m_bIsAwake) return;
+	if (!m_bIsAwake) 
+		return;
 
 	m_xmf3LastFrameAcceleration = m_xmf3Acceleration;
-	// 중력가속도 적용 (중력 * 물체 질량 / 물체 질량(선성분만 분리하기 위해) )
-	m_xmf3LastFrameAcceleration.y += Physics::xmf3Gravity.y;
+
+	if (m_bInGravity)
+	{
+		// 중력가속도 적용 (중력 * 물체 질량 / 물체 질량(선성분만 분리하기 위해) )
+		m_xmf3LastFrameAcceleration.y += Physics::xmf3Gravity.y;
+	}
+
 	XMVECTOR linearAccel = XMLoadFloat3(&m_xmf3LastFrameAcceleration);
 
 	XMVECTOR velocity = XMLoadFloat3(&m_xmf3Velocity);
 	XMVECTOR angularVelocity = XMLoadFloat3(&m_xmf3AngularVelocity);
 
 	velocity += linearAccel * elapsedTime;
-	
+
 	// damping 적용
 	velocity *= pow(m_LinearDamping, elapsedTime);
 	angularVelocity *= pow(m_AngularDamping, elapsedTime);
@@ -40,6 +46,13 @@ void RigidBody::Update(float elapsedTime)
 	XMVECTOR position = XMLoadFloat3(&m_xmf3Position);
 	position += velocity * elapsedTime;
 	XMStoreFloat3(&m_xmf3Position, position);
+
+
+	if (XMVector3IsInfinite(XMLoadFloat3(&m_xmf3Position)) || XMVector3IsNaN(XMLoadFloat3(&m_xmf3Position)))
+	{
+		SetInvalid(true);
+		return;
+	}
 
 	XMVECTOR prevOrientation = XMLoadFloat4(&m_xmf4Orientation);
 	XMVECTOR dq = angularVelocity * elapsedTime;
@@ -55,11 +68,14 @@ void RigidBody::Update(float elapsedTime)
 		float currentMotion =  XMVectorGetX(XMVectorSum(velocity * velocity)) + 
 			XMVectorGetX(XMVectorSum(angularVelocity * angularVelocity));
 
-		float bias = pow(0.5, elapsedTime);
+		float bias = powf(0.5f, elapsedTime);
 		m_Motion = bias * m_Motion + (1 - bias) * currentMotion;
 
-		if (m_Motion > Physics::sleepEpsilon) SetIsAwake(false);
+		if (m_Motion < Physics::sleepEpsilon ) 
+			SetIsAwake(false);
 		else if (m_Motion > 10 * Physics::sleepEpsilon) m_Motion = 10 * Physics::sleepEpsilon;
+
+		m_lastMotion = m_Motion;
 	}
 }
 
@@ -97,4 +113,28 @@ void RigidBody::SetRotateInertia(XMFLOAT4X4 xmf4x4RotateInertia)
 	else
 		XMStoreFloat4x4(&m_xmf4x4InverseRotateInertia, inverseinertia);
 	
+}
+
+void RigidBody::AddVelocity(float x, float y, float z)
+{
+	m_xmf3Velocity.x += x;
+	m_xmf3Velocity.y += y;
+	m_xmf3Velocity.z += z;
+}
+void RigidBody::AddVelocity(XMFLOAT3 addVelocity)
+{
+	if (m_bIsPlatform) return;
+	AddVelocity(addVelocity.x, addVelocity.y, addVelocity.z);
+}
+void RigidBody::AddAngleVelocity(float x, float y, float z)
+{
+	m_xmf3AngularVelocity.x += x;
+	m_xmf3AngularVelocity.y += y;
+	m_xmf3AngularVelocity.z += z;
+}
+void RigidBody::AddAngleVelocity(XMFLOAT3 addAngleVelocity)
+{
+	if (m_bIsPlatform) return;
+	if (m_bIsCharacter) return;
+	AddAngleVelocity(addAngleVelocity.x, addAngleVelocity.y, addAngleVelocity.z);
 }

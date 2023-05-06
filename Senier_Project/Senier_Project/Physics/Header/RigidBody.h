@@ -5,6 +5,9 @@
 
 using namespace DirectX;
 
+#define MIN_VELOCITY 2.0f
+
+
 class RigidBody
 {
 public:
@@ -37,36 +40,29 @@ protected:
 	XMFLOAT3 m_xmf3LastFrameAcceleration = XMFLOAT3(0, 0, 0);
 
 	float m_Motion = 0;
+	float m_lastMotion = 0;
+	float m_ToSleepTime = 3.0f;
+	float m_SleepElapsedTime = 0;
 
 	bool m_bIsAwake = true;
 	bool m_bCanSleep = false;
-	bool m_bPhysics = true;
+	bool m_bPhysics = false;
+	bool m_bInGravity = false;
+
+	bool m_bIsCharacter = false;
+	bool m_bIsPlatform = false;
+
+	bool m_bInvalid = false;
 
 public:
 	void Update(float elapsedTime);
 	void CalcDerivedData();
 
 public:
-	void AddVelocity(float x, float y, float z)
-	{
-		m_xmf3Velocity.x += x;
-		m_xmf3Velocity.y += y;
-		m_xmf3Velocity.z += z;
-	}
-	void AddVelocity(XMFLOAT3 addVelocity)
-	{
-		AddVelocity(addVelocity.x, addVelocity.y, addVelocity.z);
-	}
-	void AddAngleVelocity(float x, float y, float z)
-	{
-		m_xmf3AngularVelocity.x += x;
-		m_xmf3AngularVelocity.y += y;
-		m_xmf3AngularVelocity.z += z;
-	}
-	void AddAngleVelocity(XMFLOAT3 addAngleVelocity)
-	{
-		AddAngleVelocity(addAngleVelocity.x, addAngleVelocity.y, addAngleVelocity.z);
-	}
+	void AddVelocity(float x, float y, float z);
+	void AddVelocity(XMFLOAT3 addVelocity);
+	void AddAngleVelocity(float x, float y, float z);
+	void AddAngleVelocity(XMFLOAT3 addAngleVelocity);
 
 	// Set =============================================================
 
@@ -87,11 +83,22 @@ public:
 	void SetLinearDamping(float LinearDamping) { m_LinearDamping = LinearDamping; }
 	void SetAngleDamping(float AngularDamping) { m_AngularDamping = AngularDamping; }
 
-	void SetIsAwake(bool bIsAwake) { m_bIsAwake = bIsAwake; }
+	void SetIsAwake(bool bIsAwake) { m_bIsAwake = bIsAwake; 
+	if (bIsAwake) m_Motion = Physics::sleepEpsilon * 2.0f; 
+	else {
+		m_xmf3Velocity = XMFLOAT3(0, 0, 0);
+		m_xmf3AngularVelocity = XMFLOAT3(0, 0, 0);
+	}
+	}
 	void SetCanSleep(bool bCanSleep) {
 		m_bCanSleep = bCanSleep; if (!m_bCanSleep && !m_bIsAwake) { SetIsAwake(true); }
 	}
 	void SetPhysics(bool bPhysics) { m_bPhysics = bPhysics; }
+	void SetInGravity(bool bInGravity) { m_bInGravity = bInGravity; }
+	void SetIsCharacter(bool bIsCharacter) { m_bIsCharacter = bIsCharacter; }
+	void SetIsPlatform(bool bIsPlatform) { m_bIsPlatform = bIsPlatform; }
+
+	void SetInvalid(bool bInvalid) { m_bInvalid = bInvalid; }
 
 	// Get =============================================================
 
@@ -116,6 +123,11 @@ public:
 	bool GetIsAwake() { return m_bIsAwake; }
 	bool GetCanSleep() { return m_bCanSleep; }
 	bool GetPhysics() { return m_bPhysics; }
+	bool GetInGravity() { return m_bInGravity; }
+	bool GetIsCharacter() { return m_bIsCharacter; }
+	bool GetIsPlatform() { return m_bIsPlatform; }
+
+	bool GetInvalid() { return m_bInvalid; }
 
 };
 

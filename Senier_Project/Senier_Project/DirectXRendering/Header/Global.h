@@ -25,13 +25,31 @@ struct Texture
 // 다음에 이것도 map으로 변경
 extern std::vector<std::shared_ptr<Texture>> g_CachingTexture;
 
-enum RenderLayer : int
+enum RenderLayer : UINT
 {
 	Static,
 	Skinned,
 	Image,
 	WireFrame,
 	Count
+};
+
+enum ColliderType : UINT
+{
+	Collider_Plane,
+	Collider_Box,
+	Collider_Sphere,
+	Collider_None
+};
+
+enum ObjectType : UINT
+{
+	Object_World,
+	Object_Platform,
+	Object_Physics,
+	Object_Character,
+	Object_UI,
+	Object_None
 };
 
 extern std::map<RenderLayer, std::shared_ptr<Shader>> g_Shaders;
@@ -65,6 +83,18 @@ struct SkinningBoneTransformConstant
 	DirectX::XMFLOAT4X4 BoneTransform[SKINNED_ANIMATION_BONES];
 };
 
+// 오브젝트 초기화 데이터 구조체
+struct ObjectInitData
+{
+	const char* pstrFilePath;
+	XMFLOAT3 xmf3Position = XMFLOAT3(0, 0, 0);
+	XMFLOAT4 xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
+	XMFLOAT3 xmf3Scale = XMFLOAT3(1, 1, 1);
+	XMFLOAT3 xmf3Extents = XMFLOAT3(0, 0, 0);
+	ObjectType objectType = Object_None;
+	unsigned int nMass = 1;
+	ColliderType colliderType = Collider_None;
+};
 
 // 메시의 하위 범위 인덱스를 정의
 struct SubmeshGeometry

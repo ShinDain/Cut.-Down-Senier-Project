@@ -24,7 +24,9 @@ class Object : public std::enable_shared_from_this<Object>
 {
 public:
 	Object();
-	Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks);
+	Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		   std::shared_ptr<RigidBody> pBody, std::shared_ptr<Collider> pCollider,
+		   std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks);
 
 	Object(const Object& rhs) = delete;
 	Object& operator=(const Object& rhs) = delete;
@@ -43,6 +45,8 @@ public:
 	(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, int* pnSkinnedMeshes, Object* pRootObject);
 	static void LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData);
 	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject);
+
+	void Destroy();
 
 protected:
 	virtual void OnPrepareRender(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
@@ -92,7 +96,7 @@ protected:
 
 	// 물리 연산 관련
 	std::shared_ptr<RigidBody> m_pBody = nullptr;
-	std::shared_ptr<ColliderBox> m_pCollider = nullptr;
+	std::shared_ptr<Collider> m_pCollider = nullptr;
 
 	bool m_bPhysics = true;
 	bool m_bIsAlive = true;
@@ -169,7 +173,7 @@ public:
 	const XMFLOAT4& GetOrientation() { return m_xmf4Orientation; }
 
 	RigidBody* GetBody() { return m_pBody.get(); }
-	ColliderBox* GetCollider() { return m_pCollider.get(); }
+	Collider* GetCollider() { return m_pCollider.get(); }
 
 	bool GetIsAlive() { return m_bIsAlive; }
 };

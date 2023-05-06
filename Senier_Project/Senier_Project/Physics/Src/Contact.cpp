@@ -203,24 +203,32 @@ void Contact::ApplyPositionChange(XMVECTOR& deltaLinearPos_0, XMVECTOR& deltaLin
 			else if (i == 1)
 				deltaLinearPos_1 = contactNormal * linearMove[i];
 
-			XMVECTOR position = XMLoadFloat3(&m_pBody[i]->GetPosition());
-			position += contactNormal * linearMove[i];
-			XMFLOAT3 xmf3Position;
-			XMStoreFloat3(&xmf3Position, position);
-			m_pBody[i]->SetPosition(xmf3Position);
+			if (!(m_pBody[i]->GetIsPlatform()))
+			{
+				XMVECTOR position = XMLoadFloat3(&m_pBody[i]->GetPosition());
+				position += contactNormal * linearMove[i];
+				XMFLOAT3 xmf3Position;
+				XMStoreFloat3(&xmf3Position, position);
+				
+				m_pBody[i]->SetPosition(xmf3Position);
+			}
 
-			XMVECTOR dq = XMVectorZero();
-			XMVECTOR q = XMLoadFloat4(&m_pBody[i]->GetOrientation());
-			if (i == 0)
-				dq = deltaAngularPos_0;
-			else if (i == 1)
-				dq = deltaAngularPos_1;
-			dq = XMQuaternionMultiply(q, dq) * 0.5f;
-			q += dq;
+			// 캐릭터인 경우 회전 미적용
+			if (!m_pBody[i]->GetIsCharacter() && !(m_pBody[i]->GetIsPlatform()))
+			{
+				XMVECTOR dq = XMVectorZero();
+				XMVECTOR q = XMLoadFloat4(&m_pBody[i]->GetOrientation());
+				if (i == 0)
+					dq = deltaAngularPos_0;
+				else if (i == 1)
+					dq = deltaAngularPos_1;
+				dq = XMQuaternionMultiply(q, dq) * 0.5f;
+				q += dq;
 
-			XMFLOAT4 xmf4Orientation;
-			XMStoreFloat4(&xmf4Orientation, q);
-			m_pBody[i]->SetOrientation(xmf4Orientation);
+				XMFLOAT4 xmf4Orientation;
+				XMStoreFloat4(&xmf4Orientation, q);
+				m_pBody[i]->SetOrientation(xmf4Orientation);
+			}
 
 
 			if (!m_pBody[i]->GetIsAwake())
@@ -251,8 +259,14 @@ void Contact::MatchAwakeState()
 
 	if (bWake0 ^ bWake1)
 	{
-		if (bWake0) m_pBody[1]->SetIsAwake(true);
-		else m_pBody[0]->SetIsAwake(true);
+		if (bWake0)
+		{
+			m_pBody[1]->SetIsAwake(true);
+		}
+		else
+		{
+			m_pBody[0]->SetIsAwake(true);
+		}
 	}
 }
 

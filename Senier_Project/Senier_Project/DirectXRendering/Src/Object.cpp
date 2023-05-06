@@ -5,7 +5,9 @@ Object::Object()
 {
 }
 
-Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks)
+Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, 
+				std::shared_ptr<RigidBody> pBody, std::shared_ptr<Collider> pCollider,
+				std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks)
 {
 	std::shared_ptr<ModelDataInfo> pModelData = pModel;
 
@@ -13,17 +15,11 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	if(nAnimationTracks > 0)
 		m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
 
-	if (nAnimationTracks == -1)
-		return;
-
-	m_xmf3Position = XMFLOAT3(0, 20, 0);
-	m_xmf4Orientation = XMFLOAT4(0.2, 0, 0.2,1);
-	m_xmf3Scale = XMFLOAT3(10, 10, 10);
-
-	m_pBody = std::make_shared<RigidBody>(m_xmf3Position, m_xmf4Orientation, m_xmf3Scale, 1);
+	m_pBody = pBody;
+	m_pCollider = pCollider;
 
 #if defined(_DEBUG)
-	m_pCollider = std::make_shared<ColliderBox>(this->m_pBody.get(), XMFLOAT3(0,0,0), XMFLOAT3(0,0,0), XMFLOAT3(0.5f,0.5f,0.5f));
+	//m_pCollider = std::make_shared<ColliderBox>(this->m_pBody.get(), XMFLOAT3(0,0,0), XMFLOAT3(0,0,0), XMFLOAT3(0.5f,0.5f,0.5f));
 
 	m_pCollider->BuildMesh(pd3dDevice, pd3dCommandList);
 	
@@ -32,6 +28,7 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 
 Object::~Object()
 {
+	Destroy();
 }
 
 bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
@@ -52,17 +49,23 @@ void Object::Animate(float elapsedTime)
 
 void Object::Update(float elapsedTime)
 {
-	UpdateTransform(NULL);
-
 	// RigidBody를 기준으로 위치를 갱신한다.
 	if (m_pBody)
 	{
 		m_pBody->Update(elapsedTime);
+		if (m_pBody->GetInvalid())
+		{
+			Destroy();
+			return;
+		}
 		m_pCollider->UpdateWorldTransform();
 		m_xmf3Position = m_pBody->GetPosition();
 		m_xmf4Orientation = m_pBody->GetOrientation();
+		m_xmf3Scale = m_pBody->GetScale();
 		m_xmf4x4World = m_pBody->GetWorld();
 	}
+
+	UpdateTransform(NULL);
 
 	ObjConstant objConstant;
 	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
@@ -86,16 +89,16 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 	}
 	else
 	{
-		// RootObject인 경우
-		m_xmf4x4LocalTransform = MathHelper::identity4x4();
-		XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
+		//// RootObject인 경우
+		//m_xmf4x4LocalTransform = MathHelper::identity4x4();
+		//XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
 
-		XMMATRIX xmmatRotate = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
-		XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
-		// S * R * T
-		XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate)));
+		//XMMATRIX xmmatRotate = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
+		//XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
+		//// S * R * T
+		//XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate)));
 
-		m_xmf4x4World = m_xmf4x4LocalTransform;
+		//m_xmf4x4World = m_xmf4x4LocalTransform;
 	}
 
 	if (m_pSibling) {
@@ -429,6 +432,23 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	//	vpMat[i]->BuildDescriptorHeap(pd3dDevice);
 
 	SetMaterials(vpMat);
+}
+
+void Object::Destroy()
+{
+	m_bIsAlive = false;
+
+	m_pChild.reset();
+	m_pSibling.reset();
+
+	m_pMesh.reset();
+	for (int i = 0; i < m_vpMaterials.size(); ++i)
+		m_vpMaterials[i].reset();
+	m_pAnimationController.reset();
+	m_pObjectCB.reset();
+
+	m_pCollider.reset();
+	m_pBody.reset();
 }
 
 void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData)

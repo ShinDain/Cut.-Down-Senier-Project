@@ -6,6 +6,14 @@ Collider::Collider()
 
 Collider::~Collider()
 {
+	m_pRigidBody = nullptr;
+
+	m_PositionBufferGPU = nullptr;
+	m_PositionBufferUploader = nullptr;
+	m_NormalBufferGPU = nullptr;
+	m_NormalBufferUploader = nullptr;
+	m_IndexBufferGPU = nullptr;
+	m_IndexBufferUploader = nullptr;
 }
 
 void Collider::UpdateWorldTransform()
@@ -91,8 +99,9 @@ void Collider::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
 
 // =============== Collider Plane =================================
 
-ColliderPlane::ColliderPlane(XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Direction, float distance)
+ColliderPlane::ColliderPlane(RigidBody* pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Direction, float distance)
 {
+	m_pRigidBody = pBody;
 	m_xmf3OffsetPosition = xmf3OffsetPosition;
 	m_xmf3OffsetRotate = xmf3OffsetRotate;
 	m_xmf3Direction = xmf3Direction;
@@ -131,9 +140,9 @@ void ColliderPlane::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	Positions.resize(24);
 	Normal.resize(24);
 
-	float w = 100.0f;
-	float h = 0.1f;
-	float d = 100.0f;
+	float w = 0.5;
+	float h = 0.5;
+	float d = 0.5;
 
 	Positions =
 	{
@@ -431,8 +440,11 @@ void ColliderBox::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 // =============== Collider Sphere =================================
 
-ColliderSphere::ColliderSphere()
+ColliderSphere::ColliderSphere(RigidBody* pBody, XMFLOAT3 xmf3OffsetPosition, float radius)
 {
+	m_pRigidBody = pBody;
+	m_xmf3OffsetPosition = xmf3OffsetPosition;
+	m_Radius = radius;
 }
 
 ColliderSphere::~ColliderSphere()
