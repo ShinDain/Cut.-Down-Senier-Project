@@ -204,12 +204,11 @@ namespace MathHelper
 
 	inline XMMATRIX MakeSkewSymmetric(XMFLOAT3 xmf3Vector)
 	{
-		XMFLOAT4X4 ret = XMFLOAT4X4(0.0f, -xmf3Vector.z, xmf3Vector.y, 0.0f,
-									xmf3Vector.z, 0.0f, -xmf3Vector.x, 0.0f,
-									-xmf3Vector.y, xmf3Vector.x, 0.0f, 0.0f,
-									0.0f, 0.0f, 0.0f, 0.0f);
+		XMFLOAT3X3 ret = XMFLOAT3X3(0.0f, -xmf3Vector.z, xmf3Vector.y,
+									xmf3Vector.z, 0.0f, -xmf3Vector.x,
+									-xmf3Vector.y, xmf3Vector.x, 0.0f);
 
-		return XMLoadFloat4x4(&ret);
+		return XMLoadFloat3x3(&ret);
 	}
 }
 
