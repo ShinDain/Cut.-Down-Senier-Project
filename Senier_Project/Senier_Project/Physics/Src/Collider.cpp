@@ -74,8 +74,8 @@ const XMVECTOR Collider::GetAxis(int index) const
 
 void Collider::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[2] = { m_PositionBufferView, m_NormalBufferView };
-	pd3dCommandList->IASetVertexBuffers(0, 2, pVertexBufferView);
+	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[] = { m_PositionBufferView};
+	pd3dCommandList->IASetVertexBuffers(0, 1, pVertexBufferView);
 	pd3dCommandList->IASetPrimitiveTopology(m_PrimitiveTopology);
 
 	XMFLOAT4X4 tmp = m_pRigidBody->GetWorld();
@@ -99,7 +99,7 @@ void Collider::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
 
 // =============== Collider Plane =================================
 
-ColliderPlane::ColliderPlane(RigidBody* pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Direction, float distance)
+ColliderPlane::ColliderPlane(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Direction, float distance)
 {
 	m_pRigidBody = pBody;
 	m_xmf3OffsetPosition = xmf3OffsetPosition;
@@ -134,123 +134,91 @@ void ColliderPlane::CalculateRotateInertiaMatrix()
 void ColliderPlane::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	std::vector<XMFLOAT3> Positions;
-	std::vector<XMFLOAT3> Normal;
 	std::vector<std::uint16_t> Indices;
 
-	Positions.resize(24);
-	Normal.resize(24);
+	Positions.resize(4);
 
 	float w = 0.5;
 	float h = 0.5;
 	float d = 0.5;
 
-	Positions =
+	if (m_xmf3Direction.x == 1)
 	{
-		XMFLOAT3(-w, -h, -d),
-		XMFLOAT3(-w, +h, -d),
-		XMFLOAT3(+w, +h, -d),
-		XMFLOAT3(+w, -h, -d),
-
-		XMFLOAT3(-w, -h, +d),
-		XMFLOAT3(+w, -h, +d),
-		XMFLOAT3(+w, +h, +d),
-		XMFLOAT3(-w, +h, +d),
-
-		XMFLOAT3(-w, +h, -d),
-		XMFLOAT3(-w, +h, +d),
-		XMFLOAT3(+w, +h, +d),
-		XMFLOAT3(+w, +h, -d),
-
-		XMFLOAT3(-w, -h, -d),
-		XMFLOAT3(+w, -h, -d),
-		XMFLOAT3(+w, -h, +d),
-		XMFLOAT3(-w, -h, +d),
-
-		XMFLOAT3(-w, -h, +d),
-		XMFLOAT3(-w, +h, +d),
-		XMFLOAT3(-w, +h, -d),
-		XMFLOAT3(-w, -h, -d),
-
-		XMFLOAT3(+w, -h, -d),
-		XMFLOAT3(+w, +h, -d),
-		XMFLOAT3(+w, +h, +d),
-		XMFLOAT3(+w, -h, +d)
-	};
-	Normal =
+		Positions =
+		{
+			XMFLOAT3(0, -h, -d),
+			XMFLOAT3(0, +h, -d),
+			XMFLOAT3(0, +h, +d),
+			XMFLOAT3(0, -h, +d)
+		};
+	}
+	else if	(m_xmf3Direction.x == -1)
 	{
-		XMFLOAT3(0.0f, 0.0f, -1.0f),
-		XMFLOAT3(0.0f, 0.0f, -1.0f),
-		XMFLOAT3(0.0f, 0.0f, -1.0f),
-		XMFLOAT3(0.0f, 0.0f, -1.0f),
+		Positions =
+		{
+			XMFLOAT3(0, -h, +d),
+			XMFLOAT3(0, +h, +d),
+			XMFLOAT3(0, +h, -d),
+			XMFLOAT3(0, -h, -d)
+		};
+	}
+	else if (m_xmf3Direction.y == 1)
+	{
+		Positions =
+		{
+			XMFLOAT3(-w, 0, -d),
+			XMFLOAT3(-w, 0, +d),
+			XMFLOAT3(+w, 0, +d),
+			XMFLOAT3(+w, 0, -d)
+		};
+	}
+	else if (m_xmf3Direction.y == -1)
+	{
+		Positions =
+		{
+			XMFLOAT3(-w, 0, +d),
+			XMFLOAT3(-w, 0, -d),
+			XMFLOAT3(+w, 0, -d),
+			XMFLOAT3(+w, 0, +d)
+		};
+	}
+	else if (m_xmf3Direction.z == 1)
+	{
+		Positions =
+		{
+			XMFLOAT3(-w, -h, 0),
+			XMFLOAT3(-w, +h, 0),
+			XMFLOAT3(+w, +h, 0),
+			XMFLOAT3(+w, -h, 0)
+		};
+	}
+	else if (m_xmf3Direction.z == -1)
+	{
+		Positions =
+		{
+			XMFLOAT3(+w, -h, 0),
+			XMFLOAT3(+w, +h, 0),
+			XMFLOAT3(-w, +h, 0),
+			XMFLOAT3(-w, -h, 0)
+		};
+	}
 
-		XMFLOAT3(0.0f, 0.0f, 1.0f),
-		XMFLOAT3(0.0f, 0.0f, 1.0f),
-		XMFLOAT3(0.0f, 0.0f, 1.0f),
-		XMFLOAT3(0.0f, 0.0f, 1.0f),
-
-		XMFLOAT3(0.0f, 1.0f, 0.0f),
-		XMFLOAT3(0.0f, 1.0f, 0.0f),
-		XMFLOAT3(0.0f, 1.0f, 0.0f),
-		XMFLOAT3(0.0f, 1.0f, 0.0f),
-
-		XMFLOAT3(0.0f, -1.0f, 0.0f),
-		XMFLOAT3(0.0f, -1.0f, 0.0f),
-		XMFLOAT3(0.0f, -1.0f, 0.0f),
-		XMFLOAT3(0.0f, -1.0f, 0.0f),
-
-		XMFLOAT3(-1.0f, 0.0f, 0.0f),
-		XMFLOAT3(-1.0f, 0.0f, 0.0f),
-		XMFLOAT3(-1.0f, 0.0f, 0.0f),
-		XMFLOAT3(-1.0f, 0.0f, 0.0f),
-
-		XMFLOAT3(1.0f, 0.0f, 0.0f),
-		XMFLOAT3(1.0f, 0.0f, 0.0f),
-		XMFLOAT3(1.0f, 0.0f, 0.0f),
-		XMFLOAT3(1.0f, 0.0f, 0.0f)
-	};
-
-	Indices.resize(36);
+	Indices.resize(6);
 
 	Indices =
 	{
 		// ¾Õ¸é
 		0,1,2,
-		0,2,3,
-
-		// µÞ¸é
-		4,5,6,
-		4,6,7,
-
-		// ¿ÞÂÊ ¸é
-		8,9,10,
-		8,10,11,
-
-		// ¿À¸¥ÂÊ ¸é
-		12,13,14,
-		12,14,15,
-
-		// À­¸é
-		16,17,18,
-		16,18,19,
-
-		// ¾Æ·§¸é
-		20,21,22,
-		20,22,23
+		0,2,3		
 	};
 
 	const UINT positionBufferByteSize = (UINT)Positions.size() * sizeof(XMFLOAT3);
-	const UINT NormalBufferByteSize = (UINT)Normal.size() * sizeof(XMFLOAT3);
 	const UINT indexBufferByteSize = (UINT)Indices.size() * sizeof(std::uint_fast16_t);
 
 	CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 		&m_PositionBufferGPU, &m_PositionBufferUploader,
 		positionBufferByteSize, sizeof(XMFLOAT3),
 		&m_PositionBufferView, Positions.data());
-
-	CreateVertexBuffer(pd3dDevice, pd3dCommandList,
-		&m_NormalBufferGPU, &m_NormalBufferUploader,
-		NormalBufferByteSize, sizeof(XMFLOAT3),
-		&m_NormalBufferView, Normal.data());
 
 	CreateIndexBuffer(pd3dDevice, pd3dCommandList,
 		&m_IndexBufferGPU, &m_IndexBufferUploader,
@@ -267,7 +235,7 @@ void ColliderPlane::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 
 // =============== Collider Box =================================
 
-ColliderBox::ColliderBox(RigidBody* pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Extents)
+ColliderBox::ColliderBox(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Extents)
 {
 	m_pRigidBody = pBody;
 	m_xmf3OffsetPosition = xmf3OffsetPosition;
@@ -307,11 +275,9 @@ void ColliderBox::CalculateRotateInertiaMatrix()
 void ColliderBox::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	std::vector<XMFLOAT3> Positions;
-	std::vector<XMFLOAT3> Normal;
 	std::vector<std::uint16_t> Indices;
 
 	Positions.resize(24);
-	Normal.resize(24);
 
 	float w = m_xmf3Extents.x;
 	float h = m_xmf3Extents.y;
@@ -349,38 +315,6 @@ void ColliderBox::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 		XMFLOAT3(+w, +h, +d),
 		XMFLOAT3(+w, -h, +d)
 	};
-	Normal =
-	{
-		XMFLOAT3(0.0f, 0.0f, -1.0f),
-		XMFLOAT3(0.0f, 0.0f, -1.0f),
-		XMFLOAT3(0.0f, 0.0f, -1.0f),
-		XMFLOAT3(0.0f, 0.0f, -1.0f),
-
-		XMFLOAT3(0.0f, 0.0f, 1.0f),
-		XMFLOAT3(0.0f, 0.0f, 1.0f),
-		XMFLOAT3(0.0f, 0.0f, 1.0f),
-		XMFLOAT3(0.0f, 0.0f, 1.0f),
-
-		XMFLOAT3(0.0f, 1.0f, 0.0f),
-		XMFLOAT3(0.0f, 1.0f, 0.0f),
-		XMFLOAT3(0.0f, 1.0f, 0.0f),
-		XMFLOAT3(0.0f, 1.0f, 0.0f),
-
-		XMFLOAT3(0.0f, -1.0f, 0.0f),
-		XMFLOAT3(0.0f, -1.0f, 0.0f),
-		XMFLOAT3(0.0f, -1.0f, 0.0f),
-		XMFLOAT3(0.0f, -1.0f, 0.0f),
-
-		XMFLOAT3(-1.0f, 0.0f, 0.0f),
-		XMFLOAT3(-1.0f, 0.0f, 0.0f),
-		XMFLOAT3(-1.0f, 0.0f, 0.0f),
-		XMFLOAT3(-1.0f, 0.0f, 0.0f),
-
-		XMFLOAT3(1.0f, 0.0f, 0.0f),
-		XMFLOAT3(1.0f, 0.0f, 0.0f),
-		XMFLOAT3(1.0f, 0.0f, 0.0f),
-		XMFLOAT3(1.0f, 0.0f, 0.0f)
-	};
 
 	Indices.resize(36);
 
@@ -412,18 +346,12 @@ void ColliderBox::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	};
 
 	const UINT positionBufferByteSize = (UINT)Positions.size() * sizeof(XMFLOAT3);
-	const UINT NormalBufferByteSize = (UINT)Normal.size() * sizeof(XMFLOAT3);
 	const UINT indexBufferByteSize = (UINT)Indices.size() * sizeof(std::uint_fast16_t);
 
 	CreateVertexBuffer(pd3dDevice, pd3dCommandList,
 		&m_PositionBufferGPU, &m_PositionBufferUploader,
 		positionBufferByteSize, sizeof(XMFLOAT3),
 		&m_PositionBufferView, Positions.data());
-
-	CreateVertexBuffer(pd3dDevice, pd3dCommandList,
-		&m_NormalBufferGPU, &m_NormalBufferUploader,
-		NormalBufferByteSize, sizeof(XMFLOAT3),
-		&m_NormalBufferView, Normal.data());
 
 	CreateIndexBuffer(pd3dDevice, pd3dCommandList,
 		&m_IndexBufferGPU, &m_IndexBufferUploader,
@@ -440,7 +368,7 @@ void ColliderBox::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 // =============== Collider Sphere =================================
 
-ColliderSphere::ColliderSphere(RigidBody* pBody, XMFLOAT3 xmf3OffsetPosition, float radius)
+ColliderSphere::ColliderSphere(std::shared_ptr<RigidBody> pBody, XMFLOAT3 xmf3OffsetPosition, float radius)
 {
 	m_pRigidBody = pBody;
 	m_xmf3OffsetPosition = xmf3OffsetPosition;

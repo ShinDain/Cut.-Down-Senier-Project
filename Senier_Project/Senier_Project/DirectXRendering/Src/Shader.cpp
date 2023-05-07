@@ -353,8 +353,7 @@ bool ColliderShader::BuildShadersAndInputLayout()
 	m_psByteCode = d3dUtil::CompileShader(L"Shader\\ColliderShader.hlsl", nullptr, "PS", "ps_5_0");
 
 	m_vInputLayout = {
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
-		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
 	};
 
 	return true;

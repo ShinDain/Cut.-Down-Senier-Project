@@ -33,7 +33,7 @@
     <ClCompile Include="DirectXRendering\Src\Material.cpp" />
     <ClCompile Include="DirectXRendering\Src\Mesh.cpp" />
     <ClCompile Include="DirectXRendering\Src\Object.cpp" />
-    <ClCompile Include="DirectXRendering\Src\PlayerController.cpp" />
+    <ClCompile Include="DirectXRendering\Src\Character.cpp" />
     <ClCompile Include="DirectXRendering\Src\Scene.cpp" />
     <ClCompile Include="DirectXRendering\Src\Shader.cpp" />
     <ClCompile Include="main.cpp" />
@@ -51,6 +51,7 @@
     <ClInclude Include="Common\Header\GameTimer.h" />
     <ClInclude Include="Common\Header\GeometryGenerator.h" />
     <ClInclude Include="Common\Header\MathHelper.h" />
+    <ClInclude Include="Common\Header\Struct.h" />
     <ClInclude Include="Common\Header\UploadBuffer.h" />
     <ClInclude Include="DirectXRendering\Header\AnimationController.h" />
     <ClInclude Include="DirectXRendering\Header\Camera.h" />
@@ -61,7 +62,7 @@
     <ClInclude Include="DirectXRendering\Header\Material.h" />
     <ClInclude Include="DirectXRendering\Header\Mesh.h" />
     <ClInclude Include="DirectXRendering\Header\Object.h" />
-    <ClInclude Include="DirectXRendering\Header\PlayerController.h" />
+    <ClInclude Include="DirectXRendering\Header\Character.h" />
     <ClInclude Include="DirectXRendering\Header\Scene.h" />
     <ClInclude Include="DirectXRendering\Header\Shader.h" />
     <ClInclude Include="DirectXRendering\SenierProjectApp.h" />

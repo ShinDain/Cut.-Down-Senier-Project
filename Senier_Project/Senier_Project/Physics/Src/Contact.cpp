@@ -1,6 +1,6 @@
 #include "../Header/Contact.h"
 
-Contact::Contact(RigidBody* pBody1, RigidBody* pBody2, float friction, float restitution, XMFLOAT3 xmf3ContactPoint, XMFLOAT3 xmf3ContactNormal, float depth)
+Contact::Contact(std::shared_ptr<RigidBody> pBody1, std::shared_ptr<RigidBody> pBody2, float friction, float restitution, XMFLOAT3 xmf3ContactPoint, XMFLOAT3 xmf3ContactNormal, float depth)
 	: m_Friction(friction), m_Restitution(restitution), m_xmf3ContactPoint(xmf3ContactPoint), m_xmf3ContactNormal(xmf3ContactNormal), m_Depth(depth)
 {
 	m_pBody[0] = pBody1;
@@ -245,7 +245,7 @@ void Contact::SwapBodies()
 	m_xmf3ContactNormal.y *= -1;
 	m_xmf3ContactNormal.z *= -1;
 
-	RigidBody* tmp = m_pBody[0];
+	std::shared_ptr<RigidBody> tmp = m_pBody[0];
 	m_pBody[0] = m_pBody[1];
 	m_pBody[1] = tmp;
 }
@@ -313,7 +313,7 @@ void Contact::CalcDesiredDeltaVelocity(float elapsedTime)
 
 XMVECTOR Contact::CalcLocalVelocity(int nbodyidx, float elapsedTime)
 {
-	RigidBody* thisBody = m_pBody[nbodyidx];
+	std::shared_ptr<RigidBody> thisBody = m_pBody[nbodyidx];
 
 	XMVECTOR relativePosition = XMLoadFloat3(&m_pxmf3RelativePosition[nbodyidx]);
 	XMVECTOR velocity = XMLoadFloat3(&thisBody->GetAngularVelocity());

@@ -87,6 +87,7 @@ void fillPointFaceBoxBox(
 )
 {
 	XMVECTOR normal = box1.GetAxis(best);
+	normal = XMVector3Normalize(normal);
 	if (XMVectorGetX(XMVector3Dot(normal, toCentre)) > 0)
 	{
 		normal = -normal;
@@ -107,8 +108,8 @@ void fillPointFaceBoxBox(
 	XMStoreFloat3(&xmf3ContactNormal, normal);
 
 	// 물리 연산을 하지 않는 경우 NULL로 전달
-	RigidBody* pBody1 = box1.GetBody();
-	RigidBody* pBody2 = box2.GetBody();
+	std::shared_ptr<RigidBody> pBody1 = box1.GetBody();
+	std::shared_ptr<RigidBody> pBody2 = box2.GetBody();
 	if (!pBody1->GetPhysics())
 		pBody1 = nullptr;
 	if (!pBody2->GetPhysics())
@@ -417,12 +418,13 @@ int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box
 
 		// ===============================================================
 
+		axis = XMVector3Normalize(axis);
 		XMFLOAT3 xmf3ContactNormal;
 		XMStoreFloat3(&xmf3ContactNormal, axis);
 
 		// 물리 연산을 하지 않는 경우 NULL로 전달
-		RigidBody* pBody1 = box1.GetBody();
-		RigidBody* pBody2 = box2.GetBody();
+		std::shared_ptr<RigidBody> pBody1 = box1.GetBody();
+		std::shared_ptr<RigidBody> pBody2 = box2.GetBody();
 		if (!pBody1->GetPhysics())
 			pBody1 = nullptr;
 		if (!pBody2->GetPhysics())

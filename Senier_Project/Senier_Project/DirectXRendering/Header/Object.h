@@ -6,12 +6,13 @@
 
 #include "../../Common/Header/D3DUtil.h"
 #include "../../Common/Header/UploadBuffer.h"
+#include "../../Physics/Header/RigidBody.h"
+#include "../../Physics/Header/Collider.h"
 #include "Global.h"
 #include "Mesh.h"
 #include "Material.h"
 #include "AnimationController.h"
-#include "../../Physics/Header/RigidBody.h"
-#include "../../Physics/Header/Collider.h"
+
 
 #define DIR_FORWARD					0x01
 #define DIR_BACKWARD				0x02
@@ -25,7 +26,7 @@ class Object : public std::enable_shared_from_this<Object>
 public:
 	Object();
 	Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
-		   std::shared_ptr<RigidBody> pBody, std::shared_ptr<Collider> pCollider,
+		   ObjectInitData objData,
 		   std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks);
 
 	Object(const Object& rhs) = delete;
@@ -46,7 +47,7 @@ public:
 	static void LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData);
 	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject);
 
-	void Destroy();
+	virtual void Destroy();
 
 protected:
 	virtual void OnPrepareRender(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
@@ -98,14 +99,15 @@ protected:
 	std::shared_ptr<RigidBody> m_pBody = nullptr;
 	std::shared_ptr<Collider> m_pCollider = nullptr;
 
+	XMFLOAT3 m_xmf3ColliderExtents = XMFLOAT3(0, 0, 0);
+
 	bool m_bPhysics = true;
 	bool m_bIsAlive = true;
 	
 public:
-	void Move(DWORD dwDirection, float distance);
-	void Rotate(float x, float y, float z);
-	void Walk(float delta);
-	void Strafe(float delta);
+	virtual void Move(DWORD dwDirection, float distance);
+	virtual void Rotate(float x, float y, float z);
+	virtual void Jump() {}
 
 	void AddPosition(float x, float y, float z)
 	{
@@ -172,8 +174,8 @@ public:
 	const float& GetRoll() { return(m_xmf3Rotate.z); }
 	const XMFLOAT4& GetOrientation() { return m_xmf4Orientation; }
 
-	RigidBody* GetBody() { return m_pBody.get(); }
-	Collider* GetCollider() { return m_pCollider.get(); }
+	std::shared_ptr<RigidBody> GetBody() { return m_pBody; }
+	std::shared_ptr<Collider> GetCollider() { return m_pCollider; }
 
 	bool GetIsAlive() { return m_bIsAlive; }
 };

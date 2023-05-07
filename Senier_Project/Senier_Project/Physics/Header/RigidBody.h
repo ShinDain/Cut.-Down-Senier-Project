@@ -20,8 +20,8 @@ public:
 protected:
 	XMFLOAT3 m_xmf3Position = XMFLOAT3(0, 0, 0);
 	XMFLOAT4 m_xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
+	XMFLOAT3 m_xmf3Rotate = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 m_xmf3Scale = XMFLOAT3(1,1,1);
-
 	//XMFLOAT3 m_xmf3Scale = XMFLOAT3(0, 0, 0);
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 
@@ -41,8 +41,8 @@ protected:
 
 	float m_Motion = 0;
 	float m_lastMotion = 0;
-	float m_ToSleepTime = 3.0f;
-	float m_SleepElapsedTime = 0;
+
+	float m_ElapsedTimeAfterCreated = 0;
 
 	bool m_bIsAwake = true;
 	bool m_bCanSleep = false;
@@ -69,6 +69,7 @@ public:
 	void SetPosition(XMFLOAT3 xmf3Position) { m_xmf3Position = xmf3Position; }
 	void SetOrientation(XMFLOAT4 xmf4Orientation) { m_xmf4Orientation = xmf4Orientation; 
 													XMStoreFloat4(&m_xmf4Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmf4Orientation))); }
+	void SetRotate(XMFLOAT3 xmf3Rotate) { m_xmf3Rotate = xmf3Rotate; }
 	void SetScale(XMFLOAT3 xmf3Scale) { m_xmf3Scale = xmf3Scale; }
 	void SetWorld(XMFLOAT4X4 xmf4x4World) { m_xmf4x4World = xmf4x4World; }
 
@@ -104,6 +105,7 @@ public:
 
 	const XMFLOAT3& GetPosition() { return m_xmf3Position; }
 	const XMFLOAT4& GetOrientation() { return m_xmf4Orientation; }
+	const XMFLOAT3& GetRotate() { return m_xmf3Rotate; }
 	const XMFLOAT3& GetScale() { return m_xmf3Scale; }
 	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
 		 

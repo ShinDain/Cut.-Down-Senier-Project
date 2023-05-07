@@ -1,4 +1,6 @@
-#pragma once
+#ifndef COLLIDER_H
+
+#define COLLIDER_H
 
 #include "../../Common/Header/D3DUtil.h"
 #include "../../DirectXRendering/Header/Global.h"
@@ -18,7 +20,7 @@ public:
 	virtual void CalculateRotateInertiaMatrix() {}
 
 protected:
-	RigidBody* m_pRigidBody = nullptr;
+	std::shared_ptr<RigidBody> m_pRigidBody = nullptr;
 
 	XMFLOAT3 m_xmf3OffsetPosition = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 m_xmf3OffsetRotate = XMFLOAT3(0, 0, 0);
@@ -37,7 +39,7 @@ public:
 	const XMFLOAT3& GetOffsetRotate() const { return m_xmf3OffsetRotate; }
 	const XMFLOAT4X4& GetWorld() const { return m_xmf4x4World; }
 
-	RigidBody* GetBody() const { return m_pRigidBody; }
+	std::shared_ptr<RigidBody> GetBody() const { return m_pRigidBody; }
 
 	bool GetPhysics() const { return m_pRigidBody->GetPhysics(); }
 
@@ -76,7 +78,7 @@ class ColliderPlane : public Collider
 {
 public:
 	ColliderPlane() = delete;
-	ColliderPlane(RigidBody* pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Direction, float distance);
+	ColliderPlane(std::shared_ptr<RigidBody> pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Direction, float distance);
 	ColliderPlane(const ColliderPlane& rhs) = delete;
 	ColliderPlane& operator=(const ColliderPlane& rhs) = delete;
 	virtual ~ColliderPlane();
@@ -102,7 +104,7 @@ class ColliderBox : public Collider
 {
 public:
 	ColliderBox() = delete;
-	ColliderBox(RigidBody* pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Extents);
+	ColliderBox(std::shared_ptr<RigidBody> pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Extents);
 	ColliderBox(const ColliderBox& rhs) = delete;
 	ColliderBox& operator=(const ColliderBox& rhs) = delete;
 	virtual ~ColliderBox();
@@ -121,7 +123,7 @@ class ColliderSphere : public Collider
 {
 public:
 	ColliderSphere() = delete;
-	ColliderSphere(RigidBody* pBody, XMFLOAT3 xmf3OffsetPosition, float radius);
+	ColliderSphere(std::shared_ptr<RigidBody> pBody, XMFLOAT3 xmf3OffsetPosition, float radius);
 	ColliderSphere(const ColliderSphere& rhs) = delete;
 	ColliderSphere& operator=(const ColliderSphere& rhs) = delete;
 	virtual ~ColliderSphere();
@@ -135,3 +137,5 @@ public:
 	void SetRadius(const float Radius) { m_Radius = Radius; }
 	const float GetRadius() const { return m_Radius; }
 };
+
+#endif // !COLLIDER_H

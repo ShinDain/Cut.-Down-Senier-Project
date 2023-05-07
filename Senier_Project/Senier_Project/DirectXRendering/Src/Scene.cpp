@@ -1,6 +1,6 @@
 #include "../Header/Scene.h"
 
-#define CHARACTER_MADEL_PATH "Model/"
+#define CHARACTER_MADEL_PATH "Model/Angrybot.bin"
 #define CUBE_MODEL_PATH "Model/Cube.bin"
 #define CUBE_MODEL_EXTENTS XMFLOAT3(0.5f, 0.5f, 0.5f)
 
@@ -20,39 +20,59 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_pPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
 
 	ObjectInitData objectData;
-	objectData.pstrFilePath = CUBE_MODEL_PATH;
-	objectData.xmf3Extents = CUBE_MODEL_EXTENTS;
-	objectData.xmf3Position = XMFLOAT3(0, 20, 0);
+	objectData.xmf3Position = XMFLOAT3(0, 25, 0);
 	objectData.xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
 	objectData.xmf3Scale = XMFLOAT3(10, 10, 10);
-	objectData.nMass = 1;
+	objectData.nMass = 10;
+	objectData.objectType = Object_Character;
 	objectData.colliderType = Collider_Box;
+	objectData.xmf3Extents = CUBE_MODEL_EXTENTS;
+
+	// 캐릭터 테스트
+	CreateObject(pd3dDevice, pd3dCommandList,  objectData, CUBE_MODEL_PATH, 0, RenderLayer::Static);
+
 	objectData.objectType = Object_Physics;
-
 	// 복수의 박스 생성
-	for (int i = 0; i < 100; ++i)
+	for (int i = 0; i < 10; ++i)
 	{
-		//objectData.xmf3Position = XMFLOAT3(i * 20 - 40, 20, 0);
-		objectData.xmf3Position = XMFLOAT3(-50 + 10 * (i / 3), 5 + (i % 3) * 10, 0);
+		objectData.xmf3Position = XMFLOAT3(-10 + 10 * (i / 3), 0, -10 + 10 * (i % 3));
 
-		CreateObject(pd3dDevice, pd3dCommandList, objectData, 0, RenderLayer::Static);
+		CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Static);
 	}
 
 	// 플랫폼 테스트
-	objectData.xmf3Position = XMFLOAT3(500, 25, 0);
+	objectData.xmf3Position = XMFLOAT3(0, 20, 0);
 	objectData.objectType = Object_Platform;
 	objectData.xmf3Scale = XMFLOAT3(20, 1, 20);
 	//CreateObject(pd3dDevice, pd3dCommandList, objectData, 0, RenderLayer::Static);
-	//m_vpAllObjs[50]->GetBody()->SetVelocity(XMFLOAT3(-120, 0, 0));
+	//m_vpAllObjs[1]->GetBody()->SetVelocity(XMFLOAT3(25, 0, 0));
 
 
 	// 바닥
 	objectData.xmf3Extents = XMFLOAT3(0, 0, 0);
 	objectData.xmf3Position = XMFLOAT3(0,0,0);
+	objectData.xmf4Orientation = XMFLOAT4(0, 1, 0, 1);
 	objectData.xmf3Scale = XMFLOAT3(100, 0.1f, 100);
 	objectData.colliderType = Collider_Plane;
 	objectData.objectType = Object_World;
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, 0, RenderLayer::Static);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Static);
+
+	// 왼쪽 벽
+	objectData.xmf3Extents = XMFLOAT3(-50, 0, 0);
+	objectData.xmf3Position = XMFLOAT3(-50, 0, 0);
+	objectData.xmf4Orientation = XMFLOAT4(1, 0, 0, 1);
+	objectData.xmf3Scale = XMFLOAT3(0.1f, 50, 100);
+	objectData.colliderType = Collider_Plane;
+	objectData.objectType = Object_World;
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Static);
+	// 오른쪽 벽
+	objectData.xmf3Extents = XMFLOAT3(-50, 0, 0);
+	objectData.xmf3Position = XMFLOAT3(50, 0, 0);
+	objectData.xmf4Orientation = XMFLOAT4(-1, 0, 0, 1);
+	objectData.xmf3Scale = XMFLOAT3(0.1f, 50, 100);
+	objectData.colliderType = Collider_Plane;
+	objectData.objectType = Object_World;
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Static);
 	
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
@@ -60,10 +80,10 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	}
 
 	// 카메라 초기화
-	//m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
-	m_pCamera = std::make_unique<Camera>();
-	m_pCamera->SetPosition(0, 30, -100);
-	m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
+	m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
+	//m_pCamera = std::make_unique<Camera>();
+	//m_pCamera->SetPosition(0, 30, -100);
+//	m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
 	
 #if defined(_DEBUG)
 
@@ -83,7 +103,7 @@ void Scene::Update(float elapsedTime)
 {
 #if defined(_DEBUG)
 	ClearObjectLayer();
-	m_refCnt = m_LoadedModelData[CUBE_MODEL_PATH]->m_pRootObject.use_count();
+	m_refCnt = g_LoadedModelData[CUBE_MODEL_PATH]->m_pRootObject.use_count();
 	m_size = m_vpAllObjs.size();
 
 	m_tTime += elapsedTime;
@@ -96,7 +116,6 @@ void Scene::Update(float elapsedTime)
 	}
 
 	// Contact 데이터 생성
-	// Collider 객체를 타입별로 분류
 	GenerateContact();
 	// Collision Resolve
 	m_pCollisionResolver->ResolveContacts(m_CollisionData.pContacts, elapsedTime);
@@ -151,12 +170,13 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 	if (pKeybuffer[VK_LBUTTON] & 0xF0)
 	{
 		SetCursor(NULL);
+		//GetCursorPos(&ptCursorPos);
 		GetCursorPos(&ptCursorPos);
 		SetCursorPos(CLIENT_WIDTH / 2, CLIENT_HEIGHT / 2);
-		dx = (float)(ptCursorPos.x - CLIENT_WIDTH / 2) / 3.0f;
-		dy = (float)(ptCursorPos.y - CLIENT_HEIGHT / 2) / 3.0f;
+		dx = (float)(ptCursorPos.x - CLIENT_WIDTH / 2) / 30.0f;
+		dy = (float)(ptCursorPos.y - CLIENT_HEIGHT / 2) / 30.0f;
 		//m_LastMousePos = ptCursorPos;
-		SetCursorPos(CLIENT_WIDTH / 2, CLIENT_HEIGHT / 2);
+		//SetCursorPos(CLIENT_WIDTH / 2, CLIENT_HEIGHT / 2);
 	}
 
 	DWORD dwDirection = 0;
@@ -169,127 +189,85 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 	{
 		if (dx != 0 || dy != 0)
 		{
-			//m_vpAllObjs[0]->Rotate(0,-dx, 0);
+			m_vpAllObjs[0]->Rotate(0,dx, 0);
 
-			m_pCamera->Pitch(dy / 1000);
-			m_pCamera->RotateY(dx / 1000);
+			//m_pCamera->Pitch(dy / 1000);
+			//m_pCamera->RotateY(dx / 1000);
 		}
 
-		//m_vpAllObjs[0]->Move(dwDirection, m_vpAllObjs[0]->GetAcceleration());
 	}
+	m_vpAllObjs[0]->Move(dwDirection, 50.0f);
+
+	if (pKeybuffer[VK_SPACE] & 0xF0) m_vpAllObjs[0]->Jump();
+
 
 #if defined(_DEBUG)
-	/*if (pKeybuffer[VK_UP] & 0xF0) {
-		Physics::CalculateImpulse(m_vpAllObjs[0].get(), m_vpAllObjs[1].get(), XMFLOAT3(0, 1, 0), XMFLOAT3(0, -5, 0), XMFLOAT3(0, -5, 0), 1, 0.5f);
-	}
-	if (pKeybuffer[VK_DOWN] & 0xF0) {
-		Physics::CalculateImpulse(m_vpAllObjs[0].get(), m_vpAllObjs[1].get(), XMFLOAT3(0, -1, 0), XMFLOAT3(0, 5, 0), XMFLOAT3(0, 5, 0), 1, 0.5f);
-	}
-	if (pKeybuffer[VK_LEFT] & 0xF0) {
-		Physics::CalculateImpulse(m_vpAllObjs[0].get(), m_vpAllObjs[1].get(), XMFLOAT3(-1, 0, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), 1, 0.5f);
-	}
-	if (pKeybuffer[VK_RIGHT] & 0xF0) {
-		Physics::CalculateImpulse(m_vpAllObjs[0].get(), m_vpAllObjs[1].get(), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), 1, 0.5f);
-	}*/
+	
 #endif
 }
 
 
 std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
-											const ObjectInitData& objInitData, int nAnimationTracks, RenderLayer renderLayer)
+											const ObjectInitData& objInitData, const char* pstrFilePath, int nAnimationTracks, RenderLayer renderLayer)
 {
 	std::shared_ptr<ModelDataInfo> pModelData;
 	std::shared_ptr<Object> pObject;
-	const char* pstrFilePath = objInitData.pstrFilePath;
-
-	if (m_LoadedModelData.find(pstrFilePath) == m_LoadedModelData.end())
+	
+	if (g_LoadedModelData.find(pstrFilePath) == g_LoadedModelData.end())
 	{
 		// 모델 로드
 		pModelData = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, pstrFilePath);
 
-		m_LoadedModelData.insert({ pstrFilePath, pModelData });
+		g_LoadedModelData.insert({ pstrFilePath, pModelData });
 	}
 	else	// 이미 로드한 모델인 경우
 	{
-		pModelData = m_LoadedModelData[pstrFilePath];
+		pModelData = g_LoadedModelData[pstrFilePath];
 	}
 
-	// RigidBody 생성
-	std::shared_ptr<RigidBody> pBody = 
-		std::make_shared<RigidBody>(objInitData.xmf3Position, objInitData.xmf4Orientation, objInitData.xmf3Scale, objInitData.nMass);
-
-	// Object 타입에 따라 변수 조정
 	switch (objInitData.objectType)
 	{
-	case Object_World:
-		pBody->SetPhysics(false);
-		pBody->SetInGravity(false);
-		break;
-
-	case Object_Physics:
-		pBody->SetPhysics(true);
-		pBody->SetInGravity(true);
-		break;
-
-	case Object_Platform:
-		pBody->SetPhysics(true);
-		pBody->SetInGravity(false);
-		pBody->SetIsPlatform(true);
-		break;
-
 	case Object_Character:
-		pBody->SetPhysics(true);
-		pBody->SetInGravity(true);
-		pBody->SetIsCharacter(true);
-		break;
-
-	case Object_UI:
-		pBody->SetPhysics(false);
-		pBody->SetInGravity(false);
-		break;
-
-	default:
-		break;
-	}
-
-	// 충돌체 타입에 따라 
-	
-	switch (objInitData.colliderType)
 	{
-	case Collider_Plane:
-		{
-			std::shared_ptr<ColliderPlane> pCollider;
-			pCollider = std::make_shared<ColliderPlane>(pBody.get(), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0), objInitData.xmf3Extents.x);
-			m_ppColliderPlanes.emplace_back(pCollider);
-			pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, pBody, pCollider, pModelData, nAnimationTracks);
-		}
-		break;
-
-	case Collider_Box:
-		{
-			std::shared_ptr<ColliderBox> pCollider;
-			pCollider = std::make_shared<ColliderBox>(pBody.get(), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), objInitData.xmf3Extents);
-			m_ppColliderBoxs.emplace_back(pCollider);
-			pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, pBody, pCollider, pModelData, nAnimationTracks);
-		}
-		break;
-
-	case Collider_Sphere:
-		{
-			std::shared_ptr<ColliderSphere> pCollider;
-			pCollider = std::make_shared<ColliderSphere>(pBody.get(), XMFLOAT3(0, 0, 0), objInitData.xmf3Extents.x);
-			m_ppColliderSpheres.emplace_back(pCollider);
-			pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, pBody, pCollider, pModelData, nAnimationTracks);
-		}
+		std::shared_ptr<Character> pCharacter = std::make_shared<Character>(pd3dDevice, pd3dCommandList, objInitData, pModelData, nAnimationTracks);
+		pObject = std::static_pointer_cast<Object>(pCharacter);
+	}
 		break;
 
 	default:
+	{
+		pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objInitData, pModelData, nAnimationTracks);
+	}
 		break;
 	}
 
 	m_vpAllObjs.emplace_back(pObject);
 	m_vObjectLayer[renderLayer].emplace_back(pObject);
+	
+	// 충돌체 타입에 따라 
+	switch (objInitData.colliderType)
+	{
+	case Collider_Plane:
+	{
+		g_ppColliderPlanes.emplace_back(std::static_pointer_cast<ColliderPlane>(pObject->GetCollider()));
+	}
+	break;
 
+	case Collider_Box:
+	{
+		g_ppColliderBoxs.emplace_back(std::static_pointer_cast<ColliderBox>(pObject->GetCollider()));
+	}
+	break;
+
+	case Collider_Sphere:
+	{
+		g_ppColliderSpheres.emplace_back(std::static_pointer_cast<ColliderSphere>(pObject->GetCollider()));
+	}
+	break;
+
+	default:
+		break;
+	}
 
 	return pObject;
 }
@@ -299,30 +277,45 @@ void Scene::GenerateContact()
 	unsigned int nContactCnt = MAX_CONTACT_CNT * 8;
 
 	m_CollisionData.Reset(nContactCnt);
-	m_CollisionData.friction = 0.9f;
+	m_CollisionData.friction = 0;
 	m_CollisionData.restitution = 0.1f;
 	m_CollisionData.tolerance = 0.1f;
 
-	// 평면과의 검사
-	for (int i = 0; i < m_ppColliderBoxs.size(); ++i)
+	// 플레이어 검사
+	for (int i = 0; i < g_ppColliderPlanes.size(); ++i)
 	{
-		for (int j = 0; j < m_ppColliderPlanes.size(); ++j)
-		{
-			if (m_CollisionData.ContactCnt() > nContactCnt) return;
-			CollisionDetector::BoxAndHalfSpace(*m_ppColliderBoxs[i], *m_ppColliderPlanes[j], m_CollisionData);
+		if (m_CollisionData.ContactCnt() > nContactCnt) return;
+		CollisionDetector::BoxAndHalfSpace(*g_ppColliderBoxs[0], *g_ppColliderPlanes[i], m_CollisionData);
+	}
+	for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
+	{
+		if (m_CollisionData.ContactCnt() > nContactCnt) return;
 
-		}
+		CollisionDetector::BoxAndBox(*g_ppColliderBoxs[0], *g_ppColliderBoxs[i], m_CollisionData);
 	}
 
-	m_CollisionData.friction = 1.0f;
-	// 박스끼리 검사
-	for (int i = 0; i < m_ppColliderBoxs.size() - 1; ++i)
+
+	m_CollisionData.friction = 0.9f;
+	// 평면과의 검사
+	for (int i = 0; i < g_ppColliderPlanes.size(); ++i)
 	{
-		for (int j = i + 1; j < m_ppColliderBoxs.size(); ++j)
+		if (m_CollisionData.ContactCnt() > nContactCnt) return;
+		CollisionDetector::BoxAndHalfSpace(*g_ppColliderBoxs[0], *g_ppColliderPlanes[i], m_CollisionData);
+
+		for (int j = 1; j < g_ppColliderBoxs.size(); ++j)
+		{
+			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+			CollisionDetector::BoxAndHalfSpace(*g_ppColliderBoxs[j], *g_ppColliderPlanes[i], m_CollisionData);
+		}
+	}
+	// 박스끼리 검사
+	for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
+	{
+		for (int j = i + 1; j < g_ppColliderBoxs.size(); ++j)
 		{
 			if (m_CollisionData.ContactCnt() > nContactCnt) return;
 
-			CollisionDetector::BoxAndBox(*m_ppColliderBoxs[i], *m_ppColliderBoxs[j], m_CollisionData);
+			CollisionDetector::BoxAndBox(*g_ppColliderBoxs[i], *g_ppColliderBoxs[j], m_CollisionData);
 		}
 	}
 }
@@ -330,29 +323,29 @@ void Scene::GenerateContact()
 void Scene::ClearObjectLayer()
 {
 	bool bFind = false;
-	for (int j = 0; j < m_ppColliderBoxs.size(); ++j)
+	for (int j = 0; j < g_ppColliderBoxs.size(); ++j)
 	{
 		if (bFind) break;
-		if (m_ppColliderBoxs[j]->GetBody()->GetInvalid())
+		if (g_ppColliderBoxs[j]->GetBody()->GetInvalid())
 		{
-			m_ppColliderBoxs.erase(m_ppColliderBoxs.begin() + j);
+			g_ppColliderBoxs.erase(g_ppColliderBoxs.begin() + j);
 			bFind = true;
 		}
 	}
-	for (int j = 0; j < m_ppColliderSpheres.size(); ++j)
+	for (int j = 0; j < g_ppColliderSpheres.size(); ++j)
 	{
-		if (m_ppColliderSpheres[j]->GetBody()->GetInvalid())
+		if (g_ppColliderSpheres[j]->GetBody()->GetInvalid())
 		{
-			m_ppColliderSpheres.erase(m_ppColliderSpheres.begin() + j);
+			g_ppColliderSpheres.erase(g_ppColliderSpheres.begin() + j);
 			bFind = true;
 		}
 	}
-	for (int j = 0; j < m_ppColliderPlanes.size(); ++j)
+	for (int j = 0; j < g_ppColliderPlanes.size(); ++j)
 	{
 		if (bFind) break;
-		if (m_ppColliderPlanes[j]->GetBody()->GetInvalid())
+		if (g_ppColliderPlanes[j]->GetBody()->GetInvalid())
 		{
-			m_ppColliderPlanes.erase(m_ppColliderPlanes.begin() + j);
+			g_ppColliderPlanes.erase(g_ppColliderPlanes.begin() + j);
 			bFind = true;
 		}
 	}

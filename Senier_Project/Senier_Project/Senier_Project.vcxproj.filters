@@ -82,7 +82,7 @@
     <ClCompile Include="DirectXRendering\Src\Object.cpp">
       <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="DirectXRendering\Src\PlayerController.cpp">
+    <ClCompile Include="DirectXRendering\Src\Character.cpp">
       <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
     <ClCompile Include="DirectXRendering\Src\Scene.cpp">
@@ -163,7 +163,7 @@
     <ClInclude Include="DirectXRendering\Header\Object.h">
       <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="DirectXRendering\Header\PlayerController.h">
+    <ClInclude Include="DirectXRendering\Header\Character.h">
       <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
     <ClInclude Include="DirectXRendering\Header\Scene.h">
@@ -183,6 +183,9 @@
     </ClInclude>
     <ClInclude Include="Physics\Header\Physics.h">
       <Filter>Physics\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Header\Struct.h">
+      <Filter>Common\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

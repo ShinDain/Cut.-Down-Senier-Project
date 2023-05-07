@@ -8,14 +8,14 @@ class Contact
 {
 public:
 	Contact() = delete;
-	Contact(RigidBody* pBody1, RigidBody* pBody2, float friction, float restitution,
+	Contact(std::shared_ptr<RigidBody> pBody1, std::shared_ptr<RigidBody> pBody2, float friction, float restitution,
 		XMFLOAT3 xmf3ContactPoint, XMFLOAT3 xmf3ContactNormal, float depth);
 	Contact(const Contact& rhs) = delete;
 	Contact& operator=(const Contact& rhs) = delete;
 	virtual ~Contact();
 
 protected:
-	RigidBody* m_pBody[2];
+	std::shared_ptr<RigidBody> m_pBody[2];
 
 	float m_Friction = 0;								// ¸¶Âû·Â
 	float m_Restitution = 0;							// Åº¼º °è¼ö
@@ -81,7 +81,7 @@ public:
 
 
 		
-	RigidBody* GetBody(int idx) { return m_pBody[idx]; }
+	std::shared_ptr<RigidBody> GetBody(int idx) { return m_pBody[idx]; }
 	const float GetFriction() { return m_Friction; };
 	const float GetRestitution() { return m_Restitution; };
 	const XMFLOAT3& GetContactPoint() { return m_xmf3ContactPoint; };
@@ -119,7 +119,7 @@ struct CollisionData
 		pContacts.clear();
 	}
 
-	void addContact(RigidBody* pBody1, RigidBody* pBody2, float friction, float restitution,
+	void addContact(std::shared_ptr<RigidBody> pBody1, std::shared_ptr<RigidBody> pBody2, float friction, float restitution,
 		XMFLOAT3 xmf3ContactPoint, XMFLOAT3 xmf3ContactNormal, float depth)
 	{
 		pContacts.emplace_back(std::make_unique<Contact>(pBody1, pBody2, friction, restitution,

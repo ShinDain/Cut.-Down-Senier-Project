@@ -3,6 +3,12 @@
 std::vector<std::shared_ptr<Texture>> g_CachingTexture;
 std::map<RenderLayer, std::shared_ptr<Shader>> g_Shaders;
 
+std::vector<std::shared_ptr<ColliderPlane>> g_ppColliderPlanes;
+std::vector<std::shared_ptr<ColliderBox>> g_ppColliderBoxs;
+std::vector<std::shared_ptr<ColliderSphere>> g_ppColliderSpheres;
+
+std::map<const char*, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;
+
 void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName)
 {
 	auto texMap = std::make_shared<Texture>();
