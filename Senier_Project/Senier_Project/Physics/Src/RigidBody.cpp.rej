@@ -1,0 +1,37 @@
+diff a/Senier_Project/Senier_Project/Physics/Src/RigidBody.cpp b/Senier_Project/Senier_Project/Physics/Src/RigidBody.cpp	(rejected hunks)
+@@ -23,2 +25,5 @@
+ 
++	if (m_ElapsedTimeAfterCreated > 2.0f && !m_bIsCharacter && !m_bIsPlatform)
++		m_bCanSleep = true;
++
+ 	m_xmf3LastFrameAcceleration = m_xmf3Acceleration;
+@@ -28,3 +33,3 @@
+ 		// �߷°��ӵ� ���� (�߷� * ��ü ���� / ��ü ����(�����и� �и��ϱ� ����) )
+-		m_xmf3LastFrameAcceleration.y += Physics::xmf3Gravity.y;
++		m_xmf3LastFrameAcceleration.y += Physics::xmf3Gravity.y * m_Mass;
+ 	}
+@@ -49,2 +46,16 @@
+ 
++	XMVECTOR angularVelocity = XMLoadFloat3(&m_xmf3AngularVelocity);
++
++	if (!m_bIsCharacter)
++	{
++		// damping ����
++		angularVelocity *= pow(m_AngularDamping, elapsedTime);
++		XMStoreFloat3(&m_xmf3AngularVelocity, angularVelocity);
++		XMVECTOR prevOrientation = XMLoadFloat4(&m_xmf4Orientation);
++		XMVECTOR dq = angularVelocity * elapsedTime;
++		dq = XMQuaternionMultiply(prevOrientation, dq) * 0.5f;
++		XMStoreFloat4(&m_xmf4Orientation, prevOrientation + dq);
++	}
++	else 
++		m_xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
+ 
+@@ -56,7 +67,2 @@
+ 
+-	XMVECTOR prevOrientation = XMLoadFloat4(&m_xmf4Orientation);
+-	XMVECTOR dq = angularVelocity * elapsedTime;
+-	dq = XMQuaternionMultiply(prevOrientation, dq) * 0.5f;
+-	XMStoreFloat4(&m_xmf4Orientation, prevOrientation + dq);
+-
+ 	// �Ļ� ������ ����

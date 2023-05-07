@@ -67,7 +67,7 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 		break;
 
 	case Object_Platform:
-		pBody->SetPhysics(true);
+		pBody->SetPhysics(false);
 		pBody->SetInGravity(false);
 		pBody->SetIsPlatform(true);
 		break;

@@ -39,30 +39,37 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.xmf3Extents = CUBE_MODEL_EXTENTS;
 	objectData.objectType = Object_Physics;
 	// 복수의 박스 생성
-	for (int i = 0; i < 2; ++i)
-	{
-		//objectData.xmf3Position = XMFLOAT3(-30 + 10 * (i / 3), 5 + 10 * (i % 3), 30 + 10 * (i / 9));
-		objectData.xmf3Position = XMFLOAT3(0, 5 + 20 * i,0);
 
-		CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	}
+	objectData.xmf3Position = XMFLOAT3(-30, 5,0);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
+	objectData.xmf3Position = XMFLOAT3(-10, 5,0);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
+	objectData.xmf3Position = XMFLOAT3(-10, 15,0);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
+	objectData.xmf3Position = XMFLOAT3(10, 5,0);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
+	objectData.xmf3Position = XMFLOAT3(10, 15,0);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
+	objectData.xmf3Position = XMFLOAT3(10, 25,0);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
 
 
 	// 플랫폼 테스트
-	objectData.xmf3Position = XMFLOAT3(0, 20, 0);
 	objectData.objectType = Object_Platform;
-	objectData.xmf3Scale = XMFLOAT3(20, 1, 20);
-	//CreateObject(pd3dDevice, pd3dCommandList, objectData, 0, RenderLayer::Render_Static);
-	//m_vpAllObjs[1]->GetBody()->SetVelocity(XMFLOAT3(25, 0, 0));
-
-
+	objectData.xmf3Scale = XMFLOAT3(20, 5, 20);
+	objectData.xmf3Position = XMFLOAT3(-10, 5, -20);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
+	objectData.xmf3Position = XMFLOAT3(5, 15, -20);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
+	objectData.xmf3Position = XMFLOAT3(20, 25, -20);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
 
 
 	// 바닥
 	objectData.xmf3Extents = XMFLOAT3(0, 0, 0);
 	objectData.xmf3Position = XMFLOAT3(0,0,0);
 	objectData.xmf4Orientation = XMFLOAT4(0, 1, 0, 1);
-	objectData.xmf3Scale = XMFLOAT3(200.0f, 0.1f, 500.0f);
+	objectData.xmf3Scale = XMFLOAT3(300, 0.1f, 300.0f);
 	objectData.colliderType = Collider_Plane;
 	objectData.objectType = Object_World;
 	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
@@ -70,13 +77,13 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.xmf3Extents = XMFLOAT3(-100, 0, 0);
 	objectData.xmf3Position = XMFLOAT3(-100, 25, 0);
 	objectData.xmf4Orientation = XMFLOAT4(1, 0, 0, 1);
-	objectData.xmf3Scale = XMFLOAT3(0.1f, 50, 100);
+	objectData.xmf3Scale = XMFLOAT3(0.1f, 300, 20);
 	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
 	// 오른쪽 벽
 	objectData.xmf3Extents = XMFLOAT3(-100, 0, 0);
 	objectData.xmf3Position = XMFLOAT3(100, 25, 0);
 	objectData.xmf4Orientation = XMFLOAT4(-1, 0, 0, 1);
-	objectData.xmf3Scale = XMFLOAT3(0.1f, 50, 100);
+	objectData.xmf3Scale = XMFLOAT3(0.1f, 300, 20);
 	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
 	
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)

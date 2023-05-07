@@ -92,10 +92,14 @@ void RigidBody::CalcDerivedData()
 
 	XMMATRIX World = XMMatrixIdentity();
 	XMMATRIX Translation = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
-	XMMATRIX Orientate = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
-	XMMATRIX Rotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotate.x), 
-												   XMConvertToRadians(m_xmf3Rotate.y), 
-												   XMConvertToRadians(m_xmf3Rotate.z));
+	XMMATRIX Rotate = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
+	if (m_bIsCharacter)
+	{
+		Rotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotate.x),
+			XMConvertToRadians(m_xmf3Rotate.y),
+			XMConvertToRadians(m_xmf3Rotate.z));
+	}
+
 	XMMATRIX Scale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
 	World = XMMatrixMultiply(Scale, XMMatrixMultiply(Rotate, Translation));
 
