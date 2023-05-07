@@ -75,6 +75,34 @@ void Character::Update(float elapsedTime)
 	if (m_pBody)
 	{
 		// 마찰력
+		XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+		XMFLOAT3 xmf3VelocityXZ = XMFLOAT3(xmf3Velocity.x, 0, xmf3Velocity.z);
+		XMVECTOR velocityXZ = XMLoadFloat3(&xmf3VelocityXZ);
+		// 최대 속도 제한
+		if (XMVectorGetX(XMVector3Length(velocityXZ)) > m_MaxSpeedXZ)
+		{
+			XMVECTOR direction = XMVector3Normalize(velocityXZ);
+			velocityXZ = direction * m_MaxSpeedXZ;
+			XMFLOAT3 newVelocity;
+			XMStoreFloat3(&newVelocity, velocityXZ);
+			newVelocity.y = xmf3Velocity.y;
+			m_pBody->SetVelocity(newVelocity);
+		}
+		else
+		{
+			XMVECTOR direction = XMVector3Normalize(velocityXZ);
+			XMVECTOR friction = -direction;
+			friction = m_CharacterFriction * friction * elapsedTime;
+
+			if (XMVectorGetX(XMVector3Length(friction)) > XMVectorGetX(XMVector3Length(velocityXZ)))
+				friction = XMVector3Normalize(friction) * XMVectorGetX(XMVector3Length(velocityXZ));
+
+			velocityXZ = velocityXZ + friction;
+			XMFLOAT3 newVelocity;
+			XMStoreFloat3(&newVelocity, velocityXZ);
+			newVelocity.y = xmf3Velocity.y;
+			m_pBody->SetVelocity(newVelocity);
+		}
 
 
 		m_pBody->Update(elapsedTime);
@@ -104,7 +132,7 @@ void Character::Update(float elapsedTime)
 	}
 }
 
-void Character::Move(DWORD dwDirection, float distance)
+void Character::Move(DWORD dwDirection)
 {
 	XMVECTOR direction = XMVectorZero();
 	XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
@@ -128,46 +156,12 @@ void Character::Move(DWORD dwDirection, float distance)
 	}
 
 	direction = XMVector3Normalize(direction);
-	XMVECTOR deltaAccel = direction * distance;
+
+	XMVECTOR deltaAccel = direction * m_Accelation;
 	XMFLOAT3 xmf3deltaAccel;
 	XMStoreFloat3(&xmf3deltaAccel, deltaAccel);
 
 	m_pBody->SetAcceleration(xmf3deltaAccel);
-
-	m_pBody->SetRotate(m_xmf3Rotate);
-}
-
-void Character::Rotate(float x, float y, float z)
-{
-	// x : Pitch, y : Yaw, z : Roll
-	// 3인칭 카메라 기준
-	if (x != 0.0f)
-	{
-		m_xmf3Rotate.x += x;
-		if (m_xmf3Rotate.x > +89.0f) { x -= (m_xmf3Rotate.x - 89.0f); m_xmf3Rotate.x = +89.0f; }
-		if (m_xmf3Rotate.x < -89.0f) { x -= (m_xmf3Rotate.x + 89.0f); m_xmf3Rotate.x = -89.0f; }
-	}
-	if (y != 0.0f)
-	{
-		m_xmf3Rotate.y += y;
-		if (m_xmf3Rotate.y > 360.0f) m_xmf3Rotate.y -= 360.0f;
-		if (m_xmf3Rotate.y < 0.0f) m_xmf3Rotate.y += 360.0f;
-	}
-	if (z != 0.0f)
-	{
-		m_xmf3Rotate.z += z;
-		//if (m_xmf3Rotate.z > +20.0f) { z -= (m_xmf3Rotate.z - 20.0f); m_xmf3Rotate.z = +20.0f; }
-		//if (m_xmf3Rotate.z < -20.0f) { z -= (m_xmf3Rotate.z + 20.0f); m_xmf3Rotate.z = -20.0f; }
-	}
-	if (y != 0.0f)
-	{
-		XMMATRIX xmmatRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
-		XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-		XMVECTOR r = XMLoadFloat3(&m_xmf3Right);
-
-		XMStoreFloat3(&m_xmf3Look, XMVector3TransformNormal(l, xmmatRotate));
-		XMStoreFloat3(&m_xmf3Right, XMVector3TransformNormal(r, xmmatRotate));
-	}
 }
 
 void Character::Jump()

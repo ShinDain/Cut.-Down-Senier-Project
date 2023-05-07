@@ -665,7 +665,7 @@ void Object::FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>>* pp
 	if (m_pChild) m_pChild->FindAndSetSkinnedMesh(ppSkinnedMeshes);
 }
 
-void Object::Move(DWORD dwDirection, float distance)
+void Object::Move(DWORD dwDirection)
 {
 	XMVECTOR direction = XMVectorZero();
 	XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
@@ -689,7 +689,7 @@ void Object::Move(DWORD dwDirection, float distance)
 	}
 
 	direction = XMVector3Normalize(direction);
-	XMVECTOR deltaAccel = direction * distance;
+	XMVECTOR deltaAccel = direction * m_Accelation;
 	XMFLOAT3 xmf3deltaAccel;
 	XMStoreFloat3(&xmf3deltaAccel, deltaAccel);
 
@@ -727,6 +727,19 @@ void Object::Rotate(float x, float y, float z)
 		XMStoreFloat3(&m_xmf3Look, XMVector3TransformNormal(l, xmmatRotate));
 		XMStoreFloat3(&m_xmf3Right, XMVector3TransformNormal(r, xmmatRotate));
 
-		m_pBody->SetRotate(m_xmf3Rotate);
 	}
+	m_pBody->SetRotate(m_xmf3Rotate);
+}
+
+void Object::SetRotate(const XMFLOAT3& Rotate) {
+	SetRotate(Rotate.x, Rotate.y, Rotate.z);
+
+	XMMATRIX xmmatRotate = XMMatrixRotationY(XMConvertToRadians(Rotate.y));
+	XMVECTOR l = XMVectorSet(0,0,1,0);
+	XMVECTOR r = XMVectorSet(1,0,0,0);
+
+	XMStoreFloat3(&m_xmf3Look, XMVector3TransformNormal(l, xmmatRotate));
+	XMStoreFloat3(&m_xmf3Right, XMVector3TransformNormal(r, xmmatRotate));
+
+	m_pBody->SetRotate(Rotate);
 }

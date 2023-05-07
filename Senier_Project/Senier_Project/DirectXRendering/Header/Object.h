@@ -101,11 +101,13 @@ protected:
 
 	XMFLOAT3 m_xmf3ColliderExtents = XMFLOAT3(0, 0, 0);
 
+	float m_Accelation = 100.0f;
+
 	bool m_bPhysics = true;
 	bool m_bIsAlive = true;
 	
 public:
-	virtual void Move(DWORD dwDirection, float distance);
+	virtual void Move(DWORD dwDirection);
 	virtual void Rotate(float x, float y, float z);
 	virtual void Jump() {}
 
@@ -153,7 +155,7 @@ public:
 		m_xmf3Rotate.y = fYaw;
 		m_xmf3Rotate.z = fRoll;
 	}
-	void SetRotate(const XMFLOAT3& Rotate) { SetRotate(Rotate.x, Rotate.y, Rotate.z); }
+	void SetRotate(const XMFLOAT3& Rotate);
 	void SetOrientation(const XMFLOAT4& Orientation) { m_xmf4Orientation = Orientation;
 													   XMStoreFloat4(&m_xmf4Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmf4Orientation)));}
 	void SetIsAlive(bool IsAlive) { m_bIsAlive = IsAlive; }

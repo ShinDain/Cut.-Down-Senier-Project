@@ -27,17 +27,19 @@ public:
 	virtual void Update(float elapsedTime);
 
 protected:
+	float m_MaxSpeedXZ = 100.0f;
+	float m_CharacterFriction = 300.0f;
+	float m_Accelation = 500.f;
 
 	bool m_bCanJump = true;
 
 	Ray m_floorCheckRay;
-	
+
 
 public:
-	virtual void Move(DWORD dwDirection, float distance);
-	virtual void Rotate(float x, float y, float z);
-
+	virtual void Move(DWORD dwDirection);
 	virtual void Jump();
 
+	void ApplyCharacterFriction(float elapsedTime);
 	bool IsFalling();
 };

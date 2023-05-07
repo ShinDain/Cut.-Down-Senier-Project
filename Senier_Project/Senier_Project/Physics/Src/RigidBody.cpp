@@ -23,7 +23,7 @@ void RigidBody::Update(float elapsedTime)
 	if (!m_bIsAwake) 
 		return;
 
-	if (m_ElapsedTimeAfterCreated > 2.0f && !m_bIsCharacter && !m_bIsPlatform)
+	if (m_ElapsedTimeAfterCreated > 1.0f && !m_bIsCharacter && !m_bIsPlatform)
 		m_bCanSleep = true;
 
 	m_xmf3LastFrameAcceleration = m_xmf3Acceleration;

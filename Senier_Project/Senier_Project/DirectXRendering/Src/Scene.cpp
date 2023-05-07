@@ -2,7 +2,7 @@
 
 //#define CHARACTER_MODEL_PATH "Model/unitychan.bin"
 #define CHARACTER_MODEL_PATH "Model/BoxUnityChan.bin"
-#define CHARACTER_MODEL_EXTENTS XMFLOAT3(0.5f, 1.f, 0.5f)
+#define CHARACTER_MODEL_EXTENTS XMFLOAT3(0.3f, 0.8f, 0.2f)
 #define CUBE_MODEL_PATH "Model/Cube.bin"
 #define CUBE_MODEL_EXTENTS XMFLOAT3(0.5f, 0.5f, 0.5f)
 
@@ -22,7 +22,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_pPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
 
 	ObjectInitData objectData;
-	objectData.xmf3Position = XMFLOAT3(0, 25, 0);
+	objectData.xmf3Position = XMFLOAT3(0, 0, -50);
 	objectData.xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
 	objectData.xmf3Scale = XMFLOAT3(10, 10, 10);
 	objectData.nMass = 10;
@@ -32,16 +32,21 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	// 캐릭터 테스트
 	CreateObject(pd3dDevice, pd3dCommandList,  objectData, CHARACTER_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 1);
+
+
 
 	objectData.xmf3Extents = CUBE_MODEL_EXTENTS;
 	objectData.objectType = Object_Physics;
 	// 복수의 박스 생성
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < 2; ++i)
 	{
-		objectData.xmf3Position = XMFLOAT3(-10 + 10 * (i / 3), 0, -10 + 10 * (i % 3));
+		//objectData.xmf3Position = XMFLOAT3(-30 + 10 * (i / 3), 5 + 10 * (i % 3), 30 + 10 * (i / 9));
+		objectData.xmf3Position = XMFLOAT3(0, 5 + 20 * i,0);
 
 		CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
 	}
+
 
 	// 플랫폼 테스트
 	objectData.xmf3Position = XMFLOAT3(0, 20, 0);
@@ -51,30 +56,27 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//m_vpAllObjs[1]->GetBody()->SetVelocity(XMFLOAT3(25, 0, 0));
 
 
+
+
 	// 바닥
 	objectData.xmf3Extents = XMFLOAT3(0, 0, 0);
 	objectData.xmf3Position = XMFLOAT3(0,0,0);
 	objectData.xmf4Orientation = XMFLOAT4(0, 1, 0, 1);
-	objectData.xmf3Scale = XMFLOAT3(100, 0.1f, 100);
+	objectData.xmf3Scale = XMFLOAT3(200.0f, 0.1f, 500.0f);
 	objectData.colliderType = Collider_Plane;
 	objectData.objectType = Object_World;
 	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-
 	// 왼쪽 벽
-	objectData.xmf3Extents = XMFLOAT3(-50, 0, 0);
-	objectData.xmf3Position = XMFLOAT3(-50, 0, 0);
+	objectData.xmf3Extents = XMFLOAT3(-100, 0, 0);
+	objectData.xmf3Position = XMFLOAT3(-100, 25, 0);
 	objectData.xmf4Orientation = XMFLOAT4(1, 0, 0, 1);
 	objectData.xmf3Scale = XMFLOAT3(0.1f, 50, 100);
-	objectData.colliderType = Collider_Plane;
-	objectData.objectType = Object_World;
 	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
 	// 오른쪽 벽
-	objectData.xmf3Extents = XMFLOAT3(-50, 0, 0);
-	objectData.xmf3Position = XMFLOAT3(50, 0, 0);
+	objectData.xmf3Extents = XMFLOAT3(-100, 0, 0);
+	objectData.xmf3Position = XMFLOAT3(100, 25, 0);
 	objectData.xmf4Orientation = XMFLOAT4(-1, 0, 0, 1);
 	objectData.xmf3Scale = XMFLOAT3(0.1f, 50, 100);
-	objectData.colliderType = Collider_Plane;
-	objectData.objectType = Object_World;
 	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
 	
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
@@ -84,13 +86,12 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	// 카메라 초기화
 	m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
+	
+
+#if defined(_DEBUG)
 	//m_pCamera = std::make_unique<Camera>();
 	//m_pCamera->SetPosition(0, 30, -100);
 //	m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
-	
-#if defined(_DEBUG)
-
-
 
 #endif
 
@@ -189,29 +190,46 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 	}
 
 	DWORD dwDirection = 0;
-	if (pKeybuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
-	if (pKeybuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
-	if (pKeybuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
-	if (pKeybuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
+	if (pKeybuffer['W'] & 0xF0) dwDirection |= DIR_FORWARD;
+	if (pKeybuffer['S'] & 0xF0) dwDirection |= DIR_BACKWARD;
+	if (pKeybuffer['A'] & 0xF0) dwDirection |= DIR_LEFT;
+	if (pKeybuffer['D'] & 0xF0) dwDirection |= DIR_RIGHT;
 
-	if(dwDirection != 0 || dx != 0 || dy != 0)
+	if(dx != 0 || dy != 0)
 	{
 		if (dx != 0 || dy != 0)
 		{
-			m_vpAllObjs[0]->Rotate(0,dx, 0);
+			//m_vpAllObjs[0]->Rotate(0,dx, 0);
 
-			//m_pCamera->Pitch(dy / 1000);
-			//m_pCamera->RotateY(dx / 1000);
+			m_pCamera->Pitch(dy);
+			m_pCamera->RotateY(dx);
 		}
+	}
+
+	if (dwDirection != 0)
+	{
+		m_vpAllObjs[0]->SetRotate(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
+		m_vpAllObjs[0]->Move(dwDirection);
+
+		// 이동시 애니메이션이 전환 되도록 (임시)
+		m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
+	}
+	else
+	{
+		m_vpAllObjs[0]->Move(dwDirection);
+		m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 1);
 
 	}
-	m_vpAllObjs[0]->Move(dwDirection, 50.0f);
 
 	if (pKeybuffer[VK_SPACE] & 0xF0) m_vpAllObjs[0]->Jump();
 
 
 #if defined(_DEBUG)
-	
+	if (pKeybuffer['K'] & 0xF0)
+	{
+		// 오브젝트 생성
+
+	}
 #endif
 }
 
@@ -310,9 +328,6 @@ void Scene::GenerateContact()
 	// 평면과의 검사
 	for (int i = 0; i < g_ppColliderPlanes.size(); ++i)
 	{
-		if (m_CollisionData.ContactCnt() > nContactCnt) return;
-		CollisionDetector::BoxAndHalfSpace(*g_ppColliderBoxs[0], *g_ppColliderPlanes[i], m_CollisionData);
-
 		for (int j = 1; j < g_ppColliderBoxs.size(); ++j)
 		{
 			if (m_CollisionData.ContactCnt() > nContactCnt) return;

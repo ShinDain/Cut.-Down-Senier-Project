@@ -211,7 +211,9 @@ void Camera::Walk(float d)
 
 void Camera::Pitch(float angle)
 {
-	XMMATRIX R = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), angle);
+	m_Pitch += angle;
+
+	XMMATRIX R = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), XMConvertToRadians(angle));
 
 	XMStoreFloat3(&m_xmf3Up, XMVector3TransformNormal(XMLoadFloat3(&m_xmf3Up), R));
 	XMStoreFloat3(&m_xmf3Look, XMVector3TransformNormal(XMLoadFloat3(&m_xmf3Look), R));
@@ -221,7 +223,9 @@ void Camera::Pitch(float angle)
 
 void Camera::RotateY(float angle)
 {
-	XMMATRIX R = XMMatrixRotationY(angle);
+	m_Yaw += angle;
+
+	XMMATRIX R = XMMatrixRotationY(XMConvertToRadians(angle));
 
 	XMStoreFloat3(&m_xmf3Right, XMVector3TransformNormal(XMLoadFloat3(&m_xmf3Right), R));
 	XMStoreFloat3(&m_xmf3Up, XMVector3TransformNormal(XMLoadFloat3(&m_xmf3Up), R));
@@ -294,26 +298,49 @@ Third_Person_Camera::~Third_Person_Camera()
 
 void Third_Person_Camera::Update(float Etime)
 {
-	XMVECTOR newPos = XMLoadFloat3(&m_pObject->GetPosition());
-	XMVECTOR objPos = XMLoadFloat3(&m_pObject->GetPosition());
-	XMVECTOR objLook = XMLoadFloat3(&m_pObject->GetLookVector());
-	XMVECTOR objUp = XMLoadFloat3(&m_pObject->GetUpVector());
+	XMVECTOR Look = XMVectorSet(0, 0, 1, 0);
+	XMVECTOR Right = XMVectorSet(1, 0, 0, 0);
+	XMVECTOR Up = XMVectorSet(1, 0, 0, 0);
 
-	XMVECTOR zOffset = XMVectorReplicate(m_xmf3Offset.z);
-	XMVECTOR yOffset = XMVectorReplicate(m_xmf3Offset.y);
+	XMMATRIX R = XMMatrixRotationY(XMConvertToRadians(m_Yaw));
+	Look = XMVector3TransformNormal(Look, R);
+	Right = XMVector3TransformNormal(Right, R);
+	Up = XMVector3TransformNormal(Up, R);
+
+	R = XMMatrixRotationAxis(Right, XMConvertToRadians(m_Pitch));
+
+	Look = XMVector3TransformNormal(Look, R);
+	Up = XMVector3TransformNormal(Up, R);
+
+
+	XMVECTOR newPos = XMLoadFloat3(&m_pObject->GetPosition());
 	XMVECTOR length = XMVectorReplicate(m_OffsetLength);
 
-	newPos = XMVectorMultiplyAdd(objLook, zOffset, newPos);
-	newPos = XMVectorMultiplyAdd(objUp, yOffset, newPos);
-	newPos = XMVector3Normalize(newPos - objPos);
-	newPos = XMVectorMultiplyAdd(newPos, length, objPos);
+	newPos = -Look * m_OffsetLength + newPos;
 
-	XMFLOAT3 xmf3NewPos = { 0,0,0 };
+	XMFLOAT3 xmf3NewPos;
 	XMStoreFloat3(&xmf3NewPos, newPos);
 	SetPosition(xmf3NewPos);
 
 	LookAt(GetPosition3f(), m_pObject->GetPosition(), XMFLOAT3(0, 1, 0));
 
 	UpdateViewMatrix();
+}
+
+void Third_Person_Camera::Pitch(float angle)
+{
+	m_Pitch += angle;
+	if (m_Pitch > m_MaxPitch)
+	{ m_Pitch = m_MaxPitch; }
+	if (m_Pitch < m_MinPitch) 
+	{ m_Pitch = m_MinPitch; }
+}
+
+void Third_Person_Camera::RotateY(float angle)
+{
+	m_Yaw += angle;
+	if (m_Yaw > 360.0f) m_Yaw -= 360.0f;
+	if (m_Yaw < 0.0f) m_Yaw += 360.0f;
+
 }
 

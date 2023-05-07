@@ -40,6 +40,9 @@ public:
 	float GetFarWindowWidth()const;
 	float GetFarWindowHeight()const;
 
+	float GetPitch() const { return m_Pitch; }
+	float GetYaw() const { return m_Yaw; }
+
 	// frustum 설정
 	void SetLens(float fovY, float aspect, float zn, float zf);
 
@@ -58,8 +61,8 @@ public:
 	void Strafe(float d);
 	void Walk(float d);
 
-	void Pitch(float angle);
-	void RotateY(float angle);
+	virtual void Pitch(float angle);
+	virtual void RotateY(float angle);
 
 	virtual void Update(float Etime) { UpdateViewMatrix(); }
 	virtual void UpdateViewMatrix();
@@ -83,6 +86,9 @@ protected:
 	DirectX::XMFLOAT4X4 m_xmf4x4View = MathHelper::identity4x4();
 	DirectX::XMFLOAT4X4 m_xmf4x4Proj = MathHelper::identity4x4();
 	DirectX::XMFLOAT4X4 m_xmf4x4Ortho = MathHelper::identity4x4();
+
+	float m_Pitch = 0.0f;
+	float m_Yaw = 0.0f;
 };
 
 class Third_Person_Camera : public Camera
@@ -96,9 +102,15 @@ public:
 
 	virtual void Update(float Etime) override;
 
+	virtual void Pitch(float angle);
+	virtual void RotateY(float angle);
+
 protected:
 	float m_OffsetLength = 100;
-	DirectX::XMFLOAT3 m_xmf3Offset = { 0.0f, 30.0f, -100.0f };
+	//DirectX::XMFLOAT3 m_xmf3Offset = { 0.0f, 30.0f, -100.0f };
+
+	float m_MaxPitch = 45;
+	float m_MinPitch = -45;
 
 	// 추적할 대상 오브젝트
 	std::shared_ptr<Object> m_pObject = nullptr;
@@ -106,12 +118,12 @@ protected:
 
 public:
 	float GetOffsetLength() const { return m_OffsetLength; }
-	DirectX::XMFLOAT3 GetOffset() const { return m_xmf3Offset; }
-	std::shared_ptr<Object> GetObject() const { return m_pObject; }
+	//DirectX::XMFLOAT3 GetOffset() const { return m_xmf3Offset; }
+	std::shared_ptr<Object> GetTrackedObject() const { return m_pObject; }
 
 	void SetOffsetLength(float value) { m_OffsetLength = value; }
-	void SetOffset(DirectX::XMFLOAT3 xmf3Offset) {	m_xmf3Offset = xmf3Offset;}
-	void SetPlayer(const std::shared_ptr<Object> pObject) { m_pObject = pObject; }
+	//void SetOffset(DirectX::XMFLOAT3 xmf3Offset) {	m_xmf3Offset = xmf3Offset;}
+	void SetTrackedObject(const std::shared_ptr<Object> pObject) { m_pObject = pObject; }
 
 };
 
