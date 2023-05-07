@@ -212,7 +212,7 @@ void Object::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandLis
 #if defined(_DEBUG)
 	if (m_pCollider)
 	{
-		g_Shaders[RenderLayer::WireFrame]->ChangeShader(pd3dCommandList);
+		g_Shaders[ShaderType::Shader_WireFrame]->ChangeShader(pd3dCommandList);
 		m_pCollider->Render(elapsedTime, pd3dCommandList);
 	}
 #endif
@@ -413,11 +413,11 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 			{
 				if (nType & VERTEXT_BONE_INDEX_WEIGHT)
 				{
-					vpMat[nMatcnt]->SetShader(g_Shaders[RenderLayer::Skinned]);
+					vpMat[nMatcnt]->SetShader(g_Shaders[ShaderType::Shader_Skinned]);
 				}
 				else
 				{
-					vpMat[nMatcnt]->SetShader(g_Shaders[RenderLayer::Static]);
+					vpMat[nMatcnt]->SetShader(g_Shaders[ShaderType::Shader_TextureMesh]);
 				}
 			}
 		}

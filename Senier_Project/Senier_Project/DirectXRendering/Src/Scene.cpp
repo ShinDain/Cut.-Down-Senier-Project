@@ -1,6 +1,8 @@
 #include "../Header/Scene.h"
 
-#define CHARACTER_MADEL_PATH "Model/Angrybot.bin"
+//#define CHARACTER_MODEL_PATH "Model/unitychan.bin"
+#define CHARACTER_MODEL_PATH "Model/BoxUnityChan.bin"
+#define CHARACTER_MODEL_EXTENTS XMFLOAT3(0.5f, 1.f, 0.5f)
 #define CUBE_MODEL_PATH "Model/Cube.bin"
 #define CUBE_MODEL_EXTENTS XMFLOAT3(0.5f, 0.5f, 0.5f)
 
@@ -26,25 +28,26 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.nMass = 10;
 	objectData.objectType = Object_Character;
 	objectData.colliderType = Collider_Box;
-	objectData.xmf3Extents = CUBE_MODEL_EXTENTS;
+	objectData.xmf3Extents = CHARACTER_MODEL_EXTENTS;
 
 	// 캐릭터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList,  objectData, CUBE_MODEL_PATH, 0, RenderLayer::Static);
+	CreateObject(pd3dDevice, pd3dCommandList,  objectData, CHARACTER_MODEL_PATH, 1, RenderLayer::Render_Skinned);
 
+	objectData.xmf3Extents = CUBE_MODEL_EXTENTS;
 	objectData.objectType = Object_Physics;
 	// 복수의 박스 생성
 	for (int i = 0; i < 10; ++i)
 	{
 		objectData.xmf3Position = XMFLOAT3(-10 + 10 * (i / 3), 0, -10 + 10 * (i % 3));
 
-		CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Static);
+		CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
 	}
 
 	// 플랫폼 테스트
 	objectData.xmf3Position = XMFLOAT3(0, 20, 0);
 	objectData.objectType = Object_Platform;
 	objectData.xmf3Scale = XMFLOAT3(20, 1, 20);
-	//CreateObject(pd3dDevice, pd3dCommandList, objectData, 0, RenderLayer::Static);
+	//CreateObject(pd3dDevice, pd3dCommandList, objectData, 0, RenderLayer::Render_Static);
 	//m_vpAllObjs[1]->GetBody()->SetVelocity(XMFLOAT3(25, 0, 0));
 
 
@@ -55,7 +58,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.xmf3Scale = XMFLOAT3(100, 0.1f, 100);
 	objectData.colliderType = Collider_Plane;
 	objectData.objectType = Object_World;
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Static);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
 
 	// 왼쪽 벽
 	objectData.xmf3Extents = XMFLOAT3(-50, 0, 0);
@@ -64,7 +67,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.xmf3Scale = XMFLOAT3(0.1f, 50, 100);
 	objectData.colliderType = Collider_Plane;
 	objectData.objectType = Object_World;
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Static);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
 	// 오른쪽 벽
 	objectData.xmf3Extents = XMFLOAT3(-50, 0, 0);
 	objectData.xmf3Position = XMFLOAT3(50, 0, 0);
@@ -72,7 +75,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.xmf3Scale = XMFLOAT3(0.1f, 50, 100);
 	objectData.colliderType = Collider_Plane;
 	objectData.objectType = Object_World;
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Static);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
 	
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
@@ -140,22 +143,28 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 {
 	// img 오브젝트 렌더링 수정 필
 	{
-		g_Shaders[RenderLayer::Image]->ChangeShader(pd3dCommandList);
+		g_Shaders[ShaderType::Shader_Image]->ChangeShader(pd3dCommandList);
 		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &m_xmf4x4ImgObjMat, 0);
 	}
 
-	g_Shaders[RenderLayer::Static]->ChangeShader(pd3dCommandList);
-	pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
-
-	for (int i = 0; i < m_vpAllObjs.size(); ++i)
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
 	{
-		if (m_vpAllObjs[i])
+		g_Shaders[ShaderType::Shader_Static]->ChangeShader(pd3dCommandList);
+		pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
+
+		m_vObjectLayer[RenderLayer::Render_Static][i]->UpdateTransform(NULL);
+		m_vObjectLayer[RenderLayer::Render_Static][i]->Render(elapsedTime, pd3dCommandList);
+	}
+
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
+	{
+		if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
 		{
 			// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
-			m_vpAllObjs[i]->Animate(elapsedTime);
-			if (!m_vpAllObjs[i]->m_pAnimationController)
-				m_vpAllObjs[i]->UpdateTransform(NULL);
-			m_vpAllObjs[i]->Render(elapsedTime, pd3dCommandList);
+			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(elapsedTime);
+			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
+				m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
+			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(elapsedTime, pd3dCommandList);
 		}
 	}
 }
@@ -269,6 +278,8 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		break;
 	}
 
+	pObject->Initialize(pd3dDevice, pd3dCommandList, NULL);
+
 	return pObject;
 }
 
@@ -361,7 +372,7 @@ void Scene::ClearObjectLayer()
 	}
 
 	// 레이어 순회
-	for (int i = 0; i < RenderLayer::Count; ++i)
+	for (int i = 0; i < RenderLayer::Render_Count; ++i)
 	{
 		for (int j = 0; j < m_vObjectLayer[i].size(); ++j)
 		{

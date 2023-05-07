@@ -195,7 +195,10 @@
     <FxCompile Include="Shader\ImageObjShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\ColliderShader.hlsl">
+    <FxCompile Include="Shader\SkinnedMesh.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\WireFrameShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

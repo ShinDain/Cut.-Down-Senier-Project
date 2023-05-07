@@ -65,6 +65,8 @@ protected:
 
 	SubmeshGeometry m_SubmeshGeometry;
 
+	std::unique_ptr<UploadBuffer<ObjConstant>> m_pObjectCB = nullptr;
+
 public:
 	virtual void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) {};
 	void Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList);

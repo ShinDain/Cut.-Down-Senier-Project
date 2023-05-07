@@ -19,12 +19,12 @@ bool SenierProjectApp::Initialize()
 	// 명령목록 초기화
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
-	
 	// 각종 변수 초기화
-	g_Shaders.insert(std::make_pair<RenderLayer, std::shared_ptr<Shader>>(RenderLayer::Static, std::make_shared<Shader>()));
-	g_Shaders.insert(std::make_pair<RenderLayer, std::shared_ptr<Shader>>(RenderLayer::Skinned, std::make_shared<SkinnedMeshShader>()));
-	g_Shaders.insert(std::make_pair<RenderLayer, std::shared_ptr<Shader>>(RenderLayer::Image, std::make_shared<ImageObjectShader>()));
-	g_Shaders.insert(std::make_pair<RenderLayer, std::shared_ptr<Shader>>(RenderLayer::WireFrame, std::make_shared<ColliderShader>()));
+	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_Static, std::make_shared<Shader>()));
+	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_TextureMesh, std::make_shared<TextureMeshShader>()));
+	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_Skinned, std::make_shared<SkinnedMeshShader>()));
+	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_Image, std::make_shared<ImageObjectShader>()));
+	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_WireFrame, std::make_shared<WireFrameShader>()));
 
 	for (auto iter = g_Shaders.begin(); iter != g_Shaders.end(); ++iter)
 	{

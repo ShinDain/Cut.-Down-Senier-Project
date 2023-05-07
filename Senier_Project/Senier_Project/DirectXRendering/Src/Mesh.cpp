@@ -383,7 +383,7 @@ void SkinnedMesh::UpdateBoneTransformBuffer(ID3D12GraphicsCommandList* pd3dComma
 	if (m_BindPoseBoneOffsetCB != nullptr)
 	{
 		D3D12_GPU_VIRTUAL_ADDRESS BoneOffsetsGpuVirtualAddress = m_BindPoseBoneOffsetCB->Resource()->GetGPUVirtualAddress();
-		pd3dCommandList->SetGraphicsRootConstantBufferView(3, BoneOffsetsGpuVirtualAddress);
+		pd3dCommandList->SetGraphicsRootConstantBufferView(4, BoneOffsetsGpuVirtualAddress);
 	}
 
 	// SkinningBoneTransform 상수 버퍼 연결
@@ -391,7 +391,7 @@ void SkinnedMesh::UpdateBoneTransformBuffer(ID3D12GraphicsCommandList* pd3dComma
 	{
 		D3D12_GPU_VIRTUAL_ADDRESS SkinnginBoneTransformGpuVirtualAddress = m_SkinningBoneTransformCB->Resource()->GetGPUVirtualAddress();
 		// 루트 서명에 상수 버퍼 연결
-		pd3dCommandList->SetGraphicsRootConstantBufferView(4, SkinnginBoneTransformGpuVirtualAddress);
+		pd3dCommandList->SetGraphicsRootConstantBufferView(5, SkinnginBoneTransformGpuVirtualAddress);
 
 		SkinningBoneTransformConstant* tmpBoneTransformConstant = new SkinningBoneTransformConstant;
 		for (int i = 0; i < m_nSkinningBones; ++i)

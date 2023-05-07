@@ -21,14 +21,15 @@ void Shader::ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	pd3dCommandList->SetGraphicsRootSignature(m_RootSignature.Get());
 	pd3dCommandList->SetPipelineState(m_PSO.Get());
+	g_curShader = m_Type;
 }
 
 bool Shader::BuildShadersAndInputLayout()
 {
 	HRESULT hr = S_OK;
 
-	m_vsByteCode = d3dUtil::CompileShader(L"Shader\\default.hlsl", nullptr, "VS", "vs_5_0");
-	m_psByteCode = d3dUtil::CompileShader(L"Shader\\default.hlsl", nullptr, "PS", "ps_5_0");
+	m_vsByteCode = d3dUtil::CompileShader(L"Shader\\default.hlsl", nullptr, "defaultVS", "vs_5_0");
+	m_psByteCode = d3dUtil::CompileShader(L"Shader\\default.hlsl", nullptr, "defaultPS", "ps_5_0");
 
 	m_vInputLayout = {
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
@@ -40,16 +41,14 @@ bool Shader::BuildShadersAndInputLayout()
 
 bool Shader::BuildRootSignature(ID3D12Device* pd3dDevice)
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[5];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[3];
 
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 
 	slotRootParameter[0].InitAsConstants(16, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
-	slotRootParameter[2].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
-	slotRootParameter[3].InitAsConstantBufferView(1);	// BoneOffsets 상수 버퍼 
-	slotRootParameter[4].InitAsConstantBufferView(2);	// BoneTransforms 상수 버퍼 
+	slotRootParameter[2].InitAsConstantBufferView(4);	// 재질 버퍼
 
 	// 샘플러
 	auto staticSamplers = GetStaticSampler();
@@ -131,6 +130,70 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 2> Shader::GetStaticSampler()
 
 //////////////////////////////////////////////////////////
 
+TextureMeshShader::TextureMeshShader()
+{
+}
+
+TextureMeshShader::~TextureMeshShader()
+{
+}
+
+bool TextureMeshShader::BuildShadersAndInputLayout()
+{
+	HRESULT hr = S_OK;
+
+	m_vsByteCode = d3dUtil::CompileShader(L"Shader\\default.hlsl", nullptr, "TextureVS", "vs_5_0");
+	m_psByteCode = d3dUtil::CompileShader(L"Shader\\default.hlsl", nullptr, "TexturePS", "ps_5_0");
+
+	m_vInputLayout = {
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
+	};
+
+	return true;
+}
+
+bool TextureMeshShader::BuildRootSignature(ID3D12Device* pd3dDevice)
+{
+	CD3DX12_ROOT_PARAMETER slotRootParameter[4];
+
+	CD3DX12_DESCRIPTOR_RANGE texTable;
+	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+
+	slotRootParameter[0].InitAsConstants(16, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
+	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
+	slotRootParameter[2].InitAsConstantBufferView(4);	// 재질 버퍼
+	slotRootParameter[3].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
+
+	// 샘플러
+	auto staticSamplers = GetStaticSampler();
+
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(_countof(slotRootParameter), slotRootParameter,
+		(UINT)staticSamplers.size(), staticSamplers.data(),
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+	ComPtr<ID3DBlob> serializedRootSig = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+		serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+	if (errorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	}
+
+	ThrowIfFailed(hr);
+
+	ThrowIfFailed(pd3dDevice->CreateRootSignature(
+		0, serializedRootSig->GetBufferPointer(),
+		serializedRootSig->GetBufferSize(),
+		IID_PPV_ARGS(&m_RootSignature)));
+	return true;
+}
+
+
+//////////////////////////////////////////////////////////
+
 SkinnedMeshShader::SkinnedMeshShader()
 {
 }
@@ -143,8 +206,8 @@ bool SkinnedMeshShader::BuildShadersAndInputLayout()
 {
 	HRESULT hr = S_OK;
 
-	m_vsByteCode = d3dUtil::CompileShader(L"Shader\\default.hlsl", nullptr, "VSSkinnedMesh", "vs_5_0");
-	m_psByteCode = d3dUtil::CompileShader(L"Shader\\default.hlsl", nullptr, "PSSkinnedMesh", "ps_5_0");
+	m_vsByteCode = d3dUtil::CompileShader(L"Shader\\SkinnedMesh.hlsl", nullptr, "VSSkinnedMesh", "vs_5_0");
+	m_psByteCode = d3dUtil::CompileShader(L"Shader\\SkinnedMesh.hlsl", nullptr, "PSSkinnedMesh", "ps_5_0");
 
 	m_vInputLayout = {
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
@@ -161,16 +224,17 @@ bool SkinnedMeshShader::BuildShadersAndInputLayout()
 
 bool SkinnedMeshShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[5];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[6];
 
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 
 	slotRootParameter[0].InitAsConstants(16, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
-	slotRootParameter[2].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
-	slotRootParameter[3].InitAsConstantBufferView(1);	// BoneOffsets 상수 버퍼 
-	slotRootParameter[4].InitAsConstantBufferView(2);	// BoneTransforms 상수 버퍼 
+	slotRootParameter[2].InitAsConstantBufferView(4);	// 재질 버퍼
+	slotRootParameter[3].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
+	slotRootParameter[4].InitAsConstantBufferView(1);	// BoneOffsets 상수 버퍼 
+	slotRootParameter[5].InitAsConstantBufferView(2);	// BoneTransforms 상수 버퍼 
 
 	// 샘플러
 	auto staticSamplers = GetStaticSampler();
@@ -337,20 +401,20 @@ void ImageObjectShader::OnResize(float aspectRatio)
 
 //////////////////////////////////////////////////////////
 
-ColliderShader::ColliderShader()
+WireFrameShader::WireFrameShader()
 {
 }
 
-ColliderShader::~ColliderShader()
+WireFrameShader::~WireFrameShader()
 {
 }
 
-bool ColliderShader::BuildShadersAndInputLayout()
+bool WireFrameShader::BuildShadersAndInputLayout()
 {
 	HRESULT hr = S_OK;
 
-	m_vsByteCode = d3dUtil::CompileShader(L"Shader\\ColliderShader.hlsl", nullptr, "VS", "vs_5_0");
-	m_psByteCode = d3dUtil::CompileShader(L"Shader\\ColliderShader.hlsl", nullptr, "PS", "ps_5_0");
+	m_vsByteCode = d3dUtil::CompileShader(L"Shader\\WireFrameShader.hlsl", nullptr, "VS", "vs_5_0");
+	m_psByteCode = d3dUtil::CompileShader(L"Shader\\WireFrameShader.hlsl", nullptr, "PS", "ps_5_0");
 
 	m_vInputLayout = {
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
@@ -359,18 +423,15 @@ bool ColliderShader::BuildShadersAndInputLayout()
 	return true;
 }
 
-bool ColliderShader::BuildRootSignature(ID3D12Device* pd3dDevice)
+bool WireFrameShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[5];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
 
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 
 	slotRootParameter[0].InitAsConstants(16, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
-	slotRootParameter[2].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
-	slotRootParameter[3].InitAsConstantBufferView(1);	// BoneOffsets 상수 버퍼 
-	slotRootParameter[4].InitAsConstantBufferView(2);	// BoneTransforms 상수 버퍼 
 
 	// 샘플러
 	auto staticSamplers = GetStaticSampler();
@@ -398,7 +459,7 @@ bool ColliderShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 	return true;
 }
 
-bool ColliderShader::BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature)
+bool WireFrameShader::BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature)
 {
 	// 와이어 프레임으로 렌더링 이외는 모두 동일
 

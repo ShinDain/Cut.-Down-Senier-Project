@@ -32,7 +32,7 @@ Character::Character(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	case Collider_Box:
 	{
 		std::shared_ptr<ColliderBox> pColliderBox;
-		pColliderBox = std::make_shared<ColliderBox>(pBody, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), objData.xmf3Extents);
+		pColliderBox = std::make_shared<ColliderBox>(pBody, XMFLOAT3(0, objData.xmf3Extents.y, 0), XMFLOAT3(0, 0, 0), objData.xmf3Extents);
 		pCollider = std::static_pointer_cast<Collider>(pColliderBox);
 	}
 	break;
@@ -74,6 +74,9 @@ void Character::Update(float elapsedTime)
 	// RigidBody를 기준으로 위치를 갱신한다.
 	if (m_pBody)
 	{
+		// 마찰력
+
+
 		m_pBody->Update(elapsedTime);
 		if (m_pBody->GetInvalid())
 		{

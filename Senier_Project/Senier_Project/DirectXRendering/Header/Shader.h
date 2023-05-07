@@ -12,7 +12,7 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
-// 일반 텍스쳐 셰이더
+// 스태틱 메시 셰이더
 
 class Shader
 {
@@ -45,11 +45,31 @@ protected:
 
 	ComPtr<ID3D12PipelineState> m_PSO = nullptr;
 
+	ShaderType m_Type = ShaderType::Shader_Static;
 	int m_nPassBuffer = -1;
 
 public:
 	int GetPassBufferNum() { return m_nPassBuffer; }
 
+};
+
+// 텍스쳐 스태틱 메시 셰이더
+
+class TextureMeshShader : public Shader
+{
+public:
+	TextureMeshShader();
+	TextureMeshShader(const TextureMeshShader& rhs) = delete;
+	TextureMeshShader& operator=(const TextureMeshShader& rhs) = delete;
+	virtual ~TextureMeshShader();
+
+	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList)
+	{Shader::ChangeShader(pd3dCommandList);}
+protected:
+	virtual bool BuildShadersAndInputLayout();
+	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
+
+	ShaderType m_Type = ShaderType::Shader_TextureMesh;
 };
 
 // 스키닝 메시 셰이더
@@ -62,11 +82,14 @@ public:
 	SkinnedMeshShader& operator=(const SkinnedMeshShader& rhs) = delete;
 	virtual ~SkinnedMeshShader();
 
-	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList) { Shader::ChangeShader(pd3dCommandList); }
+	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList) 
+	{ Shader::ChangeShader(pd3dCommandList);}
 
 protected:
 	virtual bool BuildShadersAndInputLayout();
 	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
+
+	ShaderType m_Type = ShaderType::Shader_Skinned;
 };
 
 // 2D 이미지 렌더링 텍스쳐
@@ -78,27 +101,33 @@ public:
 	ImageObjectShader& operator=(const ImageObjectShader& rhs) = delete;
 	virtual ~ImageObjectShader();
 
-	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList) { Shader::ChangeShader(pd3dCommandList); }
+	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList) 
+	{ Shader::ChangeShader(pd3dCommandList);}
 	virtual void OnResize(float aspectRatio);
 
 protected:
 	virtual bool BuildShadersAndInputLayout();
 	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
 	virtual bool BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature);
+
+	ShaderType m_Type = ShaderType::Shader_Image;
 };
 
 // Collider 렌더링 셰이더
-class ColliderShader : public Shader
+class WireFrameShader : public Shader
 {
 public:
-	ColliderShader();
-	ColliderShader(const ColliderShader& rhs) = delete;
-	ColliderShader& operator=(const ColliderShader& rhs) = delete;
-	virtual ~ColliderShader();
+	WireFrameShader();
+	WireFrameShader(const WireFrameShader& rhs) = delete;
+	WireFrameShader& operator=(const WireFrameShader& rhs) = delete;
+	virtual ~WireFrameShader();
 
-	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList) { Shader::ChangeShader(pd3dCommandList); }
+	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList) 
+	{ Shader::ChangeShader(pd3dCommandList);}
 protected:
 	virtual bool BuildShadersAndInputLayout();
 	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
 	virtual bool BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature);
+
+	ShaderType m_Type = ShaderType::Shader_WireFrame;
 };

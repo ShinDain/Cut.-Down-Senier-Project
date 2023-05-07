@@ -17,13 +17,24 @@ struct Texture
 	Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap = nullptr;
 };
 
+enum ShaderType : UINT
+{
+	Shader_Static,
+	Shader_TextureMesh,
+	Shader_Skinned,
+	Shader_Image,
+	Shader_WireFrame,
+	Shader_Count
+};
+
 enum RenderLayer : UINT
 {
-	Static,
-	Skinned,
-	Image,
-	WireFrame,
-	Count
+	Render_Static,
+	Render_TextureMesh,
+	Render_Skinned,
+	Render_Image,
+	Render_WireFrame,
+	Render_Count
 };
 
 enum ColliderType : UINT

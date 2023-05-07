@@ -12,8 +12,17 @@ Material::~Material()
 
 bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 {
+	m_pMatCB = std::make_unique<UploadBuffer<MatConstant>>(pd3dDevice, 1, true);
+	MatConstant materialConstant;
+	materialConstant.AlbedoColor = m_xmf4AlbedoColor;
+	m_pMatCB->CopyData(0, materialConstant);
+
 	if (m_strTextureName.size() < 1)
+	{
+		SetShader(g_Shaders[ShaderType::Shader_Static]);
 		return false;
+	}
+		
 
 	for (int i = 0; i < m_strTextureName.size(); ++i)
 	{
@@ -54,16 +63,22 @@ bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 
 void Material::MaterialSet(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if(m_pShader)m_pShader->ChangeShader(pd3dCommandList);
+	if (m_pShader && g_curShader != m_nShaderType) 	m_pShader->ChangeShader(pd3dCommandList);
+
+	if(m_pMatCB) pd3dCommandList->SetGraphicsRootConstantBufferView(2, m_pMatCB->Resource()->GetGPUVirtualAddress());
 
 	if (m_DescriptorHeap == NULL)
+	{
 		return;
+	}
+	else
+	{
+		ID3D12DescriptorHeap* descriptorHeap[] = { m_DescriptorHeap.Get() };
+		pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
 
-	ID3D12DescriptorHeap* descriptorHeap[] = { m_DescriptorHeap.Get() };
-	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
-
-	D3D12_GPU_DESCRIPTOR_HANDLE matHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	pd3dCommandList->SetGraphicsRootDescriptorTable(2, matHandle);
+		D3D12_GPU_DESCRIPTOR_HANDLE matHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		pd3dCommandList->SetGraphicsRootDescriptorTable(3, matHandle);
+	}
 
 }
 

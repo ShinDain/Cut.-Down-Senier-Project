@@ -1,13 +1,15 @@
 #include "../Header/Global.h"
 
 std::vector<std::shared_ptr<Texture>> g_CachingTexture;
-std::map<RenderLayer, std::shared_ptr<Shader>> g_Shaders;
+std::map<ShaderType, std::shared_ptr<Shader>> g_Shaders;
 
 std::vector<std::shared_ptr<ColliderPlane>> g_ppColliderPlanes;
 std::vector<std::shared_ptr<ColliderBox>> g_ppColliderBoxs;
 std::vector<std::shared_ptr<ColliderSphere>> g_ppColliderSpheres;
 
 std::map<const char*, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;
+
+UINT g_curShader = ShaderType::Shader_Count;
 
 void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName)
 {

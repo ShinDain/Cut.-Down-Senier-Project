@@ -46,7 +46,7 @@ private:
 
 	// 오브젝트 객체들
 	std::vector<std::shared_ptr<Object>> m_vpAllObjs;
-	std::vector<std::shared_ptr<Object>> m_vObjectLayer[(int)RenderLayer::Count];
+	std::vector<std::shared_ptr<Object>> m_vObjectLayer[(int)RenderLayer::Render_Count];
 
 	// 씬을 렌더링할 메인 카메라
 	std::unique_ptr<Camera> m_pCamera = nullptr;
