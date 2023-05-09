@@ -18,6 +18,7 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	// RigidBody »ý¼º
 	std::shared_ptr<RigidBody> pBody =
 		std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation, objData.xmf3Scale, objData.nMass);
+	g_ppBodies.emplace_back(pBody);
 
 	std::shared_ptr<Collider> pCollider;
 
@@ -519,11 +520,12 @@ void Object::Destroy()
 	m_pMesh.reset();
 	for (int i = 0; i < m_vpMaterials.size(); ++i)
 		m_vpMaterials[i].reset();
+
 	m_pAnimationController.reset();
 	m_pObjectCB.reset();
 
-	m_pCollider.reset();
-	m_pBody.reset();
+	m_pCollider->Destroy();
+	m_pBody->Destroy();
 }
 
 void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData)

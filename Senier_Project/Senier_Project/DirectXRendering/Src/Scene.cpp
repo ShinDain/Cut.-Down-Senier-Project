@@ -49,7 +49,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.xmf3Extents = CUBE_MODEL_EXTENTS;
 	objectData.objectType = Object_Physics;
 	// 복수의 박스 생성
-	for (int i = 0; i < 30; ++i)
+	for (int i = 0; i < 100; ++i)
 	{
 		objectData.xmf3Position = XMFLOAT3(-50 + 10 * (i / 5), 5 + 10 * (i % 5), 0);
 		//objectData.xmf3Position = XMFLOAT3(0, 5 + 10 * (i), 0);
@@ -314,6 +314,12 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 DWORD WINAPI Scene::PhysicsSimulate(LPVOID arg)
 //DWORD WINAPI Scene::PhysicsSimulate(float time)
 {
+	// 모든 RigidBody를 순회하며 Contact 정보를 정리한다.
+	for (int i = 0; i < g_ppBodies.size(); ++i)
+	{
+		if(g_ppBodies[i]) g_ppBodies[i]->ClearContact();
+	}
+
 	// Contact 데이터 생성
 	GenerateContact();
 
@@ -374,14 +380,19 @@ void Scene::GenerateContact()
 
 void Scene::ClearObjectLayer()
 {
-	bool bFind = false;
+	for (int j = 0; j < g_ppBodies.size(); ++j)
+	{
+		if (g_ppBodies[j]->GetInvalid())
+		{
+			g_ppBodies.erase(g_ppBodies.begin() + j);
+		}
+	}
+
 	for (int j = 0; j < g_ppColliderBoxs.size(); ++j)
 	{
-		if (bFind) break;
 		if (g_ppColliderBoxs[j]->GetBody()->GetInvalid())
 		{
 			g_ppColliderBoxs.erase(g_ppColliderBoxs.begin() + j);
-			bFind = true;
 		}
 	}
 	for (int j = 0; j < g_ppColliderSpheres.size(); ++j)
@@ -389,16 +400,13 @@ void Scene::ClearObjectLayer()
 		if (g_ppColliderSpheres[j]->GetBody()->GetInvalid())
 		{
 			g_ppColliderSpheres.erase(g_ppColliderSpheres.begin() + j);
-			bFind = true;
 		}
 	}
 	for (int j = 0; j < g_ppColliderPlanes.size(); ++j)
 	{
-		if (bFind) break;
 		if (g_ppColliderPlanes[j]->GetBody()->GetInvalid())
 		{
 			g_ppColliderPlanes.erase(g_ppColliderPlanes.begin() + j);
-			bFind = true;
 		}
 	}
 
@@ -423,6 +431,4 @@ void Scene::ClearObjectLayer()
 			}
 		}
 	}
-
-
 }

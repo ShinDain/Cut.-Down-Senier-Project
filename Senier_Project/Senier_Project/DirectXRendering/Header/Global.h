@@ -9,11 +9,13 @@
 #include "../../Common/Header/Struct.h"
 
 class Shader;
+class RigidBody;
 class ColliderPlane;
 class ColliderBox;
 class ColliderSphere;
 class ModelDataInfo;
 
+extern std::vector<std::shared_ptr<RigidBody>> g_ppBodies;
 extern std::vector<std::shared_ptr<ColliderPlane>> g_ppColliderPlanes;
 extern std::vector<std::shared_ptr<ColliderBox>> g_ppColliderBoxs;
 extern std::vector<std::shared_ptr<ColliderSphere>> g_ppColliderSpheres;

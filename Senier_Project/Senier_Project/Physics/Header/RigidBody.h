@@ -1,4 +1,7 @@
-#pragma once
+#ifndef RIGIDBODY_H
+
+#define RIGIDBODY_H
+
 #include "../../Common/Header/D3DUtil.h"
 #include "../../Common/Header/MathHelper.h"
 #include "Physics.h"
@@ -6,6 +9,8 @@
 using namespace DirectX;
 
 #define MIN_VELOCITY 2.0f
+
+class Contact;
 
 
 class RigidBody
@@ -54,9 +59,22 @@ protected:
 
 	bool m_bInvalid = false;
 
+	// 자신(Body)을 가지는 Contact의 vector,
+	std::vector<std::shared_ptr<Contact>> m_vContacts;
+
 public:
 	void Update(float elapsedTime);
 	void CalcDerivedData();
+
+	void AddContact(std::shared_ptr<Contact> pContact);
+	void ClearContact();
+	// 여기 구현 아직 안됨,=====================================
+	// 여기 구현 아직 안됨,=====================================
+	// 여기 구현 아직 안됨,=====================================
+	// 여기 구현 아직 안됨,=====================================
+	void Destroy() {}
+
+	const std::vector<std::shared_ptr<Contact>>& GetRelativeContacts() { return m_vContacts; }
 
 public:
 	void AddVelocity(float x, float y, float z);
@@ -133,3 +151,4 @@ public:
 
 };
 
+#endif // !RIGIDBODY_H

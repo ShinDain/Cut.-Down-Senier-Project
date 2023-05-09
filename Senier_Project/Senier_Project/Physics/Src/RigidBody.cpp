@@ -110,6 +110,16 @@ void RigidBody::CalcDerivedData()
 	XMStoreFloat4x4(&m_xmf4x4InverseRotateInertiaForWorld, rotateInertiaForWorld);
 }
 
+void RigidBody::AddContact(std::shared_ptr<Contact> pContact)
+{
+	m_vContacts.push_back(pContact);
+}
+
+void RigidBody::ClearContact()
+{
+	m_vContacts.clear();
+}
+
 void RigidBody::SetRotateInertia(XMFLOAT4X4 xmf4x4RotateInertia)
 {
 	m_xmf4x4RotateInertia = xmf4x4RotateInertia;

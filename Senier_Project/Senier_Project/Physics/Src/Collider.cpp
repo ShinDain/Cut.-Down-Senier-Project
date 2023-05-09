@@ -6,7 +6,7 @@ Collider::Collider()
 
 Collider::~Collider()
 {
-	m_pRigidBody = nullptr;
+	m_pRigidBody.reset();
 
 	m_PositionBufferGPU = nullptr;
 	m_PositionBufferUploader = nullptr;

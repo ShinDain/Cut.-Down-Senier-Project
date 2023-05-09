@@ -1,4 +1,6 @@
-#pragma once
+#ifndef CONTACT_H
+
+#define CONTACT_H
 
 #include "../../Common/Header/D3DUtil.h"
 #include "../../Common/Header/MathHelper.h"
@@ -122,7 +124,14 @@ struct CollisionData
 	void addContact(std::shared_ptr<RigidBody> pBody1, std::shared_ptr<RigidBody> pBody2, float friction, float restitution,
 		XMFLOAT3 xmf3ContactPoint, XMFLOAT3 xmf3ContactNormal, float depth)
 	{
-		pContacts.emplace_back(std::make_unique<Contact>(pBody1, pBody2, friction, restitution,
-														xmf3ContactPoint, xmf3ContactNormal, depth));
+		std::shared_ptr<Contact> tmpContact = std::make_shared<Contact>(pBody1, pBody2, friction, restitution,
+			xmf3ContactPoint, xmf3ContactNormal, depth);
+
+		if(pBody1) pBody1->AddContact(tmpContact);
+		if(pBody2) pBody2->AddContact(tmpContact);
+
+		pContacts.emplace_back(tmpContact);
 	}
 };
+
+#endif // !CONTACT_H
