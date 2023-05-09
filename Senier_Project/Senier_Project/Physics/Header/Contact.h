@@ -81,7 +81,7 @@ public:
 
 
 		
-	std::shared_ptr<RigidBody> GetBody(int idx) { return m_pBody[idx]; }
+	std::shared_ptr<RigidBody>& GetBody(int idx) { return m_pBody[idx]; }
 	const float GetFriction() { return m_Friction; };
 	const float GetRestitution() { return m_Restitution; };
 	const XMFLOAT3& GetContactPoint() { return m_xmf3ContactPoint; };

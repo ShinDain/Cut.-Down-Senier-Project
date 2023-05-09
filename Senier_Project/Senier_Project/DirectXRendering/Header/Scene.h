@@ -34,8 +34,8 @@ public:
 	std::shared_ptr<Object> CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 										const ObjectInitData& objInitData, const char* pstrFilePath,int nAnimationTracks, RenderLayer renderLayer);
 
-	void GenerateContact();
 	void ClearObjectLayer();
+
 private:
 
 	XMFLOAT4X4 m_xmf4x4ViewProj = MathHelper::identity4x4();
@@ -57,10 +57,17 @@ public:
 	void SetViewProjMatrix(XMFLOAT4X4 viewProj) { m_xmf4x4ViewProj = viewProj; }
 
 
+public:
+	static DWORD WINAPI PhysicsSimulate(LPVOID arg);
+	//static DWORD WINAPI PhysicsSimulate(float time);
+	static void GenerateContact();
+
 private:
 	
-	CollisionData m_CollisionData;
-	std::unique_ptr<CollisionResolver> m_pCollisionResolver = nullptr;
+	static CollisionData m_CollisionData;
+	static std::unique_ptr<CollisionResolver> m_pCollisionResolver;
+
+	static HANDLE m_hPhysicsEvent;
 
 #if defined(_DEBUG) | defined(DEBUG)
 public:

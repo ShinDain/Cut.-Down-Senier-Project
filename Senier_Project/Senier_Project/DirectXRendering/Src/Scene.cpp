@@ -6,10 +6,20 @@
 #define CUBE_MODEL_PATH "Model/Cube.bin"
 #define CUBE_MODEL_EXTENTS XMFLOAT3(0.5f, 0.5f, 0.5f)
 
+CollisionData Scene::m_CollisionData;
+std::unique_ptr<CollisionResolver> Scene::m_pCollisionResolver;
+
+HANDLE Scene::m_hPhysicsEvent;
+
+static float pEtime = 0;
+
 Scene::Scene()
 {
 	m_CollisionData.Reset(MAX_CONTACT_CNT);
 	m_pCollisionResolver = std::make_unique<CollisionResolver>(MAX_CONTACT_CNT * 8);
+
+	m_hPhysicsEvent = CreateEvent(NULL, FALSE, TRUE, L"PhysicsEvent");
+
 }
 
 Scene::~Scene()
@@ -31,7 +41,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.xmf3Extents = CHARACTER_MODEL_EXTENTS;
 
 	// 캐릭터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList,  objectData, CHARACTER_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CHARACTER_MODEL_PATH, 1, RenderLayer::Render_Skinned);
 	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 1);
 
 
@@ -39,30 +49,19 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.xmf3Extents = CUBE_MODEL_EXTENTS;
 	objectData.objectType = Object_Physics;
 	// 복수의 박스 생성
-
-	objectData.xmf3Position = XMFLOAT3(-30, 5,0);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	objectData.xmf3Position = XMFLOAT3(-10, 5,0);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	objectData.xmf3Position = XMFLOAT3(-10, 15,0);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	objectData.xmf3Position = XMFLOAT3(10, 5,0);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	objectData.xmf3Position = XMFLOAT3(10, 15,0);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	objectData.xmf3Position = XMFLOAT3(10, 25,0);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
+	for (int i = 0; i < 30; ++i)
+	{
+		objectData.xmf3Position = XMFLOAT3(-50 + 10 * (i / 5), 5 + 10 * (i % 5), 0);
+		//objectData.xmf3Position = XMFLOAT3(0, 5 + 10 * (i), 0);
+		CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
+	}
 
 
 	// 플랫폼 테스트
-	objectData.objectType = Object_Platform;
-	objectData.xmf3Scale = XMFLOAT3(20, 5, 20);
-	objectData.xmf3Position = XMFLOAT3(-10, 5, -20);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	objectData.xmf3Position = XMFLOAT3(5, 15, -20);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	objectData.xmf3Position = XMFLOAT3(20, 25, -20);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
+	//objectData.objectType = Object_Platform;
+	//objectData.xmf3Scale = XMFLOAT3(20, 5, 20);
+	//objectData.xmf3Position = XMFLOAT3(-10, 5, -20);
+	//CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
 
 
 	// 바닥
@@ -73,22 +72,22 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.colliderType = Collider_Plane;
 	objectData.objectType = Object_World;
 	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	// 왼쪽 벽
-	objectData.xmf3Extents = XMFLOAT3(-100, 0, 0);
-	objectData.xmf3Position = XMFLOAT3(-100, 25, 0);
-	objectData.xmf4Orientation = XMFLOAT4(1, 0, 0, 1);
-	objectData.xmf3Scale = XMFLOAT3(0.1f, 300, 20);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	// 오른쪽 벽
-	objectData.xmf3Extents = XMFLOAT3(-100, 0, 0);
-	objectData.xmf3Position = XMFLOAT3(100, 25, 0);
-	objectData.xmf4Orientation = XMFLOAT4(-1, 0, 0, 1);
-	objectData.xmf3Scale = XMFLOAT3(0.1f, 300, 20);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	
+	//// 왼쪽 벽
+	//objectData.xmf3Extents = XMFLOAT3(-100, 0, 0);
+	//objectData.xmf3Position = XMFLOAT3(-100, 25, 0);
+	//objectData.xmf4Orientation = XMFLOAT4(1, 0, 0, 1);
+	//objectData.xmf3Scale = XMFLOAT3(0.1f, 300, 20);
+	//CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
+	//// 오른쪽 벽
+	//objectData.xmf3Extents = XMFLOAT3(-100, 0, 0);
+	//objectData.xmf3Position = XMFLOAT3(100, 25, 0);
+	//objectData.xmf4Orientation = XMFLOAT4(-1, 0, 0, 1);
+	//objectData.xmf3Scale = XMFLOAT3(0.1f, 300, 20);
+	//CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
+	//
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
-		if (m_vpAllObjs[i]) m_vpAllObjs[i]->UpdateTransform(NULL);
+		if (m_vpAllObjs[i]) m_vpAllObjs[i]->UpdateTransform();
 	}
 
 	// 카메라 초기화
@@ -121,17 +120,21 @@ void Scene::Update(float elapsedTime)
 
 #endif
 
+	DWORD retval = WaitForSingleObject(m_hPhysicsEvent, INFINITE);
+
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
 		if (m_vpAllObjs[i]) m_vpAllObjs[i]->Update(elapsedTime);
 	}
 
-	// Contact 데이터 생성
-	GenerateContact();
-	// Collision Resolve
-	m_pCollisionResolver->ResolveContacts(m_CollisionData.pContacts, elapsedTime);
+	pEtime = elapsedTime;
 
+	HANDLE hPhysicsThread = CreateThread(NULL, 0, Scene::PhysicsSimulate, &pEtime, 0, NULL);
+	if (hPhysicsThread == NULL) assert(false);
+	CloseHandle(hPhysicsThread);
 
+	//Scene::PhysicsSimulate(eTime);
+	
 	m_pCamera->Update(elapsedTime);
 
 	XMMATRIX view = m_pCamera->GetView();
@@ -306,6 +309,22 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	pObject->Initialize(pd3dDevice, pd3dCommandList, NULL);
 
 	return pObject;
+}
+
+DWORD WINAPI Scene::PhysicsSimulate(LPVOID arg)
+//DWORD WINAPI Scene::PhysicsSimulate(float time)
+{
+	// Contact 데이터 생성
+	GenerateContact();
+
+	float* elapsedTime = (float*)arg;
+	float eTime = *elapsedTime;
+	// Collision Resolve
+	m_pCollisionResolver->ResolveContacts(m_CollisionData.pContacts, eTime);
+
+	SetEvent(m_hPhysicsEvent);
+
+	return 0;
 }
 
 void Scene::GenerateContact()

@@ -288,7 +288,7 @@ void Camera::UpdateViewMatrix()
 Third_Person_Camera::Third_Person_Camera(std::shared_ptr<Object> pObject)
 {
 	SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
-
+	//m_Pitch = 20;
 	m_pObject = pObject;
 }
 
