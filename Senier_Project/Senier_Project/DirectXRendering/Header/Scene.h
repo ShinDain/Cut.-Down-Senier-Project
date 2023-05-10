@@ -10,10 +10,8 @@
 #include "Object.h"
 #include "Character.h"
 
-#include "../../Physics/Header/Contact.h"
 #include "../../Physics/Header/Collider.h"
 #include "../../Physics/Header/CollisionDetact.h"
-#include "../../Physics/Header/CollisionResolver.h"
 
 
 class Scene
@@ -56,18 +54,6 @@ private:
 public:
 	void SetViewProjMatrix(XMFLOAT4X4 viewProj) { m_xmf4x4ViewProj = viewProj; }
 
-
-public:
-	static DWORD WINAPI PhysicsSimulate(LPVOID arg);
-	//static DWORD WINAPI PhysicsSimulate(float time);
-	static void GenerateContact();
-
-private:
-	
-	static CollisionData m_CollisionData;
-	static std::unique_ptr<CollisionResolver> m_pCollisionResolver;
-
-	static HANDLE m_hPhysicsEvent;
 
 #if defined(_DEBUG) | defined(DEBUG)
 public:

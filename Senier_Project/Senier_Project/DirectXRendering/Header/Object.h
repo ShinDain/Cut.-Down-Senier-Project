@@ -6,7 +6,7 @@
 
 #include "../../Common/Header/D3DUtil.h"
 #include "../../Common/Header/UploadBuffer.h"
-#include "../../Physics/Header/RigidBody.h"
+
 #include "../../Physics/Header/Collider.h"
 #include "Global.h"
 #include "Mesh.h"
@@ -80,7 +80,6 @@ public:
 
 protected:
 	// 좌표 관련
-
 	UINT m_ObjCBByteSize = 0;
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 	XMFLOAT4X4 m_xmf4x4ParentWorld = MathHelper::identity4x4();
@@ -96,14 +95,14 @@ protected:
 	XMFLOAT3 m_xmf3Rotate = XMFLOAT3(0, 0, 0);
 
 	// 물리 연산 관련
-	std::shared_ptr<RigidBody> m_pBody = nullptr;
 	std::shared_ptr<Collider> m_pCollider = nullptr;
-
 	XMFLOAT3 m_xmf3ColliderExtents = XMFLOAT3(0, 0, 0);
 
+	float m_Mass = 1.0f;
+
+	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	float m_Accelation = 100.0f;
 
-	bool m_bPhysics = true;
 	bool m_bIsAlive = true;
 	
 public:
@@ -131,6 +130,15 @@ public:
 	void AddRotate(XMFLOAT3 addRotate)
 	{
 		AddRotate(addRotate.x, addRotate.y, addRotate.z);
+	}
+
+	void AddVelocity(float x, float y, float z) {
+		m_xmf3Velocity.x += x;
+		m_xmf3Velocity.y += y;
+		m_xmf3Velocity.z += z;
+	}
+	void AddVelocity(XMFLOAT3 addVelocity) {
+		AddVelocity(addVelocity.x, addVelocity.y, addVelocity.z);
 	}
 
 public:
@@ -176,7 +184,6 @@ public:
 	const float& GetRoll() { return(m_xmf3Rotate.z); }
 	const XMFLOAT4& GetOrientation() { return m_xmf4Orientation; }
 
-	std::shared_ptr<RigidBody> GetBody() { return m_pBody; }
 	std::shared_ptr<Collider> GetCollider() { return m_pCollider; }
 
 	bool GetIsAlive() { return m_bIsAlive; }

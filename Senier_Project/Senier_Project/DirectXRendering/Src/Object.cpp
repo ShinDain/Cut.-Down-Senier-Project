@@ -15,11 +15,6 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	if(nAnimationTracks > 0)
 		m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
 
-	// RigidBody 생성
-	std::shared_ptr<RigidBody> pBody =
-		std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation, objData.xmf3Scale, objData.nMass);
-	g_ppBodies.emplace_back(pBody);
-
 	std::shared_ptr<Collider> pCollider;
 
 	// 충돌체 타입에 따라 
@@ -29,7 +24,6 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	{
 		std::shared_ptr<ColliderPlane> pColliderPlane;
 		XMFLOAT3 direction = XMFLOAT3(objData.xmf4Orientation.x, objData.xmf4Orientation.y, objData.xmf4Orientation.z);
-		pColliderPlane = std::make_shared<ColliderPlane>(pBody, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), direction, objData.xmf3Extents.x);
 		pCollider = std::static_pointer_cast<Collider>(pColliderPlane);
 	}
 	break;
@@ -37,7 +31,6 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	case Collider_Box:
 	{
 		std::shared_ptr<ColliderBox> pColliderBox;
-		pColliderBox = std::make_shared<ColliderBox>(pBody, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), objData.xmf3Extents);
 		pCollider = std::static_pointer_cast<Collider>(pColliderBox);
 	}
 	break;
@@ -45,7 +38,6 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	case Collider_Sphere:
 	{
 		std::shared_ptr<ColliderSphere> pColliderSphere;
-		pColliderSphere = std::make_shared<ColliderSphere>(pBody, XMFLOAT3(0, 0, 0), objData.xmf3Extents.x);
 		pCollider = std::static_pointer_cast<Collider>(pColliderSphere);
 	}
 	break;
@@ -58,37 +50,29 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	switch (objData.objectType)
 	{
 	case Object_World:
-		pBody->SetPhysics(false);
-		pBody->SetInGravity(false);
+	
 		break;
 
 	case Object_Physics:
-		pBody->SetPhysics(true);
-		pBody->SetInGravity(true);
+
 		break;
 
 	case Object_Platform:
-		pBody->SetPhysics(false);
-		pBody->SetInGravity(false);
-		pBody->SetIsPlatform(true);
+
 		break;
 
 	case Object_Character:
-		pBody->SetPhysics(true);
-		pBody->SetInGravity(true);
-		pBody->SetIsCharacter(true);
+
 		break;
 
 	case Object_UI:
-		pBody->SetPhysics(false);
-		pBody->SetInGravity(false);
+
 		break;
 
 	default:
 		break;
 	}
 
-	m_pBody = pBody;
 	m_pCollider = pCollider;
 	m_xmf3ColliderExtents = objData.xmf3Extents;
 
@@ -120,21 +104,7 @@ void Object::Animate(float elapsedTime)
 
 void Object::Update(float elapsedTime)
 {
-	// RigidBody를 기준으로 위치를 갱신한다.
-	if (m_pBody)
-	{
-		m_pBody->Update(elapsedTime);
-		if (m_pBody->GetInvalid())
-		{
-			Destroy();
-			return;
-		}
-		m_pCollider->UpdateWorldTransform();
-		m_xmf3Position = m_pBody->GetPosition();
-		m_xmf4Orientation = m_pBody->GetOrientation();
-		m_xmf3Scale = m_pBody->GetScale();
-		m_xmf4x4World = m_pBody->GetWorld();
-	}
+	m_pCollider->UpdateWorldTransform();
 
 	UpdateTransform(NULL);
 
@@ -161,20 +131,15 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 	else
 	{
 		// RootObject인 경우
-		//m_xmf4x4LocalTransform = MathHelper::identity4x4();
-		//XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
-
+		m_xmf4x4LocalTransform = MathHelper::identity4x4();
+		XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
 		//XMMATRIX xmmatOrientation = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
-		//
-		//XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
-		//// S * R * T
+		XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotate.x), XMConvertToRadians(m_xmf3Rotate.y), XMConvertToRadians(m_xmf3Rotate.z));
+		XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
+		// S * R * T
 		//XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate)));
-		//m_xmf4x4World = m_xmf4x4LocalTransform;
-
-
-		//=====================================
-		//XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotate.x), XMConvertToRadians(m_xmf3Rotate.y), XMConvertToRadians(m_xmf3Rotate.z));
-		//XMStoreFloat4x4(&m_xmf4x4World, XMMatrixMultiply(xmmatRotate, XMLoadFloat4x4(&m_xmf4x4World)));
+		XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate)));
+		m_xmf4x4World = m_xmf4x4LocalTransform;
 	}
 
 	if (m_pSibling) {
@@ -524,8 +489,7 @@ void Object::Destroy()
 	m_pAnimationController.reset();
 	m_pObjectCB.reset();
 
-	m_pCollider->Destroy();
-	m_pBody->Destroy();
+	if(m_pCollider) m_pCollider->Destroy();
 }
 
 void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData)
@@ -694,8 +658,6 @@ void Object::Move(DWORD dwDirection)
 	XMVECTOR deltaAccel = direction * m_Accelation;
 	XMFLOAT3 xmf3deltaAccel;
 	XMStoreFloat3(&xmf3deltaAccel, deltaAccel);
-
-	m_pBody->SetAcceleration(xmf3deltaAccel);
 }
 
 void Object::Rotate(float x, float y, float z)
@@ -730,7 +692,6 @@ void Object::Rotate(float x, float y, float z)
 		XMStoreFloat3(&m_xmf3Right, XMVector3TransformNormal(r, xmmatRotate));
 
 	}
-	m_pBody->SetRotate(m_xmf3Rotate);
 }
 
 void Object::SetRotate(const XMFLOAT3& Rotate) {
@@ -742,6 +703,4 @@ void Object::SetRotate(const XMFLOAT3& Rotate) {
 
 	XMStoreFloat3(&m_xmf3Look, XMVector3TransformNormal(l, xmmatRotate));
 	XMStoreFloat3(&m_xmf3Right, XMVector3TransformNormal(r, xmmatRotate));
-
-	m_pBody->SetRotate(Rotate);
 }

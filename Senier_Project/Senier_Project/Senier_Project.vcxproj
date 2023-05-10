@@ -38,10 +38,7 @@
     <ClCompile Include="DirectXRendering\Src\Shader.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Physics\Src\CollisionDetact.cpp" />
-    <ClCompile Include="Physics\Src\CollisionResolver.cpp" />
-    <ClCompile Include="Physics\Src\Contact.cpp" />
     <ClCompile Include="Physics\Src\Physics.cpp" />
-    <ClCompile Include="Physics\Src\RigidBody.cpp" />
     <ClCompile Include="Physics\Src\Collider.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -57,7 +54,6 @@
     <ClInclude Include="DirectXRendering\Header\Camera.h" />
     <ClInclude Include="DirectXRendering\Header\DirectXApp.h" />
     <ClInclude Include="DirectXRendering\Header\DWriteText.h" />
-    <ClInclude Include="DirectXRendering\Header\Global.h" />
     <ClInclude Include="DirectXRendering\Header\ImgObject.h" />
     <ClInclude Include="DirectXRendering\Header\Material.h" />
     <ClInclude Include="DirectXRendering\Header\Mesh.h" />
@@ -67,10 +63,7 @@
     <ClInclude Include="DirectXRendering\Header\Shader.h" />
     <ClInclude Include="DirectXRendering\SenierProjectApp.h" />
     <ClInclude Include="Physics\Header\CollisionDetact.h" />
-    <ClInclude Include="Physics\Header\CollisionResolver.h" />
-    <ClInclude Include="Physics\Header\Contact.h" />
     <ClInclude Include="Physics\Header\Physics.h" />
-    <ClInclude Include="Physics\Header\RigidBody.h" />
     <ClInclude Include="Physics\Header\Collider.h" />
   </ItemGroup>
   <ItemGroup>

@@ -72,31 +72,47 @@ void Contact::ApplyVelocityChange(XMVECTOR& deltaLinearVel_0, XMVECTOR& deltaLin
 	XMMATRIX contactToWorld = XMLoadFloat4x4(&m_xmf4x4ContactToWorld);
 	XMVECTOR impulse = XMVector3TransformCoord(impulseContact, contactToWorld);
 
-	// 충격량을 이용해 선성분과 각성분 변화량 계산
-	XMVECTOR angularResult = XMLoadFloat3(&m_pxmf3RelativePosition[0]);
-	angularResult = XMVector3Cross(angularResult, impulse);
-	angularResult = XMVector3TransformCoord(angularResult, inverseInertia_0);
-	deltaAngularVel_0 = angularResult;
 
+	deltaAngularVel_0 = XMVectorZero();
+	deltaAngularVel_1 = XMVectorZero();
+
+	XMFLOAT3 xmf3AngularResult;
+	XMFLOAT3 xmf3LinearResult;
+	if (!m_pBody[0]->GetIsCharacter())
+	{
+		// 충격량을 이용해 선성분과 각성분 변화량 계산
+		XMVECTOR angularResult = XMLoadFloat3(&m_pxmf3RelativePosition[0]);
+		angularResult = XMVector3Cross(angularResult, impulse);
+		angularResult = XMVector3TransformCoord(angularResult, inverseInertia_0);
+		deltaAngularVel_0 = angularResult;
+
+		
+		XMStoreFloat3(&xmf3AngularResult, angularResult);
+		m_pBody[0]->AddAngleVelocity(xmf3AngularResult);
+	}
 	float mass = m_pBody[0]->GetMass();
 	XMVECTOR linearResult = impulse / mass;
 	deltaLinearVel_0 = linearResult;
-	XMFLOAT3 xmf3LinearResult;
-	XMFLOAT3 xmf3AngularResult;
+	
+	
 	XMStoreFloat3(&xmf3LinearResult, linearResult);
-	XMStoreFloat3(&xmf3AngularResult, angularResult);
-
 	m_pBody[0]->AddVelocity(xmf3LinearResult);
-	m_pBody[0]->AddAngleVelocity(xmf3AngularResult);
+	
 
 	if (m_pBody[1])
 	{
-		angularResult = XMLoadFloat3(&m_pxmf3RelativePosition[1]);
-		// Body1의 경우 반대 방향 작용이므로,
-		// pos X (-impulse) => impulse X pos
-		angularResult = XMVector3Cross(impulse, angularResult);
-		angularResult = XMVector3TransformCoord(angularResult, inverseInertia_1);
-		deltaAngularVel_1 = angularResult;
+		if (!m_pBody[1]->GetIsCharacter())
+		{
+			XMVECTOR angularResult = XMLoadFloat3(&m_pxmf3RelativePosition[1]);
+			// Body1의 경우 반대 방향 작용이므로,
+			// pos X (-impulse) => impulse X pos
+			angularResult = XMVector3Cross(impulse, angularResult);
+			angularResult = XMVector3TransformCoord(angularResult, inverseInertia_1);
+			deltaAngularVel_1 = angularResult;
+
+			XMStoreFloat3(&xmf3AngularResult, angularResult);
+			m_pBody[1]->AddAngleVelocity(xmf3AngularResult);
+		}
 
 		mass = m_pBody[1]->GetMass();
 
@@ -104,10 +120,8 @@ void Contact::ApplyVelocityChange(XMVECTOR& deltaLinearVel_0, XMVECTOR& deltaLin
 		linearResult = -impulse / mass;
 		deltaLinearVel_1 = linearResult;
 		XMStoreFloat3(&xmf3LinearResult, linearResult);
-		XMStoreFloat3(&xmf3AngularResult, angularResult);
 
 		m_pBody[1]->AddVelocity(xmf3LinearResult);
-		m_pBody[1]->AddAngleVelocity(xmf3AngularResult);
 	}
 }
 
@@ -410,26 +424,34 @@ XMVECTOR Contact::CalcFrictionlessImpulse(FXMMATRIX InverseInertia_0, CXMMATRIX 
 
 	// 단위 충격량 당 속도변화를 계산
 	// 각속도
-	XMVECTOR relativePosition_0 = XMLoadFloat3(&m_pxmf3RelativePosition[0]);			// RelativePosition은 World 좌표계
-	XMVECTOR deltaVelWorld = XMVector3Cross(relativePosition_0, contactNormal);
-	deltaVelWorld = XMVector3TransformNormal(deltaVelWorld, InverseInertia_0);
-	deltaVelWorld = XMVector3Cross(deltaVelWorld, relativePosition_0);
+	XMVECTOR deltaVelWorld;
+	float deltaVelocity = 0;
+	if (!m_pBody[0]->GetIsCharacter())
+	{
+		XMVECTOR relativePosition_0 = XMLoadFloat3(&m_pxmf3RelativePosition[0]);			// RelativePosition은 World 좌표계
+		deltaVelWorld = XMVector3Cross(relativePosition_0, contactNormal);
+		deltaVelWorld = XMVector3TransformNormal(deltaVelWorld, InverseInertia_0);
+		deltaVelWorld = XMVector3Cross(deltaVelWorld, relativePosition_0);
 
-	// Contact Normal로 사영하여 Normal 방향 크기만 추출
-	float deltaVelocity = XMVectorGetX(XMVector3Dot(deltaVelWorld, contactNormal));
+		// Contact Normal로 사영하여 Normal 방향 크기만 추출
+		deltaVelocity = XMVectorGetX(XMVector3Dot(deltaVelWorld, contactNormal));
+	}
 	// 선속도
 	deltaVelocity += ((float)1) / m_pBody[0]->GetMass();
 
 	if (m_pBody[1])
 	{
-		// 각속도
-		XMVECTOR relativePosition_1 = XMLoadFloat3(&m_pxmf3RelativePosition[1]);		// RelativePosition은 World 좌표계
-		deltaVelWorld = XMVector3Cross(relativePosition_1, contactNormal);
-		deltaVelWorld = XMVector3TransformNormal(deltaVelWorld, InverseInertia_1);
-		deltaVelWorld = XMVector3Cross(deltaVelWorld, relativePosition_1);
+		if (!m_pBody[1]->GetIsCharacter())
+		{
+			// 각속도
+			XMVECTOR relativePosition_1 = XMLoadFloat3(&m_pxmf3RelativePosition[1]);		// RelativePosition은 World 좌표계
+			deltaVelWorld = XMVector3Cross(relativePosition_1, contactNormal);
+			deltaVelWorld = XMVector3TransformNormal(deltaVelWorld, InverseInertia_1);
+			deltaVelWorld = XMVector3Cross(deltaVelWorld, relativePosition_1);
 
-		// Contact Normal로 사영하여 Normal 방향 크기만 추출
-		deltaVelocity += XMVectorGetX(XMVector3Dot(deltaVelWorld, contactNormal));
+			// Contact Normal로 사영하여 Normal 방향 크기만 추출
+			deltaVelocity += XMVectorGetX(XMVector3Dot(deltaVelWorld, contactNormal));
+		}
 		// 선속도
 		deltaVelocity += ((float)1) / m_pBody[1]->GetMass();
 	}

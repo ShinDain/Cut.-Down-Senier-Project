@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <list>
 
 #include "../../Common/Header/D3DUtil.h"
 #include "../../Common/Header/MathHelper.h"

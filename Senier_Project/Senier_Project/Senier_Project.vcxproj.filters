@@ -34,12 +34,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Physics\Src\Contact.cpp">
-      <Filter>Physics\Src</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Src\RigidBody.cpp">
-      <Filter>Physics\Src</Filter>
-    </ClCompile>
     <ClCompile Include="Physics\Src\Collider.cpp">
       <Filter>Physics\Src</Filter>
     </ClCompile>
@@ -95,23 +89,14 @@
       <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Physics\Src\CollisionDetact.cpp">
-      <Filter>Physics\Src</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\Src\CollisionResolver.cpp">
-      <Filter>Physics\Src</Filter>
-    </ClCompile>
     <ClCompile Include="Physics\Src\Physics.cpp">
+      <Filter>Physics\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Src\CollisionDetact.cpp">
       <Filter>Physics\Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Physics\Header\Contact.h">
-      <Filter>Physics\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Header\RigidBody.h">
-      <Filter>Physics\Header</Filter>
-    </ClInclude>
     <ClInclude Include="Physics\Header\Collider.h">
       <Filter>Physics\Header</Filter>
     </ClInclude>
@@ -148,9 +133,6 @@
     <ClInclude Include="DirectXRendering\Header\DWriteText.h">
       <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="DirectXRendering\Header\Global.h">
-      <Filter>DirectXRendering\Header</Filter>
-    </ClInclude>
     <ClInclude Include="DirectXRendering\Header\ImgObject.h">
       <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
@@ -175,17 +157,14 @@
     <ClInclude Include="DirectXRendering\SenierProjectApp.h">
       <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Physics\Header\CollisionDetact.h">
-      <Filter>Physics\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\Header\CollisionResolver.h">
-      <Filter>Physics\Header</Filter>
-    </ClInclude>
     <ClInclude Include="Physics\Header\Physics.h">
       <Filter>Physics\Header</Filter>
     </ClInclude>
     <ClInclude Include="Common\Header\Struct.h">
       <Filter>Common\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Header\CollisionDetact.h">
+      <Filter>Physics\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

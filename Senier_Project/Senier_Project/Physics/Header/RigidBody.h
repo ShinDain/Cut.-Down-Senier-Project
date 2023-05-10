@@ -72,7 +72,7 @@ public:
 	// 여기 구현 아직 안됨,=====================================
 	// 여기 구현 아직 안됨,=====================================
 	// 여기 구현 아직 안됨,=====================================
-	void Destroy() {}
+	void Destroy();
 
 	const std::vector<std::shared_ptr<Contact>>& GetRelativeContacts() { return m_vContacts; }
 

@@ -6,19 +6,11 @@
 #define CUBE_MODEL_PATH "Model/Cube.bin"
 #define CUBE_MODEL_EXTENTS XMFLOAT3(0.5f, 0.5f, 0.5f)
 
-CollisionData Scene::m_CollisionData;
-std::unique_ptr<CollisionResolver> Scene::m_pCollisionResolver;
-
-HANDLE Scene::m_hPhysicsEvent;
 
 static float pEtime = 0;
 
 Scene::Scene()
 {
-	m_CollisionData.Reset(MAX_CONTACT_CNT);
-	m_pCollisionResolver = std::make_unique<CollisionResolver>(MAX_CONTACT_CNT * 8);
-
-	m_hPhysicsEvent = CreateEvent(NULL, FALSE, TRUE, L"PhysicsEvent");
 
 }
 
@@ -45,46 +37,16 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 1);
 
 
-
 	objectData.xmf3Extents = CUBE_MODEL_EXTENTS;
 	objectData.objectType = Object_Physics;
 	// 복수의 박스 생성
-	for (int i = 0; i < 100; ++i)
+	for (int i = 0; i < 2; ++i)
 	{
-		objectData.xmf3Position = XMFLOAT3(-50 + 10 * (i / 5), 5 + 10 * (i % 5), 0);
-		//objectData.xmf3Position = XMFLOAT3(0, 5 + 10 * (i), 0);
+		//objectData.xmf3Position = XMFLOAT3(-50 + 10 * (i / 5), 5 + 10 * (i % 5), 0);
+		objectData.xmf3Position = XMFLOAT3(0, 5 + 10 * (i), 0);
 		CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
 	}
 
-
-	// 플랫폼 테스트
-	//objectData.objectType = Object_Platform;
-	//objectData.xmf3Scale = XMFLOAT3(20, 5, 20);
-	//objectData.xmf3Position = XMFLOAT3(-10, 5, -20);
-	//CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-
-
-	// 바닥
-	objectData.xmf3Extents = XMFLOAT3(0, 0, 0);
-	objectData.xmf3Position = XMFLOAT3(0,0,0);
-	objectData.xmf4Orientation = XMFLOAT4(0, 1, 0, 1);
-	objectData.xmf3Scale = XMFLOAT3(300, 0.1f, 300.0f);
-	objectData.colliderType = Collider_Plane;
-	objectData.objectType = Object_World;
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	//// 왼쪽 벽
-	//objectData.xmf3Extents = XMFLOAT3(-100, 0, 0);
-	//objectData.xmf3Position = XMFLOAT3(-100, 25, 0);
-	//objectData.xmf4Orientation = XMFLOAT4(1, 0, 0, 1);
-	//objectData.xmf3Scale = XMFLOAT3(0.1f, 300, 20);
-	//CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	//// 오른쪽 벽
-	//objectData.xmf3Extents = XMFLOAT3(-100, 0, 0);
-	//objectData.xmf3Position = XMFLOAT3(100, 25, 0);
-	//objectData.xmf4Orientation = XMFLOAT4(-1, 0, 0, 1);
-	//objectData.xmf3Scale = XMFLOAT3(0.1f, 300, 20);
-	//CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	//
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
 		if (m_vpAllObjs[i]) m_vpAllObjs[i]->UpdateTransform();
@@ -120,20 +82,11 @@ void Scene::Update(float elapsedTime)
 
 #endif
 
-	DWORD retval = WaitForSingleObject(m_hPhysicsEvent, INFINITE);
 
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
 		if (m_vpAllObjs[i]) m_vpAllObjs[i]->Update(elapsedTime);
 	}
-
-	pEtime = elapsedTime;
-
-	HANDLE hPhysicsThread = CreateThread(NULL, 0, Scene::PhysicsSimulate, &pEtime, 0, NULL);
-	if (hPhysicsThread == NULL) assert(false);
-	CloseHandle(hPhysicsThread);
-
-	//Scene::PhysicsSimulate(eTime);
 	
 	m_pCamera->Update(elapsedTime);
 
@@ -311,84 +264,9 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	return pObject;
 }
 
-DWORD WINAPI Scene::PhysicsSimulate(LPVOID arg)
-//DWORD WINAPI Scene::PhysicsSimulate(float time)
-{
-	// 모든 RigidBody를 순회하며 Contact 정보를 정리한다.
-	for (int i = 0; i < g_ppBodies.size(); ++i)
-	{
-		if(g_ppBodies[i]) g_ppBodies[i]->ClearContact();
-	}
-
-	// Contact 데이터 생성
-	GenerateContact();
-
-	float* elapsedTime = (float*)arg;
-	float eTime = *elapsedTime;
-	// Collision Resolve
-	m_pCollisionResolver->ResolveContacts(m_CollisionData.pContacts, eTime);
-
-	SetEvent(m_hPhysicsEvent);
-
-	return 0;
-}
-
-void Scene::GenerateContact()
-{
-	unsigned int nContactCnt = MAX_CONTACT_CNT * 8;
-
-	m_CollisionData.Reset(nContactCnt);
-	m_CollisionData.friction = 0;
-	m_CollisionData.restitution = 0.1f;
-	m_CollisionData.tolerance = 0.1f;
-
-	// 플레이어 검사
-	for (int i = 0; i < g_ppColliderPlanes.size(); ++i)
-	{
-		if (m_CollisionData.ContactCnt() > nContactCnt) return;
-		CollisionDetector::BoxAndHalfSpace(*g_ppColliderBoxs[0], *g_ppColliderPlanes[i], m_CollisionData);
-	}
-	for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
-	{
-		if (m_CollisionData.ContactCnt() > nContactCnt) return;
-
-		CollisionDetector::BoxAndBox(*g_ppColliderBoxs[0], *g_ppColliderBoxs[i], m_CollisionData);
-	}
-
-
-	m_CollisionData.friction = 0.9f;
-	// 평면과의 검사
-	for (int i = 0; i < g_ppColliderPlanes.size(); ++i)
-	{
-		for (int j = 1; j < g_ppColliderBoxs.size(); ++j)
-		{
-			if (m_CollisionData.ContactCnt() > nContactCnt) return;
-			CollisionDetector::BoxAndHalfSpace(*g_ppColliderBoxs[j], *g_ppColliderPlanes[i], m_CollisionData);
-		}
-	}
-	// 박스끼리 검사
-	for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
-	{
-		for (int j = i + 1; j < g_ppColliderBoxs.size(); ++j)
-		{
-			if (m_CollisionData.ContactCnt() > nContactCnt) return;
-
-			CollisionDetector::BoxAndBox(*g_ppColliderBoxs[i], *g_ppColliderBoxs[j], m_CollisionData);
-		}
-	}
-}
-
 void Scene::ClearObjectLayer()
 {
-	for (int j = 0; j < g_ppBodies.size(); ++j)
-	{
-		if (g_ppBodies[j]->GetInvalid())
-		{
-			g_ppBodies.erase(g_ppBodies.begin() + j);
-		}
-	}
-
-	for (int j = 0; j < g_ppColliderBoxs.size(); ++j)
+	/*for (int j = 0; j < g_ppColliderBoxs.size(); ++j)
 	{
 		if (g_ppColliderBoxs[j]->GetBody()->GetInvalid())
 		{
@@ -408,7 +286,7 @@ void Scene::ClearObjectLayer()
 		{
 			g_ppColliderPlanes.erase(g_ppColliderPlanes.begin() + j);
 		}
-	}
+	}*/
 
 	// 전체 순회
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)

@@ -3,7 +3,6 @@
 std::vector<std::shared_ptr<Texture>> g_CachingTexture;
 std::map<ShaderType, std::shared_ptr<Shader>> g_Shaders;
 
-std::vector<std::shared_ptr<RigidBody>> g_ppBodies;
 std::vector<std::shared_ptr<ColliderPlane>> g_ppColliderPlanes;
 std::vector<std::shared_ptr<ColliderBox>> g_ppColliderBoxs;
 std::vector<std::shared_ptr<ColliderSphere>> g_ppColliderSpheres;

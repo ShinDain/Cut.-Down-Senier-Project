@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../Common/Header/D3DUtil.h"
-#include "../../Physics/Header/RigidBody.h"
 #include "Object.h"
 
 struct Ray

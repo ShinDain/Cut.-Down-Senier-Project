@@ -13,9 +13,6 @@ Character::Character(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 		m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
 
 	// RigidBody 생성
-	std::shared_ptr<RigidBody> pBody =
-		std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation, objData.xmf3Scale, objData.nMass);
-
 	std::shared_ptr<Collider> pCollider;
 
 	// 충돌체 타입에 따라 
@@ -24,7 +21,6 @@ Character::Character(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	case Collider_Plane:
 	{
 		std::shared_ptr<ColliderPlane> pColliderPlane;
-		pCollider = std::make_shared<ColliderPlane>(pBody, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 1, 0), objData.xmf3Extents.x);
 		pCollider = std::static_pointer_cast<Collider>(pColliderPlane);
 	}
 	break;
@@ -32,7 +28,6 @@ Character::Character(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	case Collider_Box:
 	{
 		std::shared_ptr<ColliderBox> pColliderBox;
-		pColliderBox = std::make_shared<ColliderBox>(pBody, XMFLOAT3(0, objData.xmf3Extents.y, 0), XMFLOAT3(0, 0, 0), objData.xmf3Extents);
 		pCollider = std::static_pointer_cast<Collider>(pColliderBox);
 	}
 	break;
@@ -40,7 +35,6 @@ Character::Character(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 	case Collider_Sphere:
 	{
 		std::shared_ptr<ColliderSphere> pColliderSphere;
-		pColliderSphere = std::make_shared<ColliderSphere>(pBody, XMFLOAT3(0, 0, 0), objData.xmf3Extents.x);
 		pCollider = std::static_pointer_cast<Collider>(pColliderSphere);
 	}
 	break;
@@ -49,11 +43,6 @@ Character::Character(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 		break;
 	}
 
-	pBody->SetPhysics(true);
-	pBody->SetInGravity(true);
-	pBody->SetIsCharacter(true);
-
-	m_pBody = pBody;
 	m_pCollider = pCollider;
 	m_xmf3ColliderExtents = objData.xmf3Extents;
 
@@ -72,10 +61,10 @@ Character::~Character()
 void Character::Update(float elapsedTime)
 {
 	// RigidBody를 기준으로 위치를 갱신한다.
-	if (m_pBody)
+	if (true)
 	{
 		// 마찰력
-		XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+		XMFLOAT3 xmf3Velocity = m_xmf3Velocity;
 		XMFLOAT3 xmf3VelocityXZ = XMFLOAT3(xmf3Velocity.x, 0, xmf3Velocity.z);
 		XMVECTOR velocityXZ = XMLoadFloat3(&xmf3VelocityXZ);
 		// 최대 속도 제한
@@ -86,7 +75,7 @@ void Character::Update(float elapsedTime)
 			XMFLOAT3 newVelocity;
 			XMStoreFloat3(&newVelocity, velocityXZ);
 			newVelocity.y = xmf3Velocity.y;
-			m_pBody->SetVelocity(newVelocity);
+			//m_pBody->SetVelocity(newVelocity);
 		}
 		else
 		{
@@ -101,21 +90,10 @@ void Character::Update(float elapsedTime)
 			XMFLOAT3 newVelocity;
 			XMStoreFloat3(&newVelocity, velocityXZ);
 			newVelocity.y = xmf3Velocity.y;
-			m_pBody->SetVelocity(newVelocity);
+			//m_pBody->SetVelocity(newVelocity);
 		}
 
-
-		m_pBody->Update(elapsedTime);
-		if (m_pBody->GetInvalid())
-		{
-			Destroy();
-			return;
-		}
 		m_pCollider->UpdateWorldTransform();
-		m_xmf3Position = m_pBody->GetPosition();
-		m_xmf4Orientation = m_pBody->GetOrientation();
-		m_xmf3Scale = m_pBody->GetScale();
-		m_xmf4x4World = m_pBody->GetWorld();
 	}
 
 	UpdateTransform(NULL);
@@ -160,8 +138,6 @@ void Character::Move(DWORD dwDirection)
 	XMVECTOR deltaAccel = direction * m_Accelation;
 	XMFLOAT3 xmf3deltaAccel;
 	XMStoreFloat3(&xmf3deltaAccel, deltaAccel);
-
-	m_pBody->SetAcceleration(xmf3deltaAccel);
 }
 
 void Character::Jump()
@@ -174,11 +150,10 @@ void Character::Jump()
 
 		m_pBody->SetAcceleration(xmf3deltaAccel);*/
 
-		XMVECTOR deltaVelocity = XMLoadFloat3(&m_pBody->GetVelocity()) + (XMLoadFloat3(&m_xmf3Up) * 50.f);
+		//XMVECTOR deltaVelocity = XMLoadFloat3(&m_pBody->GetVelocity()) + (XMLoadFloat3(&m_xmf3Up) * 50.f);
 		XMFLOAT3 xmf3deltaVelocity;
-		XMStoreFloat3(&xmf3deltaVelocity, deltaVelocity);
+		//XMStoreFloat3(&xmf3deltaVelocity, deltaVelocity);
 
-		m_pBody->SetVelocity(xmf3deltaVelocity);
 		m_bCanJump = false;
 	}
 }
@@ -188,9 +163,11 @@ bool Character::IsFalling()
 	XMVECTOR rayStart = XMLoadFloat3(&m_floorCheckRay.xmf3Start);
 	rayStart = XMVector3TransformCoord(rayStart, XMLoadFloat4x4(&m_xmf4x4World));
 
-	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
-	if (fabs(xmf3Velocity.y) > 3)
-		return true;
-	else
-		return false;
+	//XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+	//if (fabs(xmf3Velocity.y) > 3)
+	//	return true;
+	//else
+	//	return false;
+	
+	return false;
 }

@@ -140,32 +140,12 @@ void CollisionResolver::AdjustPositions(std::vector<std::shared_ptr<Contact>> pC
 	XMVECTOR linearDelta[2];
 	XMVECTOR angularDelta[2];
 	XMVECTOR deltaPosition;
-
-	std::vector<std::shared_ptr<Contact>> orderedContacts = pContacts;
 	
-	//std::sort(orderedContacts.begin(), orderedContacts.end(), [](auto first, auto second)->bool
-	//	{
-	//		return first->GetDepth() > second->GetDepth();
-	//	});
-
 	m_nPositionIterationCnt = 0;
 	while (m_nPositionIterationCnt < m_nIteration)
 	{
-		max = Physics::positionEpsilon;;
+		max = Physics::positionEpsilon;
 		index = pContacts.size();
-
-		//if (orderedContacts[0]->GetDepth() < max)
-		//	break;
-
-		//for (int i = 0; i < orderedContacts.size(); ++i)
-		//{
-		//	// 가장 교차된 깊이가 큰 index를 탐색한다.
-		//	if (orderedContacts[0]->GetDepth() < max)
-		//	{
-		//		max = orderedContacts[0]->GetDepth();
-		//		index = i;
-		//	}
-		//}
 
 		for (int i = 0; i < pContacts.size(); ++i)
 		{
@@ -178,6 +158,7 @@ void CollisionResolver::AdjustPositions(std::vector<std::shared_ptr<Contact>> pC
 		}
 
 		if (index == pContacts.size()) break;
+
 
 		// 연산을 위해 관련 body Awake 
 		pContacts[index]->MatchAwakeState();
