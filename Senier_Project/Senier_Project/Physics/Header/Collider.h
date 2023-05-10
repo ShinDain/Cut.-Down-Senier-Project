@@ -26,7 +26,7 @@ protected:
 	bool m_bIsCollision = false;
 
 public:
-	void UpdateWorldTransform();
+	void UpdateWorldTransform(XMFLOAT4X4& xmf4x4World);
 
 	void SetOffsetPosition(const XMFLOAT3& xmf3OffsetPosition);
 	void SetOffsetRotate(const XMFLOAT3& xmf3OffsetRotate);

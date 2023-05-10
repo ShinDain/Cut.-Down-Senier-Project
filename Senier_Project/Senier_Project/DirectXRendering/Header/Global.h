@@ -8,6 +8,9 @@
 #include "../../Common/Header/UploadBuffer.h"
 #include "../../Common/Header/Struct.h"
 
+#define GRAVITY_SIZE -9.81f
+
+
 class Shader;
 class ColliderPlane;
 class ColliderBox;

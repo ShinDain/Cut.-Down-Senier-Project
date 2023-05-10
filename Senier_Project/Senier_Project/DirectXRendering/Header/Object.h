@@ -101,14 +101,18 @@ protected:
 	float m_Mass = 1.0f;
 
 	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	float m_Accelation = 100.0f;
+	float m_Acceleration = 100.0f;
+	XMFLOAT3 m_xmf3Acceleration = XMFLOAT3(0, 0, 0);
 
+	bool m_bIsFalling = false;
 	bool m_bIsAlive = true;
 	
 public:
-	virtual void Move(DWORD dwDirection);
-	virtual void Rotate(float x, float y, float z);
+	virtual void Move(DWORD dwDirection) {}
+	virtual void Rotate(float x, float y, float z) {}
 	virtual void Jump() {}
+	virtual void ApplyGravity(float elapsedTime);
+	virtual void IsFalling();
 
 	void AddPosition(float x, float y, float z)
 	{
@@ -166,6 +170,8 @@ public:
 	void SetRotate(const XMFLOAT3& Rotate);
 	void SetOrientation(const XMFLOAT4& Orientation) { m_xmf4Orientation = Orientation;
 													   XMStoreFloat4(&m_xmf4Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmf4Orientation)));}
+	
+	void SetIsFalling(bool IsFalling) { m_bIsFalling = IsFalling; }
 	void SetIsAlive(bool IsAlive) { m_bIsAlive = IsAlive; }
 
 
@@ -186,6 +192,7 @@ public:
 
 	std::shared_ptr<Collider> GetCollider() { return m_pCollider; }
 
+	bool GetIsFalling() { return m_bIsFalling; }
 	bool GetIsAlive() { return m_bIsAlive; }
 };
 

@@ -24,6 +24,7 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	{
 		std::shared_ptr<ColliderPlane> pColliderPlane;
 		XMFLOAT3 direction = XMFLOAT3(objData.xmf4Orientation.x, objData.xmf4Orientation.y, objData.xmf4Orientation.z);
+		pColliderPlane = std::make_shared<ColliderPlane>(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), direction, objData.xmf3Extents.x);
 		pCollider = std::static_pointer_cast<Collider>(pColliderPlane);
 	}
 	break;
@@ -31,6 +32,7 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	case Collider_Box:
 	{
 		std::shared_ptr<ColliderBox> pColliderBox;
+		pColliderBox = std::make_shared<ColliderBox>(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), objData.xmf3Extents);
 		pCollider = std::static_pointer_cast<Collider>(pColliderBox);
 	}
 	break;
@@ -38,6 +40,7 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	case Collider_Sphere:
 	{
 		std::shared_ptr<ColliderSphere> pColliderSphere;
+		pColliderSphere = std::make_shared<ColliderSphere>(XMFLOAT3(0, 0, 0), objData.xmf3Extents.x);
 		pCollider = std::static_pointer_cast<Collider>(pColliderSphere);
 	}
 	break;
@@ -46,32 +49,10 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 		break;
 	}
 
-	// Object 타입에 따라 변수 조정
-	switch (objData.objectType)
-	{
-	case Object_World:
-	
-		break;
-
-	case Object_Physics:
-
-		break;
-
-	case Object_Platform:
-
-		break;
-
-	case Object_Character:
-
-		break;
-
-	case Object_UI:
-
-		break;
-
-	default:
-		break;
-	}
+	m_xmf3Position = objData.xmf3Position;
+	m_xmf4Orientation = objData.xmf4Orientation;
+	m_xmf3Scale = objData.xmf3Scale;
+	m_Mass = objData.nMass;
 
 	m_pCollider = pCollider;
 	m_xmf3ColliderExtents = objData.xmf3Extents;
@@ -104,9 +85,9 @@ void Object::Animate(float elapsedTime)
 
 void Object::Update(float elapsedTime)
 {
-	m_pCollider->UpdateWorldTransform();
-
-	UpdateTransform(NULL);
+	//UpdateTransform(NULL);
+	IsFalling();
+	ApplyGravity(elapsedTime);
 
 	ObjConstant objConstant;
 	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
@@ -140,6 +121,8 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 		//XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate)));
 		XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate)));
 		m_xmf4x4World = m_xmf4x4LocalTransform;
+
+		if(m_pCollider) m_pCollider->UpdateWorldTransform(m_xmf4x4World);
 	}
 
 	if (m_pSibling) {
@@ -469,9 +452,6 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		}
 	}
 
-	//for (int i = 0; i < vpMat.size(); ++i)
-	//	vpMat[i]->BuildDescriptorHeap(pd3dDevice);
-
 	SetMaterials(vpMat);
 }
 
@@ -631,66 +611,28 @@ void Object::FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>>* pp
 	if (m_pChild) m_pChild->FindAndSetSkinnedMesh(ppSkinnedMeshes);
 }
 
-void Object::Move(DWORD dwDirection)
+void Object::ApplyGravity(float elapsedTime)
 {
-	XMVECTOR direction = XMVectorZero();
-	XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-	XMVECTOR r = XMLoadFloat3(&m_xmf3Right);
-
-	if (dwDirection & DIR_FORWARD)
+	if (m_bIsFalling)
 	{
-		direction = XMVectorAdd(direction, l);
+		m_xmf3Acceleration.y += (m_Mass * GRAVITY_SIZE) * elapsedTime;
 	}
-	if (dwDirection & DIR_BACKWARD)
+	else
 	{
-		direction = XMVectorAdd(direction, -l);
+		m_xmf3Acceleration.y = 0;
 	}
-	if (dwDirection & DIR_LEFT)
-	{
-		direction = XMVectorAdd(direction, -r);
-	}
-	if (dwDirection & DIR_RIGHT)
-	{
-		direction = XMVectorAdd(direction, r);
-	}
-
-	direction = XMVector3Normalize(direction);
-	XMVECTOR deltaAccel = direction * m_Accelation;
-	XMFLOAT3 xmf3deltaAccel;
-	XMStoreFloat3(&xmf3deltaAccel, deltaAccel);
 }
 
-void Object::Rotate(float x, float y, float z)
+void Object::IsFalling()
 {
-	// x : Pitch, y : Yaw, z : Roll
-	// 3인칭 카메라 기준
-	if (x != 0.0f)
+	if (m_xmf3Position.y > 0)
 	{
-		m_xmf3Rotate.x += x;
-		if (m_xmf3Rotate.x > +89.0f) { x -= (m_xmf3Rotate.x - 89.0f); m_xmf3Rotate.x = +89.0f; }
-		if (m_xmf3Rotate.x < -89.0f) { x -= (m_xmf3Rotate.x + 89.0f); m_xmf3Rotate.x = -89.0f; }
+		m_bIsFalling = true;
 	}
-	if (y != 0.0f)
+	else if(m_xmf3Position.y < 0)
 	{
-		m_xmf3Rotate.y += y;
-		if (m_xmf3Rotate.y > 360.0f) m_xmf3Rotate.y -= 360.0f;
-		if (m_xmf3Rotate.y < 0.0f) m_xmf3Rotate.y += 360.0f;
-	}
-	if (z != 0.0f)
-	{
-		m_xmf3Rotate.z += z;
-		//if (m_xmf3Rotate.z > +20.0f) { z -= (m_xmf3Rotate.z - 20.0f); m_xmf3Rotate.z = +20.0f; }
-		//if (m_xmf3Rotate.z < -20.0f) { z -= (m_xmf3Rotate.z + 20.0f); m_xmf3Rotate.z = -20.0f; }
-	}
-	if (y != 0.0f)
-	{
-		XMMATRIX xmmatRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(y));
-		XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-		XMVECTOR r = XMLoadFloat3(&m_xmf3Right);
-
-		XMStoreFloat3(&m_xmf3Look, XMVector3TransformNormal(l, xmmatRotate));
-		XMStoreFloat3(&m_xmf3Right, XMVector3TransformNormal(r, xmmatRotate));
-
+		m_xmf3Position.y = 0;
+		m_bIsFalling = false;
 	}
 }
 

@@ -14,28 +14,26 @@ Collider::~Collider()
 	m_IndexBufferUploader = nullptr;
 }
 
-void Collider::UpdateWorldTransform()
+void Collider::UpdateWorldTransform(XMFLOAT4X4& xmf4x4World)
 {
-	//m_xmf4x4World = m_pRigidBody->GetWorld();
+	m_xmf4x4World = xmf4x4World;
 
-	/*XMMATRIX World = XMLoadFloat4x4(&m_xmf4x4World);
+	XMMATRIX World = XMLoadFloat4x4(&m_xmf4x4World);
 	XMMATRIX OffsetTranslation = XMMatrixTranslation(m_xmf3OffsetPosition.x, m_xmf3OffsetPosition.y, m_xmf3OffsetPosition.z);
 	XMMATRIX OffsetRotate = XMMatrixRotationRollPitchYaw(m_xmf3OffsetRotate.x, m_xmf3OffsetRotate.y, m_xmf3OffsetRotate.z);
-	World = XMMatrixMultiply(XMMatrixMultiply(OffsetRotate, OffsetTranslation), World);*/
+	World = XMMatrixMultiply(XMMatrixMultiply(OffsetRotate, OffsetTranslation), World);
 
-	//XMStoreFloat4x4(&m_xmf4x4World, World);
+	XMStoreFloat4x4(&m_xmf4x4World, World);
 }
 
 void Collider::SetOffsetPosition(const XMFLOAT3& xmf3OffsetPosition)
 {
 	m_xmf3OffsetPosition = xmf3OffsetPosition;
-	UpdateWorldTransform();
 }
 
 void Collider::SetOffsetRotate(const XMFLOAT3& xmf3OffsetRotate)
 {
 	m_xmf3OffsetRotate = xmf3OffsetRotate;
-	UpdateWorldTransform();
 }
 
 const XMVECTOR Collider::GetAxis(int index) const
@@ -101,10 +99,6 @@ ColliderPlane::ColliderPlane(XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRot
 	m_xmf3OffsetRotate = xmf3OffsetRotate;
 	m_xmf3Direction = xmf3Direction;
 	m_distance = distance;
-
-
-	UpdateWorldTransform();
-	
 }
 
 ColliderPlane::~ColliderPlane()
@@ -220,8 +214,6 @@ ColliderBox::ColliderBox(XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate,
 	m_xmf3OffsetPosition = xmf3OffsetPosition;
 	m_xmf3OffsetRotate = xmf3OffsetRotate;
 	m_xmf3Extents = xmf3Extents;
-
-	UpdateWorldTransform();
 }
 
 ColliderBox::~ColliderBox()

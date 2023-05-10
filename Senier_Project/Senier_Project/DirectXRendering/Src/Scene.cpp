@@ -24,10 +24,10 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_pPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
 
 	ObjectInitData objectData;
-	objectData.xmf3Position = XMFLOAT3(0, 0, -50);
+	objectData.xmf3Position = XMFLOAT3(0, 0, 0);
 	objectData.xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
 	objectData.xmf3Scale = XMFLOAT3(10, 10, 10);
-	objectData.nMass = 10;
+	objectData.nMass = 20;
 	objectData.objectType = Object_Character;
 	objectData.colliderType = Collider_Box;
 	objectData.xmf3Extents = CHARACTER_MODEL_EXTENTS;
@@ -37,15 +37,16 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 1);
 
 
-	objectData.xmf3Extents = CUBE_MODEL_EXTENTS;
-	objectData.objectType = Object_Physics;
-	// 복수의 박스 생성
-	for (int i = 0; i < 2; ++i)
-	{
-		//objectData.xmf3Position = XMFLOAT3(-50 + 10 * (i / 5), 5 + 10 * (i % 5), 0);
-		objectData.xmf3Position = XMFLOAT3(0, 5 + 10 * (i), 0);
-		CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 0, RenderLayer::Render_Static);
-	}
+
+	// 임시 바닥
+	objectData.xmf3Extents = XMFLOAT3(0,0,0);
+	objectData.objectType = Object_World;
+	objectData.xmf3Position = XMFLOAT3(0, 0, 0);
+	objectData.xmf4Orientation = XMFLOAT4(0, 1, 0, 1);
+	objectData.xmf3Scale = XMFLOAT3(100, 0.1, 100);
+	objectData.colliderType = Collider_Plane;
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 1, RenderLayer::Render_Static);
+
 
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
@@ -75,7 +76,7 @@ void Scene::Update(float elapsedTime)
 {
 #if defined(_DEBUG)
 	ClearObjectLayer();
-	m_refCnt = g_LoadedModelData[CUBE_MODEL_PATH]->m_pRootObject.use_count();
+	m_refCnt = g_LoadedModelData[CHARACTER_MODEL_PATH]->m_pRootObject.use_count();
 	m_size = m_vpAllObjs.size();
 
 	m_tTime += elapsedTime;
@@ -111,11 +112,10 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &m_xmf4x4ImgObjMat, 0);
 	}
 
+	g_Shaders[ShaderType::Shader_Static]->ChangeShader(pd3dCommandList);
+	pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
 	{
-		g_Shaders[ShaderType::Shader_Static]->ChangeShader(pd3dCommandList);
-		pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
-
 		m_vObjectLayer[RenderLayer::Render_Static][i]->UpdateTransform(NULL);
 		m_vObjectLayer[RenderLayer::Render_Static][i]->Render(elapsedTime, pd3dCommandList);
 	}
@@ -169,19 +169,15 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 		}
 	}
 
+	// 임시
 	if (dwDirection != 0)
 	{
 		m_vpAllObjs[0]->SetRotate(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
 		m_vpAllObjs[0]->Move(dwDirection);
-
-		// 이동시 애니메이션이 전환 되도록 (임시)
-		m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
 	}
 	else
 	{
 		m_vpAllObjs[0]->Move(dwDirection);
-		m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 1);
-
 	}
 
 	if (pKeybuffer[VK_SPACE] & 0xF0) m_vpAllObjs[0]->Jump();
@@ -203,7 +199,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	std::shared_ptr<ModelDataInfo> pModelData;
 	std::shared_ptr<Object> pObject;
 	
-	if (g_LoadedModelData.find(pstrFilePath) == g_LoadedModelData.end())
+	if (g_LoadedModelData.find(pstrFilePath) == g_LoadedModelData.end() && pstrFilePath != nullptr)
 	{
 		// 모델 로드
 		pModelData = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, pstrFilePath);
