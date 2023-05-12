@@ -8,6 +8,12 @@ Material::Material()
 
 Material::~Material()
 {
+	for(int i = 0 ; i < m_vpTextures.size(); ++i)
+		m_vpTextures;
+
+	m_DescriptorHeap = nullptr;
+	m_pMatCB = nullptr;
+	m_pShader = nullptr;
 }
 
 bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
@@ -67,7 +73,7 @@ void Material::MaterialSet(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	if(m_pMatCB) pd3dCommandList->SetGraphicsRootConstantBufferView(2, m_pMatCB->Resource()->GetGPUVirtualAddress());
 
-	if (m_DescriptorHeap == NULL)
+	if (m_DescriptorHeap == nullptr)
 	{
 		return;
 	}

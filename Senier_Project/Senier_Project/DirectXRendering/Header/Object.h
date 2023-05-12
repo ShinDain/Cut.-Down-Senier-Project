@@ -27,13 +27,15 @@ public:
 	Object();
 	Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 		   ObjectInitData objData,
-		   std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks);
+		   std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
 
 	Object(const Object& rhs) = delete;
 	Object& operator=(const Object& rhs) = delete;
 	virtual ~Object();
 
-	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext);
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+							ObjectInitData objData,
+							std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
 
 	virtual void OnResize(float aspectRatio) {}
 	virtual void Animate(float elapsedTime);

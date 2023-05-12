@@ -44,6 +44,14 @@ AnimationSets::AnimationSets()
 
 AnimationSets::~AnimationSets()
 {
+	for (int i = 0; i < m_vpAnimationSets.size(); ++i)
+	{
+		m_vpAnimationSets[i].reset();
+	}
+	for (int i = 0; i < m_vpAnimatedBoneFrameCaches.size(); ++i)
+	{
+		m_vpAnimatedBoneFrameCaches[i].reset();
+	}
 }
 
 ////////////////////////////////////////////////////////////////
@@ -54,6 +62,7 @@ AnimationTrack::AnimationTrack()
 
 AnimationTrack::~AnimationTrack()
 {
+	m_pAnimationCallbackHandler = nullptr;
 }
 
 void AnimationTrack::SetCallbackKeys(int nCallbackKeys)
@@ -130,6 +139,14 @@ ModelDataInfo::ModelDataInfo()
 
 ModelDataInfo::~ModelDataInfo()
 {
+	m_pRootObject = nullptr;
+
+	for (int i = 0; i < m_vpSkinnedMeshes.size(); ++i)
+	{
+		m_vpSkinnedMeshes[i].reset();
+	}
+
+	m_pAnimationSets = nullptr;
 }
 
 void ModelDataInfo::PrepareSkinning()
@@ -205,6 +222,24 @@ void AnimationController::AdvanceTime(float ElapsedTime, Object* pRootGameObject
 
 		OnRootMotion(pRootGameObject);
 	}
+}
+
+void AnimationController::Destroy()
+{
+	for (int i = 0; i < m_vpAnimationTracks.size(); ++i)
+		m_vpAnimationTracks[i].reset();
+
+	m_pAnimationSets.reset();
+
+	for (int i = 0; i < m_vpSkinnedMeshes.size(); ++i)
+		m_vpSkinnedMeshes[i].reset();
+
+	for (int i = 0; i < m_vSkinningBoneTransformCBs.size(); ++i)
+		m_vSkinningBoneTransformCBs[i].reset();
+
+	m_pModelRootObject.reset();
+
+	m_pRootMotionObject.reset();
 }
 
 void AnimationController::ChangeBoneTransformCB(ID3D12GraphicsCommandList* pd3dCommandList)

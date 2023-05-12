@@ -23,13 +23,14 @@ protected:
 
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 
-	bool m_bIsCollision = false;
+	bool m_bIsActive = false;
 
 public:
 	void UpdateWorldTransform(XMFLOAT4X4& xmf4x4World);
 
 	void SetOffsetPosition(const XMFLOAT3& xmf3OffsetPosition);
 	void SetOffsetRotate(const XMFLOAT3& xmf3OffsetRotate);
+	
 
 	const XMVECTOR GetAxis(int index) const;
 
@@ -37,7 +38,8 @@ public:
 	const XMFLOAT3& GetOffsetRotate() const { return m_xmf3OffsetRotate; }
 	const XMFLOAT4X4& GetWorld() const { return m_xmf4x4World; }
 
-	const bool GetIsCollision() { return m_bIsCollision; }
+	void SetIsActive(bool bIsActive) { m_bIsActive = bIsActive; }
+	const bool GetIsActive() { return m_bIsActive; }
 
 #if defined(_DEBUG) | defined(DEBUG)
 protected:

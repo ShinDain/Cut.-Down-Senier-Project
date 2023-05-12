@@ -8,11 +8,11 @@
 #include "Global.h"
 #include "Shader.h"
 #include "Object.h"
-#include "Character.h"
+#include "../../Game/Header/Character.h"
+#include "../../Game/Header/Weapon.h"
 
 #include "../../Physics/Header/Collider.h"
 #include "../../Physics/Header/CollisionDetact.h"
-
 
 class Scene
 {
@@ -48,7 +48,7 @@ private:
 
 	// 씬을 렌더링할 메인 카메라
 	std::unique_ptr<Camera> m_pCamera = nullptr;
-	std::shared_ptr<Character> m_pCharacter = nullptr;
+	//std::shared_ptr<Character> m_pCharacter = nullptr;
 
 	POINT m_LastMousePos = { 0,0 };
 public:

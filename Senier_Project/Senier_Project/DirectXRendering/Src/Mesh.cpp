@@ -10,6 +10,36 @@ Mesh::Mesh()
 
 Mesh::~Mesh()
 {
+	 m_PositionBufferGPU = nullptr;
+	 m_PositionBufferUploader = nullptr;
+
+	 m_ColorBufferGPU = nullptr;
+	 m_ColorBufferUploader = nullptr;
+
+	 m_TexC0BufferGPU = nullptr;
+	 m_TexC0BufferUploader = nullptr;
+
+	 m_TexC1BufferGPU = nullptr;
+	 m_TexC1BufferUploader = nullptr;
+
+	 m_NormalBufferGPU = nullptr;
+	 m_NormalBufferUploader = nullptr;
+
+	 m_TangentBufferGPU = nullptr;
+	 m_TangentBufferUploader = nullptr;
+
+	 m_BiTangentBufferGPU = nullptr;
+	 m_BiTangentBufferUploader = nullptr;
+
+	 for (int i = 0; i < m_vIndexBufferGPU.size(); ++i)
+	 {
+		 m_vIndexBufferGPU[i].Reset();
+	 }
+
+	 for (int i = 0; i < m_vIndexBufferUploader.size(); ++i)
+	 {
+		 m_vIndexBufferUploader[i].Reset();
+	 }
 }
 
 void Mesh::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -261,6 +291,20 @@ SkinnedMesh::SkinnedMesh()
 
 SkinnedMesh::~SkinnedMesh()
 {
+	m_BoneIndexBufferGPU = nullptr;
+	m_BoneIndexBufferUploader = nullptr;
+
+	m_BoneWeightBufferGPU = nullptr;
+	m_BoneWeightBufferUploader = nullptr;
+
+	for (int i = 0; i < m_vpSkinningBoneFrameCaches.size(); ++i)
+	{
+		m_vpSkinningBoneFrameCaches[i].reset();
+		m_vpSkinningBoneFrameCaches.erase(m_vpSkinningBoneFrameCaches.begin() + i);
+	}
+
+	m_SkinningBoneTransformCB.reset();
+	m_BindPoseBoneOffsetCB.reset();
 }
 
 void SkinnedMesh::LoadSkinInfoFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)

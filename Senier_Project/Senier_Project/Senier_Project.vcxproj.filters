@@ -32,6 +32,15 @@
     <Filter Include="Physics\Header">
       <UniqueIdentifier>{737091aa-a083-4b92-a7d5-cf4187b79139}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{d951df93-55b5-412d-a962-d81c0163d5fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Src">
+      <UniqueIdentifier>{309e47d5-f29c-4296-bdeb-28e66ee74baa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Header">
+      <UniqueIdentifier>{5048186c-89f6-4f98-953b-914898915eea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Physics\Src\Collider.cpp">
@@ -76,9 +85,6 @@
     <ClCompile Include="DirectXRendering\Src\Object.cpp">
       <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="DirectXRendering\Src\Character.cpp">
-      <Filter>DirectXRendering\Src</Filter>
-    </ClCompile>
     <ClCompile Include="DirectXRendering\Src\Scene.cpp">
       <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
@@ -94,6 +100,15 @@
     </ClCompile>
     <ClCompile Include="Physics\Src\CollisionDetact.cpp">
       <Filter>Physics\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Src\Weapon.cpp">
+      <Filter>Game\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Src\Character.cpp">
+      <Filter>Game\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Src\Player.cpp">
+      <Filter>Game\Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -145,9 +160,6 @@
     <ClInclude Include="DirectXRendering\Header\Object.h">
       <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
-    <ClInclude Include="DirectXRendering\Header\Character.h">
-      <Filter>DirectXRendering\Header</Filter>
-    </ClInclude>
     <ClInclude Include="DirectXRendering\Header\Scene.h">
       <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
@@ -165,6 +177,18 @@
     </ClInclude>
     <ClInclude Include="Physics\Header\CollisionDetact.h">
       <Filter>Physics\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Header\Weapon.h">
+      <Filter>Game\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Header\Character.h">
+      <Filter>Game\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Header\Player.h">
+      <Filter>Game\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXRendering\Header\Global.h">
+      <Filter>DirectXRendering\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

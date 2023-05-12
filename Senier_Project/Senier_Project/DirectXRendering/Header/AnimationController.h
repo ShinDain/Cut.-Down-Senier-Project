@@ -141,6 +141,8 @@ public:
 	void ChangeBoneTransformCB(ID3D12GraphicsCommandList* pd3dCommandList);
 	void AdvanceTime(float ElapsedTime, Object* pRootGameObject);
 
+	void Destroy();
+
 public:
 	float m_Time = 0.0f;
 

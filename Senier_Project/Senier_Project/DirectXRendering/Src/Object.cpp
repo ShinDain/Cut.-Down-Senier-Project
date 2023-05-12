@@ -7,12 +7,24 @@ Object::Object()
 
 Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, 
 				ObjectInitData objData,
-				std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks)
+				std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+{
+	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+}
+
+Object::~Object()
+{
+	Destroy();
+}
+
+bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+						ObjectInitData objData,
+						std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
 	std::shared_ptr<ModelDataInfo> pModelData = pModel;
 
 	SetChild(pModelData->m_pRootObject);
-	if(nAnimationTracks > 0)
+	if (nAnimationTracks > 0)
 		m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
 
 	std::shared_ptr<Collider> pCollider;
@@ -25,6 +37,7 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 		std::shared_ptr<ColliderPlane> pColliderPlane;
 		XMFLOAT3 direction = XMFLOAT3(objData.xmf4Orientation.x, objData.xmf4Orientation.y, objData.xmf4Orientation.z);
 		pColliderPlane = std::make_shared<ColliderPlane>(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), direction, objData.xmf3Extents.x);
+		g_ppColliderPlanes.emplace_back(pColliderPlane);
 		pCollider = std::static_pointer_cast<Collider>(pColliderPlane);
 	}
 	break;
@@ -33,6 +46,7 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	{
 		std::shared_ptr<ColliderBox> pColliderBox;
 		pColliderBox = std::make_shared<ColliderBox>(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), objData.xmf3Extents);
+		g_ppColliderBoxs.emplace_back(pColliderBox);
 		pCollider = std::static_pointer_cast<Collider>(pColliderBox);
 	}
 	break;
@@ -41,6 +55,7 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	{
 		std::shared_ptr<ColliderSphere> pColliderSphere;
 		pColliderSphere = std::make_shared<ColliderSphere>(XMFLOAT3(0, 0, 0), objData.xmf3Extents.x);
+		g_ppColliderSpheres.emplace_back(pColliderSphere);
 		pCollider = std::static_pointer_cast<Collider>(pColliderSphere);
 	}
 	break;
@@ -58,17 +73,9 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	m_xmf3ColliderExtents = objData.xmf3Extents;
 
 #if defined(_DEBUG)
-	if(m_pCollider) m_pCollider->BuildMesh(pd3dDevice, pd3dCommandList);
+	if (m_pCollider) m_pCollider->BuildMesh(pd3dDevice, pd3dCommandList);
 #endif
-}
 
-Object::~Object()
-{
-	Destroy();
-}
-
-bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
-{
 	BuildConstantBuffers(pd3dDevice);
 
 	return true;
@@ -121,9 +128,9 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 		//XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate)));
 		XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate)));
 		m_xmf4x4World = m_xmf4x4LocalTransform;
-
-		if(m_pCollider) m_pCollider->UpdateWorldTransform(m_xmf4x4World);
 	}
+
+	if (m_pCollider) m_pCollider->UpdateWorldTransform(m_xmf4x4World);
 
 	if (m_pSibling) {
 		m_pSibling->UpdateTransform(pxmf4x4Parent);
@@ -214,6 +221,7 @@ std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dD
 			else if (!strcmp(pstrToken, "<Animation>:"))
 			{
 				Object::LoadAnimationFromFile(pInFile, pModelData);
+
 				pModelData->PrepareSkinning();
 
 			}
@@ -240,7 +248,7 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 	int nFrame = 0, nTextures = 0;
 
 	std::shared_ptr<Object> pObject = std::make_shared<Object>();
-	pObject->Initialize(pd3dDevice, pd3dCommandList, NULL);
+	//pObject->Initialize(pd3dDevice, pd3dCommandList, NULL);
 
 	for (; ; )
 	{
@@ -258,7 +266,7 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 			pObject->SetName(tmpstr);
 		}
 		else if (!strcmp(pstrToken, "<Transform>:"))
-		{
+		{ 
 			nReads = (UINT)fread(&pObject->m_xmf3Position, sizeof(float), 3, pInFile);
 			nReads = (UINT)fread(&pObject->m_xmf3Rotate.x, sizeof(float), 1, pInFile);
 			nReads = (UINT)fread(&pObject->m_xmf3Rotate.y, sizeof(float), 1, pInFile);
@@ -269,6 +277,16 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 		else if (!strcmp(pstrToken, "<TransformMatrix>:"))
 		{
 			nReads = (UINT)fread(&pObject->m_xmf4x4LocalTransform, sizeof(XMFLOAT4X4), 1, pInFile);
+
+			if (!strcmp(pObject->m_FrameName, "Base_HumanHeadREyelid"))
+			{
+				//pObject->m_xmf4x4LocalTransform = XMStoreFloat4x4(&pObject->m_xmf4x4LocalTransform XMMatrixTranslation(0, -50, 0);
+				XMStoreFloat4x4(&pObject->m_xmf4x4LocalTransform, XMMatrixTranslation(0, -50, 0));
+			}
+			if (!strcmp(pObject->m_FrameName, "Base_HumanHeadREye"))
+			{
+				pObject->m_xmf4x4LocalTransform = MathHelper::identity4x4();
+			}
 		}
 		else if (!strcmp(pstrToken, "<Mesh>:"))
 		{
@@ -459,14 +477,14 @@ void Object::Destroy()
 {
 	m_bIsAlive = false;
 
-	m_pChild.reset();
-	m_pSibling.reset();
+	if(m_pChild) m_pChild->Destroy();
+	if(m_pSibling) m_pSibling->Destroy();
 
-	m_pMesh.reset();
+	if(m_pMesh) m_pMesh.reset();
 	for (int i = 0; i < m_vpMaterials.size(); ++i)
 		m_vpMaterials[i].reset();
 
-	m_pAnimationController.reset();
+	if(m_pAnimationController) m_pAnimationController->Destroy();
 	m_pObjectCB.reset();
 
 	if(m_pCollider) m_pCollider->Destroy();
@@ -483,6 +501,7 @@ void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo>
 	for (; ; )
 	{
 		ReadStringFromFile(pInFile, pstrToken);
+
 		if (!strcmp(pstrToken, "<AnimationSets>:"))
 		{
 			nAnimationSets = ReadintegerFromFile(pInFile);

@@ -1,12 +1,5 @@
 #include "../Header/Scene.h"
 
-//#define CHARACTER_MODEL_PATH "Model/unitychan.bin"
-#define CHARACTER_MODEL_PATH "Model/BoxUnityChan.bin"
-#define CHARACTER_MODEL_EXTENTS XMFLOAT3(0.3f, 0.8f, 0.2f)
-#define CUBE_MODEL_PATH "Model/Cube.bin"
-#define CUBE_MODEL_EXTENTS XMFLOAT3(0.5f, 0.5f, 0.5f)
-
-
 static float pEtime = 0;
 
 Scene::Scene()
@@ -26,7 +19,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	ObjectInitData objectData;
 	objectData.xmf3Position = XMFLOAT3(0, 0, 0);
 	objectData.xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
-	objectData.xmf3Scale = XMFLOAT3(10, 10, 10);
+	objectData.xmf3Scale = XMFLOAT3(3, 3, 3);
 	objectData.nMass = 20;
 	objectData.objectType = Object_Character;
 	objectData.colliderType = Collider_Box;
@@ -34,9 +27,14 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	// 캐릭터 테스트
 	CreateObject(pd3dDevice, pd3dCommandList, objectData, CHARACTER_MODEL_PATH, 1, RenderLayer::Render_Skinned);
-	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 1);
+	//m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
 
-
+	objectData.xmf3Position = XMFLOAT3(0, 0.5, 0);
+	objectData.xmf3Scale = XMFLOAT3(0.1, 0.1, 0.1);
+	objectData.objectType = Object_Physics;			// 임시로 무기
+	objectData.colliderType = Collider_Box;
+	objectData.xmf3Extents = WEAPON_MODEL_EXTENTS;
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, WEAPON_MODEL_PATH, 1, RenderLayer::Render_Static);
 
 	// 임시 바닥
 	objectData.xmf3Extents = XMFLOAT3(0,0,0);
@@ -172,15 +170,15 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 	// 임시
 	if (dwDirection != 0)
 	{
-		m_vpAllObjs[0]->SetRotate(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
-		m_vpAllObjs[0]->Move(dwDirection);
+		if(m_vpAllObjs[0]) m_vpAllObjs[0]->SetRotate(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
+		if (m_vpAllObjs[0]) m_vpAllObjs[0]->Move(dwDirection);
 	}
 	else
 	{
-		m_vpAllObjs[0]->Move(dwDirection);
+		if (m_vpAllObjs[0]) m_vpAllObjs[0]->Move(dwDirection);
 	}
 
-	if (pKeybuffer[VK_SPACE] & 0xF0) m_vpAllObjs[0]->Jump();
+	if (pKeybuffer[VK_SPACE] & 0xF0 && (m_vpAllObjs[0])) m_vpAllObjs[0]->Jump();
 
 
 #if defined(_DEBUG)
@@ -198,7 +196,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 {
 	std::shared_ptr<ModelDataInfo> pModelData;
 	std::shared_ptr<Object> pObject;
-	
+
 	if (g_LoadedModelData.find(pstrFilePath) == g_LoadedModelData.end() && pstrFilePath != nullptr)
 	{
 		// 모델 로드
@@ -215,47 +213,33 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	{
 	case Object_Character:
 	{
-		std::shared_ptr<Character> pCharacter = std::make_shared<Character>(pd3dDevice, pd3dCommandList, objInitData, pModelData, nAnimationTracks);
+		std::shared_ptr<Character> pCharacter = std::make_shared<Character>(pd3dDevice, pd3dCommandList, objInitData, pModelData, nAnimationTracks, nullptr);
 		pObject = std::static_pointer_cast<Object>(pCharacter);
 	}
 		break;
 
+	case Object_Physics:
+	{
+		// 임시로 무기
+		//char tmp[64] = "Character1_RightHand";
+		//char tmp[64] = "PinkyFinger2_L";
+		char tmp[64] = "Base_HumanRArmPalm";
+		std::shared_ptr<Weapon> pWeapon = std::make_shared<Weapon>(pd3dDevice, pd3dCommandList, objInitData, tmp, m_vpAllObjs[0], pModelData, nAnimationTracks, nullptr);
+		pObject = std::static_pointer_cast<Object>(pWeapon);
+	}
+	break;	
+
 	default:
 	{
-		pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objInitData, pModelData, nAnimationTracks);
+		pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objInitData, pModelData, nAnimationTracks, nullptr);
 	}
 		break;
 	}
 
 	m_vpAllObjs.emplace_back(pObject);
 	m_vObjectLayer[renderLayer].emplace_back(pObject);
-	
-	// 충돌체 타입에 따라 
-	switch (objInitData.colliderType)
-	{
-	case Collider_Plane:
-	{
-		g_ppColliderPlanes.emplace_back(std::static_pointer_cast<ColliderPlane>(pObject->GetCollider()));
-	}
-	break;
 
-	case Collider_Box:
-	{
-		g_ppColliderBoxs.emplace_back(std::static_pointer_cast<ColliderBox>(pObject->GetCollider()));
-	}
-	break;
-
-	case Collider_Sphere:
-	{
-		g_ppColliderSpheres.emplace_back(std::static_pointer_cast<ColliderSphere>(pObject->GetCollider()));
-	}
-	break;
-
-	default:
-		break;
-	}
-
-	pObject->Initialize(pd3dDevice, pd3dCommandList, NULL);
+//	pObject->Initialize(pd3dDevice, pd3dCommandList, NULL);
 
 	return pObject;
 }
@@ -301,6 +285,7 @@ void Scene::ClearObjectLayer()
 		{
 			if (!m_vObjectLayer[i][j]->GetIsAlive())
 			{
+				m_vObjectLayer[i][j]->Destroy();
 				m_vObjectLayer[i].erase(m_vObjectLayer[i].begin() + j);
 			}
 		}
