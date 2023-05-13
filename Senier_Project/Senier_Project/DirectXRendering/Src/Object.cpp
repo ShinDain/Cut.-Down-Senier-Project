@@ -110,6 +110,11 @@ void Object::Update(float elapsedTime)
 
 void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 {
+	if (!strcmp(m_FrameName, "Vampire_A_Lusth"))
+	{
+		float a = 1000;
+		float b = this->m_Acceleration;
+	}
 	// Animate 후에 호출되어 Bone 행렬을 갱신
 	// 
 	if (pxmf4x4Parent)
@@ -277,16 +282,6 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 		else if (!strcmp(pstrToken, "<TransformMatrix>:"))
 		{
 			nReads = (UINT)fread(&pObject->m_xmf4x4LocalTransform, sizeof(XMFLOAT4X4), 1, pInFile);
-
-			if (!strcmp(pObject->m_FrameName, "Base_HumanHeadREyelid"))
-			{
-				//pObject->m_xmf4x4LocalTransform = XMStoreFloat4x4(&pObject->m_xmf4x4LocalTransform XMMatrixTranslation(0, -50, 0);
-				XMStoreFloat4x4(&pObject->m_xmf4x4LocalTransform, XMMatrixTranslation(0, -50, 0));
-			}
-			if (!strcmp(pObject->m_FrameName, "Base_HumanHeadREye"))
-			{
-				pObject->m_xmf4x4LocalTransform = MathHelper::identity4x4();
-			}
 		}
 		else if (!strcmp(pstrToken, "<Mesh>:"))
 		{
@@ -518,6 +513,10 @@ void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo>
 			for (int i = 0; i < nBoneFrames; ++i)
 			{
 				ReadStringFromFile(pInFile, pstrToken);
+				if (!strcmp(pstrToken, "Vampire"))
+				{
+					float a = 100;
+				}
 				pModelData->m_pAnimationSets->m_vpAnimatedBoneFrameCaches.emplace_back(pModelData->m_pRootObject->FindFrame(pstrToken));
 			}
 
@@ -613,7 +612,7 @@ void Object::SetMaterials(std::vector<std::shared_ptr<Material>> vpMaterial)
 std::shared_ptr<Object> Object::FindFrame(char* pstrFrameName)
 {
 	std::shared_ptr<Object> pObject = NULL;
-	if (!strncmp(GetName(), pstrFrameName, strlen(pstrFrameName))) return shared_from_this();
+	if (!strcmp(GetName(), pstrFrameName)) return shared_from_this();
 
 	if (m_pSibling) if (pObject = m_pSibling->FindFrame(pstrFrameName)) return pObject;
 	if (m_pChild) if (pObject = m_pChild->FindFrame(pstrFrameName)) return pObject;

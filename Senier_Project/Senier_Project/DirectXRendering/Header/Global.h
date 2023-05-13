@@ -11,7 +11,8 @@
 #define GRAVITY_SIZE -9.81f
 
 //#define CHARACTER_MODEL_PATH "Model/BoxUnityChan.bin"
-#define CHARACTER_MODEL_PATH "Model/Vampire_A_Lusth.bin"
+//#define CHARACTER_MODEL_PATH "Model/Vampire_A_Lusth.bin"
+#define CHARACTER_MODEL_PATH "Model/Zombie1.bin"
 #define CHARACTER_MODEL_EXTENTS XMFLOAT3(0.3f, 0.8f, 0.2f)
 #define WEAPON_MODEL_PATH "Model/Katana.bin"
 #define WEAPON_MODEL_EXTENTS XMFLOAT3(0.5f, 0.5f, 0.5f)

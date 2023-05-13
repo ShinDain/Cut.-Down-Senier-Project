@@ -19,7 +19,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	ObjectInitData objectData;
 	objectData.xmf3Position = XMFLOAT3(0, 0, 0);
 	objectData.xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
-	objectData.xmf3Scale = XMFLOAT3(3, 3, 3);
+	objectData.xmf3Scale = XMFLOAT3(10,10, 10);
 	objectData.nMass = 20;
 	objectData.objectType = Object_Character;
 	objectData.colliderType = Collider_Box;

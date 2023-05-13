@@ -106,7 +106,7 @@ void Character::IsFalling()
 {
 	// 플랫폼 위에 올라가 있다면 
 	// false로, 
-
+	
 	if (m_xmf3Position.y > 0)
 	{
 		m_bIsFalling = true;
