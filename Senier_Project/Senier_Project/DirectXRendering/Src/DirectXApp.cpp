@@ -381,6 +381,7 @@ LRESULT DirectXApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	case WM_KEYDOWN:
 		ProcessInput();
+		KeyDownEvent(wParam);
 		return 0;
 	}
 

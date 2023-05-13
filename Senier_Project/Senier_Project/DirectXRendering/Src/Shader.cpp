@@ -425,13 +425,17 @@ bool WireFrameShader::BuildShadersAndInputLayout()
 
 bool WireFrameShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[3];
 
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 
-	slotRootParameter[0].InitAsConstants(16, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
+	slotRootParameter[0].InitAsConstants(16, 0);		// 월드 변환 행렬
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
+	slotRootParameter[2].InitAsConstants(1,4);	// 재질 버퍼
+	//slotRootParameter[3].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
+	//slotRootParameter[4].InitAsConstantBufferView(1);	// BoneOffsets 상수 버퍼 
+	//slotRootParameter[5].InitAsConstantBufferView(2);	// BoneTransforms 상수 버퍼 
 
 	// 샘플러
 	auto staticSamplers = GetStaticSampler();

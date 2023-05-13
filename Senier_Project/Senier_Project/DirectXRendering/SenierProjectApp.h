@@ -26,6 +26,7 @@ protected:
 	virtual void Render(float elapsedTime) override;
 
 	virtual void ProcessInput() override;
+	virtual void KeyDownEvent(WPARAM wParam) override;
 
 private:
 

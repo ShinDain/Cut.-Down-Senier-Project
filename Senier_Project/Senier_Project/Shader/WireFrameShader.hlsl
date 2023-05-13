@@ -8,6 +8,11 @@ cbuffer cbPerPass : register(b3)
 	float4x4 gViewProj;
 };
 
+cbuffer cbPerCollider : register(b4)
+{
+	float gIsActive;
+}
+
 Texture2D gDiffuseMap : register(t0);
 SamplerState gSamLinear : register(s0);
 
@@ -36,6 +41,8 @@ VertexOut VS(VertexIn vin)
 float4 PS(VertexOut pin) : SV_Target
 {
 	float4 diffuseAlbedo = float4(1.0f, 0.0f, 0.0f, 1.0f);
+	if(gIsActive)
+		diffuseAlbedo = float4(1.0f, gIsActive, 0.0f, 1.0f);
 
 	return diffuseAlbedo;
 }

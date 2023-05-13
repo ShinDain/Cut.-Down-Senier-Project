@@ -23,7 +23,8 @@ protected:
 
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 
-	bool m_bIsActive = false;
+	bool m_bIsActive = true;
+	float m_Intersect = 0;
 
 public:
 	void UpdateWorldTransform(XMFLOAT4X4& xmf4x4World);
@@ -40,6 +41,9 @@ public:
 
 	void SetIsActive(bool bIsActive) { m_bIsActive = bIsActive; }
 	const bool GetIsActive() { return m_bIsActive; }
+	void SetIntersect(float intersect) { m_Intersect = intersect; }
+	const float GetIntersect() { return m_Intersect; }
+
 
 #if defined(_DEBUG) | defined(DEBUG)
 protected:

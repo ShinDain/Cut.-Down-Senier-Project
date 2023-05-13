@@ -40,6 +40,10 @@ public:
 	virtual void OnResize(float aspectRatio) {}
 	virtual void Animate(float elapsedTime);
 	virtual void Update(float elapsedTime);
+
+	virtual void ProcessInput(UCHAR* pKeybuffer) {}
+	virtual void KeyDownEvent(WPARAM wParam) {}
+
 	virtual void UpdateTransform(XMFLOAT4X4 *pxmf4x4Parent = NULL);
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 

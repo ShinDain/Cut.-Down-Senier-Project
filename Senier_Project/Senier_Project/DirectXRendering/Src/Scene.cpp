@@ -18,20 +18,29 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	ObjectInitData objectData;
 	objectData.xmf3Position = XMFLOAT3(0, 0, 0);
-	objectData.xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
+	objectData.xmf3Rotation = XMFLOAT3(0, 0, 0);
+	objectData.xmf4Orientation = XMFLOAT4(0, 1, 0, 1);
 	objectData.xmf3Scale = XMFLOAT3(10,10, 10);
 	objectData.nMass = 20;
-	objectData.objectType = Object_Character;
+	objectData.objectType = Object_Player;
 	objectData.colliderType = Collider_Box;
 	objectData.xmf3Extents = CHARACTER_MODEL_EXTENTS;
 
 	// 캐릭터 테스트
 	CreateObject(pd3dDevice, pd3dCommandList, objectData, CHARACTER_MODEL_PATH, 1, RenderLayer::Render_Skinned);
-	//m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
 
-	objectData.xmf3Position = XMFLOAT3(0, 0.5, 0);
-	objectData.xmf3Scale = XMFLOAT3(0.1, 0.1, 0.1);
-	objectData.objectType = Object_Physics;			// 임시로 무기
+	objectData.xmf3Extents = ZOMBIE_MODEL_EXTENTS;
+	objectData.xmf3Position = XMFLOAT3(-20, 0, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+	objectData.xmf3Position = XMFLOAT3(0, 0, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+	objectData.xmf3Position = XMFLOAT3(20, 0, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+
+	objectData.xmf3Position = XMFLOAT3(0, 0.2, 0);
+	objectData.xmf3Rotation = XMFLOAT3(50, 0, 90);
+	objectData.xmf3Scale = XMFLOAT3(0.2, 0.2, 0.2);
+	objectData.objectType = Object_Weapon;			// 임시로 무기
 	objectData.colliderType = Collider_Box;
 	objectData.xmf3Extents = WEAPON_MODEL_EXTENTS;
 	CreateObject(pd3dDevice, pd3dCommandList, objectData, WEAPON_MODEL_PATH, 1, RenderLayer::Render_Static);
@@ -40,16 +49,11 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.xmf3Extents = XMFLOAT3(0,0,0);
 	objectData.objectType = Object_World;
 	objectData.xmf3Position = XMFLOAT3(0, 0, 0);
+	objectData.xmf3Rotation = XMFLOAT3(0, 0, 0);
 	objectData.xmf4Orientation = XMFLOAT4(0, 1, 0, 1);
 	objectData.xmf3Scale = XMFLOAT3(100, 0.1, 100);
 	objectData.colliderType = Collider_Plane;
 	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 1, RenderLayer::Render_Static);
-
-
-	for (int i = 0; i < m_vpAllObjs.size(); ++i)
-	{
-		if (m_vpAllObjs[i]) m_vpAllObjs[i]->UpdateTransform();
-	}
 
 	// 카메라 초기화
 	m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
@@ -81,6 +85,8 @@ void Scene::Update(float elapsedTime)
 
 #endif
 
+	// 교차 검사
+	Intersect();
 
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
@@ -141,22 +147,13 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 	if (pKeybuffer[VK_LBUTTON] & 0xF0)
 	{
 		SetCursor(NULL);
-		//GetCursorPos(&ptCursorPos);
 		GetCursorPos(&ptCursorPos);
 		SetCursorPos(CLIENT_WIDTH / 2, CLIENT_HEIGHT / 2);
 		dx = (float)(ptCursorPos.x - CLIENT_WIDTH / 2) / 30.0f;
 		dy = (float)(ptCursorPos.y - CLIENT_HEIGHT / 2) / 30.0f;
-		//m_LastMousePos = ptCursorPos;
-		//SetCursorPos(CLIENT_WIDTH / 2, CLIENT_HEIGHT / 2);
 	}
 
-	DWORD dwDirection = 0;
-	if (pKeybuffer['W'] & 0xF0) dwDirection |= DIR_FORWARD;
-	if (pKeybuffer['S'] & 0xF0) dwDirection |= DIR_BACKWARD;
-	if (pKeybuffer['A'] & 0xF0) dwDirection |= DIR_LEFT;
-	if (pKeybuffer['D'] & 0xF0) dwDirection |= DIR_RIGHT;
-
-	if(dx != 0 || dy != 0)
+	if (dx != 0 || dy != 0)
 	{
 		if (dx != 0 || dy != 0)
 		{
@@ -167,29 +164,32 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 		}
 	}
 
+	/*for (int i = 0; i < m_vpAllObjs.size(); ++i)
+	{
+		m_vpAllObjs[i]->ProcessInput(pKeybuffer);
+	}*/
+	
+
 	// 임시
-	if (dwDirection != 0)
+	if (m_vpAllObjs[0])
 	{
-		if(m_vpAllObjs[0]) m_vpAllObjs[0]->SetRotate(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
-		if (m_vpAllObjs[0]) m_vpAllObjs[0]->Move(dwDirection);
+		m_vpAllObjs[0]->ProcessInput(pKeybuffer);
+		m_vpAllObjs[0]->SetRotate(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
+		
 	}
-	else
-	{
-		if (m_vpAllObjs[0]) m_vpAllObjs[0]->Move(dwDirection);
-	}
-
-	if (pKeybuffer[VK_SPACE] & 0xF0 && (m_vpAllObjs[0])) m_vpAllObjs[0]->Jump();
-
-
+	
 #if defined(_DEBUG)
-	if (pKeybuffer['K'] & 0xF0)
-	{
-		// 오브젝트 생성
 
-	}
 #endif
 }
 
+void Scene::KeyDownEvent(WPARAM wParam)
+{
+	for (int i = 0; i < m_vpAllObjs.size(); ++i)
+	{
+		m_vpAllObjs[i]->KeyDownEvent(wParam);
+	}
+}
 
 std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 											const ObjectInitData& objInitData, const char* pstrFilePath, int nAnimationTracks, RenderLayer renderLayer)
@@ -211,19 +211,16 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 
 	switch (objInitData.objectType)
 	{
-	case Object_Character:
+	case Object_Player:
 	{
 		std::shared_ptr<Character> pCharacter = std::make_shared<Character>(pd3dDevice, pd3dCommandList, objInitData, pModelData, nAnimationTracks, nullptr);
 		pObject = std::static_pointer_cast<Object>(pCharacter);
 	}
 		break;
 
-	case Object_Physics:
+	case Object_Weapon:
 	{
-		// 임시로 무기
-		//char tmp[64] = "Character1_RightHand";
-		//char tmp[64] = "PinkyFinger2_L";
-		char tmp[64] = "Base_HumanRArmPalm";
+		char tmp[64] = "mixamorig:RightHand";
 		std::shared_ptr<Weapon> pWeapon = std::make_shared<Weapon>(pd3dDevice, pd3dCommandList, objInitData, tmp, m_vpAllObjs[0], pModelData, nAnimationTracks, nullptr);
 		pObject = std::static_pointer_cast<Object>(pWeapon);
 	}
@@ -238,7 +235,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 
 	m_vpAllObjs.emplace_back(pObject);
 	m_vObjectLayer[renderLayer].emplace_back(pObject);
-
+	m_vObjectLayer[renderLayer][0]->GetCollider();
 //	pObject->Initialize(pd3dDevice, pd3dCommandList, NULL);
 
 	return pObject;
@@ -287,6 +284,30 @@ void Scene::ClearObjectLayer()
 			{
 				m_vObjectLayer[i][j]->Destroy();
 				m_vObjectLayer[i].erase(m_vObjectLayer[i].begin() + j);
+			}
+		}
+	}
+}
+
+void Scene::Intersect()
+{
+	for (int i = 0; i < g_ppColliderBoxs.size(); ++i)
+	{
+		g_ppColliderBoxs[i]->SetIntersect(0);
+	}
+
+	for (int i = 0; i < g_ppColliderBoxs.size() - 1; ++i)
+	{
+		if (!g_ppColliderBoxs[i]->GetIsActive())
+			continue;
+		for (int k = i + 1; k < g_ppColliderBoxs.size(); ++k)
+		{
+			if (!g_ppColliderBoxs[k]->GetIsActive())
+				continue;
+			if (IntersectTests::BoxAndBox(*g_ppColliderBoxs[i], *g_ppColliderBoxs[k]))
+			{
+				g_ppColliderBoxs[i]->SetIntersect(1);
+				g_ppColliderBoxs[k]->SetIntersect(1);
 			}
 		}
 	}

@@ -57,6 +57,7 @@ protected:
 	virtual void Render(float elapsedTime) = 0;
 
 	virtual void ProcessInput() {}
+	virtual void KeyDownEvent(WPARAM wParam) {};
 
 protected:
 

@@ -175,6 +175,12 @@ void SenierProjectApp::ProcessInput()
 
 }
 
+void SenierProjectApp::KeyDownEvent(WPARAM wParam)
+{
+	if (m_Scene) m_Scene->KeyDownEvent(wParam);
+
+}
+
 
 
 

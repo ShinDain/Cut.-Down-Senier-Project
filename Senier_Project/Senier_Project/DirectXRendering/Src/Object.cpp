@@ -65,6 +65,7 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	}
 
 	m_xmf3Position = objData.xmf3Position;
+	m_xmf3Rotate = objData.xmf3Rotation;
 	m_xmf4Orientation = objData.xmf4Orientation;
 	m_xmf3Scale = objData.xmf3Scale;
 	m_Mass = objData.nMass;

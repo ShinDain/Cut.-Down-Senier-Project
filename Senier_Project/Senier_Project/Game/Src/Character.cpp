@@ -8,20 +8,26 @@ Character::Character(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCo
 					 ObjectInitData objData,
 					 std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
-	Object::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
-
-	m_pCollider->SetOffsetPosition(XMFLOAT3(0, objData.xmf3Extents.y, 0));
-
-	m_Acceleration = 500.0f;
-
-	m_floorCheckRay.length = 3.f;
-	m_floorCheckRay.xmf3Direction = XMFLOAT3(0, -1, 0);
-	m_floorCheckRay.xmf3Start = XMFLOAT3(0, m_xmf3Position.y - m_xmf3ColliderExtents.y, 0);
+	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 }
 
 Character::~Character()
 {
 	Object::Destroy();
+}
+
+bool Character::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+{
+	Object::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	m_pCollider->SetOffsetPosition(XMFLOAT3(0, objData.xmf3Extents.y, 0));
+
+	m_Acceleration = 500.0f;
+	m_floorCheckRay.length = 3.f;
+	m_floorCheckRay.xmf3Direction = XMFLOAT3(0, -1, 0);
+	m_floorCheckRay.xmf3Start = XMFLOAT3(0, m_xmf3Position.y - m_xmf3ColliderExtents.y, 0);
+
+	return true;
 }
 
 void Character::Update(float elapsedTime)
@@ -41,6 +47,37 @@ void Character::Update(float elapsedTime)
 	}
 	if (m_pChild) {
 		m_pChild->Update(elapsedTime);
+	}
+}
+
+void Character::ProcessInput(UCHAR* pKeybuffer)
+{
+	DWORD dwDirection = 0;
+	if (pKeybuffer['W'] & 0xF0) dwDirection |= DIR_FORWARD;
+	if (pKeybuffer['S'] & 0xF0) dwDirection |= DIR_BACKWARD;
+	if (pKeybuffer['A'] & 0xF0) dwDirection |= DIR_LEFT;
+	if (pKeybuffer['D'] & 0xF0) dwDirection |= DIR_RIGHT;
+
+	if (dwDirection != 0)
+	{
+		Move(dwDirection);
+	}
+	else
+	{
+		Move(dwDirection);
+	}
+	if (pKeybuffer[VK_SPACE] & 0xF0) Jump();
+}
+
+
+int tmpCnt = 0;
+
+void Character::KeyDownEvent(WPARAM wParam)
+{
+	if (wParam == 'K')
+	{
+		tmpCnt = (tmpCnt + 1) % 17;
+		m_pAnimationController->SetTrackAnimationSet(0, tmpCnt);
 	}
 }
 

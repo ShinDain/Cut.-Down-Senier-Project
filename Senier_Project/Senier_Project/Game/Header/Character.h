@@ -10,7 +10,7 @@ struct Ray
 	float length = 10.f;
 };
 
-// Object를 상속, State Machine을 가지며 애니메이션 전환이 가능
+// Object를 상속, 애니메이션
 class Character : public Object
 {
 public:
@@ -23,7 +23,14 @@ public:
 	Character& operator=(const Character& rhs) = delete;
 	virtual ~Character();
 
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+							ObjectInitData objData,
+							std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
 	virtual void Update(float elapsedTime);
+
+	virtual void ProcessInput(UCHAR* pKeybuffer);
+	virtual void KeyDownEvent(WPARAM wParam);
 
 protected:
 	float m_MaxSpeedXZ = 100.0f;

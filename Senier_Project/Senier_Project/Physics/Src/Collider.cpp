@@ -78,6 +78,9 @@ void Collider::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 	XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
 	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
 
+	// 충돌 여부를 전달, 충돌 중이면 색 변화
+	pd3dCommandList->SetGraphicsRoot32BitConstants(2, 1, &m_Intersect, 0);
+
 	pd3dCommandList->IASetIndexBuffer(&m_IndexBufferView);
 }
 

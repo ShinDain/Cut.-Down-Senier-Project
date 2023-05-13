@@ -49,8 +49,9 @@ enum ObjectType : UINT
 {
 	Object_World,
 	Object_Platform,
-	Object_Physics,
-	Object_Character,
+	Object_Player,
+	Object_Monster,
+	Object_Weapon,
 	Object_UI,
 	Object_None
 };
@@ -85,6 +86,7 @@ struct SkinningBoneTransformConstant
 struct ObjectInitData
 {
 	XMFLOAT3 xmf3Position = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 xmf3Rotation = XMFLOAT3(0, 0, 0);
 	XMFLOAT4 xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
 	XMFLOAT3 xmf3Scale = XMFLOAT3(1, 1, 1);
 	ObjectType objectType = Object_None;

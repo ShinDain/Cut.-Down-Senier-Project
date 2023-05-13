@@ -28,11 +28,14 @@ public:
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	void ProcessInput(UCHAR* pKeybuffer);
+	void KeyDownEvent(WPARAM wParam);
 
 	std::shared_ptr<Object> CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 										const ObjectInitData& objInitData, const char* pstrFilePath,int nAnimationTracks, RenderLayer renderLayer);
 
 	void ClearObjectLayer();
+
+	void Intersect();
 
 private:
 
