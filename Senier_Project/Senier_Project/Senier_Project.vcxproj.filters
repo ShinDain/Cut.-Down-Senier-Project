@@ -110,6 +110,9 @@
     <ClCompile Include="Game\Src\Player.cpp">
       <Filter>Game\Src</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Src\Monster.cpp">
+      <Filter>Game\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Physics\Header\Collider.h">
@@ -189,6 +192,9 @@
     </ClInclude>
     <ClInclude Include="DirectXRendering\Header\Global.h">
       <Filter>DirectXRendering\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Header\Monster.h">
+      <Filter>Game\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

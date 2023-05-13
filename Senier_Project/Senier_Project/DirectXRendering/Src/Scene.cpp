@@ -27,8 +27,11 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.xmf3Extents = CHARACTER_MODEL_EXTENTS;
 
 	// 캐릭터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, CHARACTER_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CHARACTER_MODEL_PATH, 2, RenderLayer::Render_Skinned);
+	//m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(1, 13);
+	m_vpAllObjs[0]->m_pAnimationController->SetTrackEnable(1, false);
 
+	objectData.objectType = Object_Monster;
 	objectData.xmf3Extents = ZOMBIE_MODEL_EXTENTS;
 	objectData.xmf3Position = XMFLOAT3(-20, 0, 0);
 	CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
@@ -144,7 +147,7 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 
 	POINT ptCursorPos;
 
-	if (pKeybuffer[VK_LBUTTON] & 0xF0)
+	if (pKeybuffer[VK_RBUTTON] & 0xF0)
 	{
 		SetCursor(NULL);
 		GetCursorPos(&ptCursorPos);
@@ -213,16 +216,25 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	{
 	case Object_Player:
 	{
-		std::shared_ptr<Character> pCharacter = std::make_shared<Character>(pd3dDevice, pd3dCommandList, objInitData, pModelData, nAnimationTracks, nullptr);
-		pObject = std::static_pointer_cast<Object>(pCharacter);
+		std::shared_ptr<Player> pPlayer = std::make_shared<Player>(pd3dDevice, pd3dCommandList, objInitData, pModelData, nAnimationTracks, nullptr);
+		pObject = std::static_pointer_cast<Object>(pPlayer);
 	}
 		break;
+
+	case Object_Monster:
+	{
+		std::shared_ptr<Monster> pMonster = std::make_shared<Monster>(pd3dDevice, pd3dCommandList, objInitData, pModelData, nAnimationTracks, nullptr);
+		pObject = std::static_pointer_cast<Object>(pMonster);
+	}
+		break;
+
 
 	case Object_Weapon:
 	{
 		char tmp[64] = "mixamorig:RightHand";
 		std::shared_ptr<Weapon> pWeapon = std::make_shared<Weapon>(pd3dDevice, pd3dCommandList, objInitData, tmp, m_vpAllObjs[0], pModelData, nAnimationTracks, nullptr);
 		pObject = std::static_pointer_cast<Object>(pWeapon);
+		std::static_pointer_cast<Player>(m_vpAllObjs[0])->SetWeapon(pWeapon);
 	}
 	break;	
 

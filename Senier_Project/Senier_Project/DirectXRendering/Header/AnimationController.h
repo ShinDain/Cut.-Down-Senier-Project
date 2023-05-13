@@ -211,6 +211,11 @@ public:
 	{
 		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetAnimationCallbackHandler(pCallbackHandler);
 	}
+
+	bool GetTrackEnable(int nAnimationTrack)
+	{
+		if (nAnimationTrack < m_vpAnimationTracks.size()) return m_vpAnimationTracks[nAnimationTrack]->m_bEnable;
+	}
 };
 
 

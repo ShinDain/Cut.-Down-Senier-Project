@@ -10,6 +10,8 @@
 #include "Object.h"
 #include "../../Game/Header/Character.h"
 #include "../../Game/Header/Weapon.h"
+#include "../../Game/Header/Player.h"
+#include "../../Game/Header/Monster.h"
 
 #include "../../Physics/Header/Collider.h"
 #include "../../Physics/Header/CollisionDetact.h"

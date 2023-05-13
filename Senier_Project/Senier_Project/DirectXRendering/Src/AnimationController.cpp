@@ -104,7 +104,10 @@ float AnimationTrack::UpdatePosition(float TrackPosition, float ElapsedTime, flo
 
 	case ANIMATION_TYPE_ONCE:
 		m_Position = TrackPosition + fTrackElapsedTime;
-		if (m_Position > AnimationLength) m_Position = AnimationLength;
+		if (m_Position > AnimationLength) {
+			m_Position = AnimationLength;
+			m_bEnable = false;	
+		}
 		break;
 	case ANIMATION_TYPE_PINGPONG:
 		break;

@@ -29,8 +29,17 @@ public:
 
 	virtual void Update(float elapsedTime);
 
-	virtual void ProcessInput(UCHAR* pKeybuffer);
-	virtual void KeyDownEvent(WPARAM wParam);
+	virtual void ProcessInput(UCHAR* pKeybuffer) {}
+	virtual void KeyDownEvent(WPARAM wParam) {}
+
+public:
+	virtual void Move(DWORD dwDirection) {}
+	virtual void Jump() {}
+	virtual void Attack() {}
+	virtual void OnHit() {}
+	virtual void OnDeath() {}
+
+	virtual void IsFalling();
 
 protected:
 	float m_MaxSpeedXZ = 100.0f;
@@ -39,10 +48,6 @@ protected:
 
 	Ray m_floorCheckRay;
 
-public:
-	virtual void Move(DWORD dwDirection);
-	virtual void Jump();
-	virtual void IsFalling();
 
 	void ApplyCharacterFriction(float elapsedTime);
 	void CalcVelocityAndPosition(float elapsedTime);
