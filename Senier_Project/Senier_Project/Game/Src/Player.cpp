@@ -25,7 +25,7 @@ void Player::Destroy()
 {
 	Character::Destroy();
 
-	m_pWeapon->Destroy();
+	if(m_pWeapon) m_pWeapon->Destroy();
 	m_pWeapon.reset();
 }
 
@@ -96,20 +96,15 @@ void Player::Move(DWORD dwDirection)
 	//m_xmf3Acceleration.y = m_xmf3Acceleration.y;
 	m_xmf3Acceleration.z = xmf3deltaAccelXZ.z;
 
-	if (m_pAnimationController->GetTrackEnable(1))
-		return;
+	//if (m_pAnimationController->GetTrackEnable(1))
+	//	return;
 
-	if (dwDirection != 0)
-	{
-		// 이동시 애니메이션이 전환 되도록 (임시)
-		m_pAnimationController->SetTrackEnable(0, true);
-		m_pAnimationController->SetTrackAnimationSet(0, 1);
-	}
-	else
-	{
-		m_pAnimationController->SetTrackEnable(0, true);
-		m_pAnimationController->SetTrackAnimationSet(0, 0);
-	}
+	float tmp = 0;
+	XMVECTOR velocity = XMLoadFloat3(&m_xmf3Velocity);
+	tmp = XMVectorGetX(XMVector3Length(velocity)) / m_MaxSpeedXZ;
+
+	m_pAnimationController->SetTrackWeight(0, 1 - tmp);
+	m_pAnimationController->SetTrackWeight(1, tmp);
 }
 
 void Player::Jump()

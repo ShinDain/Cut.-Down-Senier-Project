@@ -29,16 +29,19 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// 캐릭터 테스트
 	CreateObject(pd3dDevice, pd3dCommandList, objectData, CHARACTER_MODEL_PATH, 2, RenderLayer::Render_Skinned);
 	//m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(1, 13);
-	m_vpAllObjs[0]->m_pAnimationController->SetTrackEnable(1, false);
+	m_vpAllObjs[0]->m_pAnimationController->SetTrackEnable(0, true);
+	m_vpAllObjs[0]->m_pAnimationController->SetTrackEnable(1, true);
+	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(1, 1);
+	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
 
 	objectData.objectType = Object_Monster;
 	objectData.xmf3Extents = ZOMBIE_MODEL_EXTENTS;
 	objectData.xmf3Position = XMFLOAT3(-20, 0, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+	//CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
 	objectData.xmf3Position = XMFLOAT3(0, 0, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+	//CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
 	objectData.xmf3Position = XMFLOAT3(20, 0, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+	//CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
 
 	objectData.xmf3Position = XMFLOAT3(0, 0.2, 0);
 	objectData.xmf3Rotation = XMFLOAT3(50, 0, 90);
@@ -46,7 +49,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.objectType = Object_Weapon;			// 임시로 무기
 	objectData.colliderType = Collider_Box;
 	objectData.xmf3Extents = WEAPON_MODEL_EXTENTS;
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, WEAPON_MODEL_PATH, 1, RenderLayer::Render_Static);
+	//CreateObject(pd3dDevice, pd3dCommandList, objectData, WEAPON_MODEL_PATH, 1, RenderLayer::Render_Static);
 
 	// 임시 바닥
 	objectData.xmf3Extents = XMFLOAT3(0,0,0);
@@ -177,7 +180,7 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 	if (m_vpAllObjs[0])
 	{
 		m_vpAllObjs[0]->ProcessInput(pKeybuffer);
-		m_vpAllObjs[0]->SetRotate(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
+		//m_vpAllObjs[0]->SetRotate(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
 		
 	}
 	
