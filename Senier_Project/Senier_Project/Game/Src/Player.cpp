@@ -73,8 +73,8 @@ void Player::Move(DWORD dwDirection)
 {
 	if (dwDirection == 0)
 	{
-		m_xmf3Acceleration.x = 0;
-		m_xmf3Acceleration.z = 0;
+		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+		m_pBody->SetAcceleration(XMFLOAT3(0, xmf3Accel.y, 0));
 	}
 
 	XMVECTOR direction = XMVectorZero();
@@ -109,6 +109,13 @@ void Player::Move(DWORD dwDirection)
 	//m_xmf3Acceleration.y = m_xmf3Acceleration.y;
 	m_xmf3Acceleration.z = xmf3deltaAccelXZ.z;
 
+
+	XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+	xmf3Accel.x = m_xmf3Acceleration.x;
+	xmf3Accel.z = m_xmf3Acceleration.z;
+	m_pBody->SetAcceleration(xmf3Accel);
+
+
 	if (m_pAnimationController->GetTrackEnable(2))
 		return;
 	else
@@ -118,7 +125,7 @@ void Player::Move(DWORD dwDirection)
 	}
 
 	float tmp = 0;
-	XMVECTOR velocity = XMLoadFloat3(&m_xmf3Velocity);
+	XMVECTOR velocity = XMLoadFloat3(&m_pBody->GetVelocity());
 	tmp = XMVectorGetX(XMVector3Length(velocity)) / m_MaxSpeedXZ;
 
 	m_pAnimationController->SetTrackWeight(0, 1 - tmp);

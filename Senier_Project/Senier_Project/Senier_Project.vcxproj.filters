@@ -113,6 +113,15 @@
     <ClCompile Include="Game\Src\Monster.cpp">
       <Filter>Game\Src</Filter>
     </ClCompile>
+    <ClCompile Include="Physics\Src\CollisionResolver.cpp">
+      <Filter>Physics\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Src\Contact.cpp">
+      <Filter>Physics\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Src\RigidBody.cpp">
+      <Filter>Physics\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Physics\Header\Collider.h">
@@ -195,6 +204,15 @@
     </ClInclude>
     <ClInclude Include="Game\Header\Monster.h">
       <Filter>Game\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Header\CollisionResolver.h">
+      <Filter>Physics\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Header\Contact.h">
+      <Filter>Physics\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Header\RigidBody.h">
+      <Filter>Physics\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

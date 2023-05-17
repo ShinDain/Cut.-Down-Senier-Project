@@ -18,6 +18,7 @@ Monster::~Monster()
 
 void Monster::Update(float elapsedTime)
 {
+	Character::Update(elapsedTime);
 }
 
 void Monster::Destroy()

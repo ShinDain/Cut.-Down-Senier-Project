@@ -32,12 +32,13 @@ bool Character::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 void Character::Update(float elapsedTime)
 {
-	// 속도 및 위치 변화
-	IsFalling();
-	CalcVelocityAndPosition(elapsedTime);
-	
-	UpdateTransform(NULL);
+	Object::Update(elapsedTime);
 
+	// 속도 및 위치 변화
+	//IsFalling();
+	//CalcVelocityAndPosition(elapsedTime);
+	/*UpdateToRigidBody(elapsedTime);
+	
 	ObjConstant objConstant;
 	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
 	if (m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
@@ -47,7 +48,7 @@ void Character::Update(float elapsedTime)
 	}
 	if (m_pChild) {
 		m_pChild->Update(elapsedTime);
-	}
+	}*/
 }
 
 void Character::IsFalling()

@@ -28,6 +28,10 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 		m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
 
 	std::shared_ptr<Collider> pCollider;
+	std::shared_ptr<RigidBody> pBody;
+
+	pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation,
+		objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
 
 	// 충돌체 타입에 따라 
 	switch (objData.colliderType)
@@ -36,7 +40,7 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	{
 		std::shared_ptr<ColliderPlane> pColliderPlane;
 		XMFLOAT3 direction = XMFLOAT3(objData.xmf4Orientation.x, objData.xmf4Orientation.y, objData.xmf4Orientation.z);
-		pColliderPlane = std::make_shared<ColliderPlane>(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), direction, objData.xmf3Extents.x);
+		pColliderPlane = std::make_shared<ColliderPlane>(pBody, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), direction, objData.xmf3Extents.x);
 		g_ppColliderPlanes.emplace_back(pColliderPlane);
 		pCollider = std::static_pointer_cast<Collider>(pColliderPlane);
 	}
@@ -45,7 +49,7 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	case Collider_Box:
 	{
 		std::shared_ptr<ColliderBox> pColliderBox;
-		pColliderBox = std::make_shared<ColliderBox>(XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), objData.xmf3Extents);
+		pColliderBox = std::make_shared<ColliderBox>(pBody, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), objData.xmf3Extents);
 		g_ppColliderBoxs.emplace_back(pColliderBox);
 		pCollider = std::static_pointer_cast<Collider>(pColliderBox);
 	}
@@ -54,7 +58,7 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	case Collider_Sphere:
 	{
 		std::shared_ptr<ColliderSphere> pColliderSphere;
-		pColliderSphere = std::make_shared<ColliderSphere>(XMFLOAT3(0, 0, 0), objData.xmf3Extents.x);
+		pColliderSphere = std::make_shared<ColliderSphere>(pBody, XMFLOAT3(0, 0, 0), objData.xmf3Extents.x);
 		g_ppColliderSpheres.emplace_back(pColliderSphere);
 		pCollider = std::static_pointer_cast<Collider>(pColliderSphere);
 	}
@@ -64,12 +68,7 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 		break;
 	}
 
-	m_xmf3Position = objData.xmf3Position;
-	m_xmf3Rotate = objData.xmf3Rotation;
-	m_xmf4Orientation = objData.xmf4Orientation;
-	m_xmf3Scale = objData.xmf3Scale;
-	m_Mass = objData.nMass;
-
+	m_pBody = pBody;
 	m_pCollider = pCollider;
 	m_xmf3ColliderExtents = objData.xmf3Extents;
 
@@ -94,8 +93,10 @@ void Object::Animate(float elapsedTime)
 void Object::Update(float elapsedTime)
 {
 	//UpdateTransform(NULL);
-	IsFalling();
-	ApplyGravity(elapsedTime);
+	//IsFalling();
+	//ApplyGravity(elapsedTime);
+
+	UpdateToRigidBody(elapsedTime);
 
 	ObjConstant objConstant;
 	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
@@ -109,13 +110,29 @@ void Object::Update(float elapsedTime)
 	}
 }
 
+void Object::UpdateToRigidBody(float elapsedTime)
+{
+	// RigidBody를 기준으로 위치를 갱신한다.
+	if (m_pBody)
+	{
+		m_pBody->Update(elapsedTime);
+		if (m_pBody->GetInvalid())
+		{
+			Destroy();
+			return;
+		}
+		m_pCollider->UpdateWorldTransform();
+		m_xmf3Position = m_pBody->GetPosition();
+		m_xmf4Orientation = m_pBody->GetOrientation();
+		m_xmf3Rotate = m_pBody->GetRotate();
+		m_xmf3Scale = m_pBody->GetScale();
+		m_xmf4x4World = m_pBody->GetWorld();
+	}
+
+}
+
 void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 {
-	if (!strcmp(m_FrameName, "Vampire_A_Lusth"))
-	{
-		float a = 1000;
-		float b = this->m_Acceleration;
-	}
 	// Animate 후에 호출되어 Bone 행렬을 갱신
 	// 
 	if (pxmf4x4Parent)
@@ -136,7 +153,7 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 		m_xmf4x4World = m_xmf4x4LocalTransform;
 	}
 
-	if (m_pCollider) m_pCollider->UpdateWorldTransform(m_xmf4x4World);
+	if (m_pCollider) m_pCollider->UpdateWorldTransform();
 
 	if (m_pSibling) {
 		m_pSibling->UpdateTransform(pxmf4x4Parent);
@@ -484,6 +501,7 @@ void Object::Destroy()
 	m_pObjectCB.reset();
 
 	if(m_pCollider) m_pCollider->Destroy();
+	if (m_pBody) m_pBody->Destroy();
 }
 
 void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData)
@@ -664,4 +682,6 @@ void Object::SetRotate(const XMFLOAT3& Rotate) {
 
 	XMStoreFloat3(&m_xmf3Look, XMVector3TransformNormal(l, xmmatRotate));
 	XMStoreFloat3(&m_xmf3Right, XMVector3TransformNormal(r, xmmatRotate));
+
+	m_pBody->SetRotate(Rotate);
 }

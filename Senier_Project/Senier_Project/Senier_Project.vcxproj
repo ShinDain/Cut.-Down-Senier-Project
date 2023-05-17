@@ -41,8 +41,11 @@
     <ClCompile Include="Game\Src\Weapon.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Physics\Src\CollisionDetact.cpp" />
+    <ClCompile Include="Physics\Src\CollisionResolver.cpp" />
+    <ClCompile Include="Physics\Src\Contact.cpp" />
     <ClCompile Include="Physics\Src\Physics.cpp" />
     <ClCompile Include="Physics\Src\Collider.cpp" />
+    <ClCompile Include="Physics\Src\RigidBody.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Header\D3DUtil.h" />
@@ -70,8 +73,11 @@
     <ClInclude Include="Game\Header\Player.h" />
     <ClInclude Include="Game\Header\Weapon.h" />
     <ClInclude Include="Physics\Header\CollisionDetact.h" />
+    <ClInclude Include="Physics\Header\CollisionResolver.h" />
+    <ClInclude Include="Physics\Header\Contact.h" />
     <ClInclude Include="Physics\Header\Physics.h" />
     <ClInclude Include="Physics\Header\Collider.h" />
+    <ClInclude Include="Physics\Header\RigidBody.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\default.hlsl">

@@ -13,8 +13,10 @@
 #include "../../Game/Header/Player.h"
 #include "../../Game/Header/Monster.h"
 
+#include "../../Physics/Header/Contact.h"
 #include "../../Physics/Header/Collider.h"
 #include "../../Physics/Header/CollisionDetact.h"
+#include "../../Physics/Header/CollisionResolver.h"
 
 class Scene
 {
@@ -35,6 +37,9 @@ public:
 	std::shared_ptr<Object> CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 										const ObjectInitData& objInitData, const char* pstrFilePath,int nAnimationTracks, RenderLayer renderLayer);
 
+	void GenerateContact();
+	void ProcessPhysics();
+
 	void ClearObjectLayer();
 
 	void Intersect();
@@ -54,6 +59,9 @@ private:
 	// 씬을 렌더링할 메인 카메라
 	std::unique_ptr<Camera> m_pCamera = nullptr;
 	//std::shared_ptr<Character> m_pCharacter = nullptr;
+
+	static std::unique_ptr<CollisionResolver> m_pCollisionResolver;
+	static CollisionData m_CollisionData;
 
 	POINT m_LastMousePos = { 0,0 };
 public:

@@ -29,7 +29,18 @@ bool Weapon::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 void Weapon::Update(float elapsedTime)
 {
-	Object::Update(elapsedTime);
+	//UpdateToRigidBody(elapsedTime);
+
+	ObjConstant objConstant;
+	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+	if (m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
+
+	if (m_pSibling) {
+		m_pSibling->Update(elapsedTime);
+	}
+	if (m_pChild) {
+		m_pChild->Update(elapsedTime);
+	}
 }
 
 void Weapon::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
@@ -47,6 +58,9 @@ void Weapon::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 	//m_xmf4x4World = m_xmf4x4LocalTransform;
 
 	Object::UpdateTransform(&m_xmf4x4World);
+
+	//m_pCollider->SetWorld(m_xmf4x4World);
+
 }
 
 void Weapon::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)

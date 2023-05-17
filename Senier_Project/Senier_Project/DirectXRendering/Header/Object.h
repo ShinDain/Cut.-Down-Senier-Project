@@ -8,6 +8,7 @@
 #include "../../Common/Header/UploadBuffer.h"
 
 #include "../../Physics/Header/Collider.h"
+#include "../../Physics/Header/RigidBody.h"
 #include "Global.h"
 #include "Mesh.h"
 #include "Material.h"
@@ -40,6 +41,7 @@ public:
 	virtual void OnResize(float aspectRatio) {}
 	virtual void Animate(float elapsedTime);
 	virtual void Update(float elapsedTime);
+	void UpdateToRigidBody(float elapsedTime);
 
 	virtual void ProcessInput(UCHAR* pKeybuffer) {}
 	virtual void KeyDownEvent(WPARAM wParam) {}
@@ -101,6 +103,7 @@ protected:
 	XMFLOAT3 m_xmf3Rotate = XMFLOAT3(0, 0, 0);
 
 	// 물리 연산 관련
+	std::shared_ptr<RigidBody> m_pBody = nullptr;
 	std::shared_ptr<Collider> m_pCollider = nullptr;
 	XMFLOAT3 m_xmf3ColliderExtents = XMFLOAT3(0, 0, 0);
 
@@ -177,6 +180,7 @@ public:
 	void SetOrientation(const XMFLOAT4& Orientation) { m_xmf4Orientation = Orientation;
 													   XMStoreFloat4(&m_xmf4Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmf4Orientation)));}
 	
+
 	void SetIsFalling(bool IsFalling) { m_bIsFalling = IsFalling; }
 	void SetIsAlive(bool IsAlive) { m_bIsAlive = IsAlive; }
 
@@ -196,6 +200,7 @@ public:
 	const float& GetRoll() { return(m_xmf3Rotate.z); }
 	const XMFLOAT4& GetOrientation() { return m_xmf4Orientation; }
 
+	std::shared_ptr<RigidBody> GetBody() { return m_pBody; }
 	std::shared_ptr<Collider> GetCollider() { return m_pCollider; }
 
 	bool GetIsFalling() { return m_bIsFalling; }

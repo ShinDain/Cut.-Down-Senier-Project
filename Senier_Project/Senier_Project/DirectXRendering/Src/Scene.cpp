@@ -1,9 +1,13 @@
 #include "../Header/Scene.h"
 
 static float pEtime = 0;
+CollisionData Scene::m_CollisionData;
+std::unique_ptr<CollisionResolver> Scene::m_pCollisionResolver;
 
 Scene::Scene()
 {
+	m_CollisionData.Reset(MAX_CONTACT_CNT);
+	m_pCollisionResolver = std::make_unique<CollisionResolver>(MAX_CONTACT_CNT * 8);
 
 }
 
@@ -39,11 +43,11 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.objectType = Object_Monster;
 	objectData.xmf3Extents = ZOMBIE_MODEL_EXTENTS;
 	objectData.xmf3Position = XMFLOAT3(-20, 0, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+	//CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
 	objectData.xmf3Position = XMFLOAT3(0, 0, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+	//CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
 	objectData.xmf3Position = XMFLOAT3(20, 0, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+	//CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
 
 	objectData.xmf3Position = XMFLOAT3(0, 0.2, 0);
 	objectData.xmf3Rotation = XMFLOAT3(50, 0, 90);
@@ -51,7 +55,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.objectType = Object_Weapon;			// 임시로 무기
 	objectData.colliderType = Collider_Box;
 	objectData.xmf3Extents = WEAPON_MODEL_EXTENTS;
-	CreateObject(pd3dDevice, pd3dCommandList, objectData, WEAPON_MODEL_PATH, 1, RenderLayer::Render_Static);
+	//CreateObject(pd3dDevice, pd3dCommandList, objectData, WEAPON_MODEL_PATH, 1, RenderLayer::Render_Static);
 
 	// 임시 바닥
 	objectData.xmf3Extents = XMFLOAT3(0,0,0);
@@ -95,6 +99,8 @@ void Scene::Update(float elapsedTime)
 
 	// 교차 검사
 	Intersect();
+
+
 
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
@@ -182,7 +188,7 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 	if (m_vpAllObjs[0])
 	{
 		m_vpAllObjs[0]->ProcessInput(pKeybuffer);
-		m_vpAllObjs[0]->SetRotate(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
+		m_vpAllObjs[0]->GetBody()->SetRotate(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
 		
 	}
 	
@@ -256,6 +262,55 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 //	pObject->Initialize(pd3dDevice, pd3dCommandList, NULL);
 
 	return pObject;
+}
+
+void Scene::GenerateContact()
+{
+	unsigned int nContactCnt = MAX_CONTACT_CNT * 8;
+
+	m_CollisionData.Reset(nContactCnt);
+	m_CollisionData.friction = 0;
+	m_CollisionData.restitution = 0.1f;
+	m_CollisionData.tolerance = 0.1f;
+
+	// 플레이어 검사
+	for (int i = 0; i < g_ppColliderPlanes.size(); ++i)
+	{
+		if (m_CollisionData.ContactCnt() > nContactCnt) return;
+		CollisionDetector::BoxAndHalfSpace(*g_ppColliderBoxs[0], *g_ppColliderPlanes[i], m_CollisionData);
+	}
+	for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
+	{
+		if (m_CollisionData.ContactCnt() > nContactCnt) return;
+
+		CollisionDetector::BoxAndBox(*g_ppColliderBoxs[0], *g_ppColliderBoxs[i], m_CollisionData);
+	}
+
+
+	m_CollisionData.friction = 0.9f;
+	// 평면과의 검사
+	for (int i = 0; i < g_ppColliderPlanes.size(); ++i)
+	{
+		for (int j = 1; j < g_ppColliderBoxs.size(); ++j)
+		{
+			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+			CollisionDetector::BoxAndHalfSpace(*g_ppColliderBoxs[j], *g_ppColliderPlanes[i], m_CollisionData);
+		}
+	}
+	// 박스끼리 검사
+	for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
+	{
+		for (int j = i + 1; j < g_ppColliderBoxs.size(); ++j)
+		{
+			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+
+			CollisionDetector::BoxAndBox(*g_ppColliderBoxs[i], *g_ppColliderBoxs[j], m_CollisionData);
+		}
+	}
+}
+
+void Scene::ProcessPhysics()
+{
 }
 
 void Scene::ClearObjectLayer()

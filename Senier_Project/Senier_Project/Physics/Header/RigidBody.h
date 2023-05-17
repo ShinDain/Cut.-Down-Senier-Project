@@ -17,7 +17,7 @@ class RigidBody
 {
 public:
 	RigidBody();
-	RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Scale, float mass);
+	RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotate,  XMFLOAT3 xmf3Scale, float mass);
 	RigidBody(const RigidBody& rhs) = delete;
 	RigidBody& operator=(const RigidBody& rhs) = delete;
 	virtual ~RigidBody();

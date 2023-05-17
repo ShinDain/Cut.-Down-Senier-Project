@@ -5,6 +5,7 @@
 #include "../../Common/Header/D3DUtil.h"
 #include "../../DirectXRendering/Header/Global.h"
 #include "../../Common/Header/MathHelper.h"
+#include "RigidBody.h"
 
 using namespace DirectX;
 
@@ -16,7 +17,11 @@ public:
 	Collider& operator=(const Collider& rhs) = delete;
 	virtual ~Collider();
 
+	virtual void CalculateRotateInertiaMatrix() {}
+
 protected:
+
+	std::shared_ptr<RigidBody> m_pRigidBody = nullptr;
 
 	XMFLOAT3 m_xmf3OffsetPosition = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 m_xmf3OffsetRotate = XMFLOAT3(0, 0, 0);
@@ -27,11 +32,12 @@ protected:
 	float m_Intersect = 0;
 
 public:
-	void UpdateWorldTransform(XMFLOAT4X4& xmf4x4World);
+	void UpdateWorldTransform();
 
 	void SetOffsetPosition(const XMFLOAT3& xmf3OffsetPosition);
 	void SetOffsetRotate(const XMFLOAT3& xmf3OffsetRotate);
 	
+	void SetWorld(XMFLOAT4X4 xmf4x4World) { m_xmf4x4World = xmf4x4World; }
 
 	const XMVECTOR GetAxis(int index) const;
 
@@ -39,10 +45,15 @@ public:
 	const XMFLOAT3& GetOffsetRotate() const { return m_xmf3OffsetRotate; }
 	const XMFLOAT4X4& GetWorld() const { return m_xmf4x4World; }
 
+	std::shared_ptr<RigidBody> GetBody() const { return m_pRigidBody; }
+
 	void SetIsActive(bool bIsActive) { m_bIsActive = bIsActive; }
 	const bool GetIsActive() { return m_bIsActive; }
 	void SetIntersect(float intersect) { m_Intersect = intersect; }
 	const float GetIntersect() { return m_Intersect; }
+
+	void SetPhysics(bool bPhysics) const { m_pRigidBody->SetPhysics(bPhysics); }
+	bool GetPhysics() const { return m_pRigidBody->GetPhysics(); }
 
 
 #if defined(_DEBUG) | defined(DEBUG)
@@ -88,12 +99,14 @@ class ColliderPlane : public Collider
 {
 public:
 	ColliderPlane() = delete;
-	ColliderPlane(XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Direction, float distance);
+	ColliderPlane(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Direction, float distance);
 	ColliderPlane(const ColliderPlane& rhs) = delete;
 	ColliderPlane& operator=(const ColliderPlane& rhs) = delete;
 	virtual ~ColliderPlane();
 
 	virtual void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+
+	virtual void CalculateRotateInertiaMatrix();
 
 private:
 	XMFLOAT3 m_xmf3Direction = XMFLOAT3(0, 0, 0);
@@ -113,12 +126,15 @@ class ColliderBox : public Collider
 {
 public:
 	ColliderBox() = delete;
-	ColliderBox(XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Extents);
+	ColliderBox(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Extents);
 	ColliderBox(const ColliderBox& rhs) = delete;
 	ColliderBox& operator=(const ColliderBox& rhs) = delete;
 	virtual ~ColliderBox();
 
 	virtual void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+
+	virtual void CalculateRotateInertiaMatrix();
+
 private:
 	XMFLOAT3 m_xmf3Extents = XMFLOAT3(0, 0, 0);
 
@@ -131,12 +147,15 @@ class ColliderSphere : public Collider
 {
 public:
 	ColliderSphere() = delete;
-	ColliderSphere(XMFLOAT3 xmf3OffsetPosition, float radius);
+	ColliderSphere(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3OffsetPosition, float radius);
 	ColliderSphere(const ColliderSphere& rhs) = delete;
 	ColliderSphere& operator=(const ColliderSphere& rhs) = delete;
 	virtual ~ColliderSphere();
 
 	virtual void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) {};
+
+	//virtual void CalculateRotateInertiaMatrix();
+
 private:
 	float m_Radius = 0;
 
