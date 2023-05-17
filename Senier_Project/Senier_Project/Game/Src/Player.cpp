@@ -8,12 +8,25 @@ Player::Player(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 			   ObjectInitData objData, 
 			   std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
-	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 }
 
 Player::~Player()
 {
 	Destroy();
+}
+
+bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+{
+	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	std::shared_ptr<AnimationCallbackHandler> pHandler = std::make_shared<AttackCallbackHandler>();
+	m_pAnimationController->SetAnimationCallbackHandler(0, pHandler);
+
+	m_pAnimationController->SetCallbackKeys(0, 2);
+
+
+	return true;
 }
 
 void Player::Update(float elapsedTime)
@@ -96,8 +109,13 @@ void Player::Move(DWORD dwDirection)
 	//m_xmf3Acceleration.y = m_xmf3Acceleration.y;
 	m_xmf3Acceleration.z = xmf3deltaAccelXZ.z;
 
-	//if (m_pAnimationController->GetTrackEnable(1))
-	//	return;
+	if (m_pAnimationController->GetTrackEnable(2))
+		return;
+	else
+	{
+		m_pAnimationController->SetTrackEnable(0, true);
+		m_pAnimationController->SetTrackEnable(1, true);
+	}
 
 	float tmp = 0;
 	XMVECTOR velocity = XMLoadFloat3(&m_xmf3Velocity);
@@ -122,11 +140,12 @@ void Player::Jump()
 
 void Player::Attack()
 {
-	m_pAnimationController->SetTrackAnimationSet(1, 13);
-	m_pAnimationController->SetTrackEnable(1, true);
-	m_pAnimationController->SetTrackPosition(1, 0);
+	m_pAnimationController->SetTrackAnimationSet(2, 13);
+	m_pAnimationController->SetTrackEnable(2, true);
+	m_pAnimationController->SetTrackPosition(2, 0);
 	m_pAnimationController->SetTrackEnable(0, false);
-	m_pAnimationController->m_vpAnimationTracks[1]->SetType(ANIMATION_TYPE_ONCE);
+	m_pAnimationController->SetTrackEnable(1, false);
+	m_pAnimationController->m_vpAnimationTracks[2]->SetType(ANIMATION_TYPE_ONCE);
 }
 
 void Player::OnHit()
@@ -135,4 +154,19 @@ void Player::OnHit()
 
 void Player::OnDeath()
 {
+}
+
+// ====================================================================
+
+void AttackCallbackHandler::HandleCallback(void* pCallbackData, float TrackPosition)
+{
+	//_TCHAR* pDataName = (_TCHAR*)pCallbackData;
+#ifdef _WITH_DEBUG_CALLBACK_DATA
+	TCHAR pstrDebug[256] = { 0 };
+	_stprintf_s(pstrDebug, 256, _T("%s(%f)\n"), pWavName, fTrackPosition);
+	OutputDebugString(pstrDebug);
+#endif
+
+	Weapon* pWeapon = (Weapon*)pCallbackData;
+	pWeapon->SetActive(true);
 }

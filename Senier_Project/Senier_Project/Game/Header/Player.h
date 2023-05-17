@@ -20,6 +20,10 @@ public:
 	Player& operator=(const Player& rhs) = delete;
 	virtual ~Player();
 
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
 	virtual void Update(float elapsedTime);
 
 	virtual void Destroy();
@@ -52,7 +56,7 @@ public:
 	virtual ~AttackCallbackHandler() {}
 
 public:
-	virtual void HandleCallback(void* pCallbackData, float TrackPosition) {}
+	virtual void HandleCallback(void* pCallbackData, float TrackPosition);
 };
 
 

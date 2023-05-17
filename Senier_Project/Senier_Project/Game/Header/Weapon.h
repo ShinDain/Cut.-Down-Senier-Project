@@ -45,7 +45,10 @@ public:
 	bool GetActive() { return m_bActive = false; }
 
 
-	void SetActive(bool bActive) { m_bActive = bActive; }
+	void SetActive(bool bActive) {
+		m_bActive = bActive;
+		m_pCollider->SetIsActive(bActive);
+	}
 	void SetFollowObject(std::shared_ptr<Object> pFollowObject) { m_pFollowObject = pFollowObject; }
 
 };

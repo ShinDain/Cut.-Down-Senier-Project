@@ -7,6 +7,9 @@ Weapon::Weapon(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 
 	m_pFollowObject = pFollowObject->FindFrame(pstrFollowObject);
+
+	pFollowObject->m_pAnimationController->SetCallbackKey(0, 0, 0.0f, (void*)(this));
+	//m_pAnimationController->SetCallbackKey(2, 1, 0.0f, (void*)(m_pWeapon.get()));
 }
 
 Weapon::~Weapon()
@@ -19,7 +22,7 @@ bool Weapon::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	Object::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 
 	m_pCollider->SetOffsetPosition(XMFLOAT3(0, objData.xmf3Extents.y, 0));
-	//m_pCollider->SetIsActive(false);
+	m_pCollider->SetIsActive(false);
 
 	return true;
 }
