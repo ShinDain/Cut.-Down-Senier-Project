@@ -109,9 +109,7 @@ protected:
 
 	float m_Mass = 1.0f;
 
-	XMFLOAT3 m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	float m_Acceleration = 100.0f;
-	XMFLOAT3 m_xmf3Acceleration = XMFLOAT3(0, 0, 0);
 
 	bool m_bIsFalling = false;
 	bool m_bIsAlive = true;
@@ -120,7 +118,6 @@ public:
 	virtual void Move(DWORD dwDirection) {}
 	virtual void Rotate(float x, float y, float z) {}
 	virtual void Jump() {}
-	virtual void ApplyGravity(float elapsedTime);
 	virtual void IsFalling();
 
 	void AddPosition(float x, float y, float z)
@@ -145,14 +142,14 @@ public:
 		AddRotate(addRotate.x, addRotate.y, addRotate.z);
 	}
 
-	void AddVelocity(float x, float y, float z) {
-		m_xmf3Velocity.x += x;
-		m_xmf3Velocity.y += y;
-		m_xmf3Velocity.z += z;
-	}
-	void AddVelocity(XMFLOAT3 addVelocity) {
-		AddVelocity(addVelocity.x, addVelocity.y, addVelocity.z);
-	}
+	//void AddVelocity(float x, float y, float z) {
+	//	m_xmf3Velocity.x += x;
+	//	m_xmf3Velocity.y += y;
+	//	m_xmf3Velocity.z += z;
+	//}
+	//void AddVelocity(XMFLOAT3 addVelocity) {
+	//	AddVelocity(addVelocity.x, addVelocity.y, addVelocity.z);
+	//}
 
 public:
 	void SetWorld(const XMFLOAT4X4& World) { m_xmf4x4World = World; }

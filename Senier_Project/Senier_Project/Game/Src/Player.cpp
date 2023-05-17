@@ -105,14 +105,10 @@ void Player::Move(DWORD dwDirection)
 	//XMStoreFloat3(&xmf3deltaAccel, deltaAccel);
 	XMFLOAT3 xmf3deltaAccelXZ;
 	XMStoreFloat3(&xmf3deltaAccelXZ, deltaAccel);
-	m_xmf3Acceleration.x = xmf3deltaAccelXZ.x;
-	//m_xmf3Acceleration.y = m_xmf3Acceleration.y;
-	m_xmf3Acceleration.z = xmf3deltaAccelXZ.z;
-
 
 	XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
-	xmf3Accel.x = m_xmf3Acceleration.x;
-	xmf3Accel.z = m_xmf3Acceleration.z;
+	xmf3Accel.x = xmf3deltaAccelXZ.x;
+	xmf3Accel.z = xmf3deltaAccelXZ.z;
 	m_pBody->SetAcceleration(xmf3Accel);
 
 
@@ -127,6 +123,9 @@ void Player::Move(DWORD dwDirection)
 	float tmp = 0;
 	XMVECTOR velocity = XMLoadFloat3(&m_pBody->GetVelocity());
 	tmp = XMVectorGetX(XMVector3Length(velocity)) / m_MaxSpeedXZ;
+	
+	if (tmp < 0.1f)
+		tmp = 0;
 
 	m_pAnimationController->SetTrackWeight(0, 1 - tmp);
 	m_pAnimationController->SetTrackWeight(1, tmp);
@@ -140,8 +139,10 @@ void Player::Jump()
 		//XMVECTOR deltaAccel = XMLoadFloat3(&m_xmf3Acceleration) + (XMLoadFloat3(&m_xmf3Up) * 100.0f);
 		//XMStoreFloat3(&m_xmf3Acceleration, deltaAccel);
 
-		XMVECTOR deltaVelocity = XMLoadFloat3(&m_xmf3Velocity) + (XMLoadFloat3(&m_xmf3Up) * m_JumpSpeed);
-		XMStoreFloat3(&m_xmf3Velocity, deltaVelocity);
+		XMVECTOR deltaVelocity = XMLoadFloat3(&m_pBody->GetVelocity()) + (XMLoadFloat3(&m_xmf3Up) * m_JumpSpeed);
+		XMFLOAT3 xmf3DeltaVel;
+		XMStoreFloat3(&xmf3DeltaVel, deltaVelocity);
+		m_pBody->SetVelocity(xmf3DeltaVel);
 	}
 }
 

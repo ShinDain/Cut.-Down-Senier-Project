@@ -38,7 +38,7 @@ public:
 										const ObjectInitData& objInitData, const char* pstrFilePath,int nAnimationTracks, RenderLayer renderLayer);
 
 	void GenerateContact();
-	void ProcessPhysics();
+	void ProcessPhysics(float elapsedTime);
 
 	void ClearObjectLayer();
 

@@ -52,6 +52,7 @@ enum ObjectType : UINT
 	Object_Player,
 	Object_Monster,
 	Object_Weapon,
+	Object_Physics,
 	Object_UI,
 	Object_None
 };

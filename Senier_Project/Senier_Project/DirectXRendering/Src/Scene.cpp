@@ -43,11 +43,11 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.objectType = Object_Monster;
 	objectData.xmf3Extents = ZOMBIE_MODEL_EXTENTS;
 	objectData.xmf3Position = XMFLOAT3(-20, 0, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
 	objectData.xmf3Position = XMFLOAT3(0, 0, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
 	objectData.xmf3Position = XMFLOAT3(20, 0, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, ZOMBIE_MODEL_PATH, 1, RenderLayer::Render_Skinned);
 
 	objectData.xmf3Position = XMFLOAT3(0, 0.2, 0);
 	objectData.xmf3Rotation = XMFLOAT3(50, 0, 90);
@@ -55,7 +55,18 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	objectData.objectType = Object_Weapon;			// 임시로 무기
 	objectData.colliderType = Collider_Box;
 	objectData.xmf3Extents = WEAPON_MODEL_EXTENTS;
-	//CreateObject(pd3dDevice, pd3dCommandList, objectData, WEAPON_MODEL_PATH, 1, RenderLayer::Render_Static);
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, WEAPON_MODEL_PATH, 1, RenderLayer::Render_Static);
+
+	// 임시 바닥
+	objectData.xmf3Extents = CUBE_MODEL_EXTENTS;
+	objectData.objectType = Object_Physics;
+	objectData.xmf3Position = XMFLOAT3(0, 0, 10);
+	objectData.xmf3Rotation = XMFLOAT3(0, 0, 0);
+	objectData.xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
+	objectData.xmf3Scale = XMFLOAT3(10, 10, 10);
+	objectData.colliderType = Collider_Box;
+	CreateObject(pd3dDevice, pd3dCommandList, objectData, CUBE_MODEL_PATH, 1, RenderLayer::Render_Static);
+
 
 	// 임시 바닥
 	objectData.xmf3Extents = XMFLOAT3(0,0,0);
@@ -100,6 +111,8 @@ void Scene::Update(float elapsedTime)
 	// 교차 검사
 	Intersect();
 
+	GenerateContact();
+	ProcessPhysics(elapsedTime);
 
 
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
@@ -188,7 +201,7 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 	if (m_vpAllObjs[0])
 	{
 		m_vpAllObjs[0]->ProcessInput(pKeybuffer);
-		m_vpAllObjs[0]->GetBody()->SetRotate(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
+		m_vpAllObjs[0]->SetRotate(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
 		
 	}
 	
@@ -249,6 +262,12 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	}
 	break;	
 
+	case Object_Physics:
+	{
+		//std::shared_ptr<Monster> pMonster = std::make_shared<Monster>(pd3dDevice, pd3dCommandList, objInitData, pModelData, nAnimationTracks, nullptr);
+		//pObject = std::static_pointer_cast<Object>(pMonster);
+	}
+
 	default:
 	{
 		pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objInitData, pModelData, nAnimationTracks, nullptr);
@@ -267,6 +286,11 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 void Scene::GenerateContact()
 {
 	unsigned int nContactCnt = MAX_CONTACT_CNT * 8;
+
+	for (int i = 0; i < m_vpAllObjs.size(); ++i)
+	{
+		m_vpAllObjs[i]->GetBody()->ClearContact();
+	}
 
 	m_CollisionData.Reset(nContactCnt);
 	m_CollisionData.friction = 0;
@@ -309,8 +333,11 @@ void Scene::GenerateContact()
 	}
 }
 
-void Scene::ProcessPhysics()
+void Scene::ProcessPhysics(float elapsedTime)
 {
+
+	m_pCollisionResolver->ResolveContacts(m_CollisionData.pContacts, elapsedTime);
+
 }
 
 void Scene::ClearObjectLayer()

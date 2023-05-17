@@ -21,6 +21,9 @@ bool Weapon::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 {
 	Object::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 
+	m_pBody->SetInGravity(false);
+	m_pBody->SetPhysics(true);
+
 	m_pCollider->SetOffsetPosition(XMFLOAT3(0, objData.xmf3Extents.y, 0));
 	m_pCollider->SetIsActive(false);
 

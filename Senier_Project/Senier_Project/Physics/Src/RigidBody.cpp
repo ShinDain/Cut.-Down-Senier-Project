@@ -24,8 +24,15 @@ void RigidBody::Update(float elapsedTime)
 	if (!m_bIsAwake)
 		return;
 
-	//if (m_ElapsedTimeAfterCreated > 0.0f && !m_bIsCharacter && !m_bIsPlatform)
-	//	m_bCanSleep = true;
+	if (m_ElapsedTimeAfterCreated > 0.0f && !m_bIsCharacter && !m_bIsPlatform)
+		m_bCanSleep = true;
+
+	if (m_bIsCharacter)
+	{
+		m_xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
+		m_xmf3AngularVelocity = XMFLOAT3(0, 0, 0);
+		m_xmf3Rotate = XMFLOAT3(0, m_xmf3Rotate.y, 0);
+	}
 
 	m_xmf3LastFrameAcceleration = m_xmf3Acceleration;
 
@@ -94,12 +101,12 @@ void RigidBody::CalcDerivedData()
 	XMMATRIX World = XMMatrixIdentity();
 	XMMATRIX Translation = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
 	XMMATRIX Rotate = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
-	//if (m_bIsCharacter)
-	//{
+	if (m_bIsCharacter)
+	{
 		Rotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotate.x),
 			XMConvertToRadians(m_xmf3Rotate.y),
 			XMConvertToRadians(m_xmf3Rotate.z));
-	//}
+	}
 
 	XMMATRIX Scale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
 	World = XMMatrixMultiply(Scale, XMMatrixMultiply(Rotate, Translation));

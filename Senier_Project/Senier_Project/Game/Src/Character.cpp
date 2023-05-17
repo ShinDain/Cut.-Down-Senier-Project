@@ -22,6 +22,10 @@ bool Character::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 	m_pCollider->SetOffsetPosition(XMFLOAT3(0, objData.xmf3Extents.y, 0));
 
+	m_pBody->SetIsCharacter(true);
+	m_pBody->SetInGravity(true);
+	m_pBody->SetPhysics(true);
+
 	m_Acceleration = 500.0f;
 	m_floorCheckRay.length = 3.f;
 	m_floorCheckRay.xmf3Direction = XMFLOAT3(0, -1, 0);
@@ -33,6 +37,8 @@ bool Character::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 void Character::Update(float elapsedTime)
 {
 	Object::Update(elapsedTime);
+
+	ApplyCharacterFriction(elapsedTime);
 
 	// 속도 및 위치 변화
 	//IsFalling();
@@ -69,7 +75,7 @@ void Character::IsFalling()
 		//m_CharacterFriction = 350.0f;
 		m_MaxSpeedXZ = 100.f;
 		m_xmf3Position.y = 0;
-		m_xmf3Velocity.y = 0;
+		//m_xmf3Velocity.y = 0;
 		m_bIsFalling = false;
 	}
 }
@@ -77,7 +83,7 @@ void Character::IsFalling()
 void Character::ApplyCharacterFriction(float elapsedTime)
 {
 	// 마찰력
-	XMFLOAT3 xmf3Velocity = m_xmf3Velocity;
+	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
 	XMFLOAT3 xmf3VelocityXZ = XMFLOAT3(xmf3Velocity.x, 0, xmf3Velocity.z);
 	XMVECTOR velocityXZ = XMLoadFloat3(&xmf3VelocityXZ);
 	// 최대 속도 제한
@@ -88,7 +94,7 @@ void Character::ApplyCharacterFriction(float elapsedTime)
 		XMFLOAT3 newVelocity;
 		XMStoreFloat3(&newVelocity, velocityXZ);
 		newVelocity.y = xmf3Velocity.y;
-		m_xmf3Velocity = newVelocity;
+		m_pBody->SetVelocity(newVelocity);
 	}
 	else
 	{
@@ -103,27 +109,27 @@ void Character::ApplyCharacterFriction(float elapsedTime)
 		XMFLOAT3 newVelocity;
 		XMStoreFloat3(&newVelocity, velocityXZ);
 		newVelocity.y = xmf3Velocity.y;
-		m_xmf3Velocity = newVelocity;
+		m_pBody->SetVelocity(newVelocity);
 	}
 }
 
 void Character::CalcVelocityAndPosition(float elapsedTime)
 {
-	XMVECTOR velocity = XMLoadFloat3(&m_xmf3Velocity);
+	//XMVECTOR velocity = XMLoadFloat3(&m_xmf3Velocity);
 
-	// 중력 적용
-	ApplyGravity(elapsedTime);
-	
-	// 가속도에 따른 속도 변화
-	XMVECTOR deltaVel = XMLoadFloat3(&m_xmf3Acceleration) * elapsedTime;
-	velocity += deltaVel;
-	XMStoreFloat3(&m_xmf3Velocity, velocity);
+	//// 중력 적용
+	//ApplyGravity(elapsedTime);
+	//
+	//// 가속도에 따른 속도 변화
+	//XMVECTOR deltaVel = XMLoadFloat3(&m_xmf3Acceleration) * elapsedTime;
+	//velocity += deltaVel;
+	//XMStoreFloat3(&m_xmf3Velocity, velocity);
 
-	// 위치 변화 계산 후 적용
-	XMVECTOR resultPosition = velocity * elapsedTime + XMLoadFloat3(&m_xmf3Position);
-	XMStoreFloat3(&m_xmf3Position, resultPosition);
-		
+	//// 위치 변화 계산 후 적용
+	//XMVECTOR resultPosition = velocity * elapsedTime + XMLoadFloat3(&m_xmf3Position);
+	//XMStoreFloat3(&m_xmf3Position, resultPosition);
+	//	
 
-	// 최대 속도 제한 및 마찰력 
-	ApplyCharacterFriction(elapsedTime);
+	//// 최대 속도 제한 및 마찰력 
+	//ApplyCharacterFriction(elapsedTime);
 }

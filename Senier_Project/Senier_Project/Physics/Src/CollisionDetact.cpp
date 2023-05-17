@@ -33,7 +33,7 @@ bool OverlapOnAxis(
 
 	float distance = fabs(XMVectorGetX(XMVector3Dot(toCentre, axis)));
 
-	return (distance < project_1 + project_2);
+	return (distance <= project_1 + project_2);
 }
 
 float PenetrationOnAxis(
@@ -216,6 +216,12 @@ bool IntersectTests::BoxAndBox(const ColliderBox& box1, const ColliderBox& box2)
 	XMVECTOR Position_2 = XMLoadFloat3(&xmf3temp);
 
 	XMVECTOR toCentre = Position_2 - Position_1;
+
+	if (!OverlapOnAxis(box1, box2, XMVector3Cross(box1.GetAxis(0), box2.GetAxis(0)), toCentre))
+	{
+		float tmp = 100;
+
+	}
 
 	// SAT °úÁ¤
 	return {

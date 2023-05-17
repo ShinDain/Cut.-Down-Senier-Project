@@ -52,6 +52,10 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 		pColliderBox = std::make_shared<ColliderBox>(pBody, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), objData.xmf3Extents);
 		g_ppColliderBoxs.emplace_back(pColliderBox);
 		pCollider = std::static_pointer_cast<Collider>(pColliderBox);
+
+		//m_pBody->SetIsCharacter(true);
+		pBody->SetInGravity(true);
+		pBody->SetPhysics(true);
 	}
 	break;
 
@@ -646,18 +650,6 @@ void Object::FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>>* pp
 
 	if (m_pSibling) m_pSibling->FindAndSetSkinnedMesh(ppSkinnedMeshes);
 	if (m_pChild) m_pChild->FindAndSetSkinnedMesh(ppSkinnedMeshes);
-}
-
-void Object::ApplyGravity(float elapsedTime)
-{
-	if (m_bIsFalling)
-	{
-		m_xmf3Acceleration.y += (m_Mass * GRAVITY_SIZE) * elapsedTime;
-	}
-	else
-	{
-		m_xmf3Acceleration.y = 0;
-	}
 }
 
 void Object::IsFalling()
