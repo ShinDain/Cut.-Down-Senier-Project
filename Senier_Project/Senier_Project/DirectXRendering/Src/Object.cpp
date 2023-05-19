@@ -12,6 +12,11 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 }
 
+//Object::Object(const Object& rhs)
+//{
+//	m_Mass = rhs.m_Mass;
+//}
+
 Object::~Object()
 {
 	Destroy();
@@ -30,14 +35,13 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	std::shared_ptr<Collider> pCollider;
 	std::shared_ptr<RigidBody> pBody;
 
-	pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation,
-		objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
-
 	// 충돌체 타입에 따라 
 	switch (objData.colliderType)
 	{
 	case Collider_Plane:
 	{
+		pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation,
+			objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
 		std::shared_ptr<ColliderPlane> pColliderPlane;
 		XMFLOAT3 direction = XMFLOAT3(objData.xmf4Orientation.x, objData.xmf4Orientation.y, objData.xmf4Orientation.z);
 		pColliderPlane = std::make_shared<ColliderPlane>(pBody, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), direction, objData.xmf3Extents.x);
@@ -48,25 +52,37 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 	case Collider_Box:
 	{
+		pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation,
+			objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
 		std::shared_ptr<ColliderBox> pColliderBox;
 		pColliderBox = std::make_shared<ColliderBox>(pBody, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), objData.xmf3Extents);
 		g_ppColliderBoxs.emplace_back(pColliderBox);
 		pCollider = std::static_pointer_cast<Collider>(pColliderBox);
-
-		//m_pBody->SetIsCharacter(true);
-		pBody->SetInGravity(true);
-		pBody->SetPhysics(true);
 	}
 	break;
 
 	case Collider_Sphere:
 	{
+		pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation,
+			objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
 		std::shared_ptr<ColliderSphere> pColliderSphere;
 		pColliderSphere = std::make_shared<ColliderSphere>(pBody, XMFLOAT3(0, 0, 0), objData.xmf3Extents.x);
 		g_ppColliderSpheres.emplace_back(pColliderSphere);
 		pCollider = std::static_pointer_cast<Collider>(pColliderSphere);
 	}
 	break;
+
+	case Collider_None:
+	{
+		pBody = nullptr;
+		pCollider = nullptr;
+
+		m_xmf3Position = objData.xmf3Position;
+		m_xmf4Orientation = objData.xmf4Orientation;
+		m_xmf3Rotation = objData.xmf3Rotation;
+		m_xmf3Scale = objData.xmf3Scale;
+		m_Mass = objData.nMass;
+	}
 
 	default:
 		break;
@@ -128,9 +144,13 @@ void Object::UpdateToRigidBody(float elapsedTime)
 		m_pCollider->UpdateWorldTransform();
 		m_xmf3Position = m_pBody->GetPosition();
 		m_xmf4Orientation = m_pBody->GetOrientation();
-		m_xmf3Rotate = m_pBody->GetRotate();
+		m_xmf3Rotation = m_pBody->GetRotate();
 		m_xmf3Scale = m_pBody->GetScale();
 		m_xmf4x4World = m_pBody->GetWorld();
+	}
+	else
+	{
+		if(m_pCollider) m_pCollider->SetWorld(m_xmf4x4World);
 	}
 
 }
@@ -148,12 +168,12 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 		// RootObject인 경우
 		m_xmf4x4LocalTransform = MathHelper::identity4x4();
 		XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
-		//XMMATRIX xmmatOrientation = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
-		XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotate.x), XMConvertToRadians(m_xmf3Rotate.y), XMConvertToRadians(m_xmf3Rotate.z));
+		XMMATRIX xmmatOrientation = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
+		//XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotation.x), XMConvertToRadians(m_xmf3Rotation.y), XMConvertToRadians(m_xmf3Rotation.z));
 		XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
 		// S * R * T
-		//XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate)));
-		XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate)));
+		XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate)));
+		//XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate)));
 		m_xmf4x4World = m_xmf4x4LocalTransform;
 	}
 
@@ -221,10 +241,15 @@ void Object::BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice)
 	if (m_pChild) m_pChild->BuildTextureDescriptorHeap(pd3dDevice);
 }
 
-std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName)
+std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName, const char* pstrTexPath)
 {
 	FILE* pInFile = NULL;
-	::fopen_s(&pInFile, pstrFileName, "rb");
+
+	char pstrFilePath[64] = { '\0' };
+	strcpy_s(pstrFilePath, 64, "Model/");
+	strcat_s(pstrFilePath, pstrFileName);
+	strcat_s(pstrFilePath, ".bin");
+	::fopen_s(&pInFile, pstrFilePath, "rb");
 	::rewind(pInFile);
 
 	std::shared_ptr<ModelDataInfo> pModelData = std::make_shared<ModelDataInfo>();
@@ -239,7 +264,7 @@ std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dD
 		{
 			if (!strcmp(pstrToken, "<Hierarchy>:"))
 			{
-				pModelData->m_pRootObject = Object::LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile, &nSkinnedMeshes, NULL);
+				pModelData->m_pRootObject = Object::LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile, &nSkinnedMeshes, NULL, pstrFileName, pstrTexPath);
 				pModelData->m_nSkinnedMeshes = nSkinnedMeshes;
 
 				pModelData->m_pRootObject->BuildTextureDescriptorHeap(pd3dDevice);
@@ -267,7 +292,8 @@ std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dD
 	return pModelData;
 }
 
-std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, int* pnSkinnedMeshes, Object* pRootObject)
+std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	FILE* pInFile, int* pnSkinnedMeshes, Object* pRootObject, const char* pstrFileName, const char* pstrTexPath)
 {
 	char pstrToken[64] = { '\0' };
 	UINT nReads = 0;
@@ -295,9 +321,9 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 		else if (!strcmp(pstrToken, "<Transform>:"))
 		{ 
 			nReads = (UINT)fread(&pObject->m_xmf3Position, sizeof(float), 3, pInFile);
-			nReads = (UINT)fread(&pObject->m_xmf3Rotate.x, sizeof(float), 1, pInFile);
-			nReads = (UINT)fread(&pObject->m_xmf3Rotate.y, sizeof(float), 1, pInFile);
-			nReads = (UINT)fread(&pObject->m_xmf3Rotate.z, sizeof(float), 1, pInFile);
+			nReads = (UINT)fread(&pObject->m_xmf3Rotation.x, sizeof(float), 1, pInFile);
+			nReads = (UINT)fread(&pObject->m_xmf3Rotation.y, sizeof(float), 1, pInFile);
+			nReads = (UINT)fread(&pObject->m_xmf3Rotation.z, sizeof(float), 1, pInFile);
 			nReads = (UINT)fread(&pObject->m_xmf3Scale, sizeof(float), 3, pInFile);
 			nReads = (UINT)fread(&pObject->m_xmf4Orientation, sizeof(float), 4, pInFile);
 		}
@@ -326,9 +352,9 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 		else if (!strcmp(pstrToken, "<Materials>:"))
 		{
 			if(pRootObject)
-				pObject->LoadMaterialsFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
+				pObject->LoadMaterialsFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject, pstrFileName, pstrTexPath);
 			else
-				pObject->LoadMaterialsFromFile(pd3dDevice, pd3dCommandList, pInFile, pObject.get());
+				pObject->LoadMaterialsFromFile(pd3dDevice, pd3dCommandList, pInFile, pObject.get(), pstrFileName, pstrTexPath);
 		}
 		else if (!strcmp(pstrToken, "<Children>:"))
 		{
@@ -340,12 +366,12 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 				{
 					if (pRootObject)
 					{
-						std::shared_ptr<Object> pChild = LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile, pnSkinnedMeshes, pRootObject);
+						std::shared_ptr<Object> pChild = LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile, pnSkinnedMeshes, pRootObject, pstrFileName, pstrTexPath);
 						if (pChild) pObject->SetChild(pChild);
 					}
 					else
 					{
-						std::shared_ptr<Object> pChild = LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile, pnSkinnedMeshes, pObject.get());
+						std::shared_ptr<Object> pChild = LoadFrameHierarchyFromFile(pd3dDevice, pd3dCommandList, pInFile, pnSkinnedMeshes, pObject.get(), pstrFileName, pstrTexPath);
 						if (pChild) pObject->SetChild(pChild);
 					}
 
@@ -367,7 +393,8 @@ std::shared_ptr<Object> Object::LoadFrameHierarchyFromFile(ID3D12Device* pd3dDev
 	return pObject;
 }
 
-void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject)
+void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, 
+	FILE* pInFile, Object* pRootObject, const char* pstrFileName, const char* pstrTexPath)
 {
 	char pstrToken[64] = { '\0' };
 
@@ -455,31 +482,31 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		}
 		else if (!strcmp(pstrToken, "<AlbedoMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject, pstrFileName, pstrTexPath);
 		}
 		else if (!strcmp(pstrToken, "<SpecularMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject, pstrFileName, pstrTexPath);
 		}
 		else if (!strcmp(pstrToken, "<NormalMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject, pstrFileName, pstrTexPath);
 		}
 		else if (!strcmp(pstrToken, "<MetallicMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject, pstrFileName, pstrTexPath);
 		}
 		else if (!strcmp(pstrToken, "<EmissionMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject, pstrFileName, pstrTexPath);
 		}
 		else if (!strcmp(pstrToken, "<DetailAlbedoMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject, pstrFileName, pstrTexPath);
 		}
 		else if (!strcmp(pstrToken, "<DetailNormalMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject);
+			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject, pstrFileName, pstrTexPath);
 		}
 		else if (!strcmp(pstrToken, "</Materials>"))
 		{

@@ -16,6 +16,7 @@ bool SenierProjectApp::Initialize()
 	if (!DirectXApp::Initialize())
 		return false;
 
+
 	// 명령목록 초기화
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
@@ -30,6 +31,8 @@ bool SenierProjectApp::Initialize()
 	{
 		iter->second->Initialize(m_d3d12Device.Get(), m_CommandList.Get(), NULL);
 	}
+
+	CreateObjectDefaultData();
 
 	m_Scene = std::make_unique<Scene>();
 	if (!m_Scene->Initialize(m_d3d12Device.Get(), m_CommandList.Get()))

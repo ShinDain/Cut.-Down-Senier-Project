@@ -28,6 +28,7 @@ public:
 							std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
 
 	virtual void Update(float elapsedTime);
+	virtual void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
 
 	virtual void ProcessInput(UCHAR* pKeybuffer) {}
 	virtual void KeyDownEvent(WPARAM wParam) {}
@@ -44,7 +45,7 @@ public:
 protected:
 	float m_MaxSpeedXZ = 100.0f;
 	float m_CharacterFriction = 350.0f;
-	float m_JumpSpeed = 100;
+	float m_JumpSpeed = 5;
 
 	Ray m_floorCheckRay;
 

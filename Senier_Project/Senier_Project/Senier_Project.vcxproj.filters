@@ -122,6 +122,9 @@
     <ClCompile Include="Physics\Src\RigidBody.cpp">
       <Filter>Physics\Src</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Src\ObjectDefaultData.cpp">
+      <Filter>Game\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Physics\Header\Collider.h">
@@ -213,6 +216,9 @@
     </ClInclude>
     <ClInclude Include="Physics\Header\RigidBody.h">
       <Filter>Physics\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Header\ObjectDefaultData.h">
+      <Filter>Game\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

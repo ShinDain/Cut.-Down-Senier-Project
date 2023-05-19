@@ -11,6 +11,8 @@ std::map<const char*, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;
 
 UINT g_curShader = ShaderType::Shader_Count;
 
+std::map<const char*, ObjectDefaultData> g_DefaultObjectData;
+
 void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName)
 {
 	auto texMap = std::make_shared<Texture>();

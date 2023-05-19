@@ -4,6 +4,7 @@
 #include "../Common/Header/MathHelper.h"
 #include "Header/Scene.h"
 #include "Header/DWriteText.h"
+#include "../Game/Header/ObjectDefaultData.h"
 
 
 using Microsoft::WRL::ComPtr;

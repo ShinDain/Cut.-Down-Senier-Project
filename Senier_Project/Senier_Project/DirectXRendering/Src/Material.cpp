@@ -88,7 +88,8 @@ void Material::MaterialSet(ID3D12GraphicsCommandList* pd3dCommandList)
 
 }
 
-void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject)
+void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	FILE* pInFile, Object* pRootObject, const char* pstrFileName, const char* pstrTexPath)
 {
 	char pstrTextureName[64] = { '\0' };
 
@@ -102,6 +103,9 @@ void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	{
 		char pstrFilePath[64] = { '\0' };
 		strcpy_s(pstrFilePath, 64, "Model/Textures/");
+
+		strcat_s(pstrFilePath, pstrTexPath);
+		strcat_s(pstrFilePath, "/");
 
 		bDuplicated = (pstrTextureName[0] == '@');
 		strcat_s(pstrFilePath, (bDuplicated) ? (pstrTextureName + 1) : pstrTextureName);

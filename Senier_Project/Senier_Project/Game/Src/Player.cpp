@@ -135,7 +135,7 @@ void Player::Jump()
 {
 	if (!m_bIsFalling)
 	{
-		m_bIsFalling = true;
+		//m_bIsFalling = true;
 		//XMVECTOR deltaAccel = XMLoadFloat3(&m_xmf3Acceleration) + (XMLoadFloat3(&m_xmf3Up) * 100.0f);
 		//XMStoreFloat3(&m_xmf3Acceleration, deltaAccel);
 

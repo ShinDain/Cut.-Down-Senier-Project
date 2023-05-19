@@ -18,7 +18,8 @@ Collider::~Collider()
 
 void Collider::UpdateWorldTransform()
 {
-	m_xmf4x4World = m_pRigidBody->GetWorld();
+	if (m_pRigidBody)
+		m_xmf4x4World = m_pRigidBody->GetWorld();
 
 	XMMATRIX World = XMLoadFloat4x4(&m_xmf4x4World);
 	XMMATRIX OffsetTranslation = XMMatrixTranslation(m_xmf3OffsetPosition.x, m_xmf3OffsetPosition.y, m_xmf3OffsetPosition.z);
@@ -133,108 +134,6 @@ void ColliderPlane::CalculateRotateInertiaMatrix()
 	m_pRigidBody->SetRotateInertia(xmf4x4RotateInertia);
 }
 
-void ColliderPlane::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	std::vector<XMFLOAT3> Positions;
-	std::vector<std::uint16_t> Indices;
-
-	Positions.resize(4);
-
-	float w = 0.5;
-	float h = 0.5;
-	float d = 0.5;
-
-	if (m_xmf3Direction.x == 1)
-	{
-		Positions =
-		{
-			XMFLOAT3(0, -h, -d),
-			XMFLOAT3(0, +h, -d),
-			XMFLOAT3(0, +h, +d),
-			XMFLOAT3(0, -h, +d)
-		};
-	}
-	else if	(m_xmf3Direction.x == -1)
-	{
-		Positions =
-		{
-			XMFLOAT3(0, -h, +d),
-			XMFLOAT3(0, +h, +d),
-			XMFLOAT3(0, +h, -d),
-			XMFLOAT3(0, -h, -d)
-		};
-	}
-	else if (m_xmf3Direction.y == 1)
-	{
-		Positions =
-		{
-			XMFLOAT3(-w, 0, -d),
-			XMFLOAT3(-w, 0, +d),
-			XMFLOAT3(+w, 0, +d),
-			XMFLOAT3(+w, 0, -d)
-		};
-	}
-	else if (m_xmf3Direction.y == -1)
-	{
-		Positions =
-		{
-			XMFLOAT3(-w, 0, +d),
-			XMFLOAT3(-w, 0, -d),
-			XMFLOAT3(+w, 0, -d),
-			XMFLOAT3(+w, 0, +d)
-		};
-	}
-	else if (m_xmf3Direction.z == 1)
-	{
-		Positions =
-		{
-			XMFLOAT3(-w, -h, 0),
-			XMFLOAT3(-w, +h, 0),
-			XMFLOAT3(+w, +h, 0),
-			XMFLOAT3(+w, -h, 0)
-		};
-	}
-	else if (m_xmf3Direction.z == -1)
-	{
-		Positions =
-		{
-			XMFLOAT3(+w, -h, 0),
-			XMFLOAT3(+w, +h, 0),
-			XMFLOAT3(-w, +h, 0),
-			XMFLOAT3(-w, -h, 0)
-		};
-	}
-
-	Indices.resize(6);
-
-	Indices =
-	{
-		// ¾Õ¸é
-		0,1,2,
-		0,2,3		
-	};
-
-	const UINT positionBufferByteSize = (UINT)Positions.size() * sizeof(XMFLOAT3);
-	const UINT indexBufferByteSize = (UINT)Indices.size() * sizeof(std::uint_fast16_t);
-
-	CreateVertexBuffer(pd3dDevice, pd3dCommandList,
-		&m_PositionBufferGPU, &m_PositionBufferUploader,
-		positionBufferByteSize, sizeof(XMFLOAT3),
-		&m_PositionBufferView, Positions.data());
-
-	CreateIndexBuffer(pd3dDevice, pd3dCommandList,
-		&m_IndexBufferGPU, &m_IndexBufferUploader,
-		indexBufferByteSize, m_IndexFormat,
-		&m_IndexBufferView, Indices.data());
-
-	SubmeshGeometry subMesh;
-	subMesh.IndexCount = (UINT)Indices.size();
-	subMesh.StartIndexLocation = 0;
-	subMesh.BaseVertexLocation = 0;
-
-	m_SubmeshGeometry = subMesh;
-}
-
 // =============== Collider Box =================================
 
 ColliderBox::ColliderBox(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Extents)
@@ -254,6 +153,8 @@ ColliderBox::~ColliderBox()
 
 void ColliderBox::CalculateRotateInertiaMatrix()
 {
+	if (!m_pRigidBody) return;
+
 	XMFLOAT4X4 xmf4x4RotateInertia = MathHelper::identity4x4();
 	XMFLOAT3 xmf3ColliderExtents = m_xmf3Extents;
 	float objectMass = m_pRigidBody->GetMass();

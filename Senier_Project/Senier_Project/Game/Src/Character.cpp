@@ -23,8 +23,6 @@ bool Character::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	m_pCollider->SetOffsetPosition(XMFLOAT3(0, objData.xmf3Extents.y, 0));
 
 	m_pBody->SetIsCharacter(true);
-	m_pBody->SetInGravity(true);
-	m_pBody->SetPhysics(true);
 
 	m_Acceleration = 500.0f;
 	m_floorCheckRay.length = 3.f;
@@ -55,6 +53,39 @@ void Character::Update(float elapsedTime)
 	if (m_pChild) {
 		m_pChild->Update(elapsedTime);
 	}*/
+}
+
+void Character::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
+{
+	// Animate 후에 호출되어 Bone 행렬을 갱신
+	// 
+	if (pxmf4x4Parent)
+	{
+		XMStoreFloat4x4(&m_xmf4x4World, XMMatrixMultiply(XMLoadFloat4x4(&m_xmf4x4LocalTransform), XMLoadFloat4x4(pxmf4x4Parent)));
+	}
+	else
+	{
+		// RootObject인 경우
+		m_xmf4x4LocalTransform = MathHelper::identity4x4();
+		XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
+		//XMMATRIX xmmatOrientation = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
+		XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotation.x), XMConvertToRadians(m_xmf3Rotation.y), XMConvertToRadians(m_xmf3Rotation.z));
+		XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
+		// S * R * T
+		//XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate)));
+		XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate)));
+		m_xmf4x4World = m_xmf4x4LocalTransform;
+	}
+
+	if (m_pCollider) m_pCollider->UpdateWorldTransform();
+
+	if (m_pSibling) {
+		m_pSibling->UpdateTransform(pxmf4x4Parent);
+	}
+	if (m_pChild) {
+		m_pChild->UpdateTransform(&m_xmf4x4World);
+	}
+
 }
 
 void Character::IsFalling()

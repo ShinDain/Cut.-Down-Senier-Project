@@ -82,7 +82,7 @@ protected:
 
 public:
 	virtual void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) {};
-	void Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	// 여기 구현 아직 안됨,=====================================
 	// 여기 구현 아직 안됨,=====================================
@@ -104,7 +104,8 @@ public:
 	ColliderPlane& operator=(const ColliderPlane& rhs) = delete;
 	virtual ~ColliderPlane();
 
-	virtual void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) {};
+	virtual void Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList) {};
 
 	virtual void CalculateRotateInertiaMatrix();
 

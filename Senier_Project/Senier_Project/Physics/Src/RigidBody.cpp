@@ -11,6 +11,13 @@ RigidBody::RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 x
 	m_xmf4Orientation = xmf4Orientation;
 	m_xmf3Scale = xmf3Scale;
 	m_Mass = mass;
+
+	if (m_Mass < 1000)
+	{
+		m_bPhysics = true;
+		m_bInGravity = true;
+	}
+
 }
 
 RigidBody::~RigidBody()

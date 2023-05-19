@@ -10,22 +10,19 @@
 
 #define GRAVITY_SIZE -9.81f
 
-//#define CHARACTER_MODEL_PATH "Model/BoxUnityChan.bin"
-#define CHARACTER_MODEL_PATH "Model/Vampire_A_Lusth.bin"
-#define CHARACTER_MODEL_EXTENTS XMFLOAT3(0.3f, 0.8f, 0.2f)
-#define ZOMBIE_MODEL_PATH "Model/Zombie1.bin"
-#define ZOMBIE_MODEL_EXTENTS XMFLOAT3(0.3f, 0.8f, 0.2f)
-#define WEAPON_MODEL_PATH "Model/Katana.bin"
-#define WEAPON_MODEL_EXTENTS XMFLOAT3(0.2f, 2.7f, 0.2f)
-#define CUBE_MODEL_PATH "Model/Cube.bin"
-#define CUBE_MODEL_EXTENTS XMFLOAT3(0.5f, 0.5f, 0.5f)
-
+#define CHARACTER_MODEL_NAME "Vampire_A_Lusth"
+#define ZOMBIE_MODEL_NAME "Zombie1"
+#define WEAPON_MODEL_NAME "Katana"
+#define CUBE_MODEL_NAME "Cube"
+#define GROUND_MODEL_NAME "Epoxy_Ground"
+#define CARPET_MODEL_NAME "Carpet_5"
 
 class Shader;
 class ColliderPlane;
 class ColliderBox;
 class ColliderSphere;
 class ModelDataInfo;
+class Object;
 
 extern std::vector<std::shared_ptr<ColliderPlane>> g_ppColliderPlanes;
 extern std::vector<std::shared_ptr<ColliderBox>> g_ppColliderBoxs;
@@ -37,6 +34,8 @@ extern std::vector<std::shared_ptr<Texture>> g_CachingTexture;
 extern std::map<ShaderType, std::shared_ptr<Shader>> g_Shaders;
 
 extern UINT g_curShader;
+
+extern std::map<const char*, ObjectDefaultData> g_DefaultObjectData;
 
 void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName);
 std::shared_ptr<Texture> FindReplicatedTexture(const wchar_t* pstrTextureName);

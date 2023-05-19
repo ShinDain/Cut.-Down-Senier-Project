@@ -8,6 +8,7 @@
 #include "Global.h"
 #include "Shader.h"
 #include "Object.h"
+#include "../../Game/Header/ObjectDefaultData.h"
 #include "../../Game/Header/Character.h"
 #include "../../Game/Header/Weapon.h"
 #include "../../Game/Header/Player.h"
@@ -35,7 +36,8 @@ public:
 	void KeyDownEvent(WPARAM wParam);
 
 	std::shared_ptr<Object> CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
-										const ObjectInitData& objInitData, const char* pstrFilePath,int nAnimationTracks, RenderLayer renderLayer);
+		XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotation, const char* pstrFileName, int nAnimationTracks);
+
 
 	void GenerateContact();
 	void ProcessPhysics(float elapsedTime);

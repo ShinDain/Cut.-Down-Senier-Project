@@ -1,0 +1,32 @@
+<Hierarchy>:
+	<Frame>: 0 3 Carpet_13
+		<Transform>: 0 0 0 0 0 0 1 1 1 0 0 0 1  
+		<TransformMatrix>: 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1  
+		<Mesh>: 105 Rugs13
+			<Bounds>: 5.960464E-08 0.01731466 0 0.6029021 0.01735371 0.991716
+			<Positions>: 0  
+			<Colors>: 0  
+			<TextureCoords0>: 0  
+			<TextureCoords1>: 0  
+			<Normals>: 0  
+			<SubMeshes>: 1
+				<SubMesh>: 0 0  
+		</Mesh>
+		<Materials>: 1
+			<Material>: 0
+				<AlbedoColor>: 1 1 1 1
+				<EmissiveColor>: 1 1 1 1
+				<Glossiness>: 0.5
+				<Metallic>: 0
+				<SpecularHighlight>: 1
+				<GlossyReflection>: 1
+				<AlbedoMap>: Carpet_2_Diffuse
+				<MetallicMap>: Carpet_2_Maskmap
+				<NormalMap>: Carpet_2_Normal
+				<EmissionMap>: null
+				<DetailAlbedoMap>: null
+				<DetailNormalMap>: null
+		</Materials>
+		<Children>: 0
+	</Frame>
+</Hierarchy>

@@ -48,11 +48,9 @@ enum ColliderType : UINT
 enum ObjectType : UINT
 {
 	Object_World,
-	Object_Platform,
 	Object_Player,
 	Object_Monster,
 	Object_Weapon,
-	Object_Physics,
 	Object_UI,
 	Object_None
 };
@@ -81,6 +79,17 @@ struct BoneBindPoseOffsetConstant
 struct SkinningBoneTransformConstant
 {
 	DirectX::XMFLOAT4X4 BoneTransform[SKINNED_ANIMATION_BONES];
+};
+
+struct ObjectDefaultData
+{
+	const char* pstrTexPath;
+	XMFLOAT3 xmf3Extents;
+	ObjectType objectType;
+	ColliderType colliderType;
+	int nMass;
+	XMFLOAT3 xmf3OffsetScale;
+	RenderLayer renderLayer;
 };
 
 // 오브젝트 초기화 데이터 구조체

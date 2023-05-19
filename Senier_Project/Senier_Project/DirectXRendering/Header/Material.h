@@ -22,7 +22,7 @@ public:
 
 	virtual void MaterialSet(ID3D12GraphicsCommandList* pd3dCommandList);
 	
-	void LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject);
+	void LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject, const char* pstrFileName, const char* pstrTexPath);
 
 	std::vector<std::wstring> m_strTextureName;
 	std::vector<std::shared_ptr<Texture>> m_vpTextures;

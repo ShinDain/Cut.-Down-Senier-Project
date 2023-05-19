@@ -30,7 +30,7 @@ public:
 		   ObjectInitData objData,
 		   std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
 
-	Object(const Object& rhs) = delete;
+	//Object(const Object& rhs);
 	Object& operator=(const Object& rhs) = delete;
 	virtual ~Object();
 
@@ -49,11 +49,11 @@ public:
 	virtual void UpdateTransform(XMFLOAT4X4 *pxmf4x4Parent = NULL);
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 
-	static std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, const char* pstrFileName);
+	static std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, const char* pstrFileName, const char* pstrTexPath);
 	static std::shared_ptr<Object> LoadFrameHierarchyFromFile
-	(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, int* pnSkinnedMeshes, Object* pRootObject);
+	(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, int* pnSkinnedMeshes, Object* pRootObject, const char* pstrFileName, const char* pstrTexPath);
 	static void LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData);
-	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject);
+	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject, const char* pstrFileName, const char* pstrTexPath);
 
 	virtual void Destroy();
 
@@ -100,7 +100,7 @@ protected:
 
 	XMFLOAT3 m_xmf3Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	XMFLOAT4 m_xmf4Orientation = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	XMFLOAT3 m_xmf3Rotate = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 m_xmf3Rotation = XMFLOAT3(0, 0, 0);
 
 	// 물리 연산 관련
 	std::shared_ptr<RigidBody> m_pBody = nullptr;
@@ -133,9 +133,9 @@ public:
 	}
 	void AddRotate(float x, float y, float z)
 	{
-		m_xmf3Rotate.x += x;
-		m_xmf3Rotate.y += y;
-		m_xmf3Rotate.z += z;
+		m_xmf3Rotation.x += x;
+		m_xmf3Rotation.y += y;
+		m_xmf3Rotation.z += z;
 	}
 	void AddRotate(XMFLOAT3 addRotate)
 	{
@@ -169,9 +169,9 @@ public:
 	void SetScale(const XMFLOAT3& Scale) { SetScale(Scale.x, Scale.y, Scale.z); }
 	void SetRotate(float fPitch, float fYaw, float fRoll)
 	{
-		m_xmf3Rotate.x = fPitch;
-		m_xmf3Rotate.y = fYaw;
-		m_xmf3Rotate.z = fRoll;
+		m_xmf3Rotation.x = fPitch;
+		m_xmf3Rotation.y = fYaw;
+		m_xmf3Rotation.z = fRoll;
 	}
 	void SetRotate(const XMFLOAT3& Rotate);
 	void SetOrientation(const XMFLOAT4& Orientation) { m_xmf4Orientation = Orientation;
@@ -192,9 +192,9 @@ public:
 	const XMFLOAT3& GetLookVector() { return(m_xmf3Look); }
 	const XMFLOAT3& GetUpVector() { return(m_xmf3Up); }
 	const XMFLOAT3& GetRightVector() { return(m_xmf3Right); }
-	const float& GetYaw() { return(m_xmf3Rotate.y); }
-	const float& GetPitch() { return(m_xmf3Rotate.x); }
-	const float& GetRoll() { return(m_xmf3Rotate.z); }
+	const float& GetYaw() { return(m_xmf3Rotation.y); }
+	const float& GetPitch() { return(m_xmf3Rotation.x); }
+	const float& GetRoll() { return(m_xmf3Rotation.z); }
 	const XMFLOAT4& GetOrientation() { return m_xmf4Orientation; }
 
 	std::shared_ptr<RigidBody> GetBody() { return m_pBody; }

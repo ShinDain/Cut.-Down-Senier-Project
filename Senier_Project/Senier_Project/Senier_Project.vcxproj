@@ -37,6 +37,7 @@
     <ClCompile Include="DirectXRendering\Src\Shader.cpp" />
     <ClCompile Include="Game\Src\Character.cpp" />
     <ClCompile Include="Game\Src\Monster.cpp" />
+    <ClCompile Include="Game\Src\ObjectDefaultData.cpp" />
     <ClCompile Include="Game\Src\Player.cpp" />
     <ClCompile Include="Game\Src\Weapon.cpp" />
     <ClCompile Include="main.cpp" />
@@ -70,6 +71,7 @@
     <ClInclude Include="DirectXRendering\SenierProjectApp.h" />
     <ClInclude Include="Game\Header\Character.h" />
     <ClInclude Include="Game\Header\Monster.h" />
+    <ClInclude Include="Game\Header\ObjectDefaultData.h" />
     <ClInclude Include="Game\Header\Player.h" />
     <ClInclude Include="Game\Header\Weapon.h" />
     <ClInclude Include="Physics\Header\CollisionDetact.h" />

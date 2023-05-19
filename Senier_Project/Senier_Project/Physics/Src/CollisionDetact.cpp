@@ -69,7 +69,7 @@ bool tryAxis(
 	float penetration = PenetrationOnAxis(box1, box2, axisDir, toCentre);
 
 	if (penetration < 0) return false;
-	if (penetration < smallestPenetration)
+	if (penetration <= smallestPenetration)
 	{
 		smallestPenetration = penetration;
 		smallestCase = index;
