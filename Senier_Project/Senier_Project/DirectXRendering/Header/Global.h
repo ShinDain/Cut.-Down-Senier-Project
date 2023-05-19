@@ -36,6 +36,7 @@ extern std::map<ShaderType, std::shared_ptr<Shader>> g_Shaders;
 extern UINT g_curShader;
 
 extern std::map<const char*, ObjectDefaultData> g_DefaultObjectData;
+extern std::vector<const char*> g_DefaultObjectNames;
 
 void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName);
 std::shared_ptr<Texture> FindReplicatedTexture(const wchar_t* pstrTextureName);

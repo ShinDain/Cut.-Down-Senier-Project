@@ -20,11 +20,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// 패스 버퍼 생성
 	m_pPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
 
-	// 맵 데이터 로드
-	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
-
 	// 캐릭터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,0,-50), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0),CHARACTER_MODEL_NAME, 3);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,0,0), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), CHARACTER_MODEL_NAME, 3);
 	//m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(1, 13);
 	m_vpAllObjs[0]->m_pAnimationController->SetTrackEnable(0, true);
 	m_vpAllObjs[0]->m_pAnimationController->SetTrackEnable(1, true);
@@ -33,14 +30,26 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(1, 1);
 	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
 
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), ZOMBIE_MODEL_NAME, 1);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), ZOMBIE_MODEL_NAME, 1);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), ZOMBIE_MODEL_NAME, 1);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, 1);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0),XMFLOAT3(1,1,1), ZOMBIE_MODEL_NAME, 1);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, 1);
 
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0.2, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90), WEAPON_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0.2, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90),XMFLOAT3(1,1,1), WEAPON_MODEL_NAME, 0);
 
-	// 임시 바닥
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), GROUND_MODEL_NAME, 0);
+	// 바닥
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, -200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1,1,1), GROUND_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, -200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-200, 0, -200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-200, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-200, 0, 200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
+
+	// 맵 데이터 로드
+	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
+
 
 	// 카메라 초기화
 	m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
@@ -73,7 +82,7 @@ void Scene::Update(float elapsedTime)
 #endif
 
 	// 교차 검사
-	Intersect();
+	//Intersect();
 
 	GenerateContact();
 	ProcessPhysics(elapsedTime);
@@ -162,19 +171,12 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 			m_pCamera->RotateY(dx);
 		}
 	}
-
-	/*for (int i = 0; i < m_vpAllObjs.size(); ++i)
-	{
-		m_vpAllObjs[i]->ProcessInput(pKeybuffer);
-	}*/
 	
-
 	// 임시
 	if (m_vpAllObjs[0])
 	{
 		m_vpAllObjs[0]->ProcessInput(pKeybuffer);
 		m_vpAllObjs[0]->SetRotate(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
-		
 	}
 	
 #if defined(_DEBUG)
@@ -195,6 +197,7 @@ void Scene::LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	FILE* pInFile = NULL;
 
 	char pstrFilePath[64] = { '\0' };
+	strcpy_s(pstrFilePath, 64, "Map/");
 	strcat_s(pstrFilePath, pstrFileName);
 	strcat_s(pstrFilePath, ".bin");
 	::fopen_s(&pInFile, pstrFilePath, "rb");
@@ -202,49 +205,87 @@ void Scene::LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 	char pstrToken[64] = { '\0' };
 
+	const char* pstrObjectName = "\0";
+	XMFLOAT3 xmf3Position;
+	XMFLOAT3 xmf3Rotation;
+	XMFLOAT3 xmf3Scale;
+	XMFLOAT4 xmf4Orientation;
+
+	UINT nReads = 0;
 	for (; ; )
 	{
-		if (ReadStringFromFile(pInFile, pstrToken))
+		ReadStringFromFile(pInFile, pstrToken);
+
+		if(!strcmp(pstrToken, "<Hierarchy>:"))
 		{
-			UINT nReads = 0;
-			for (; ; )
+		} 
+		else if (!strcmp(pstrToken, "<Frame>:"))
+		{
+			char tmpstr[64] = { '\0' };
+			nReads = ReadStringFromFile(pInFile, tmpstr);
+
+			if (tmpstr[nReads - 1] == ')')
 			{
-				ReadStringFromFile(pInFile, pstrToken);
-
-				if (!strcmp(pstrToken, "<Frame>:"))
+				for (int i = 1; i < 10; ++i)
 				{
-					char tmpstr[64] = { '\0' };
-					ReadStringFromFile(pInFile, tmpstr);
-
-					//SetName(tmpstr);
-				}
-				else if (!strcmp(pstrToken, "<Transform>:"))
-				{
-					/*nReads = (UINT)fread(m_xmf3Position, sizeof(float), 3, pInFile);
-					nReads = (UINT)fread(m_xmf3Rotation.x, sizeof(float), 1, pInFile);
-					nReads = (UINT)fread(m_xmf3Rotation.y, sizeof(float), 1, pInFile);
-					nReads = (UINT)fread(m_xmf3Rotation.z, sizeof(float), 1, pInFile);
-					nReads = (UINT)fread(m_xmf3Scale, sizeof(float), 3, pInFile);
-					nReads = (UINT)fread(m_xmf4Orientation, sizeof(float), 4, pInFile);*/
-				}
-				else if (!strcmp(pstrToken, "</Frame>"))
-				{
-					break;
+					if (tmpstr[nReads - i] == '(')
+					{
+						tmpstr[nReads - i] = '\0';
+						tmpstr[nReads - i - 1] = '\0';
+						break;
+					}
+					else
+						tmpstr[nReads - i] = '\0';
 				}
 			}
+
+			pstrObjectName = tmpstr;
+
+			for (int i = 0; i < g_DefaultObjectNames.size(); ++i)
+			{
+				if (!strcmp(pstrObjectName, g_DefaultObjectNames[i]))
+					pstrObjectName = g_DefaultObjectNames[i];
+			}
+		}
+		else if (!strcmp(pstrToken, "<Transform>:"))
+		{
+			nReads = (UINT)fread(&xmf3Position, sizeof(float), 3, pInFile);
+			xmf3Position.x *= 10;
+			xmf3Position.y *= 10;
+			xmf3Position.z *= 10;
+
+			nReads = (UINT)fread(&xmf3Rotation, sizeof(float), 3, pInFile);
+			nReads = (UINT)fread(&xmf3Scale, sizeof(float), 3, pInFile);
+			nReads = (UINT)fread(&xmf4Orientation, sizeof(float), 4, pInFile);
+		}
+		else if (!strcmp(pstrToken, "</Frame>"))
+		{
+			CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, xmf3Scale, pstrObjectName, 0);
+		}
+		else if (!strcmp(pstrToken, "</Hierarchy>"))
+		{
+			break;
+		}
+		else
+		{
+			continue;
 		}
 	}
+
 }
 
 
 std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
-	XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotation, const char* pstrFileName, int nAnimationTracks)
+	XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotation, XMFLOAT3 xmf3Scale, const char* pstrFileName, int nAnimationTracks)
 {
 	ObjectInitData objectData;
 	objectData.xmf3Position = xmf3Position;
 	objectData.xmf3Rotation = xmf3Rotation;
 	objectData.xmf4Orientation = xmf4Orientation;
 	objectData.xmf3Scale = g_DefaultObjectData[pstrFileName].xmf3OffsetScale;
+	objectData.xmf3Scale.x *= xmf3Scale.x;
+	objectData.xmf3Scale.y *= xmf3Scale.y;
+	objectData.xmf3Scale.z *= xmf3Scale.z;
 	objectData.nMass = g_DefaultObjectData[pstrFileName].nMass;
 	objectData.objectType = g_DefaultObjectData[pstrFileName].objectType;
 	objectData.colliderType = g_DefaultObjectData[pstrFileName].colliderType;

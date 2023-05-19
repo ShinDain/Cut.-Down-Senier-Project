@@ -1,0 +1,58 @@
+<Hierarchy>:			<Frame>: Shelf_with_Crates
+				<Transform>: -5.27 0 -6.41 0 90 0 1 1 1 0 0.7071068 0 0.7071068  
+			</Frame>
+			<Frame>: Shelf_Without_Crates
+				<Transform>: 6.71 0 -6.03 0 90 0 1 1 1 0 0.7071068 0 0.7071068  
+			</Frame>
+			<Frame>: Shelf_Without_Crates (1)
+				<Transform>: 6.71 0 -2.97 0 90 0 1 1 1 0 0.7071068 0 0.7071068  
+			</Frame>
+			<Frame>: Shelf_with_Crates (1)
+				<Transform>: -5.92 0 -2.89 0 90 0 1 1 1 0 0.7071068 0 0.7071068  
+			</Frame>
+			<Frame>: Shelf_Without_Crates (2)
+				<Transform>: 6.71 0 0.1299996 0 90 0 1 1 1 0 0.7071068 0 0.7071068  
+			</Frame>
+			<Frame>: Shelf_with_Crates (2)
+				<Transform>: -5.92 0 0.2099996 0 90 0 1 1 1 0 0.7071068 0 0.7071068  
+			</Frame>
+			<Frame>: Shelf_Without_Crates (3)
+				<Transform>: 6.71 0 3.69 0 90 0 1 1 1 0 0.7071068 0 0.7071068  
+			</Frame>
+			<Frame>: Shelf_with_Crates (3)
+				<Transform>: -5.92 0 3.77 0 90 0 1 1 1 0 0.7071068 0 0.7071068  
+			</Frame>
+			<Frame>: Shelf_Without_Crates (4)
+				<Transform>: 6.71 0 7.51 0 90 0 1 1 1 0 0.7071068 0 0.7071068  
+			</Frame>
+			<Frame>: Shelf_with_Crates (4)
+				<Transform>: -5.92 0 7.59 0 90 0 1 1 1 0 0.7071068 0 0.7071068  
+			</Frame>
+			<Frame>: Wall_2
+				<Transform>: 29.5 0 -30 0 90 0 15 4 1 0 0.7071068 0 0.7071068  
+			</Frame>
+			<Frame>: Wall_Pillar_3 (3)
+				<Transform>: -29.66348 0 -29.91 0 270 0 1 4 1 0 -0.7071068 0 0.7071068  
+			</Frame>
+			<Frame>: Wall_Pillar_3 (2)
+				<Transform>: 29.7 0 -29.92 0 180 0 1 4 1 0 1 0 0  
+			</Frame>
+			<Frame>: Wall_Pillar_3 (1)
+				<Transform>: 29.68 0 29.84944 0 90 0 1 4 1 0 0.7071068 0 0.7071068  
+			</Frame>
+			<Frame>: Wall_Pillar_3
+				<Transform>: -29.73493 0 29.80404 0 0 0 1 4 1 0 0 0 1  
+			</Frame>
+			<Frame>: Wall_2 (1)
+				<Transform>: -29.5 0 29.5 0 270 0 14.8 4 1 0 -0.7071068 0 0.7071068  
+			</Frame>
+			<Frame>: Wall_2 (2)
+				<Transform>: 29.7 0 29.69 0 0 0 14.8 4 1 0 0 0 1  
+			</Frame>
+			<Frame>: Wall_2 (3)
+				<Transform>: -29.6 0 -29.76 0 180 0 14.8 4 1 0 1 0 0  
+			</Frame>
+			<Frame>: Wall_2 (4)
+				<Transform>: 29.5 15.98 -30 270 90 0 15 14.9 1 -0.5 0.5 0.5 0.5  
+			</Frame>
+</Hierarchy>
