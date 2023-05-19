@@ -23,12 +23,12 @@ void Contact::CalcInternals(float elapsedTime)
 
 	// 충돌점의 상대 좌표 계산, RelativePoint는 World 좌표계
 	XMVECTOR contactPoint = XMLoadFloat3(&m_xmf3ContactPoint);
-	XMVECTOR bodyPos_0 = XMLoadFloat3(&m_pBody[0]->GetPosition());
+	XMVECTOR bodyPos_0 = XMLoadFloat3(&m_pBody[0]->GetColliderPosition());
 	XMStoreFloat3(&m_pxmf3RelativePosition[0], contactPoint - bodyPos_0);
 
 	if (m_pBody[1])
 	{
-		XMVECTOR bodyPos_1 = XMLoadFloat3(&m_pBody[1]->GetPosition());
+		XMVECTOR bodyPos_1 = XMLoadFloat3(&m_pBody[1]->GetColliderPosition());
 		XMStoreFloat3(&m_pxmf3RelativePosition[1], contactPoint - bodyPos_1);
 	}
 

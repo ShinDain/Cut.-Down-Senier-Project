@@ -17,18 +17,23 @@ class RigidBody
 {
 public:
 	RigidBody();
-	RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotate,  XMFLOAT3 xmf3Scale, float mass);
+	RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotate,  XMFLOAT3 xmf3Scale, float mass,
+		XMFLOAT3 xmf3ColliderOffsetPosition, XMFLOAT3 xmf3ColliderOffsetRotation);
 	RigidBody(const RigidBody& rhs) = delete;
 	RigidBody& operator=(const RigidBody& rhs) = delete;
 	virtual ~RigidBody();
 
 protected:
 	XMFLOAT3 m_xmf3Position = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 m_xmf3ColliderPosition = XMFLOAT3(0, 0, 0);
 	XMFLOAT4 m_xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
 	XMFLOAT3 m_xmf3Rotate = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 m_xmf3Scale = XMFLOAT3(1,1,1);
 	//XMFLOAT3 m_xmf3Scale = XMFLOAT3(0, 0, 0);
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
+
+	XMFLOAT3 m_xmf3ColliderOffsetPosition = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 m_xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
 
 	float m_Mass = 1.0f;
 
@@ -122,6 +127,7 @@ public:
 	// Get =============================================================
 
 	const XMFLOAT3& GetPosition() { return m_xmf3Position; }
+	const XMFLOAT3& GetColliderPosition() { return m_xmf3ColliderPosition; }
 	const XMFLOAT4& GetOrientation() { return m_xmf4Orientation; }
 	const XMFLOAT3& GetRotate() { return m_xmf3Rotate; }
 	const XMFLOAT3& GetScale() { return m_xmf3Scale; }

@@ -20,8 +20,6 @@ bool Character::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 {
 	Object::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 
-	m_pCollider->SetOffsetPosition(XMFLOAT3(0, objData.xmf3Extents.y, 0));
-
 	m_pBody->SetIsCharacter(true);
 
 	m_Acceleration = 500.0f;

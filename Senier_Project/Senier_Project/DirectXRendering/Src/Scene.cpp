@@ -20,6 +20,9 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// 패스 버퍼 생성
 	m_pPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
 
+	// 맵 데이터 로드
+	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
+
 	// 캐릭터 테스트
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,0,-50), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0),CHARACTER_MODEL_NAME, 3);
 	//m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(1, 13);
@@ -30,34 +33,14 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(1, 1);
 	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
 
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), ZOMBIE_MODEL_NAME, 1);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), ZOMBIE_MODEL_NAME, 1);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), ZOMBIE_MODEL_NAME, 1);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), ZOMBIE_MODEL_NAME, 1);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), ZOMBIE_MODEL_NAME, 1);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), ZOMBIE_MODEL_NAME, 1);
 
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0.2, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90), WEAPON_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0.2, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90), WEAPON_MODEL_NAME, 0);
 
 	// 임시 바닥
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), GROUND_MODEL_NAME, 0);
-
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), CUBE_MODEL_NAME, 0);
-
-
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), DRAWER_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), MECHANICAL_ARM_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-30, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), OFFICE_CHAIR_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), DOOR_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-10, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), SERVER_RACK_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), SHELF_CRATE_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), SHELF_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), STOOL_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(30, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), TABLE_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(40, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), TABLE_GLASS_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(50, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), TABLE_SET_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(60, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), VASE_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(70, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), WALL_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(80, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), WALL_WITH_WINDOWS_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(90, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), WALL_PILLAR_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), WALL_PILLAR_3_MODEL_NAME, 0);
 
 	// 카메라 초기화
 	m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
@@ -66,7 +49,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 #if defined(_DEBUG)
 	//m_pCamera = std::make_unique<Camera>();
 	//m_pCamera->SetPosition(0, 30, -100);
-//	m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
+	//m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
 
 #endif
 
@@ -207,6 +190,53 @@ void Scene::KeyDownEvent(WPARAM wParam)
 	}
 }
 
+void Scene::LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName)
+{
+	FILE* pInFile = NULL;
+
+	char pstrFilePath[64] = { '\0' };
+	strcat_s(pstrFilePath, pstrFileName);
+	strcat_s(pstrFilePath, ".bin");
+	::fopen_s(&pInFile, pstrFilePath, "rb");
+	::rewind(pInFile);
+
+	char pstrToken[64] = { '\0' };
+
+	for (; ; )
+	{
+		if (ReadStringFromFile(pInFile, pstrToken))
+		{
+			UINT nReads = 0;
+			for (; ; )
+			{
+				ReadStringFromFile(pInFile, pstrToken);
+
+				if (!strcmp(pstrToken, "<Frame>:"))
+				{
+					char tmpstr[64] = { '\0' };
+					ReadStringFromFile(pInFile, tmpstr);
+
+					//SetName(tmpstr);
+				}
+				else if (!strcmp(pstrToken, "<Transform>:"))
+				{
+					/*nReads = (UINT)fread(m_xmf3Position, sizeof(float), 3, pInFile);
+					nReads = (UINT)fread(m_xmf3Rotation.x, sizeof(float), 1, pInFile);
+					nReads = (UINT)fread(m_xmf3Rotation.y, sizeof(float), 1, pInFile);
+					nReads = (UINT)fread(m_xmf3Rotation.z, sizeof(float), 1, pInFile);
+					nReads = (UINT)fread(m_xmf3Scale, sizeof(float), 3, pInFile);
+					nReads = (UINT)fread(m_xmf4Orientation, sizeof(float), 4, pInFile);*/
+				}
+				else if (!strcmp(pstrToken, "</Frame>"))
+				{
+					break;
+				}
+			}
+		}
+	}
+}
+
+
 std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 	XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotation, const char* pstrFileName, int nAnimationTracks)
 {
@@ -219,6 +249,8 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	objectData.objectType = g_DefaultObjectData[pstrFileName].objectType;
 	objectData.colliderType = g_DefaultObjectData[pstrFileName].colliderType;
 	objectData.xmf3Extents = g_DefaultObjectData[pstrFileName].xmf3Extents;
+	objectData.xmf3ColliderOffsetPosition = g_DefaultObjectData[pstrFileName].xmf3ColliderOffsetPosition;
+	objectData.xmf3ColliderOffsetRotation = g_DefaultObjectData[pstrFileName].xmf3ColliderOffsetRotation;
 	
 	std::shared_ptr<ModelDataInfo> pModelData;
 	std::shared_ptr<Object> pObject;

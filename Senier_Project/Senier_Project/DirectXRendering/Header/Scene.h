@@ -35,9 +35,10 @@ public:
 	void ProcessInput(UCHAR* pKeybuffer);
 	void KeyDownEvent(WPARAM wParam);
 
+	void LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName);
+
 	std::shared_ptr<Object> CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 		XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotation, const char* pstrFileName, int nAnimationTracks);
-
 
 	void GenerateContact();
 	void ProcessPhysics(float elapsedTime);

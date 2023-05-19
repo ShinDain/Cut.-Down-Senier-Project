@@ -32,6 +32,7 @@ bool SenierProjectApp::Initialize()
 		iter->second->Initialize(m_d3d12Device.Get(), m_CommandList.Get(), NULL);
 	}
 
+	// 오브젝트 기본 정보 생성
 	CreateObjectDefaultData();
 
 	m_Scene = std::make_unique<Scene>();

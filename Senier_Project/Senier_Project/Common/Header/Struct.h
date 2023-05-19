@@ -90,6 +90,8 @@ struct ObjectDefaultData
 	int nMass;
 	XMFLOAT3 xmf3OffsetScale;
 	RenderLayer renderLayer;
+	XMFLOAT3 xmf3ColliderOffsetPosition;
+	XMFLOAT3 xmf3ColliderOffsetRotation;
 };
 
 // 오브젝트 초기화 데이터 구조체
@@ -103,6 +105,8 @@ struct ObjectInitData
 	unsigned int nMass = 1;
 	ColliderType colliderType = Collider_None;
 	XMFLOAT3 xmf3Extents = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 xmf3ColliderOffsetPosition = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
 };
 
 // 메시의 하위 범위 인덱스를 정의

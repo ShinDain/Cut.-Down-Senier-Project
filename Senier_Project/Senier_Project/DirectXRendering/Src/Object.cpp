@@ -41,10 +41,10 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	case Collider_Plane:
 	{
 		pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation,
-			objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
+			objData.xmf3Rotation, objData.xmf3Scale, objData.nMass, objData.xmf3ColliderOffsetPosition, objData.xmf3ColliderOffsetRotation);
 		std::shared_ptr<ColliderPlane> pColliderPlane;
 		XMFLOAT3 direction = XMFLOAT3(objData.xmf4Orientation.x, objData.xmf4Orientation.y, objData.xmf4Orientation.z);
-		pColliderPlane = std::make_shared<ColliderPlane>(pBody, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), direction, objData.xmf3Extents.x);
+		pColliderPlane = std::make_shared<ColliderPlane>(pBody, objData.xmf3ColliderOffsetPosition, objData.xmf3ColliderOffsetRotation, direction, objData.xmf3Extents.x);
 		g_ppColliderPlanes.emplace_back(pColliderPlane);
 		pCollider = std::static_pointer_cast<Collider>(pColliderPlane);
 	}
@@ -53,9 +53,9 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	case Collider_Box:
 	{
 		pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation,
-			objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
+			objData.xmf3Rotation, objData.xmf3Scale, objData.nMass, objData.xmf3ColliderOffsetPosition, objData.xmf3ColliderOffsetRotation);
 		std::shared_ptr<ColliderBox> pColliderBox;
-		pColliderBox = std::make_shared<ColliderBox>(pBody, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), objData.xmf3Extents);
+		pColliderBox = std::make_shared<ColliderBox>(pBody, objData.xmf3ColliderOffsetPosition, objData.xmf3ColliderOffsetRotation, objData.xmf3Extents);
 		g_ppColliderBoxs.emplace_back(pColliderBox);
 		pCollider = std::static_pointer_cast<Collider>(pColliderBox);
 	}
@@ -64,9 +64,9 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	case Collider_Sphere:
 	{
 		pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation,
-			objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
+			objData.xmf3Rotation, objData.xmf3Scale, objData.nMass, objData.xmf3ColliderOffsetPosition, objData.xmf3ColliderOffsetRotation);
 		std::shared_ptr<ColliderSphere> pColliderSphere;
-		pColliderSphere = std::make_shared<ColliderSphere>(pBody, XMFLOAT3(0, 0, 0), objData.xmf3Extents.x);
+		pColliderSphere = std::make_shared<ColliderSphere>(pBody, objData.xmf3ColliderOffsetPosition, objData.xmf3Extents.x);
 		g_ppColliderSpheres.emplace_back(pColliderSphere);
 		pCollider = std::static_pointer_cast<Collider>(pColliderSphere);
 	}
