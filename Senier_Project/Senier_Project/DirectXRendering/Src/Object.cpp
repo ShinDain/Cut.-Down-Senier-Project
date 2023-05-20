@@ -119,7 +119,10 @@ void Object::Update(float elapsedTime)
 	UpdateToRigidBody(elapsedTime);
 
 	ObjConstant objConstant;
-	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+	XMMATRIX world = XMLoadFloat4x4(&m_xmf4x4World);
+	XMMATRIX inverseTransWorld = XMMatrixInverse(nullptr, XMMatrixTranspose(world));
+	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(world));
+	XMStoreFloat4x4(&objConstant.InverseTransWorld, XMMatrixTranspose(inverseTransWorld));
 	if(m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
 
 	if (m_pSibling) {
@@ -203,6 +206,9 @@ void Object::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandLis
 		XMFLOAT4X4 xmf4x4World;
 		XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
 		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
+		XMFLOAT4X4 xmf4x4InverseTransWorld;
+		XMStoreFloat4x4(&xmf4x4InverseTransWorld, XMMatrixTranspose(XMMatrixTranspose(XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_xmf4x4World)))));
+		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4InverseTransWorld, 16);
 
 		for (int i = 0; i < m_vpMaterials.size(); ++i)
 		{

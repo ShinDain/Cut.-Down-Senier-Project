@@ -8,6 +8,8 @@
 #include "Global.h"
 #include "Shader.h"
 #include "Object.h"
+#include "../../Common/Header/GameTimer.h"
+
 #include "../../Game/Header/ObjectDefaultData.h"
 #include "../../Game/Header/Character.h"
 #include "../../Game/Header/Weapon.h"
@@ -29,8 +31,10 @@ public:
 
 	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void OnResize(float aspectRatio);
-	virtual void Update(float elapsedTime);
+	virtual void Update(float totalTime, float elapsedTime);
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
+
+	void UpdatePassCB(float totalTime, float elapsedTime);
 
 	void ProcessInput(UCHAR* pKeybuffer);
 	void KeyDownEvent(WPARAM wParam);
@@ -67,6 +71,14 @@ private:
 	static CollisionData m_CollisionData;
 
 	POINT m_LastMousePos = { 0,0 };
+
+	XMFLOAT3 m_BaseLightDirections[3] = {
+	XMFLOAT3(0.57735f, -0.57735f, 0.57735f),
+	XMFLOAT3(-0.57735f, -0.57735f, 0.57735f),
+	XMFLOAT3(0.0f, -0.707f, -0.707f)
+	};
+
+	float m_LightRotationAngle = 0;
 public:
 	void SetViewProjMatrix(XMFLOAT4X4 viewProj) { m_xmf4x4ViewProj = viewProj; }
 

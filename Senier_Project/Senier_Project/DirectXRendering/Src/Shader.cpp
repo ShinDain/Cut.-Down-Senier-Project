@@ -33,7 +33,8 @@ bool Shader::BuildShadersAndInputLayout()
 
 	m_vInputLayout = {
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
+		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 2, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
 	};
 
 	return true;
@@ -46,7 +47,7 @@ bool Shader::BuildRootSignature(ID3D12Device* pd3dDevice)
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 
-	slotRootParameter[0].InitAsConstants(16, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
+	slotRootParameter[0].InitAsConstants(32, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
 	slotRootParameter[2].InitAsConstantBufferView(4);	// 재질 버퍼
 
@@ -147,7 +148,8 @@ bool TextureMeshShader::BuildShadersAndInputLayout()
 
 	m_vInputLayout = {
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
+		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 2, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
 	};
 
 	return true;
@@ -160,7 +162,7 @@ bool TextureMeshShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 
-	slotRootParameter[0].InitAsConstants(16, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
+	slotRootParameter[0].InitAsConstants(32, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
 	slotRootParameter[2].InitAsConstantBufferView(4);	// 재질 버퍼
 	slotRootParameter[3].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
@@ -229,7 +231,7 @@ bool SkinnedMeshShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 
-	slotRootParameter[0].InitAsConstants(16, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
+	slotRootParameter[0].InitAsConstants(32, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
 	slotRootParameter[2].InitAsConstantBufferView(4);	// 재질 버퍼
 	slotRootParameter[3].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
@@ -294,7 +296,7 @@ bool ImageObjectShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 
-	slotRootParameter[0].InitAsConstants(16, 0); // 변환 행렬 상수 
+	slotRootParameter[0].InitAsConstants(32, 0); // 변환 행렬 상수 
 	slotRootParameter[1].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
 
 	// 샘플러
@@ -430,7 +432,7 @@ bool WireFrameShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 	CD3DX12_DESCRIPTOR_RANGE texTable;
 	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 
-	slotRootParameter[0].InitAsConstants(16, 0);		// 월드 변환 행렬
+	slotRootParameter[0].InitAsConstants(32, 0);		// 월드 변환 행렬
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
 	slotRootParameter[2].InitAsConstants(1,4);	// 재질 버퍼
 	//slotRootParameter[3].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);

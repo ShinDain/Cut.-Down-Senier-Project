@@ -44,8 +44,8 @@ Mesh::~Mesh()
 
 void Mesh::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[2] = { m_PositionBufferView, m_TexC0BufferView };
-    pd3dCommandList->IASetVertexBuffers(0, 2, pVertexBufferView);
+	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[3] = { m_PositionBufferView, m_NormalBufferView , m_TexC0BufferView };
+    pd3dCommandList->IASetVertexBuffers(0, 3, pVertexBufferView);
     pd3dCommandList->IASetPrimitiveTopology(m_PrimitiveTopology);
 }
 

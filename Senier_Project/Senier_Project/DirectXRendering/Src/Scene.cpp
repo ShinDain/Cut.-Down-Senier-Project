@@ -53,7 +53,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	// 카메라 초기화
 	m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
-	
+	m_pCamera->Pitch(15);
 
 #if defined(_DEBUG)
 	//m_pCamera = std::make_unique<Camera>();
@@ -70,7 +70,7 @@ void Scene::OnResize(float aspectRatio)
 	m_pCamera->SetLens(0.25f * MathHelper::Pi, aspectRatio, 1.0f, 10000.0f);
 }
 
-void Scene::Update(float elapsedTime)
+void Scene::Update(float totalTime ,float elapsedTime)
 {
 #if defined(_DEBUG)
 	ClearObjectLayer();
@@ -95,17 +95,56 @@ void Scene::Update(float elapsedTime)
 	
 	m_pCamera->Update(elapsedTime);
 
-	XMMATRIX view = m_pCamera->GetView();
-	XMMATRIX viewProj = XMMatrixMultiply(view, m_pCamera->GetProj());
-
-	// 패스 버퍼 : 뷰 * 투영 변환 행렬 업데이트
-	PassConstant passConstant;
-	XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
-	m_pPassCB->CopyData(0, passConstant);
+	// 패스버퍼 업데이트
+	UpdatePassCB(totalTime, elapsedTime);
 
 	// ImageObject 렌더를 위한  직교 투영행렬 업데이트
 	m_xmf4x4ImgObjMat = m_pCamera->GetOrtho4x4f();
 
+}
+
+void Scene::UpdatePassCB(float totalTime, float elapsedTime)
+{
+	// 패스 버퍼 : 뷰 * 투영 변환 행렬 업데이트
+	PassConstant passConstant;
+
+	XMMATRIX view = m_pCamera->GetView();
+	XMMATRIX viewProj = XMMatrixMultiply(view, m_pCamera->GetProj());
+
+	//XMMATRIX shadowTransform = XMLoadFloat4x4(&mShadowTransform);
+
+	XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
+	//XMStoreFloat4x4(&passConstant.ShadowTransform, XMMatrixTranspose(shadowTransform));
+
+	passConstant.EyePosW = m_pCamera->GetPosition3f();
+	passConstant.RenderTargetSize = XMFLOAT2((float)CLIENT_WIDTH, (float)CLIENT_HEIGHT);
+	passConstant.InvRenderTargetSize = XMFLOAT2(1.0f / CLIENT_WIDTH, 1.0f / CLIENT_HEIGHT);
+	passConstant.NearZ = 1.0f;
+	passConstant.FarZ = 1000.0f;
+	passConstant.TotalTime = totalTime;
+	passConstant.DeltaTime = elapsedTime;
+	passConstant.AmbientLight = { 0.25f, 0.25f, 0.25f, 1.0f };
+	//passConstant.AmbientLight = { 0, 0, 0, 1.0f };
+	passConstant.Lights[0].Direction = m_BaseLightDirections[0];
+	passConstant.Lights[0].Strength = { 0.5f, 0.5f, 0.5f };
+//	passConstant.Lights[0].Position = { 500.f, 1000.0f, 0.1f };
+
+	//XMFLOAT3 xmf3RotateLight;
+	//m_LightRotationAngle += 0.1f * elapsedTime;
+	//XMMATRIX R = XMMatrixRotationY(m_LightRotationAngle);
+	//XMVECTOR lightDir = XMLoadFloat3(&m_BaseLightDirections[0]);
+	//lightDir = XMVector3TransformNormal(lightDir, R);
+	//XMStoreFloat3(&xmf3RotateLight, lightDir);
+
+	//passConstant.Lights[0].Direction = xmf3RotateLight;
+	
+	passConstant.Lights[0].Position = { 0.8f, 500, 0.8f };
+	//passConstant.Lights[1].Direction = m_BaseLightDirections[1];
+	//passConstant.Lights[1].Strength = { 0.4f, 0.4f, 0.4f };
+	//passConstant.Lights[2].Direction = m_BaseLightDirections[2];
+	//passConstant.Lights[2].Strength = { 0.2f, 0.2f, 0.2f };
+
+	m_pPassCB->CopyData(0, passConstant);
 }
 
 void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)

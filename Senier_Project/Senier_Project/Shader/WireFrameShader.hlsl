@@ -1,6 +1,7 @@
 cbuffer cbPerWorld : register(b0)
 {
 	float4x4 gWorld;
+	float4x4 gInverseTransWorld;
 };
 
 cbuffer cbPerPass : register(b3)

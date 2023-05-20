@@ -1,5 +1,8 @@
 #ifndef STRUCT_H
 
+#include "D3DUtil.h"
+#include "MathHelper.h"
+
 #define STRUCT_H
 
 #define CLIENT_WIDTH 1920
@@ -7,6 +10,16 @@
 
 #define SKINNED_ANIMATION_BONES 256
 #define MaxLights 16
+
+struct Light
+{
+	DirectX::XMFLOAT3 Strength = { 0.5f, 0.5f, 0.5f };
+	float FalloffStart = 1.0f;
+	DirectX::XMFLOAT3 Direction = { 0.0f, -1.0f, 0.0f };
+	float FalloffEnd = 1000.0f;
+	DirectX::XMFLOAT3 Position = { 0.5f, 0.5f, 0.5f };
+	float SpotPower = 64.0f;
+};
 
 //////////////// Texture ±¸Á¶Ã¼ //////////////////////
 struct Texture
@@ -60,16 +73,39 @@ enum ObjectType : UINT
 struct ObjConstant
 {
 	DirectX::XMFLOAT4X4 World = MathHelper::identity4x4();
+	DirectX::XMFLOAT4X4 InverseTransWorld = MathHelper::identity4x4();
 };
 
 struct PassConstant
 {
 	DirectX::XMFLOAT4X4 ViewProj = MathHelper::identity4x4();
+	//DirectX::XMFLOAT4X4 ShadowTransform = MathHelper::identity4x4();
+	DirectX::XMFLOAT3 EyePosW = { 0.0f, 0.0f, 0.0f };
+	float cbPerObjectPad1 = 0.0f;
+	DirectX::XMFLOAT2 RenderTargetSize = { 0.0f, 0.0f };
+	DirectX::XMFLOAT2 InvRenderTargetSize = { 0.0f, 0.0f };
+	float NearZ = 0.0f;
+	float FarZ = 0.0f;
+	float TotalTime = 0.0f;
+	float DeltaTime = 0.0f;
+
+	DirectX::XMFLOAT4 AmbientLight;
+
+	Light Lights[MaxLights];
 };
 
 struct MatConstant
 {
 	DirectX::XMFLOAT4 AlbedoColor = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	DirectX::XMFLOAT3 FresnelR0 = { 0.01f, 0.01f, 0.01f };
+	float Roughness = 0.5f;
+
+	DirectX::XMFLOAT4X4 MatTransform = MathHelper::identity4x4();
+
+	UINT DiffuseMapIndex = 0;
+	UINT NormalMapIndex = 0;
+	UINT MaterialPad1;
+	UINT MaterialPad2;
 };
 
 struct BoneBindPoseOffsetConstant
@@ -117,15 +153,6 @@ struct SubmeshGeometry
 	INT BaseVertexLocation = 0;
 };
 
-struct Light
-{
-	DirectX::XMFLOAT3 Strength = { 0.5f, 0.5f, 0.5f };
-	float FalloffStart = 1.0f;
-	DirectX::XMFLOAT3 Direction = { 0.0f, -1.0f, 0.0f };
-	float FalloffEnd = 10.0f;
-	DirectX::XMFLOAT3 Position = { 0.5f, 0.5f, 0.5f };
-	float SpotPower = 64.0f;
-};
 
 
 

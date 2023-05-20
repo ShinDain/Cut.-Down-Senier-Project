@@ -93,7 +93,10 @@ void Weapon::Update(float elapsedTime)
 	UpdateToRigidBody(elapsedTime);
 
 	ObjConstant objConstant;
-	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+	XMMATRIX world = XMLoadFloat4x4(&m_xmf4x4World);
+	XMMATRIX inverseTransWorld = XMMatrixInverse(nullptr, XMMatrixTranspose(world));
+	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(world));
+	XMStoreFloat4x4(&objConstant.InverseTransWorld, XMMatrixTranspose(inverseTransWorld));
 	if (m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
 
 	if (m_pSibling) {

@@ -71,7 +71,7 @@ void SenierProjectApp::Update(float elapsedTime)
 	if (m_Scene)
 	{
 		//m_Scene->SetViewProjMatrix(viewProj4x4f);
-		m_Scene->Update(elapsedTime);
+		m_Scene->Update(m_Timer.TotalTime(), elapsedTime);
 	}
 
 	// 디버그를 위한 텍스트들 업데이트

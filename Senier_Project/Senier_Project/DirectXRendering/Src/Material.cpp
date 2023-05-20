@@ -28,7 +28,7 @@ bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 		SetShader(g_Shaders[ShaderType::Shader_Static]);
 		return false;
 	}
-		
+	
 
 	for (int i = 0; i < m_strTextureName.size(); ++i)
 	{
