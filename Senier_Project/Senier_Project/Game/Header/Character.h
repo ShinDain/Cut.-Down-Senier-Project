@@ -45,7 +45,7 @@ public:
 protected:
 	float m_MaxSpeedXZ = 100.0f;
 	float m_CharacterFriction = 350.0f;
-	float m_JumpSpeed = 5;
+	float m_JumpSpeed = 100;
 
 	Ray m_floorCheckRay;
 

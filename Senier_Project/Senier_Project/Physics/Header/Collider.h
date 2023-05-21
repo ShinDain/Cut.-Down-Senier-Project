@@ -27,6 +27,8 @@ protected:
 	XMFLOAT3 m_xmf3OffsetRotate = XMFLOAT3(0, 0, 0);
 
 	XMFLOAT3 m_xmf3Position = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 m_xmf3Scale = XMFLOAT3(1, 1, 1);
+
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 
 	bool m_bIsActive = true;
@@ -142,13 +144,13 @@ public:
 private:
 	XMFLOAT3 m_xmf3Extents = XMFLOAT3(0, 0, 0);
 
-	BoundingBox m_d3dBoundingBox;
+	BoundingOrientedBox m_d3dOBB;
 
 public:
 	void SetExtents(const XMFLOAT3& xmf3Extents) { m_xmf3Extents = xmf3Extents; }
 	const XMFLOAT3& GetExtents() const { return m_xmf3Extents; }
 
-	const BoundingBox& GetBoundingBox() const { return m_d3dBoundingBox; }
+	const BoundingOrientedBox& GetOBB() const { return m_d3dOBB; }
 };
 
 class ColliderSphere : public Collider

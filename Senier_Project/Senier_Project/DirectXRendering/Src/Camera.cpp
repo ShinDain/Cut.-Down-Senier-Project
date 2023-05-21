@@ -327,7 +327,7 @@ void Third_Person_Camera::Update(float Etime)
 	float best = -100;
 	for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
 	{
-		BoundingBox tmpBB = g_ppColliderBoxs[i]->GetBoundingBox();
+		BoundingOrientedBox tmpBB = g_ppColliderBoxs[i]->GetOBB();
 		if (!tmpBB.Intersects(objectPos, camDir, distance))
 			continue;
 		if (distance > best && distance < m_OffsetLength)

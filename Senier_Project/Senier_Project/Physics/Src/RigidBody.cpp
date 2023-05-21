@@ -15,16 +15,22 @@ RigidBody::RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 x
 	m_xmf3ColliderOffsetPosition = xmf3ColliderOffsetPosition;
 	m_xmf3ColliderOffsetRotation = xmf3ColliderOffsetRotation;
 
+	XMStoreFloat4(&m_xmf4Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmf4Orientation)));
 
-	XMMATRIX ColliderWorld = XMLoadFloat4x4(&m_xmf4x4World);
-	XMMATRIX OffsetTranslation = XMMatrixTranslation(m_xmf3ColliderOffsetPosition.x, m_xmf3ColliderOffsetPosition.y, m_xmf3ColliderOffsetPosition.z);
-	XMMATRIX OffsetRotate = XMMatrixRotationRollPitchYaw(m_xmf3ColliderOffsetRotation.x, m_xmf3ColliderOffsetRotation.y, m_xmf3ColliderOffsetRotation.z);
-	ColliderWorld = XMMatrixMultiply(XMMatrixMultiply(OffsetRotate, OffsetTranslation), ColliderWorld);
+	XMMATRIX World = XMMatrixIdentity();
+	XMMATRIX Translation = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
+	XMMATRIX Rotate = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
+	if (m_bIsCharacter)
+	{
+		Rotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotate.x),
+			XMConvertToRadians(m_xmf3Rotate.y),
+			XMConvertToRadians(m_xmf3Rotate.z));
+	}
 
-	XMVECTOR colliderPosition = XMVectorSet(0, 0, 0, 1);
-	colliderPosition = XMVector3TransformCoord(colliderPosition, ColliderWorld);
+	XMMATRIX Scale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
+	World = XMMatrixMultiply(Scale, XMMatrixMultiply(Rotate, Translation));
 
-	XMStoreFloat3(&m_xmf3ColliderPosition, colliderPosition);
+	XMStoreFloat4x4(&m_xmf4x4World, World);
 
 	if (m_Mass < 1000)
 	{
@@ -53,6 +59,15 @@ void RigidBody::Update(float elapsedTime)
 		m_xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
 		m_xmf3AngularVelocity = XMFLOAT3(0, 0, 0);
 		m_xmf3Rotate = XMFLOAT3(0, m_xmf3Rotate.y, 0);
+		if (!XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_xmf3Acceleration))))
+		{
+			if (XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_xmf3Velocity))) < 0.8f)
+			{
+				m_xmf3Velocity.x = 0;
+				m_xmf3Velocity.z = 0;
+			}
+			
+		}
 	}
 
 	m_xmf3LastFrameAcceleration = m_xmf3Acceleration;
