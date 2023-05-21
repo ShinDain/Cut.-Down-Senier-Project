@@ -26,6 +26,7 @@
     <ClCompile Include="DirectXRendering\SenierProjectApp.cpp" />
     <ClCompile Include="DirectXRendering\Src\AnimationController.cpp" />
     <ClCompile Include="DirectXRendering\Src\Camera.cpp" />
+    <ClCompile Include="DirectXRendering\Src\DepthMap.cpp" />
     <ClCompile Include="DirectXRendering\Src\DirectXApp.cpp" />
     <ClCompile Include="DirectXRendering\Src\DWriteText.cpp" />
     <ClCompile Include="DirectXRendering\Src\Global.cpp" />
@@ -59,6 +60,7 @@
     <ClInclude Include="Common\Header\UploadBuffer.h" />
     <ClInclude Include="DirectXRendering\Header\AnimationController.h" />
     <ClInclude Include="DirectXRendering\Header\Camera.h" />
+    <ClInclude Include="DirectXRendering\Header\DepthMap.h" />
     <ClInclude Include="DirectXRendering\Header\DirectXApp.h" />
     <ClInclude Include="DirectXRendering\Header\DWriteText.h" />
     <ClInclude Include="DirectXRendering\Header\Global.h" />
@@ -82,6 +84,9 @@
     <ClInclude Include="Physics\Header\RigidBody.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Shader\Common.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Shader\default.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">defaultVS</EntryPointName>
@@ -91,6 +96,14 @@
     <FxCompile Include="Shader\ImageObjShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shader\Shadow.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shader\ShadowDebug.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Shader\SkinnedMesh.hlsl">

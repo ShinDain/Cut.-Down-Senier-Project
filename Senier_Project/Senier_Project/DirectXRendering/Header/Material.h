@@ -22,7 +22,7 @@ public:
 
 	virtual void MaterialSet(ID3D12GraphicsCommandList* pd3dCommandList);
 	
-	void LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject, const char* pstrFileName, const char* pstrTexPath);
+	bool LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject, const char* pstrFileName, const char* pstrTexPath);
 
 	std::vector<std::wstring> m_strTextureName;
 	std::vector<std::shared_ptr<Texture>> m_vpTextures;
@@ -46,6 +46,8 @@ protected:
 	float m_Roughness = 0.25f;
 	XMFLOAT4X4 m_xmf4x4MatTransform = MathHelper::identity4x4();
 
+	bool m_bIsNonTextureMat = false;
+
 public:
 	XMFLOAT4 GetAlbedoColor() { return m_xmf4AlbedoColor; }
 	XMFLOAT4 GetEmissiveColor() { return m_xmf4EmissiveColor; }
@@ -57,6 +59,7 @@ public:
 	float GetGlossyReflection() { return m_GlossyReflection; }
 	XMFLOAT3 GetFresnelIOR() { return m_xmf3FresnelIOR; }
 	float GetRoughness() { return m_Roughness; }
+	bool GetIsNonTextureMat() { return m_bIsNonTextureMat; }
 
 	void SetAlbedoColor(XMFLOAT4 in) { m_xmf4AlbedoColor = in; }
 	void SetEmissiveColor(XMFLOAT4 in) { m_xmf4EmissiveColor = in; }
@@ -68,6 +71,7 @@ public:
 	void SetGlossyReflection(float in) { m_GlossyReflection = in; }
 	void SetFresnelIOR(XMFLOAT3 in) { m_xmf3FresnelIOR = in; }
 	void SetRoughness(float in) { m_Roughness = in; }
+	void SetIsNonTextureMat(bool bIsNonTextureMat) { m_bIsNonTextureMat = bIsNonTextureMat; }
 
 	void SetShader(std::shared_ptr<Shader> pShader) { m_pShader = pShader; }
 

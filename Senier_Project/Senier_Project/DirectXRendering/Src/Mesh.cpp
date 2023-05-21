@@ -44,8 +44,9 @@ Mesh::~Mesh()
 
 void Mesh::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[3] = { m_PositionBufferView, m_NormalBufferView , m_TexC0BufferView };
-    pd3dCommandList->IASetVertexBuffers(0, 3, pVertexBufferView);
+	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[5] = { m_PositionBufferView, m_NormalBufferView , m_TexC0BufferView,
+		m_TangentBufferView, m_BiTangentBufferView };
+    pd3dCommandList->IASetVertexBuffers(0, 5, pVertexBufferView);
     pd3dCommandList->IASetPrimitiveTopology(m_PrimitiveTopology);
 }
 
@@ -427,7 +428,7 @@ void SkinnedMesh::UpdateBoneTransformBuffer(ID3D12GraphicsCommandList* pd3dComma
 	if (m_BindPoseBoneOffsetCB != nullptr)
 	{
 		D3D12_GPU_VIRTUAL_ADDRESS BoneOffsetsGpuVirtualAddress = m_BindPoseBoneOffsetCB->Resource()->GetGPUVirtualAddress();
-		pd3dCommandList->SetGraphicsRootConstantBufferView(4, BoneOffsetsGpuVirtualAddress);
+		pd3dCommandList->SetGraphicsRootConstantBufferView(5, BoneOffsetsGpuVirtualAddress);
 	}
 
 	// SkinningBoneTransform 상수 버퍼 연결
@@ -435,7 +436,7 @@ void SkinnedMesh::UpdateBoneTransformBuffer(ID3D12GraphicsCommandList* pd3dComma
 	{
 		D3D12_GPU_VIRTUAL_ADDRESS SkinnginBoneTransformGpuVirtualAddress = m_SkinningBoneTransformCB->Resource()->GetGPUVirtualAddress();
 		// 루트 서명에 상수 버퍼 연결
-		pd3dCommandList->SetGraphicsRootConstantBufferView(5, SkinnginBoneTransformGpuVirtualAddress);
+		pd3dCommandList->SetGraphicsRootConstantBufferView(6, SkinnginBoneTransformGpuVirtualAddress);
 
 		SkinningBoneTransformConstant* tmpBoneTransformConstant = new SkinningBoneTransformConstant;
 		for (int i = 0; i < m_nSkinningBones; ++i)
@@ -452,7 +453,7 @@ void SkinnedMesh::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 	UpdateBoneTransformBuffer(pd3dCommandList);
 
 	D3D12_VERTEX_BUFFER_VIEW pVertexBufferView[7] =
-	{ m_PositionBufferView, m_TexC0BufferView, m_NormalBufferView, m_TangentBufferView,
+	{ m_PositionBufferView, m_NormalBufferView,m_TexC0BufferView, m_TangentBufferView,
 		m_BiTangentBufferView, m_BoneIndexBufferView, m_BoneWeightBufferView };
 	pd3dCommandList->IASetVertexBuffers(0, 7, pVertexBufferView);
 	pd3dCommandList->IASetPrimitiveTopology(m_PrimitiveTopology);

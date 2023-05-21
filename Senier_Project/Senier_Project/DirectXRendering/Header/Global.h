@@ -10,13 +10,6 @@
 
 #define GRAVITY_SIZE -9.81f
 
-#define CHARACTER_MODEL_NAME "Vampire_A_Lusth"
-#define ZOMBIE_MODEL_NAME "Zombie1"
-#define WEAPON_MODEL_NAME "Katana"
-#define CUBE_MODEL_NAME "Cube"
-#define GROUND_MODEL_NAME "Epoxy_Ground"
-#define CARPET_MODEL_NAME "Carpet_5"
-
 class Shader;
 class ColliderPlane;
 class ColliderBox;

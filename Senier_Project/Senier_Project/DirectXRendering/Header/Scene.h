@@ -8,6 +8,7 @@
 #include "Global.h"
 #include "Shader.h"
 #include "Object.h"
+#include "DepthMap.h"
 #include "../../Common/Header/GameTimer.h"
 
 #include "../../Game/Header/ObjectDefaultData.h"
@@ -30,11 +31,17 @@ public:
 	virtual ~Scene();
 
 	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-	virtual void OnResize(float aspectRatio);
+	void BuildDescriptorHeap(ID3D12Device* pd3dDevice);
+
+
+	virtual void OnResize(float aspectRatio, float newWidth, float newHeight);
 	virtual void Update(float totalTime, float elapsedTime);
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
+	void RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList);
+
 
 	void UpdatePassCB(float totalTime, float elapsedTime);
+	void UpdateShadowPassCB(float totalTime, float elapsedTime);
 
 	void ProcessInput(UCHAR* pKeybuffer);
 	void KeyDownEvent(WPARAM wParam);
@@ -58,10 +65,13 @@ private:
 
 	// 프레임마다 넘겨줄 상수 버퍼
 	std::unique_ptr<UploadBuffer<PassConstant>> m_pPassCB = nullptr;
+	std::unique_ptr<UploadBuffer<PassConstant>> m_pShadowPassCB = nullptr;
 
 	// 오브젝트 객체들
 	std::vector<std::shared_ptr<Object>> m_vpAllObjs;
 	std::vector<std::shared_ptr<Object>> m_vObjectLayer[(int)RenderLayer::Render_Count];
+
+	std::shared_ptr<ImgObject> m_pImage = nullptr;
 
 	// 씬을 렌더링할 메인 카메라
 	std::unique_ptr<Camera> m_pCamera = nullptr;
@@ -72,13 +82,27 @@ private:
 
 	POINT m_LastMousePos = { 0,0 };
 
+	// ================================================================
+	// 조명, 그림자 관련
+	// ===============================================================
+
 	XMFLOAT3 m_BaseLightDirections[3] = {
-	XMFLOAT3(0.57735f, -0.57735f, 0.57735f),
+	//XMFLOAT3(-0.57735f, -0.57735f, -0.57735f),
+	XMFLOAT3(0.0f, -1.0f, 0.0f),
 	XMFLOAT3(-0.57735f, -0.57735f, 0.57735f),
 	XMFLOAT3(0.0f, -0.707f, -0.707f)
 	};
 
-	float m_LightRotationAngle = 0;
+	XMFLOAT4X4 m_xmf4x4ShadowTransform = MathHelper::identity4x4();
+
+	std::unique_ptr<DepthMap> m_ShadowMap = nullptr;
+	ComPtr<ID3D12DescriptorHeap> m_SrvDescriptorHeap = nullptr;
+	ComPtr<ID3D12DescriptorHeap> m_DsvDescriptorHeap = nullptr;
+
+	UINT m_ShadowMapHeapIndex = 0;
+
+
+
 public:
 	void SetViewProjMatrix(XMFLOAT4X4 viewProj) { m_xmf4x4ViewProj = viewProj; }
 

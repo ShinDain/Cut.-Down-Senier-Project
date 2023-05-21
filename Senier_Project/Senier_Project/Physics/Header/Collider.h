@@ -26,13 +26,14 @@ protected:
 	XMFLOAT3 m_xmf3OffsetPosition = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 m_xmf3OffsetRotate = XMFLOAT3(0, 0, 0);
 
+	XMFLOAT3 m_xmf3Position = XMFLOAT3(0, 0, 0);
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 
 	bool m_bIsActive = true;
 	float m_Intersect = 0;
 
 public:
-	void UpdateWorldTransform();
+	virtual void UpdateWorldTransform();
 
 	void SetOffsetPosition(const XMFLOAT3& xmf3OffsetPosition);
 	void SetOffsetRotate(const XMFLOAT3& xmf3OffsetRotate);
@@ -135,13 +136,19 @@ public:
 	virtual void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	virtual void CalculateRotateInertiaMatrix();
+	virtual void UpdateWorldTransform();
+
 
 private:
 	XMFLOAT3 m_xmf3Extents = XMFLOAT3(0, 0, 0);
 
+	BoundingBox m_d3dBoundingBox;
+
 public:
 	void SetExtents(const XMFLOAT3& xmf3Extents) { m_xmf3Extents = xmf3Extents; }
 	const XMFLOAT3& GetExtents() const { return m_xmf3Extents; }
+
+	const BoundingBox& GetBoundingBox() const { return m_d3dBoundingBox; }
 };
 
 class ColliderSphere : public Collider

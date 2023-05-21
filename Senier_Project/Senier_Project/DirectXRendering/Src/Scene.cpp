@@ -19,6 +19,11 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 {
 	// 패스 버퍼 생성
 	m_pPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
+	m_pShadowPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
+
+	// 그림자 맵 생성
+	m_ShadowMap = std::make_unique<DepthMap>(pd3dDevice, 2048, 2048);
+	BuildDescriptorHeap(pd3dDevice);
 
 	// 캐릭터 테스트
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,0,0), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), CHARACTER_MODEL_NAME, 3);
@@ -30,26 +35,28 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(1, 1);
 	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
 
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, 1);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0),XMFLOAT3(1,1,1), ZOMBIE_MODEL_NAME, 1);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, 1);
+	// 몬스터 테스트
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(220, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, 1);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(240, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0),XMFLOAT3(1,1,1), ZOMBIE_MODEL_NAME, 1);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(260, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, 1);
 
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0.2, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90),XMFLOAT3(1,1,1), WEAPON_MODEL_NAME, 0);
 
 	// 바닥
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, -200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1,1,1), GROUND_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, -200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-200, 0, -200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-200, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-200, 0, 200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_NULL_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1,1,1), nullptr, 0);
+
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
+
 
 	// 맵 데이터 로드
 	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 
+	std::shared_ptr<ImgObject> imgobj = std::make_shared<ImgObject>();
+	imgobj->Initialize(pd3dDevice, pd3dCommandList, 1900, 1024, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 500, 500);
+	m_pImage = imgobj;
 
 	// 카메라 초기화
 	m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
@@ -65,9 +72,47 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	return true;
 }
 
-void Scene::OnResize(float aspectRatio)
+void Scene::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
+{
+	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
+	dsvHeapDesc.NumDescriptors = 1;
+	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+	dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	dsvHeapDesc.NodeMask = 0;
+	ThrowIfFailed(pd3dDevice->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_DsvDescriptorHeap)));
+
+	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+	srvHeapDesc.NumDescriptors = 1;
+	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	ThrowIfFailed(pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_SrvDescriptorHeap)));
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(
+		m_SrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+	m_ShadowMapHeapIndex = 0;
+
+	auto srvCpuStart = m_SrvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+	auto srvGpuStart = m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	auto dsvCpuStart = m_DsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+
+	UINT cbvSrvUavDescriptorSize = pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	UINT dsvDescriptorSize = pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+
+	m_ShadowMap->BuildDescriptors(
+		CD3DX12_CPU_DESCRIPTOR_HANDLE(srvCpuStart, m_ShadowMapHeapIndex, cbvSrvUavDescriptorSize),
+		CD3DX12_GPU_DESCRIPTOR_HANDLE(srvGpuStart, m_ShadowMapHeapIndex, cbvSrvUavDescriptorSize),
+		CD3DX12_CPU_DESCRIPTOR_HANDLE(dsvCpuStart, 0, dsvDescriptorSize));
+}
+
+void Scene::OnResize(float aspectRatio, float newWidth, float newHeight)
 {
 	m_pCamera->SetLens(0.25f * MathHelper::Pi, aspectRatio, 1.0f, 10000.0f);
+
+	//m_ShadowMap->OnResize(newWidth, newHeight);
 }
 
 void Scene::Update(float totalTime ,float elapsedTime)
@@ -84,9 +129,9 @@ void Scene::Update(float totalTime ,float elapsedTime)
 	// 교차 검사
 	//Intersect();
 
+	// 충돌 검사
 	GenerateContact();
 	ProcessPhysics(elapsedTime);
-
 
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
@@ -97,10 +142,10 @@ void Scene::Update(float totalTime ,float elapsedTime)
 
 	// 패스버퍼 업데이트
 	UpdatePassCB(totalTime, elapsedTime);
+	UpdateShadowPassCB(totalTime, elapsedTime);
 
 	// ImageObject 렌더를 위한  직교 투영행렬 업데이트
 	m_xmf4x4ImgObjMat = m_pCamera->GetOrtho4x4f();
-
 }
 
 void Scene::UpdatePassCB(float totalTime, float elapsedTime)
@@ -111,52 +156,110 @@ void Scene::UpdatePassCB(float totalTime, float elapsedTime)
 	XMMATRIX view = m_pCamera->GetView();
 	XMMATRIX viewProj = XMMatrixMultiply(view, m_pCamera->GetProj());
 
-	//XMMATRIX shadowTransform = XMLoadFloat4x4(&mShadowTransform);
+	XMMATRIX shadowTransform = XMLoadFloat4x4(&m_xmf4x4ShadowTransform);
 
 	XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
-	//XMStoreFloat4x4(&passConstant.ShadowTransform, XMMatrixTranspose(shadowTransform));
+	XMStoreFloat4x4(&passConstant.ShadowTransform, XMMatrixTranspose(shadowTransform));
 
 	passConstant.EyePosW = m_pCamera->GetPosition3f();
 	passConstant.RenderTargetSize = XMFLOAT2((float)CLIENT_WIDTH, (float)CLIENT_HEIGHT);
 	passConstant.InvRenderTargetSize = XMFLOAT2(1.0f / CLIENT_WIDTH, 1.0f / CLIENT_HEIGHT);
 	passConstant.NearZ = 1.0f;
-	passConstant.FarZ = 1000.0f;
+	passConstant.FarZ = 100.0f;
 	passConstant.TotalTime = totalTime;
 	passConstant.DeltaTime = elapsedTime;
-	passConstant.AmbientLight = { 0.25f, 0.25f, 0.25f, 1.0f };
-	//passConstant.AmbientLight = { 0, 0, 0, 1.0f };
+	passConstant.AmbientLight = { 0.2f, 0.2f, 0.3f, 1.0f };
 	passConstant.Lights[0].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[0].Strength = { 0.5f, 0.5f, 0.5f };
-//	passConstant.Lights[0].Position = { 500.f, 1000.0f, 0.1f };
+	passConstant.Lights[0].Strength = { 0.3f, 0.3f, 0.3f };
+	//passConstant.Lights[0].Position = { -50, 50.0f, 0 };
 
-	//XMFLOAT3 xmf3RotateLight;
-	//m_LightRotationAngle += 0.1f * elapsedTime;
-	//XMMATRIX R = XMMatrixRotationY(m_LightRotationAngle);
-	//XMVECTOR lightDir = XMLoadFloat3(&m_BaseLightDirections[0]);
-	//lightDir = XMVector3TransformNormal(lightDir, R);
-	//XMStoreFloat3(&xmf3RotateLight, lightDir);
+	passConstant.Lights[1].Direction = m_BaseLightDirections[1];
+	passConstant.Lights[1].Strength = { 0.2f, 0.2f, 0.2f };
+	//passConstant.Lights[1].Position = { -50, 50.0f, 0 };
 
-	//passConstant.Lights[0].Direction = xmf3RotateLight;
-	
-	passConstant.Lights[0].Position = { 0.8f, 500, 0.8f };
-	//passConstant.Lights[1].Direction = m_BaseLightDirections[1];
-	//passConstant.Lights[1].Strength = { 0.4f, 0.4f, 0.4f };
-	//passConstant.Lights[2].Direction = m_BaseLightDirections[2];
-	//passConstant.Lights[2].Strength = { 0.2f, 0.2f, 0.2f };
+	passConstant.Lights[2].Direction = m_BaseLightDirections[2];
+	passConstant.Lights[2].Strength = { 0.2f, 0.2f, 0.2f };
+	//passConstant.Lights[2].Position = { 50, 50.0f, 0 };
 
 	m_pPassCB->CopyData(0, passConstant);
 }
 
+void Scene::UpdateShadowPassCB(float totalTime, float elapsedTime)
+{
+	float sceneBoundRadius = 100;
+
+	// Only the first "main" light casts a shadow.
+	XMVECTOR lightDir = XMLoadFloat3(&m_BaseLightDirections[0]);
+	XMVECTOR lightPos = -2.0f * sceneBoundRadius * lightDir;
+	XMVECTOR targetPos = XMVectorSet(0, 0, 0, 1);
+	XMVECTOR lightUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMMATRIX lightView = XMMatrixLookAtLH(lightPos, targetPos, lightUp);
+
+	// Transform bounding sphere to light space.
+	XMFLOAT3 sphereCenterLS;
+	XMStoreFloat3(&sphereCenterLS, XMVector3TransformCoord(targetPos, lightView));
+
+	// Ortho frustum in light space encloses scene.
+	float l = sphereCenterLS.x - sceneBoundRadius;
+	float b = sphereCenterLS.y - sceneBoundRadius;
+	float lightNear = sphereCenterLS.z - sceneBoundRadius;
+	float r = sphereCenterLS.x + sceneBoundRadius;
+	float t = sphereCenterLS.y + sceneBoundRadius;
+	float lightFar = sphereCenterLS.z + sceneBoundRadius;
+
+	XMMATRIX lightProj = XMMatrixOrthographicOffCenterLH(l, r, b, t, lightNear, lightFar);
+
+	// Transform NDC space [-1,+1]^2 to texture space [0,1]^2
+	XMMATRIX T(
+		0.5f, 0.0f, 0.0f, 0.0f,
+		0.0f, -0.5f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.0f, 1.0f);
+
+	XMMATRIX shadowTransform = lightView * lightProj * T;
+	XMStoreFloat4x4(&m_xmf4x4ShadowTransform, shadowTransform);
+
+	float shadowMapWidth = m_ShadowMap->Width();
+	float shadowMapHeight = m_ShadowMap->Height();
+
+	// 그림자 패스 버퍼 
+	PassConstant passConstant;
+
+	XMMATRIX view = lightView;
+	XMMATRIX viewProj = XMMatrixMultiply(view, lightProj);
+
+	XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
+	XMStoreFloat4x4(&passConstant.ShadowTransform, XMMatrixTranspose(shadowTransform));
+
+	XMStoreFloat3(&passConstant.EyePosW, lightPos);
+	passConstant.RenderTargetSize = XMFLOAT2((float)shadowMapWidth, (float)shadowMapHeight);
+	passConstant.InvRenderTargetSize = XMFLOAT2(1.0f / shadowMapWidth, 1.0f / shadowMapHeight);
+	passConstant.NearZ = lightNear;
+	passConstant.FarZ = lightFar;
+	passConstant.TotalTime = totalTime;
+	passConstant.DeltaTime = elapsedTime;
+
+	passConstant.AmbientLight = { 0.1f, 0.1f, 0.2f, 1.0f };
+	passConstant.Lights[0].Direction = m_BaseLightDirections[0];
+	passConstant.Lights[0].Strength = { 0.3f, 0.3f, 0.3f };
+	//passConstant.Lights[0].Position = { -50, 50.0f, 0 };
+
+	passConstant.Lights[1].Direction = m_BaseLightDirections[1];
+	passConstant.Lights[1].Strength = { 0.2f, 0.2f, 0.2f };
+	//passConstant.Lights[1].Position = { -50, 50.0f, 0 };
+
+	passConstant.Lights[2].Direction = m_BaseLightDirections[2];
+	passConstant.Lights[2].Strength = { 0.2f, 0.2f, 0.2f };
+
+	m_pShadowPassCB->CopyData(0, passConstant);
+}
+
 void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	// img 오브젝트 렌더링 수정 필
-	{
-		g_Shaders[ShaderType::Shader_Image]->ChangeShader(pd3dCommandList);
-		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &m_xmf4x4ImgObjMat, 0);
-	}
 
 	g_Shaders[ShaderType::Shader_Static]->ChangeShader(pd3dCommandList);
 	pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
+	//pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pShadowPassCB->Resource()->GetGPUVirtualAddress());
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
 	{
 		m_vObjectLayer[RenderLayer::Render_Static][i]->UpdateTransform(NULL);
@@ -164,7 +267,6 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 	}
 
 	g_Shaders[ShaderType::Shader_TextureMesh]->ChangeShader(pd3dCommandList);
-	pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_TextureMesh].size(); ++i)
 	{
 		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->UpdateTransform(NULL);
@@ -182,6 +284,60 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(elapsedTime, pd3dCommandList);
 		}
 	}
+
+	// img 오브젝트
+	/*{
+		g_Shaders[ShaderType::Shader_Image]->ChangeShader(pd3dCommandList);
+
+		ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
+		pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
+
+		D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		pd3dCommandList->SetGraphicsRootDescriptorTable(1, texHandle);
+
+		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &m_xmf4x4ImgObjMat, 0);
+		m_pImage->Render(elapsedTime, pd3dCommandList);
+	}*/
+}
+
+void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	ID3D12DescriptorHeap* descriptorHeaps[] = { m_SrvDescriptorHeap.Get() };
+	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
+	D3D12_VIEWPORT viewPort = m_ShadowMap->Viewport();
+	D3D12_RECT scissorRect = m_ShadowMap->ScissorRect();
+	pd3dCommandList->RSSetViewports(1, &viewPort);
+	pd3dCommandList->RSSetScissorRects(1, &scissorRect);
+
+	CD3DX12_RESOURCE_BARRIER transition = CD3DX12_RESOURCE_BARRIER::Transition(m_ShadowMap->Resource(),
+		D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+	pd3dCommandList->ResourceBarrier(1, &transition);
+
+	pd3dCommandList->ClearDepthStencilView(m_ShadowMap->Dsv(),
+		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
+	// 셰이더 변경 여기
+	g_Shaders[ShaderType::Shader_DepthMap]->ChangeShader(pd3dCommandList);
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE dsv = m_ShadowMap->Dsv();
+	pd3dCommandList->OMSetRenderTargets(0, nullptr, false, &dsv);
+	pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pShadowPassCB->Resource()->GetGPUVirtualAddress());
+
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
+	{
+		m_vObjectLayer[RenderLayer::Render_Static][i]->UpdateTransform(NULL);
+		m_vObjectLayer[RenderLayer::Render_Static][i]->Render(0.0f, pd3dCommandList);
+	}
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_TextureMesh].size(); ++i)
+	{
+		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->UpdateTransform(NULL);
+		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(0.0f, pd3dCommandList);
+	}
+
+	transition = CD3DX12_RESOURCE_BARRIER::Transition(m_ShadowMap->Resource(),
+		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ);
+	pd3dCommandList->ResourceBarrier(1, &transition);
 }
 
 void Scene::ProcessInput(UCHAR* pKeybuffer)
@@ -299,6 +455,11 @@ void Scene::LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 		}
 		else if (!strcmp(pstrToken, "</Frame>"))
 		{
+			if (!strcmp(pstrObjectName, ZOMBIE_MODEL_NAME))
+			{
+				continue;
+			}
+
 			CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, xmf3Scale, pstrObjectName, 0);
 		}
 		else if (!strcmp(pstrToken, "</Hierarchy>"))
@@ -321,16 +482,27 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	objectData.xmf3Position = xmf3Position;
 	objectData.xmf3Rotation = xmf3Rotation;
 	objectData.xmf4Orientation = xmf4Orientation;
-	objectData.xmf3Scale = g_DefaultObjectData[pstrFileName].xmf3OffsetScale;
-	objectData.xmf3Scale.x *= xmf3Scale.x;
-	objectData.xmf3Scale.y *= xmf3Scale.y;
-	objectData.xmf3Scale.z *= xmf3Scale.z;
-	objectData.nMass = g_DefaultObjectData[pstrFileName].nMass;
-	objectData.objectType = g_DefaultObjectData[pstrFileName].objectType;
-	objectData.colliderType = g_DefaultObjectData[pstrFileName].colliderType;
-	objectData.xmf3Extents = g_DefaultObjectData[pstrFileName].xmf3Extents;
-	objectData.xmf3ColliderOffsetPosition = g_DefaultObjectData[pstrFileName].xmf3ColliderOffsetPosition;
-	objectData.xmf3ColliderOffsetRotation = g_DefaultObjectData[pstrFileName].xmf3ColliderOffsetRotation;
+	if (pstrFileName == nullptr)
+	{
+		objectData.nMass = 9999;
+		objectData.objectType = Object_World;
+		objectData.colliderType = Collider_Plane;
+	}
+	else
+	{
+		objectData.xmf3Scale = g_DefaultObjectData[pstrFileName].xmf3OffsetScale;
+		objectData.xmf3Scale.x *= xmf3Scale.x;
+		objectData.xmf3Scale.y *= xmf3Scale.y;
+		objectData.xmf3Scale.z *= xmf3Scale.z;
+		objectData.nMass = g_DefaultObjectData[pstrFileName].nMass;
+		objectData.objectType = g_DefaultObjectData[pstrFileName].objectType;
+		objectData.colliderType = g_DefaultObjectData[pstrFileName].colliderType;
+		objectData.xmf3Extents = g_DefaultObjectData[pstrFileName].xmf3Extents;
+		objectData.xmf3ColliderOffsetPosition = g_DefaultObjectData[pstrFileName].xmf3ColliderOffsetPosition;
+		objectData.xmf3ColliderOffsetRotation = g_DefaultObjectData[pstrFileName].xmf3ColliderOffsetRotation;
+	}
+
+	
 	
 	std::shared_ptr<ModelDataInfo> pModelData;
 	std::shared_ptr<Object> pObject;
@@ -341,6 +513,10 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		pModelData = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, pstrFileName, g_DefaultObjectData[pstrFileName].pstrTexPath);
 
 		g_LoadedModelData.insert({ pstrFileName, pModelData });
+	}
+	else if (pstrFileName == nullptr)
+	{
+		pModelData = nullptr;
 	}
 	else	// 이미 로드한 모델인 경우
 	{

@@ -64,12 +64,13 @@ public:
 	virtual ~TextureMeshShader();
 
 	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList)
-	{Shader::ChangeShader(pd3dCommandList);}
+	{
+		Shader::ChangeShader(pd3dCommandList);
+		g_curShader = m_Type;
+	}
 protected:
 	virtual bool BuildShadersAndInputLayout();
 	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
-
-	ShaderType m_Type = ShaderType::Shader_TextureMesh;
 };
 
 // ½ºÅ°´× ¸Þ½Ã ¼ÎÀÌ´õ
@@ -83,13 +84,13 @@ public:
 	virtual ~SkinnedMeshShader();
 
 	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList) 
-	{ Shader::ChangeShader(pd3dCommandList);}
+	{ 
+		Shader::ChangeShader(pd3dCommandList); 
+	}
 
 protected:
 	virtual bool BuildShadersAndInputLayout();
 	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
-
-	ShaderType m_Type = ShaderType::Shader_Skinned;
 };
 
 // 2D ÀÌ¹ÌÁö ·»´õ¸µ ÅØ½ºÃÄ
@@ -102,15 +103,16 @@ public:
 	virtual ~ImageObjectShader();
 
 	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList) 
-	{ Shader::ChangeShader(pd3dCommandList);}
+	{
+		Shader::ChangeShader(pd3dCommandList);
+		g_curShader = m_Type;
+	}
 	virtual void OnResize(float aspectRatio);
 
 protected:
 	virtual bool BuildShadersAndInputLayout();
 	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
-	virtual bool BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature);
-
-	ShaderType m_Type = ShaderType::Shader_Image;
+	virtual bool BuildPSO(ID3D12Device* pd3dDevice);
 };
 
 // Collider ·»´õ¸µ ¼ÎÀÌ´õ
@@ -123,11 +125,33 @@ public:
 	virtual ~WireFrameShader();
 
 	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList) 
-	{ Shader::ChangeShader(pd3dCommandList);}
+	{ 
+		Shader::ChangeShader(pd3dCommandList);
+		g_curShader = m_Type;
+	}
 protected:
 	virtual bool BuildShadersAndInputLayout();
 	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
-	virtual bool BuildPSO(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dRootSignature);
+	virtual bool BuildPSO(ID3D12Device* pd3dDevice);
+};
 
-	ShaderType m_Type = ShaderType::Shader_WireFrame;
+// DepthMap ·»´õ¸µ ¼ÎÀÌ´õ
+class DepthMapShader : public Shader
+{
+public:
+	DepthMapShader();
+	DepthMapShader(const DepthMapShader& rhs) = delete;
+	DepthMapShader& operator=(const DepthMapShader& rhs) = delete;
+	virtual ~DepthMapShader();
+
+	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList)
+	{
+		Shader::ChangeShader(pd3dCommandList);
+		g_curShader = m_Type;
+	}
+
+protected:
+	virtual bool BuildShadersAndInputLayout();
+	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
+	virtual bool BuildPSO(ID3D12Device* pd3dDevice);
 };

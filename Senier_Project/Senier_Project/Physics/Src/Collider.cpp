@@ -27,6 +27,11 @@ void Collider::UpdateWorldTransform()
 	World = XMMatrixMultiply(XMMatrixMultiply(OffsetRotate, OffsetTranslation), World);
 
 	XMStoreFloat4x4(&m_xmf4x4World, World);
+
+	XMVECTOR position = XMVectorSet(0, 0, 0, 1);
+	position = XMVector3TransformCoord(position, World);
+	XMStoreFloat3(&m_xmf3Position, position);
+
 }
 
 void Collider::SetOffsetPosition(const XMFLOAT3& xmf3OffsetPosition)
@@ -143,8 +148,11 @@ ColliderBox::ColliderBox(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3OffsetPos
 	m_xmf3OffsetRotate = xmf3OffsetRotate;
 	m_xmf3Extents = xmf3Extents;
 
+
+
 	CalculateRotateInertiaMatrix();
 	UpdateWorldTransform();
+
 }
 
 ColliderBox::~ColliderBox()
@@ -168,6 +176,22 @@ void ColliderBox::CalculateRotateInertiaMatrix()
 	xmf4x4RotateInertia._33 = objectMass * (xmf3ColliderExtents.y * xmf3ColliderExtents.y) + (xmf3ColliderExtents.x * xmf3ColliderExtents.x) / 12;
 
 	m_pRigidBody->SetRotateInertia(xmf4x4RotateInertia);
+}
+
+void ColliderBox::UpdateWorldTransform()
+{
+	Collider::UpdateWorldTransform();
+
+	m_d3dBoundingBox.Center = m_xmf3Position;
+
+	//m_d3dBoundingBox.Extents = m_xmf3Extents;
+
+	XMMATRIX world = XMLoadFloat4x4(&m_xmf4x4World);
+	XMVECTOR extents = XMLoadFloat3(&m_xmf3Extents);
+	extents = XMVector3Normalize(extents);
+	extents = XMVector3TransformNormal(extents, world);
+
+	XMStoreFloat3(&m_d3dBoundingBox.Extents, extents);
 }
 
 

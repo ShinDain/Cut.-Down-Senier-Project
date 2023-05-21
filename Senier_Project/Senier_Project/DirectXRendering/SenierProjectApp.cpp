@@ -26,6 +26,7 @@ bool SenierProjectApp::Initialize()
 	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_Skinned, std::make_shared<SkinnedMeshShader>()));
 	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_Image, std::make_shared<ImageObjectShader>()));
 	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_WireFrame, std::make_shared<WireFrameShader>()));
+	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_DepthMap, std::make_shared<DepthMapShader>()));
 
 	for (auto iter = g_Shaders.begin(); iter != g_Shaders.end(); ++iter)
 	{
@@ -115,6 +116,9 @@ void SenierProjectApp::Render(float elapsedTime)
 	ThrowIfFailed(cmdListalloc->Reset());
 	ThrowIfFailed(m_CommandList->Reset(cmdListalloc.Get(), NULL));
 
+	// Shadow¸Ê »ý¼º
+	m_Scene->RenderSceneToShadowMap(m_CommandList.Get());
+
 	// Viewport, ScissorRect ¼³Á¤
 	m_CommandList->RSSetViewports(1, &m_ScreenViewport);
 	m_CommandList->RSSetScissorRects(1, &m_ScissorRect);
@@ -168,6 +172,12 @@ void SenierProjectApp::Render(float elapsedTime)
 void SenierProjectApp::OnResize()
 {
 	DirectXApp::OnResize();
+
+	if (m_Scene)
+	{
+	//	m_Scene->OnResize((float)m_ClientWidth / (float)m_ClientHeight, m_ClientWidth, m_ClientHeight);
+		m_Scene->OnResize(1.5f, m_ClientWidth, m_ClientHeight);
+	}
 }
 
 void SenierProjectApp::ProcessInput()

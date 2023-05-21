@@ -126,7 +126,8 @@ void Player::Move(DWORD dwDirection)
 	
 	if (tmp < 0.1f)
 		tmp = 0;
-
+	else if (tmp > 1)
+		tmp = 1;
 	m_pAnimationController->SetTrackWeight(0, 1 - tmp);
 	m_pAnimationController->SetTrackWeight(1, tmp);
 }

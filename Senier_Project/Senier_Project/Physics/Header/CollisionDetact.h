@@ -4,7 +4,7 @@
 #include "Collider.h"
 #include "Contact.h"
 
-#define MAX_CONTACT_CNT 256
+#define MAX_CONTACT_CNT 1024
 
 class IntersectTests
 {

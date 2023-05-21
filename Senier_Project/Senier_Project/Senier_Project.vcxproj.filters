@@ -125,6 +125,9 @@
     <ClCompile Include="Game\Src\ObjectDefaultData.cpp">
       <Filter>Game\Src</Filter>
     </ClCompile>
+    <ClCompile Include="DirectXRendering\Src\DepthMap.cpp">
+      <Filter>DirectXRendering\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Physics\Header\Collider.h">
@@ -220,6 +223,9 @@
     <ClInclude Include="Game\Header\ObjectDefaultData.h">
       <Filter>Game\Header</Filter>
     </ClInclude>
+    <ClInclude Include="DirectXRendering\Header\DepthMap.h">
+      <Filter>DirectXRendering\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\default.hlsl">
@@ -232,6 +238,15 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shader\WireFrameShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Shadow.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\ShadowDebug.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Common.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

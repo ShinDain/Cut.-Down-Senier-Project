@@ -28,10 +28,13 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 {
 	std::shared_ptr<ModelDataInfo> pModelData = pModel;
 
-	SetChild(pModelData->m_pRootObject);
-	if (nAnimationTracks > 0)
-		m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
+	if (pModelData)
+	{
 
+		SetChild(pModelData->m_pRootObject);
+		if (nAnimationTracks > 0)
+			m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
+	}
 	std::shared_ptr<Collider> pCollider;
 	std::shared_ptr<RigidBody> pBody;
 
@@ -218,7 +221,7 @@ void Object::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandLis
 		}
 	}
 
-#if defined(_DEBUG)
+#if defined(_DEBUG) && defined(COLLIDER_RENDER)
 	if (m_pCollider)
 	{
 		g_Shaders[ShaderType::Shader_WireFrame]->ChangeShader(pd3dCommandList);
@@ -488,7 +491,8 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		}
 		else if (!strcmp(pstrToken, "<AlbedoMap>:"))
 		{
-			vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject, pstrFileName, pstrTexPath);
+			bool ret = vpMat[nMatcnt]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pInFile, pRootObject, pstrFileName, pstrTexPath);
+			if (!ret) vpMat[nMatcnt]->SetIsNonTextureMat(true);
 		}
 		else if (!strcmp(pstrToken, "<SpecularMap>:"))
 		{

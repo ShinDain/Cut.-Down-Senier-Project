@@ -16,7 +16,7 @@ struct Light
 	DirectX::XMFLOAT3 Strength = { 0.5f, 0.5f, 0.5f };
 	float FalloffStart = 1.0f;
 	DirectX::XMFLOAT3 Direction = { 0.0f, -1.0f, 0.0f };
-	float FalloffEnd = 1000.0f;
+	float FalloffEnd = 100.0f;
 	DirectX::XMFLOAT3 Position = { 0.5f, 0.5f, 0.5f };
 	float SpotPower = 64.0f;
 };
@@ -37,6 +37,7 @@ enum ShaderType : UINT
 	Shader_Skinned,
 	Shader_Image,
 	Shader_WireFrame,
+	Shader_DepthMap,
 	Shader_Count
 };
 
@@ -79,7 +80,7 @@ struct ObjConstant
 struct PassConstant
 {
 	DirectX::XMFLOAT4X4 ViewProj = MathHelper::identity4x4();
-	//DirectX::XMFLOAT4X4 ShadowTransform = MathHelper::identity4x4();
+	DirectX::XMFLOAT4X4 ShadowTransform = MathHelper::identity4x4();
 	DirectX::XMFLOAT3 EyePosW = { 0.0f, 0.0f, 0.0f };
 	float cbPerObjectPad1 = 0.0f;
 	DirectX::XMFLOAT2 RenderTargetSize = { 0.0f, 0.0f };

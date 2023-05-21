@@ -23,7 +23,7 @@ bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 	materialConstant.AlbedoColor = m_xmf4AlbedoColor;
 	m_pMatCB->CopyData(0, materialConstant);
 
-	if (m_strTextureName.size() < 1)
+	if (m_bIsNonTextureMat)
 	{
 		SetShader(g_Shaders[ShaderType::Shader_Static]);
 		return false;
@@ -32,11 +32,11 @@ bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 
 	for (int i = 0; i < m_strTextureName.size(); ++i)
 	{
-		m_vpTextures.emplace_back(FindReplicatedTexture(m_strTextureName[i].c_str()));
+		if (wcscmp(m_strTextureName[i].c_str(), L"null"))
+			m_vpTextures.emplace_back(FindReplicatedTexture(m_strTextureName[i].c_str()));
+		else
+			m_vpTextures.emplace_back(nullptr);
 	}
-
-	if (m_vpTextures.size() < 1)
-		return false;
 
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 	srvHeapDesc.NumDescriptors = m_vpTextures.size();
@@ -49,18 +49,29 @@ bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 
 	for (size_t i = 0; i < m_vpTextures.size(); ++i)
 	{
-		auto tex = m_vpTextures[i]->Resource;
-
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.Format = tex->GetDesc().Format;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MipLevels = tex->GetDesc().MipLevels;
 		srvDesc.Texture2D.MostDetailedMip = 0;
 		srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-		pd3dDevice->CreateShaderResourceView(tex.Get(), &srvDesc, hDescriptor);
 
-		hDescriptor.Offset(1, CbvSrvUavDescriptorSize);
+		if (m_vpTextures[i])
+		{
+			auto tex = m_vpTextures[i]->Resource;
+
+			srvDesc.Format = tex->GetDesc().Format;
+			srvDesc.Texture2D.MipLevels = tex->GetDesc().MipLevels;
+
+			pd3dDevice->CreateShaderResourceView(tex.Get(), &srvDesc, hDescriptor);
+			hDescriptor.Offset(1, CbvSrvUavDescriptorSize);
+		}
+		else
+		{
+			srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			srvDesc.Texture2D.MipLevels = 1;
+			pd3dDevice->CreateShaderResourceView(nullptr, &srvDesc, hDescriptor);
+			hDescriptor.Offset(1, CbvSrvUavDescriptorSize);
+		}
 
 	}
 
@@ -69,9 +80,14 @@ bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 
 void Material::MaterialSet(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	if (m_pShader && g_curShader != m_nShaderType) 	m_pShader->ChangeShader(pd3dCommandList);
+
+	if (m_pShader && g_curShader != m_nShaderType && g_curShader != ShaderType::Shader_DepthMap) 
+		m_pShader->ChangeShader(pd3dCommandList);
 
 	if(m_pMatCB) pd3dCommandList->SetGraphicsRootConstantBufferView(2, m_pMatCB->Resource()->GetGPUVirtualAddress());
+
+	if (g_curShader == ShaderType::Shader_DepthMap)
+		return;
 
 	if (m_DescriptorHeap == nullptr)
 	{
@@ -83,12 +99,12 @@ void Material::MaterialSet(ID3D12GraphicsCommandList* pd3dCommandList)
 		pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
 
 		D3D12_GPU_DESCRIPTOR_HANDLE matHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		pd3dCommandList->SetGraphicsRootDescriptorTable(3, matHandle);
+		pd3dCommandList->SetGraphicsRootDescriptorTable(4, matHandle);
 	}
 
 }
 
-void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+bool Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 	FILE* pInFile, Object* pRootObject, const char* pstrFileName, const char* pstrTexPath)
 {
 	char pstrTextureName[64] = { '\0' };
@@ -120,6 +136,13 @@ void Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		if (!bDuplicated)
 		{
 			LoadTexture(pd3dDevice, pd3dCommandList, conStr);
+			
 		}
+		return true;
+	}
+	else
+	{
+		m_strTextureName.push_back(L"null");
+		return false;
 	}
 }
