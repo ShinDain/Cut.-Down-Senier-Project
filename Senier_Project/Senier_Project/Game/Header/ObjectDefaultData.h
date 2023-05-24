@@ -50,7 +50,7 @@ using namespace DirectX;
 #define GROUND_MODEL_TYPE Object_World
 #define GROUND_MODEL_COLLIDERTYPE Collider_None
 #define GROUND_MODEL_MASS 9999
-#define GROUND_MODEL_SCALE XMFLOAT3(10,1,10)
+#define GROUND_MODEL_SCALE XMFLOAT3(10,10,10)
 #define GROUND_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
 
 #define CARPET_MODEL_NAME "Carpet_5"

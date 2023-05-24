@@ -45,10 +45,10 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// ¹Ù´Ú
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1,1,1), nullptr, 0);
 
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
 
 	// ¸Ê µ¥ÀÌÅÍ ·Îµå
@@ -168,18 +168,50 @@ void Scene::UpdatePassCB(float totalTime, float elapsedTime)
 	passConstant.FarZ = 100.0f;
 	passConstant.TotalTime = totalTime;
 	passConstant.DeltaTime = elapsedTime;
-	passConstant.AmbientLight = { 0.2f, 0.2f, 0.3f, 1.0f };
+	passConstant.AmbientLight = { 0.5f, 0.5f, 0.5f, 1.0f };
 	passConstant.Lights[0].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[0].Strength = { 0.3f, 0.3f, 0.3f };
-	//passConstant.Lights[0].Position = { -50, 50.0f, 0 };
+	passConstant.Lights[0].Strength = { 0.5f, 0.5f, 0.5f };
+	passConstant.Lights[0].Position = { 0, 30.0f, 20 };
 
-	passConstant.Lights[1].Direction = m_BaseLightDirections[1];
-	passConstant.Lights[1].Strength = { 0.2f, 0.2f, 0.2f };
-	//passConstant.Lights[1].Position = { -50, 50.0f, 0 };
+	passConstant.Lights[1].Direction = m_BaseLightDirections[0];
+	passConstant.Lights[1].Strength = { 0.5f, 0.5f, 0.5f };
+	passConstant.Lights[1].Position = { 20, 20.0f, 120 };
 
-	passConstant.Lights[2].Direction = m_BaseLightDirections[2];
-	passConstant.Lights[2].Strength = { 0.2f, 0.2f, 0.2f };
-	//passConstant.Lights[2].Position = { 50, 50.0f, 0 };
+	passConstant.Lights[2].Direction = m_BaseLightDirections[0];
+	passConstant.Lights[2].Strength = { 0.5f, 0.5f, 0.5f };
+	passConstant.Lights[2].Position = { -50, 20.0f, 240 };
+
+	passConstant.Lights[3].Direction = m_BaseLightDirections[0];
+	passConstant.Lights[3].Strength = { 0.5f, 0.5f, 0.5f };
+	passConstant.Lights[3].Position = { 220, 20.0f, 0 };
+
+	passConstant.Lights[4].Direction = m_BaseLightDirections[0];
+	passConstant.Lights[4].Strength = { 0.5f, 0.5f, 0.5f };
+	passConstant.Lights[4].Position = { 220, 20.0f, 120 };
+
+	passConstant.Lights[5].Direction = m_BaseLightDirections[0];
+	passConstant.Lights[5].Strength = { 0.5f, 0.5f, 0.5f };
+	passConstant.Lights[5].Position = { 220, 20.0f, 240 };
+
+	passConstant.Lights[6].Direction = m_BaseLightDirections[0];
+	passConstant.Lights[6].Strength = { 0.5f, 0.5f, 0.5f };
+	passConstant.Lights[6].Position = { 150, 20.0f, 0 };
+
+	passConstant.Lights[7].Direction = m_BaseLightDirections[0];
+	passConstant.Lights[7].Strength = { 0.5f, 0.5f, 0.5f };
+	passConstant.Lights[7].Position = { 150, 20.0f, 120 };
+
+	passConstant.Lights[8].Direction = m_BaseLightDirections[0];
+	passConstant.Lights[8].Strength = { 0.5f, 0.5f, 0.5f };
+	passConstant.Lights[8].Position = { 150, 20.0f, 240 };
+
+	passConstant.Lights[9].Direction = m_BaseLightDirections[0];
+	passConstant.Lights[9].Strength = { 0.5f, 0.5f, 0.5f };
+	passConstant.Lights[9].Position = { 20, 20.0f, 240 };
+
+	passConstant.Lights[10].Direction = m_BaseLightDirections[0];
+	passConstant.Lights[10].Strength = { 0.5f, 0.5f, 0.5f };
+	passConstant.Lights[10].Position = { -50, 20.0f, 150 };
 
 	m_pPassCB->CopyData(0, passConstant);
 }
@@ -238,18 +270,6 @@ void Scene::UpdateShadowPassCB(float totalTime, float elapsedTime)
 	passConstant.FarZ = lightFar;
 	passConstant.TotalTime = totalTime;
 	passConstant.DeltaTime = elapsedTime;
-
-	passConstant.AmbientLight = { 0.1f, 0.1f, 0.2f, 1.0f };
-	passConstant.Lights[0].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[0].Strength = { 0.3f, 0.3f, 0.3f };
-	//passConstant.Lights[0].Position = { -50, 50.0f, 0 };
-
-	passConstant.Lights[1].Direction = m_BaseLightDirections[1];
-	passConstant.Lights[1].Strength = { 0.2f, 0.2f, 0.2f };
-	//passConstant.Lights[1].Position = { -50, 50.0f, 0 };
-
-	passConstant.Lights[2].Direction = m_BaseLightDirections[2];
-	passConstant.Lights[2].Strength = { 0.2f, 0.2f, 0.2f };
 
 	m_pShadowPassCB->CopyData(0, passConstant);
 }
