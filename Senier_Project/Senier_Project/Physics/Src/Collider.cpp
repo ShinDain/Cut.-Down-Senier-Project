@@ -169,9 +169,9 @@ void ColliderBox::CalculateRotateInertiaMatrix()
 	xmf3ColliderExtents.y *= m_xmf3Scale.y;
 	xmf3ColliderExtents.z *= m_xmf3Scale.z;
 
-	xmf4x4RotateInertia._11 = objectMass * (xmf3ColliderExtents.y * xmf3ColliderExtents.y) + (xmf3ColliderExtents.z * xmf3ColliderExtents.z) / 12;
-	xmf4x4RotateInertia._22 = objectMass * (xmf3ColliderExtents.x * xmf3ColliderExtents.x) + (xmf3ColliderExtents.z * xmf3ColliderExtents.z) / 12;
-	xmf4x4RotateInertia._33 = objectMass * (xmf3ColliderExtents.y * xmf3ColliderExtents.y) + (xmf3ColliderExtents.x * xmf3ColliderExtents.x) / 12;
+	xmf4x4RotateInertia._11 = objectMass * ((xmf3ColliderExtents.y * xmf3ColliderExtents.y) + (xmf3ColliderExtents.z * xmf3ColliderExtents.z)) / 12;
+	xmf4x4RotateInertia._22 = objectMass * ((xmf3ColliderExtents.x * xmf3ColliderExtents.x) + (xmf3ColliderExtents.z * xmf3ColliderExtents.z)) / 12;
+	xmf4x4RotateInertia._33 = objectMass * ((xmf3ColliderExtents.y * xmf3ColliderExtents.y) + (xmf3ColliderExtents.x * xmf3ColliderExtents.x)) / 12;
 
 	m_pRigidBody->SetRotateInertia(xmf4x4RotateInertia);
 }

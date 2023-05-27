@@ -41,11 +41,21 @@ public:
 
 protected:
 	std::shared_ptr<Weapon> m_pWeapon = nullptr;
+	
+	XMFLOAT3 m_xmf3CameraRotation = XMFLOAT3(0, 0, 0);
+	//float m_TargetYaw = 0;
+
+	float m_TurnSpeed = 360;
 
 public:
+	void RotateToMove(float elapsedTime);
+
+
 	std::shared_ptr<Weapon> GetWeapon() { return m_pWeapon; }
+	XMFLOAT3 GetCameraRotation() {	return m_xmf3CameraRotation;}
 
 	void SetWeapon(std::shared_ptr<Weapon> pWeapon) { m_pWeapon = pWeapon; }
+	void SetCameraRotation(XMFLOAT3 xmf3CameraRotation) { m_xmf3CameraRotation = xmf3CameraRotation; }
 
 };
 

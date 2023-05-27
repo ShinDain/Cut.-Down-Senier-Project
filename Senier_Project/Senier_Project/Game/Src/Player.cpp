@@ -32,6 +32,8 @@ bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 void Player::Update(float elapsedTime)
 {
 	Character::Update(elapsedTime);
+
+	RotateToMove(elapsedTime);
 }
 
 void Player::Destroy()
@@ -71,46 +73,59 @@ void Player::KeyDownEvent(WPARAM wParam)
 
 void Player::Move(DWORD dwDirection)
 {
+	//if (!m_pAnimationController->GetTrackEnable(2))
+	//	m_pAnimationController->SetTrackEnable(0, true);
+
 	if (dwDirection == 0)
 	{
 		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
 		m_pBody->SetAcceleration(XMFLOAT3(0, xmf3Accel.y, 0));
 	}
-
-	XMVECTOR direction = XMVectorZero();
-	XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-	XMVECTOR r = XMLoadFloat3(&m_xmf3Right);
-
-	if (dwDirection & DIR_FORWARD)
+	else
 	{
-		direction = XMVectorAdd(direction, l);
-	}
-	if (dwDirection & DIR_BACKWARD)
-	{
-		direction = XMVectorAdd(direction, -l);
-	}
-	if (dwDirection & DIR_LEFT)
-	{
-		direction = XMVectorAdd(direction, -r);
-	}
-	if (dwDirection & DIR_RIGHT)
-	{
-		direction = XMVectorAdd(direction, r);
+		XMVECTOR direction = XMVectorZero();
+
+		XMMATRIX xmmatRotate = XMMatrixRotationY(XMConvertToRadians(m_xmf3CameraRotation.y));
+		XMVECTOR camLook = XMVectorSet(0, 0, 1, 0);
+		XMVECTOR camRight = XMVectorSet(1, 0, 0, 0);
+
+		camLook = XMVector3TransformNormal(camLook, xmmatRotate);
+		camRight = XMVector3TransformNormal(camRight, xmmatRotate);
+
+		if (dwDirection & DIR_FORWARD)
+		{
+			direction = XMVectorAdd(direction, camLook);
+		}
+		if (dwDirection & DIR_BACKWARD)
+		{
+			direction = XMVectorAdd(direction, -camLook);
+		}
+		if (dwDirection & DIR_LEFT)
+		{
+			direction = XMVectorAdd(direction, -camRight);
+		}
+		if (dwDirection & DIR_RIGHT)
+		{
+			direction = XMVectorAdd(direction, camRight);
+		}
+
+		// 진행 방향
+		direction = XMVector3Normalize(direction);
+		XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+		XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
+
+		XMVECTOR deltaAccel = direction * m_Acceleration;
+		XMFLOAT3 xmf3deltaAccelXZ;
+		XMStoreFloat3(&xmf3deltaAccelXZ, deltaAccel);
+
+		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+		xmf3Accel.x = xmf3deltaAccelXZ.x;
+		xmf3Accel.z = xmf3deltaAccelXZ.z;
+		m_pBody->SetAcceleration(xmf3Accel);
+
 	}
 
-	direction = XMVector3Normalize(direction);
-
-	XMVECTOR deltaAccel = direction * m_Acceleration;
-	//XMFLOAT3 xmf3deltaAccel;
-	//XMStoreFloat3(&xmf3deltaAccel, deltaAccel);
-	XMFLOAT3 xmf3deltaAccelXZ;
-	XMStoreFloat3(&xmf3deltaAccelXZ, deltaAccel);
-
-	XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
-	xmf3Accel.x = xmf3deltaAccelXZ.x;
-	xmf3Accel.z = xmf3deltaAccelXZ.z;
-	m_pBody->SetAcceleration(xmf3Accel);
-
+	// move 애니메이션 블랜딩
 
 	if (m_pAnimationController->GetTrackEnable(2))
 		return;
@@ -154,12 +169,12 @@ void Player::Jump()
 
 void Player::Attack()
 {
-	m_pAnimationController->SetTrackAnimationSet(2, 13);
+	/*m_pAnimationController->SetTrackAnimationSet(2, 13);
 	m_pAnimationController->SetTrackEnable(2, true);
 	m_pAnimationController->SetTrackPosition(2, 0);
 	m_pAnimationController->SetTrackEnable(0, false);
 	m_pAnimationController->SetTrackEnable(1, false);
-	m_pAnimationController->m_vpAnimationTracks[2]->SetType(ANIMATION_TYPE_ONCE);
+	m_pAnimationController->m_vpAnimationTracks[2]->SetType(ANIMATION_TYPE_ONCE);*/
 }
 
 void Player::OnHit()
@@ -168,6 +183,35 @@ void Player::OnHit()
 
 void Player::OnDeath()
 {
+}
+
+void Player::RotateToMove(float elapsedTime)
+{
+	// 진행 방향
+	XMVECTOR l = XMVectorSet(0, 0, 1, 0);
+	XMVECTOR targetLook = XMLoadFloat3(&m_pBody->GetAcceleration());
+	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+	XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
+	float angleBetweenLook = XMVectorGetX(XMVector3AngleBetweenVectors(targetLook, look));
+	angleBetweenLook = XMConvertToDegrees(angleBetweenLook);
+
+	if (!XMVectorGetX(XMVectorIsNaN(XMVectorReplicate(angleBetweenLook))))
+	{
+		if (XMVectorGetX(XMVector3Dot(targetLook, right)) < 0)
+			angleBetweenLook *= -1;
+
+		XMFLOAT3 xmf3Velcity = m_pBody->GetVelocity();
+		xmf3Velcity.y = 0;
+		XMVECTOR velocity = XMLoadFloat3(&xmf3Velcity);
+		float velocityLength = XMVectorGetX(XMVector3Length(velocity));
+
+		angleBetweenLook = angleBetweenLook / 5;
+
+		// 값이 너무 커지지 않도록
+		float tmp = (int)(m_xmf3Rotation.y + angleBetweenLook) % 360;
+
+		SetRotate(XMFLOAT3(m_xmf3Rotation.x, tmp, m_xmf3Rotation.z));
+	}
 }
 
 // ====================================================================

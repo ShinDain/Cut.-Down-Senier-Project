@@ -28,17 +28,17 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// 캐릭터 테스트
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,0,0), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), CHARACTER_MODEL_NAME, 3);
 	//m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(1, 13);
-	m_vpAllObjs[0]->m_pAnimationController->SetTrackEnable(0, true);
-	m_vpAllObjs[0]->m_pAnimationController->SetTrackEnable(1, true);
-	m_vpAllObjs[0]->m_pAnimationController->SetTrackEnable(2, false);
-	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(2, 13);
-	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(1, 1);
-	m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(0, 0);
+	m_pPlayer->m_pAnimationController->SetTrackEnable(0, true);
+	m_pPlayer->m_pAnimationController->SetTrackEnable(1, true);
+	m_pPlayer->m_pAnimationController->SetTrackEnable(2, false);
+	//m_pPlayer->m_pAnimationController->SetTrackAnimationSet(2, 13);
+	m_pPlayer->m_pAnimationController->SetTrackAnimationSet(1, 1);
+	m_pPlayer->m_pAnimationController->SetTrackAnimationSet(0, 0);
 
 	// 몬스터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(220, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, 1);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(240, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0),XMFLOAT3(1,1,1), ZOMBIE_MODEL_NAME, 1);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(260, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, 1);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(220, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, 1);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(240, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0),XMFLOAT3(1,1,1), ZOMBIE_MODEL_NAME, 1);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(260, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, 1);
 
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0.2, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90),XMFLOAT3(1,1,1), WEAPON_MODEL_NAME, 0);
 
@@ -50,18 +50,22 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
+	// tmp
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
-	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
+	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 
 	std::shared_ptr<ImgObject> imgobj = std::make_shared<ImgObject>();
 	imgobj->Initialize(pd3dDevice, pd3dCommandList, 1900, 1024, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 500, 500);
 	m_pImage = imgobj;
 
 	// 카메라 초기화
-	m_pCamera = std::make_unique<Third_Person_Camera>(m_vpAllObjs[0]);
-	m_pCamera->Pitch(15);
-
+	if (m_pPlayer)
+	{
+		m_pCamera = std::make_unique<Third_Person_Camera>(m_pPlayer);
+		m_pCamera->Pitch(15);
+	}
 #if defined(_DEBUG)
 	//m_pCamera = std::make_unique<Camera>();
 	//m_pCamera->SetPosition(0, 30, -100);
@@ -129,14 +133,18 @@ void Scene::Update(float totalTime ,float elapsedTime)
 	// 교차 검사
 	//Intersect();
 
-	// 충돌 검사
-	GenerateContact();
-	ProcessPhysics(elapsedTime);
+
 
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
 		if (m_vpAllObjs[i]) m_vpAllObjs[i]->Update(elapsedTime);
 	}
+
+	m_pPlayer->Update(elapsedTime);
+
+	// 충돌 검사
+	GenerateContact();
+	ProcessPhysics(elapsedTime);
 	
 	m_pCamera->Update(elapsedTime);
 
@@ -305,6 +313,12 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		}
 	}
 
+	{
+		m_pPlayer->Animate(elapsedTime);
+		if (!m_pPlayer->m_pAnimationController)
+			m_pPlayer->UpdateTransform(NULL);
+		m_pPlayer->Render(elapsedTime, pd3dCommandList);
+	}
 	// img 오브젝트
 	/*{
 		g_Shaders[ShaderType::Shader_Image]->ChangeShader(pd3dCommandList);
@@ -322,6 +336,8 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 
 void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	return;
+
 	ID3D12DescriptorHeap* descriptorHeaps[] = { m_SrvDescriptorHeap.Get() };
 	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
@@ -388,10 +404,10 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 	}
 	
 	// 임시
-	if (m_vpAllObjs[0])
+	if (m_pPlayer)
 	{
-		m_vpAllObjs[0]->ProcessInput(pKeybuffer);
-		m_vpAllObjs[0]->SetRotate(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
+		m_pPlayer->ProcessInput(pKeybuffer);
+		m_pPlayer->SetCameraRotation(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
 	}
 	
 #if defined(_DEBUG)
@@ -401,10 +417,12 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 
 void Scene::KeyDownEvent(WPARAM wParam)
 {
-	for (int i = 0; i < m_vpAllObjs.size(); ++i)
+	m_pPlayer->KeyDownEvent(wParam);
+
+	/*for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
 		m_vpAllObjs[i]->KeyDownEvent(wParam);
-	}
+	}*/
 }
 
 void Scene::LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName)
@@ -553,7 +571,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	case Object_Player:
 	{
 		std::shared_ptr<Player> pPlayer = std::make_shared<Player>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
-		pObject = std::static_pointer_cast<Object>(pPlayer);
+		m_pPlayer = pPlayer;
 	}
 		break;
 
@@ -561,6 +579,9 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	{
 		std::shared_ptr<Monster> pMonster = std::make_shared<Monster>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 		pObject = std::static_pointer_cast<Object>(pMonster);
+
+		m_vpAllObjs.emplace_back(pObject);
+		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
 	}
 		break;
 
@@ -571,20 +592,23 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		std::shared_ptr<Weapon> pWeapon = std::make_shared<Weapon>(pd3dDevice, pd3dCommandList, objectData, tmp, m_vpAllObjs[0], pModelData, nAnimationTracks, nullptr);
 		pObject = std::static_pointer_cast<Object>(pWeapon);
 		std::static_pointer_cast<Player>(m_vpAllObjs[0])->SetWeapon(pWeapon);
+
+		m_vpAllObjs.emplace_back(pObject);
+		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
 	}
 	break;	
 
 	default:
 	{
 		pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+
+		m_vpAllObjs.emplace_back(pObject);
+		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
 	}
 		break;
 	}
 
-	m_vpAllObjs.emplace_back(pObject);
-	m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
-	m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer][0]->GetCollider();
-//	pObject->Initialize(pd3dDevice, pd3dCommandList, NULL);
+	
 
 	return pObject;
 }

@@ -702,7 +702,8 @@ void Object::IsFalling()
 	}
 }
 
-void Object::SetRotate(const XMFLOAT3& Rotate) {
+void Object::SetRotate(const XMFLOAT3& Rotate) 
+{
 	SetRotate(Rotate.x, Rotate.y, Rotate.z);
 
 	XMMATRIX xmmatRotate = XMMatrixRotationY(XMConvertToRadians(Rotate.y));

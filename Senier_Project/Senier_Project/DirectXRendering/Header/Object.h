@@ -193,6 +193,7 @@ public:
 	const XMFLOAT3& GetLookVector() { return(m_xmf3Look); }
 	const XMFLOAT3& GetUpVector() { return(m_xmf3Up); }
 	const XMFLOAT3& GetRightVector() { return(m_xmf3Right); }
+	const XMFLOAT3& GetRotation() { return m_xmf3Rotation; }
 	const float& GetYaw() { return(m_xmf3Rotation.y); }
 	const float& GetPitch() { return(m_xmf3Rotation.x); }
 	const float& GetRoll() { return(m_xmf3Rotation.z); }

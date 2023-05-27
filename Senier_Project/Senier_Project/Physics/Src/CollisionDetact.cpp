@@ -271,7 +271,10 @@ int CollisionDetector::SphereAndSphere(const ColliderSphere& sphere1, const Coll
 int CollisionDetector::BoxAndHalfSpace(const ColliderBox& box, const ColliderPlane& plane, CollisionData& pData)
 {
 	// 박스가 물리 연산을 하지 않는 경우 return;
-	if (!box.GetPhysics() && box.GetBody()->GetInvalid())
+	if (!box.GetPhysics() || box.GetBody()->GetInvalid())
+		return 0;
+
+	if (!box.GetBody()->GetIsAwake())
 		return 0;
 
 	if (pData.ContactCnt() > pData.maxContacts) return 0;
@@ -331,6 +334,9 @@ int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box
 		return 0;
 
 	XMVECTOR toCentre = box2.GetAxis(3) - box1.GetAxis(3);
+
+	if (XMVectorGetX(XMVectorIsNaN(toCentre)))
+		return 0;
 
 	float pen = FLT_MAX;
 	int best = 0xffffff;
