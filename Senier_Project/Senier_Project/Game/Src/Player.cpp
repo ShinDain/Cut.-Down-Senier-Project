@@ -25,7 +25,6 @@ bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 	m_pAnimationController->SetCallbackKeys(0, 2);
 
-
 	return true;
 }
 

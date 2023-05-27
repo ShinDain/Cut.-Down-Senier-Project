@@ -50,9 +50,6 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
-	// tmp
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
-
 	// 맵 데이터 로드
 	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 
@@ -130,17 +127,15 @@ void Scene::Update(float totalTime ,float elapsedTime)
 
 #endif
 
-	// 교차 검사
-	//Intersect();
-
-
-
 	for (int i = 0; i < m_vpAllObjs.size(); ++i)
 	{
 		if (m_vpAllObjs[i]) m_vpAllObjs[i]->Update(elapsedTime);
 	}
 
 	m_pPlayer->Update(elapsedTime);
+
+	// 교차 검사
+	//Intersect();
 
 	// 충돌 검사
 	GenerateContact();
@@ -622,6 +617,7 @@ void Scene::GenerateContact()
 		if(m_vpAllObjs[i]->GetBody())
 			m_vpAllObjs[i]->GetBody()->ClearContact();
 	}
+	m_pPlayer->GetBody()->ClearContact();
 
 	m_CollisionData.Reset(nContactCnt);
 	m_CollisionData.friction = 0;
