@@ -9,9 +9,7 @@ Weapon::Weapon(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	if (pFollowObject)
 	{
 		m_pFollowObject = pFollowObject->FindFrame(pstrFollowObject);
-		pFollowObject->m_pAnimationController->SetCallbackKey(0, 0, 0.0f, (void*)(this));
 	}
-	//m_pAnimationController->SetCallbackKey(2, 1, 0.0f, (void*)(m_pWeapon.get()));
 }
 
 Weapon::~Weapon()
@@ -93,9 +91,6 @@ void Weapon::Update(float elapsedTime)
 {
 	UpdateToRigidBody(elapsedTime);
 
-	// 무기와 교차 체크
-	Intersect();
-
 	ObjConstant objConstant;
 	XMMATRIX world = XMLoadFloat4x4(&m_xmf4x4World);
 	XMMATRIX inverseTransWorld = XMMatrixInverse(nullptr, XMMatrixTranspose(world));
@@ -155,26 +150,41 @@ void Weapon::UpdateToRigidBody(float elapsedTime)
 	}
 }
 
-void Weapon::Intersect()
+void Weapon::Intersect(XMFLOAT3 xmf3PlayerLook)
 {
-	//if (!m_pCollider->GetIsActive())
-	//	return;
-
+#if defined(_DEBUG) || defined(DEBUG)
 	m_pCollider->SetIntersect(0);
-
-	ColliderBox* tmpCollider = std::static_pointer_cast<ColliderBox>(m_pCollider).get();
 
 	for (int i = 0; i < g_ppColliderBoxs.size(); ++i)
 	{
-		if (!g_ppColliderBoxs[i]->GetIsActive() || m_pCollider == g_ppColliderBoxs[i])
+		g_ppColliderBoxs[i]->SetIntersect(0);
+	}
+
+#endif
+
+	if (!m_pCollider->GetIsActive())
+		return;
+
+	ColliderBox* tmpCollider = std::static_pointer_cast<ColliderBox>(m_pCollider).get();
+
+	for (int i = 0; i < g_vpAllObjs.size(); ++i)
+	{
+		ColliderBox* objCollider = std::static_pointer_cast<ColliderBox>(g_vpAllObjs[i]->GetCollider()).get();
+
+		if (!objCollider)
 			continue;
 
-		if (IntersectTests::BoxAndBox(*tmpCollider, *g_ppColliderBoxs[i]))
+		if (!objCollider->GetIsActive() || m_pCollider.get() == objCollider)
+			continue;
+
+		if (IntersectTests::BoxAndBox(*tmpCollider, *objCollider))
 		{
+#if defined(_DEBUG) || defined(DEBUG)
 			m_pCollider->SetIntersect(1);
-			//g_ppColliderBoxs[i]->SetIntersect(1);
+			objCollider->SetIntersect(1);
+#endif
+			g_vpAllObjs[i]->ApplyDamage(10, xmf3PlayerLook);
 		}
-		
 	}
 }
 

@@ -96,20 +96,4 @@ public:
 
 };
 
-class AttackCallbackHandler :public AnimationCallbackHandler
-{
-public:
-	AttackCallbackHandler() {}
-	virtual ~AttackCallbackHandler() {}
-
-public:
-	virtual void HandleCallback(void* pCallbackData, float TrackPosition);
-};
-
-
-
-
-
-
-
 #endif

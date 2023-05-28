@@ -31,7 +31,7 @@ public:
 
 	virtual void UpdateToRigidBody(float elapsedTime);
 
-	void Intersect();
+	void Intersect(XMFLOAT3 xmf3PlayerLook);
 
 
 	virtual void Destroy();
@@ -48,8 +48,6 @@ protected:
 public:
 	void Active();
 
-
-
 public:
 	bool GetActive() { return m_bActive = false; }
 
@@ -58,6 +56,12 @@ public:
 		m_bActive = bActive;
 		m_pCollider->SetIsActive(bActive);
 	}
+	void ToggleActive()
+	{
+		m_bActive = !m_bActive;
+		m_pCollider->SetIsActive(m_bActive);
+	}
+
 	void SetFollowObject(std::shared_ptr<Object> pFollowObject) { m_pFollowObject = pFollowObject; }
 
 };

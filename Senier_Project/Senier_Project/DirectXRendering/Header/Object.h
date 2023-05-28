@@ -14,7 +14,7 @@
 #include "Material.h"
 #include "AnimationController.h"
 
-//#define COLLIDER_RENDER
+#define COLLIDER_RENDER
 
 #define DIR_FORWARD					0x01
 #define DIR_BACKWARD				0x02
@@ -124,6 +124,8 @@ public:
 	virtual void Rotate(float x, float y, float z) {}
 	virtual void Jump() {}
 	virtual void IsFalling();
+
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 
 	void AddPosition(float x, float y, float z)
 	{

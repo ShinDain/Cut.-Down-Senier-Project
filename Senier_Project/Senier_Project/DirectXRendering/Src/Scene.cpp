@@ -127,15 +127,15 @@ void Scene::Update(float totalTime ,float elapsedTime)
 #if defined(_DEBUG)
 	ClearObjectLayer();
 	m_refCnt = g_LoadedModelData[CHARACTER_MODEL_NAME]->m_pRootObject.use_count();
-	m_size = m_vpAllObjs.size();
+	m_size = g_vpAllObjs.size();
 
 	m_tTime += elapsedTime;
 
 #endif
 
-	for (int i = 0; i < m_vpAllObjs.size(); ++i)
+	for (int i = 0; i < g_vpAllObjs.size(); ++i)
 	{
-		if (m_vpAllObjs[i]) m_vpAllObjs[i]->Update(elapsedTime);
+		if (g_vpAllObjs[i]) g_vpAllObjs[i]->Update(elapsedTime);
 	}
 
 	m_pPlayer->Update(elapsedTime);
@@ -581,7 +581,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		std::shared_ptr<Monster> pMonster = std::make_shared<Monster>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 		pObject = std::static_pointer_cast<Object>(pMonster);
 
-		m_vpAllObjs.emplace_back(pObject);
+		g_vpAllObjs.emplace_back(pObject);
 		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
 	}
 		break;
@@ -594,7 +594,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		pObject = std::static_pointer_cast<Object>(pWeapon);
 		m_pPlayer->SetWeapon(pWeapon);
 
-		m_vpAllObjs.emplace_back(pObject);
+		g_vpAllObjs.emplace_back(pObject);
 		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
 	}
 	break;	
@@ -603,13 +603,11 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	{
 		pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 
-		m_vpAllObjs.emplace_back(pObject);
+		g_vpAllObjs.emplace_back(pObject);
 		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
 	}
 		break;
 	}
-
-	
 
 	return pObject;
 }
@@ -618,10 +616,10 @@ void Scene::GenerateContact()
 {
 	unsigned int nContactCnt = MAX_CONTACT_CNT * 8;
 
-	for (int i = 0; i < m_vpAllObjs.size(); ++i)
+	for (int i = 0; i < g_vpAllObjs.size(); ++i)
 	{
-		if(m_vpAllObjs[i]->GetBody())
-			m_vpAllObjs[i]->GetBody()->ClearContact();
+		if(g_vpAllObjs[i]->GetBody())
+			g_vpAllObjs[i]->GetBody()->ClearContact();
 	}
 	m_pPlayer->GetBody()->ClearContact();
 
@@ -698,12 +696,12 @@ void Scene::ClearObjectLayer()
 	}*/
 
 	// 전체 순회
-	for (int i = 0; i < m_vpAllObjs.size(); ++i)
+	for (int i = 0; i < g_vpAllObjs.size(); ++i)
 	{
-		if (!m_vpAllObjs[i]->GetIsAlive())
+		if (!g_vpAllObjs[i]->GetIsAlive())
 		{
-			m_vpAllObjs[i]->Destroy();
-			m_vpAllObjs.erase(m_vpAllObjs.begin() + i);
+			g_vpAllObjs[i]->Destroy();
+			g_vpAllObjs.erase(g_vpAllObjs.begin() + i);
 		}
 	}
 

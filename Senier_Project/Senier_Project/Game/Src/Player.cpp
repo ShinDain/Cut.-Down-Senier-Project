@@ -20,11 +20,6 @@ bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 {
 	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 
-	std::shared_ptr<AnimationCallbackHandler> pHandler = std::make_shared<AttackCallbackHandler>();
-	m_pAnimationController->SetAnimationCallbackHandler(0, pHandler);
-
-	m_pAnimationController->SetCallbackKeys(0, 2);
-
 	return true;
 }
 
@@ -34,6 +29,8 @@ void Player::Update(float elapsedTime)
 
 	RotateToMove(elapsedTime);
 	UpdateAnimationTrack();
+
+	m_pWeapon->Intersect(m_xmf3Look);
 }
 
 void Player::Destroy()
@@ -200,7 +197,6 @@ void Player::Attack()
 		break;
 	}
 
-
 	m_Acceleration = 0.0f;
 
 	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
@@ -321,6 +317,14 @@ void Player::UpdateAnimationTrack()
 
 	case Player_State_Melee:
 	{
+		if (m_pAnimationController->GetTrackRate(2) > 0.6f)
+		{
+			m_pWeapon->SetActive(false);
+		}
+		else
+		{
+			m_pWeapon->SetActive(true);
+		}
 		if (m_pAnimationController->GetTrackOver(2))
 		{
 			m_pAnimationController->SetTrackEnable(0, true);
@@ -376,19 +380,4 @@ void Player::RotateToMove(float elapsedTime)
 
 		SetRotate(XMFLOAT3(m_xmf3Rotation.x, tmp, m_xmf3Rotation.z));
 	}
-}
-
-// ====================================================================
-
-void AttackCallbackHandler::HandleCallback(void* pCallbackData, float TrackPosition)
-{
-	//_TCHAR* pDataName = (_TCHAR*)pCallbackData;
-#ifdef _WITH_DEBUG_CALLBACK_DATA
-	TCHAR pstrDebug[256] = { 0 };
-	_stprintf_s(pstrDebug, 256, _T("%s(%f)\n"), pWavName, fTrackPosition);
-	OutputDebugString(pstrDebug);
-#endif
-
-	Weapon* pWeapon = (Weapon*)pCallbackData;
-	pWeapon->SetActive(true);
 }

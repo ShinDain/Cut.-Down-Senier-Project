@@ -21,6 +21,8 @@ extern std::vector<std::shared_ptr<ColliderPlane>> g_ppColliderPlanes;
 extern std::vector<std::shared_ptr<ColliderBox>> g_ppColliderBoxs;
 extern std::vector<std::shared_ptr<ColliderSphere>> g_ppColliderSpheres;
 
+extern std::vector<std::shared_ptr<Object>> g_vpAllObjs;
+
 extern std::map<const char*, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;
 
 extern std::vector<std::shared_ptr<Texture>> g_CachingTexture;

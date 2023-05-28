@@ -717,6 +717,18 @@ void Object::IsFalling()
 	}
 }
 
+void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+{
+	XMVECTOR damageDirection = XMLoadFloat3(&xmf3DamageDirection);
+	damageDirection = XMVector3Normalize(damageDirection);
+	XMVECTOR deltaVelocity = damageDirection * power;
+
+	XMFLOAT3 xmf3DeltaVelocity;
+	XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+
+	m_pBody->AddVelocity(xmf3DeltaVelocity);
+}
+
 void Object::SetRotate(const XMFLOAT3& Rotate) 
 {
 	SetRotate(Rotate.x, Rotate.y, Rotate.z);

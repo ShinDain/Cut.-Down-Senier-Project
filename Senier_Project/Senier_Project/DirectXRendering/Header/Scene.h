@@ -68,7 +68,6 @@ private:
 	std::unique_ptr<UploadBuffer<PassConstant>> m_pShadowPassCB = nullptr;
 
 	// 오브젝트 객체들
-	std::vector<std::shared_ptr<Object>> m_vpAllObjs;
 	std::vector<std::shared_ptr<Object>> m_vObjectLayer[(int)RenderLayer::Render_Count];
 
 	std::shared_ptr<Player> m_pPlayer = nullptr;
