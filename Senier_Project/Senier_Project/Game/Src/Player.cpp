@@ -55,20 +55,17 @@ void Player::ProcessInput(UCHAR* pKeybuffer)
 
 	Move(dwDirection);
 
-	//if (pKeybuffer[VK_SPACE] & 0xF0) 
-
 	if (pKeybuffer[VK_LBUTTON] & 0xF0)	Attack();
 }
 
-int tmpCnt = 0;
 
 void Player::KeyDownEvent(WPARAM wParam)
 {
-	if (wParam == 'K')
+	/*if (wParam == 'K')
 	{
 		tmpCnt = (tmpCnt + 1) % 17;
 		m_pAnimationController->SetTrackAnimationSet(0, tmpCnt);
-	}
+	}*/
 	if(wParam == VK_SPACE)
 		Jump();
 }
@@ -136,7 +133,9 @@ void Player::Jump()
 		XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
 		float length = xmf3Velocity.y;
 
-		XMVECTOR deltaVelocity = XMLoadFloat3(&m_pBody->GetVelocity()) + (XMLoadFloat3(&m_xmf3Up) * m_JumpSpeed);
+		XMFLOAT3 xmf3Velcity = m_pBody->GetVelocity();
+		xmf3Velocity.y = 0;
+		XMVECTOR deltaVelocity = XMLoadFloat3(&xmf3Velocity) + (XMLoadFloat3(&m_xmf3Up) * m_JumpSpeed);
 		XMFLOAT3 xmf3DeltaVel;
 		XMStoreFloat3(&xmf3DeltaVel, deltaVelocity);
 		m_pBody->SetVelocity(xmf3DeltaVel);
@@ -147,7 +146,7 @@ void Player::Jump()
 
 void Player::ChangeToJumpState()
 {
-	m_nAnimationState = PlayerAnimationState::Player_Animation_Jump;
+	m_nAnimationState = PlayerAnimationState::Player_State_Jump;
 	UnableAnimationTrack(2);
 	m_pAnimationController->SetTrackEnable(2, true);
 	m_pAnimationController->SetTrackWeight(2, 1);
@@ -176,12 +175,39 @@ void Player::BlendWithIdleMovement(float maxWeight)
 
 void Player::Attack()
 {
-	/*m_pAnimationController->SetTrackAnimationSet(2, 13);
-	m_pAnimationController->SetTrackEnable(2, true);
-	m_pAnimationController->SetTrackPosition(2, 0);
-	m_pAnimationController->SetTrackEnable(0, false);
-	m_pAnimationController->SetTrackEnable(1, false);
-	m_pAnimationController->m_vpAnimationTracks[2]->SetType(ANIMATION_TYPE_ONCE);*/
+	switch (m_nAnimationState)
+	{
+	//case Player_State_Idle:
+	//	break;
+	//case Player_State_Jump:
+	//	break;
+	//case Player_State_Falling:
+	//	break;
+	//case Player_State_Land:
+	//	break;
+	case Player_State_Melee:
+		return;
+		break;
+	default:
+		m_pAnimationController->SetTrackEnable(0, false);
+		m_pAnimationController->SetTrackEnable(1, false);
+
+		m_nAnimationState = PlayerAnimationState::Player_State_Melee;
+		UnableAnimationTrack(2);
+		m_pAnimationController->SetTrackEnable(2, true);
+		m_pAnimationController->SetTrackAnimationSet(2, Player_Anim_Index_MeleeOneHand);
+		m_pAnimationController->SetTrackWeight(2, 1);
+		break;
+	}
+
+
+	m_Acceleration = 0.0f;
+
+	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+	XMVECTOR addVelocity = look * 100.0f;
+	XMFLOAT3 xmf3AddVelocity;
+	XMStoreFloat3(&xmf3AddVelocity, addVelocity);
+	m_pBody->AddVelocity(xmf3AddVelocity);
 }
 
 void Player::OnHit()
@@ -198,36 +224,49 @@ void Player::DoLanding()
 	m_bCanDoubleJump = true;
 	m_MaxSpeedXZ = 100.f;
 	m_CharacterFriction = 350.0f;
-	m_Acceleration = 500.0f;
+	
 
-	if (m_nAnimationState == PlayerAnimationState::Player_Animation_Falling)
+	switch (m_nAnimationState)
 	{
-		m_pAnimationController->SetTrackAnimationSet(2, 9);
-		m_nAnimationState = PlayerAnimationState::Player_Animation_Land;
+	//case Player_State_Idle:
+	//	break;
+	//case Player_State_Jump:
+	//	break;
+	case Player_State_Falling:
+		m_pAnimationController->SetTrackAnimationSet(2, Player_Anim_Index_JumpDown);
+		m_nAnimationState = PlayerAnimationState::Player_State_Land;
+		break;
+	//case Player_State_Land:
+	//	break;
+	case Player_State_Melee:
+		break;
+	default:
+		m_Acceleration = 500.0f;
+		break;
 	}
+
 }
 
 void Player::UpdateAnimationTrack()
 {
 	switch (m_nAnimationState)
 	{
-	case Player_Animation_Idle:
+	case Player_State_Idle:
 	{
 		// 바닥에서의 기본 움직임
 		BlendWithIdleMovement(1);
 	}
 		break;
-	case Player_Animation_Jump:
+	case Player_State_Jump:
 	{
 		m_pAnimationController->SetTrackEnable(0, false);
 		m_pAnimationController->SetTrackEnable(1, false);
 
-		m_pAnimationController->SetTrackAnimationSet(2, 8);
+		m_pAnimationController->SetTrackAnimationSet(2, Player_Anim_Index_JumpUp);
 		// 낙하 애니메이션과 블랜딩
 		if (m_pAnimationController->GetTrackRate(2) > 0.8f)
 		{
 			m_pAnimationController->SetTrackEnable(3, true);
-			m_pAnimationController->SetTrackAnimationSet(3, 11);
 
 			float weight = (1.0f - m_pAnimationController->GetTrackRate(2)) * 5;
 			if (weight > 1)
@@ -241,17 +280,14 @@ void Player::UpdateAnimationTrack()
 			UnableAnimationTrack(2);
 
 			m_pAnimationController->SetTrackWeight(3, 1);
-			m_nAnimationState = PlayerAnimationState::Player_Animation_Falling;
+			m_nAnimationState = PlayerAnimationState::Player_State_Falling;
 		}
 	}
 		break;
 
-	case Player_Animation_Falling:
-	{
-
-	}
+	case Player_State_Falling:
 		break;
-	case Player_Animation_Land:
+	case Player_State_Land:
 	{
 		m_pAnimationController->SetTrackEnable(2, true);
 
@@ -278,10 +314,25 @@ void Player::UpdateAnimationTrack()
 		{
 			UnableAnimationTrack(2);
 
-			m_nAnimationState = PlayerAnimationState::Player_Animation_Idle;
+			m_nAnimationState = PlayerAnimationState::Player_State_Idle;
 		}
 	}
 	break;
+
+	case Player_State_Melee:
+	{
+		if (m_pAnimationController->GetTrackOver(2))
+		{
+			m_pAnimationController->SetTrackEnable(0, true);
+			m_pAnimationController->SetTrackEnable(1, true);
+
+			UnableAnimationTrack(2);
+			m_Acceleration = 500.0f;
+
+			m_nAnimationState = PlayerAnimationState::Player_State_Idle;
+		}
+	}
+		break;
 	default:
 		break;
 	}

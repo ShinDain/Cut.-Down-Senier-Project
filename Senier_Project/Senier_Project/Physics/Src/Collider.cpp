@@ -22,28 +22,12 @@ void Collider::UpdateWorldTransform()
 		m_xmf4x4World = m_pRigidBody->GetWorld();
 
 	XMMATRIX World = XMLoadFloat4x4(&m_xmf4x4World);
-	XMMATRIX OffsetTranslation = XMMatrixTranslation(m_xmf3OffsetPosition.x, m_xmf3OffsetPosition.y, m_xmf3OffsetPosition.z);
-	XMMATRIX OffsetRotate = XMMatrixRotationRollPitchYaw(m_xmf3OffsetRotate.x, m_xmf3OffsetRotate.y, m_xmf3OffsetRotate.z);
-	World = XMMatrixMultiply(XMMatrixMultiply(OffsetRotate, OffsetTranslation), World);
 
 	XMStoreFloat4x4(&m_xmf4x4World, World);
 
 	XMVECTOR position = XMVectorSet(0, 0, 0, 1);
 	position = XMVector3TransformCoord(position, World);
 	XMStoreFloat3(&m_xmf3Position, position);
-
-}
-
-void Collider::SetOffsetPosition(const XMFLOAT3& xmf3OffsetPosition)
-{
-	m_xmf3OffsetPosition = xmf3OffsetPosition;
-	UpdateWorldTransform();
-}
-
-void Collider::SetOffsetRotate(const XMFLOAT3& xmf3OffsetRotate)
-{
-	m_xmf3OffsetRotate = xmf3OffsetRotate;
-	UpdateWorldTransform();
 }
 
 const XMVECTOR Collider::GetAxis(int index) const
@@ -106,12 +90,10 @@ void Collider::Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList)
 
 // =============== Collider Plane =================================
 
-ColliderPlane::ColliderPlane(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Direction, float distance)
+ColliderPlane::ColliderPlane(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3Direction, float distance)
 {
 	m_pRigidBody = pBody;
 
-	m_xmf3OffsetPosition = xmf3OffsetPosition;
-	m_xmf3OffsetRotate = xmf3OffsetRotate;
 	m_xmf3Direction = xmf3Direction;
 	m_distance = distance;
 
@@ -141,11 +123,9 @@ void ColliderPlane::CalculateRotateInertiaMatrix()
 
 // =============== Collider Box =================================
 
-ColliderBox::ColliderBox(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Extents)
+ColliderBox::ColliderBox(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3Extents)
 {
 	m_pRigidBody = pBody;
-	m_xmf3OffsetPosition = xmf3OffsetPosition;
-	m_xmf3OffsetRotate = xmf3OffsetRotate;
 	m_xmf3Extents = xmf3Extents;
 
 	CalculateRotateInertiaMatrix();
@@ -180,12 +160,16 @@ void ColliderBox::UpdateWorldTransform()
 {
 	Collider::UpdateWorldTransform();
 
-	m_d3dOBB.Center = m_xmf3Position;
-	m_d3dOBB.Orientation = m_pRigidBody->GetOrientation();
-	m_d3dOBB.Extents = m_xmf3Extents;
-	m_d3dOBB.Extents.x *= m_xmf3Scale.x;
-	m_d3dOBB.Extents.y *= m_xmf3Scale.y;
-	m_d3dOBB.Extents.z *= m_xmf3Scale.z;
+	if (m_pRigidBody)
+	{
+		m_d3dOBB.Center = m_xmf3Position;
+		m_d3dOBB.Orientation = m_pRigidBody->GetOrientation();
+
+		m_d3dOBB.Extents = m_xmf3Extents;
+		m_d3dOBB.Extents.x *= m_xmf3Scale.x;
+		m_d3dOBB.Extents.y *= m_xmf3Scale.y;
+		m_d3dOBB.Extents.z *= m_xmf3Scale.z;
+	}
 }
 
 
@@ -285,11 +269,9 @@ void ColliderBox::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 // =============== Collider Sphere =================================
 
-ColliderSphere::ColliderSphere(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3OffsetPosition, float radius)
+ColliderSphere::ColliderSphere(std::shared_ptr<RigidBody>pBody, float radius)
 {
 	m_pRigidBody = pBody;
-
-	m_xmf3OffsetPosition = xmf3OffsetPosition;
 	m_Radius = radius;
 }
 

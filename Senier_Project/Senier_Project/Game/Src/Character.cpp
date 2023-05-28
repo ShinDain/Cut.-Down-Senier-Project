@@ -23,9 +23,6 @@ bool Character::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	m_pBody->SetIsCharacter(true);
 
 	m_Acceleration = 500.0f;
-	m_floorCheckRay.length = 3.f;
-	m_floorCheckRay.xmf3Direction = XMFLOAT3(0, -1, 0);
-	m_floorCheckRay.xmf3Start = XMFLOAT3(0, m_xmf3Position.y - m_xmf3ColliderExtents.y, 0);
 
 	return true;
 }
@@ -66,14 +63,26 @@ void Character::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 	{
 		// RootObjectÀÎ °æ¿ì
 		m_xmf4x4LocalTransform = MathHelper::identity4x4();
+		XMMATRIX world = XMMatrixIdentity();
 		XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
 		//XMMATRIX xmmatOrientation = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
 		XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotation.x), XMConvertToRadians(m_xmf3Rotation.y), XMConvertToRadians(m_xmf3Rotation.z));
 		XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
 		// S * R * T
-		//XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate)));
-		XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate)));
+		//world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate));
+		world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate));
+
+		XMMATRIX offset = XMMatrixTranslation(-m_xmf3RenderOffsetPosition.x, -m_xmf3RenderOffsetPosition.y, -m_xmf3RenderOffsetPosition.z);
+		XMMATRIX offsetRotate = XMMatrixRotationRollPitchYaw(m_xmf3RenderOffsetRotation.x, m_xmf3RenderOffsetRotation.y, m_xmf3RenderOffsetRotation.z);
+		world = XMMatrixMultiply(XMMatrixMultiply(offsetRotate, offset), world);
+		XMStoreFloat4x4(&m_xmf4x4LocalTransform, world);
+
 		m_xmf4x4World = m_xmf4x4LocalTransform;
+
+		m_xmf3RenderPosition = XMFLOAT3(0, 0, 0);
+		XMVECTOR renderPosition = XMLoadFloat3(&m_xmf3RenderPosition);
+		renderPosition = XMVector3TransformCoord(renderPosition, world);
+		XMStoreFloat3(&m_xmf3RenderPosition, renderPosition);
 	}
 
 	if (m_pCollider) m_pCollider->UpdateWorldTransform();
@@ -89,23 +98,22 @@ void Character::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 
 void Character::IsFalling()
 {
-	if (m_xmf3Position.y < 0)
+	if (m_xmf3RenderPosition.y < 0)
 	{
-		
-		m_xmf3Position.y = 0;
+		m_xmf3RenderPosition.y = 0;
 		DoLanding();
 	}
-	else if (m_xmf3Position.y > 0)
+	else if (m_xmf3RenderPosition.y > 0)
 	{
 		for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
 		{
 			BoundingOrientedBox obb = g_ppColliderBoxs[i]->GetOBB();
 			
-			XMVECTOR position = XMLoadFloat3(&m_xmf3Position);
+			XMVECTOR position = XMLoadFloat3(&m_xmf3RenderPosition);
 			XMVECTOR direction = XMVectorSet(0, -1, 0, 0);
 			float distance = 100;
 			bool bIntersect = obb.Intersects(position, direction, distance);
-			if (distance < 1 && bIntersect)
+			if (distance < m_xmf3ColliderExtents.y && bIntersect)
 			{
 				DoLanding();
 				return;

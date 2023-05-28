@@ -17,23 +17,22 @@ class RigidBody
 {
 public:
 	RigidBody();
-	RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotate,  XMFLOAT3 xmf3Scale, float mass,
-		XMFLOAT3 xmf3ColliderOffsetPosition, XMFLOAT3 xmf3ColliderOffsetRotation);
+	RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotate, XMFLOAT3 xmf3Scale, float mass);
 	RigidBody(const RigidBody& rhs) = delete;
 	RigidBody& operator=(const RigidBody& rhs) = delete;
 	virtual ~RigidBody();
 
 protected:
 	XMFLOAT3 m_xmf3Position = XMFLOAT3(0, 0, 0);
-	XMFLOAT3 m_xmf3ColliderPosition = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 m_xmf3PhysicsPosition = XMFLOAT3(0, 0, 0);
 	XMFLOAT4 m_xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
 	XMFLOAT3 m_xmf3Rotate = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 m_xmf3Scale = XMFLOAT3(1,1,1);
 	//XMFLOAT3 m_xmf3Scale = XMFLOAT3(0, 0, 0);
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 
-	XMFLOAT3 m_xmf3ColliderOffsetPosition = XMFLOAT3(0, 0, 0);
-	XMFLOAT3 m_xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 m_xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 m_xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 
 	float m_Mass = 1.0f;
 
@@ -89,7 +88,10 @@ public:
 
 	// Set =============================================================
 
-	void SetPosition(XMFLOAT3 xmf3Position) { m_xmf3Position = xmf3Position; }
+	void SetPosition(XMFLOAT3 xmf3Position) { 
+		m_xmf3Position = xmf3Position; 
+	}
+
 	void SetOrientation(XMFLOAT4 xmf4Orientation) { m_xmf4Orientation = xmf4Orientation; 
 													XMStoreFloat4(&m_xmf4Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmf4Orientation))); }
 	void SetRotate(XMFLOAT3 xmf3Rotate) { m_xmf3Rotate = xmf3Rotate; }
@@ -127,7 +129,7 @@ public:
 	// Get =============================================================
 
 	const XMFLOAT3& GetPosition() { return m_xmf3Position; }
-	const XMFLOAT3& GetColliderPosition() { return m_xmf3ColliderPosition; }
+	const XMFLOAT3& GetPhysicsPosition() { return m_xmf3PhysicsPosition; }
 	const XMFLOAT4& GetOrientation() { return m_xmf4Orientation; }
 	const XMFLOAT3& GetRotate() { return m_xmf3Rotate; }
 	const XMFLOAT3& GetScale() { return m_xmf3Scale; }

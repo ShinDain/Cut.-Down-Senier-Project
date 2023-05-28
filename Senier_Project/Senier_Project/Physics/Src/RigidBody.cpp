@@ -4,16 +4,13 @@ RigidBody::RigidBody()
 {
 }
 
-RigidBody::RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotate, XMFLOAT3 xmf3Scale, float mass,
-	XMFLOAT3 xmf3ColliderOffsetPosition, XMFLOAT3 xmf3ColliderOffsetRotation)
+RigidBody::RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotate, XMFLOAT3 xmf3Scale, float mass)
 {
 	m_xmf3Position = xmf3Position;
 	m_xmf3Rotate = xmf3Rotate;
 	m_xmf4Orientation = xmf4Orientation;
 	m_xmf3Scale = xmf3Scale;
 	m_Mass = mass;
-	m_xmf3ColliderOffsetPosition = xmf3ColliderOffsetPosition;
-	m_xmf3ColliderOffsetRotation = xmf3ColliderOffsetRotation;
 
 	XMStoreFloat4(&m_xmf4Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmf4Orientation)));
 
@@ -51,8 +48,8 @@ void RigidBody::Update(float elapsedTime)
 	if (!m_bIsAwake)
 		return;
 
-	if (m_ElapsedTimeAfterCreated > 0.0f && !m_bIsCharacter && !m_bIsPlatform)
-		m_bCanSleep = true;
+	//if (m_ElapsedTimeAfterCreated > 0.0f && !m_bIsCharacter && !m_bIsPlatform)
+	//	m_bCanSleep = true;
 
 	if (m_bIsCharacter)
 	{
@@ -148,17 +145,6 @@ void RigidBody::CalcDerivedData()
 	World = XMMatrixMultiply(Scale, XMMatrixMultiply(Rotate, Translation));
 
 	XMStoreFloat4x4(&m_xmf4x4World, World);
-
-	// Collider Position °»½Å
-	XMMATRIX ColliderWorld = World;
-	XMMATRIX OffsetTranslation = XMMatrixTranslation(m_xmf3ColliderOffsetPosition.x, m_xmf3ColliderOffsetPosition.y, m_xmf3ColliderOffsetPosition.z);
-	XMMATRIX OffsetRotate = XMMatrixRotationRollPitchYaw(m_xmf3ColliderOffsetRotation.x, m_xmf3ColliderOffsetRotation.y, m_xmf3ColliderOffsetRotation.z);
-	ColliderWorld = XMMatrixMultiply(XMMatrixMultiply(OffsetRotate, OffsetTranslation), ColliderWorld);
-
-	XMVECTOR colliderPosition = XMVectorSet(0, 0, 0, 1);
-	colliderPosition = XMVector3TransformCoord(colliderPosition, ColliderWorld);
-
-	XMStoreFloat3(&m_xmf3ColliderPosition, colliderPosition);
 
 	XMMATRIX rotateInertiaForWorld = XMLoadFloat4x4(&m_xmf4x4InverseRotateInertia);
 

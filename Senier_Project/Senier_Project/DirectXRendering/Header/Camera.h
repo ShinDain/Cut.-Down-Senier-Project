@@ -107,7 +107,7 @@ public:
 
 protected:
 	float m_OffsetLength = 50;
-	float m_OffsetHeight = 20;
+	float m_OffsetHeight = 10;
 	//DirectX::XMFLOAT3 m_xmf3Offset = { 0.0f, 30.0f, -100.0f };
 
 	float m_MaxPitch = 45;

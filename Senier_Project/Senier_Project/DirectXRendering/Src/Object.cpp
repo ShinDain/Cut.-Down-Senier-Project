@@ -43,11 +43,10 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	{
 	case Collider_Plane:
 	{
-		pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation,
-			objData.xmf3Rotation, objData.xmf3Scale, objData.nMass, objData.xmf3ColliderOffsetPosition, objData.xmf3ColliderOffsetRotation);
+		pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation,objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
 		std::shared_ptr<ColliderPlane> pColliderPlane;
 		XMFLOAT3 direction = XMFLOAT3(objData.xmf4Orientation.x, objData.xmf4Orientation.y, objData.xmf4Orientation.z);
-		pColliderPlane = std::make_shared<ColliderPlane>(pBody, objData.xmf3ColliderOffsetPosition, objData.xmf3ColliderOffsetRotation, direction, objData.xmf3Extents.x);
+		pColliderPlane = std::make_shared<ColliderPlane>(pBody, direction, objData.xmf3Extents.x);
 		g_ppColliderPlanes.emplace_back(pColliderPlane);
 		pCollider = std::static_pointer_cast<Collider>(pColliderPlane);
 	}
@@ -55,10 +54,9 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 	case Collider_Box:
 	{
-		pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation,
-			objData.xmf3Rotation, objData.xmf3Scale, objData.nMass, objData.xmf3ColliderOffsetPosition, objData.xmf3ColliderOffsetRotation);
+		pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation,objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
 		std::shared_ptr<ColliderBox> pColliderBox;
-		pColliderBox = std::make_shared<ColliderBox>(pBody, objData.xmf3ColliderOffsetPosition, objData.xmf3ColliderOffsetRotation, objData.xmf3Extents);
+		pColliderBox = std::make_shared<ColliderBox>(pBody, objData.xmf3Extents);
 		g_ppColliderBoxs.emplace_back(pColliderBox);
 		pCollider = std::static_pointer_cast<Collider>(pColliderBox);
 	}
@@ -66,10 +64,9 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 	case Collider_Sphere:
 	{
-		pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation,
-			objData.xmf3Rotation, objData.xmf3Scale, objData.nMass, objData.xmf3ColliderOffsetPosition, objData.xmf3ColliderOffsetRotation);
+		pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation,objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
 		std::shared_ptr<ColliderSphere> pColliderSphere;
-		pColliderSphere = std::make_shared<ColliderSphere>(pBody, objData.xmf3ColliderOffsetPosition, objData.xmf3Extents.x);
+		pColliderSphere = std::make_shared<ColliderSphere>(pBody, objData.xmf3Extents.x);
 		g_ppColliderSpheres.emplace_back(pColliderSphere);
 		pCollider = std::static_pointer_cast<Collider>(pColliderSphere);
 	}
@@ -94,6 +91,8 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_pBody = pBody;
 	m_pCollider = pCollider;
 	m_xmf3ColliderExtents = objData.xmf3Extents;
+	m_xmf3RenderOffsetPosition = objData.xmf3MeshOffsetPosition;
+	m_xmf3RenderOffsetRotation = objData.xmf3MeshOffsetRotation;
 
 #if defined(_DEBUG)
 	if (m_pCollider) m_pCollider->BuildMesh(pd3dDevice, pd3dCommandList);
@@ -152,11 +151,15 @@ void Object::UpdateToRigidBody(float elapsedTime)
 		m_xmf4Orientation = m_pBody->GetOrientation();
 		m_xmf3Rotation = m_pBody->GetRotate();
 		m_xmf3Scale = m_pBody->GetScale();
-		m_xmf4x4World = m_pBody->GetWorld();
+
 	}
 	else
 	{
-		if(m_pCollider) m_pCollider->SetWorld(m_xmf4x4World);
+		if (m_pCollider)
+		{
+			m_pCollider->SetWorld(m_xmf4x4World);
+			m_pCollider->UpdateWorldTransform();
+		}
 	}
 
 }
@@ -173,14 +176,26 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 	{
 		// RootObjectÀÎ °æ¿ì
 		m_xmf4x4LocalTransform = MathHelper::identity4x4();
+		XMMATRIX world = XMMatrixIdentity();
 		XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
 		XMMATRIX xmmatOrientation = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
 		//XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotation.x), XMConvertToRadians(m_xmf3Rotation.y), XMConvertToRadians(m_xmf3Rotation.z));
 		XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
 		// S * R * T
-		XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate)));
-		//XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate)));
+		world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate));
+		//world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate));
+
+		XMMATRIX offset = XMMatrixTranslation(-m_xmf3RenderOffsetPosition.x, -m_xmf3RenderOffsetPosition.y, -m_xmf3RenderOffsetPosition.z);
+		XMMATRIX offsetRotate = XMMatrixRotationRollPitchYaw(m_xmf3RenderOffsetRotation.x, m_xmf3RenderOffsetRotation.y, m_xmf3RenderOffsetRotation.z);
+		world = XMMatrixMultiply(XMMatrixMultiply(offsetRotate, offset), world);
+		XMStoreFloat4x4(&m_xmf4x4LocalTransform, world);
+
 		m_xmf4x4World = m_xmf4x4LocalTransform;
+
+		m_xmf3RenderPosition = XMFLOAT3(0, 0, 0);
+		XMVECTOR renderPosition = XMLoadFloat3(&m_xmf3RenderPosition);
+		renderPosition = XMVector3TransformCoord(renderPosition, world);
+		XMStoreFloat3(&m_xmf3RenderPosition, renderPosition);
 	}
 
 	if (m_pCollider) m_pCollider->UpdateWorldTransform();
@@ -691,13 +706,13 @@ void Object::FindAndSetSkinnedMesh(std::vector<std::shared_ptr<SkinnedMesh>>* pp
 
 void Object::IsFalling()
 {
-	if (m_xmf3Position.y > 0)
+	if (m_xmf3RenderPosition.y > 0)
 	{
 		m_bIsFalling = true;
 	}
-	else if(m_xmf3Position.y < 0)
+	else if(m_xmf3RenderPosition.y < 0)
 	{
-		m_xmf3Position.y = 0;
+		m_xmf3RenderPosition.y = 0;
 		m_bIsFalling = false;
 	}
 }

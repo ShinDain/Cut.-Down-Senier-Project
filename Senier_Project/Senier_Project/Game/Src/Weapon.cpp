@@ -6,9 +6,11 @@ Weapon::Weapon(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 {
 	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 
-	m_pFollowObject = pFollowObject->FindFrame(pstrFollowObject);
-
-	pFollowObject->m_pAnimationController->SetCallbackKey(0, 0, 0.0f, (void*)(this));
+	if (pFollowObject)
+	{
+		m_pFollowObject = pFollowObject->FindFrame(pstrFollowObject);
+		pFollowObject->m_pAnimationController->SetCallbackKey(0, 0, 0.0f, (void*)(this));
+	}
 	//m_pAnimationController->SetCallbackKey(2, 1, 0.0f, (void*)(m_pWeapon.get()));
 }
 
@@ -37,7 +39,7 @@ bool Weapon::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	{
 		std::shared_ptr<ColliderPlane> pColliderPlane;
 		XMFLOAT3 direction = XMFLOAT3(objData.xmf4Orientation.x, objData.xmf4Orientation.y, objData.xmf4Orientation.z);
-		pColliderPlane = std::make_shared<ColliderPlane>(pBody, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), direction, objData.xmf3Extents.x);
+		pColliderPlane = std::make_shared<ColliderPlane>(pBody, direction, objData.xmf3Extents.x);
 		//g_ppColliderPlanes.emplace_back(pColliderPlane);
 		pCollider = std::static_pointer_cast<Collider>(pColliderPlane);
 	}
@@ -46,7 +48,7 @@ bool Weapon::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	case Collider_Box:
 	{
 		std::shared_ptr<ColliderBox> pColliderBox;
-		pColliderBox = std::make_shared<ColliderBox>(pBody, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0), objData.xmf3Extents);
+		pColliderBox = std::make_shared<ColliderBox>(pBody,objData.xmf3Extents);
 		//g_ppColliderBoxs.emplace_back(pColliderBox);
 		pCollider = std::static_pointer_cast<Collider>(pColliderBox);
 	}
@@ -55,7 +57,7 @@ bool Weapon::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	case Collider_Sphere:
 	{
 		std::shared_ptr<ColliderSphere> pColliderSphere;
-		pColliderSphere = std::make_shared<ColliderSphere>(pBody, XMFLOAT3(0, 0, 0), objData.xmf3Extents.x);
+		pColliderSphere = std::make_shared<ColliderSphere>(pBody, objData.xmf3Extents.x);
 		//g_ppColliderSpheres.emplace_back(pColliderSphere);
 		pCollider = std::static_pointer_cast<Collider>(pColliderSphere);
 	}
@@ -80,9 +82,6 @@ bool Weapon::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 #endif
 
 	BuildConstantBuffers(pd3dDevice);
-
-
-	m_pCollider->SetOffsetPosition(XMFLOAT3(0, objData.xmf3Extents.y, 0));
 	m_pCollider->SetIsActive(false);
 
 	return true;
@@ -91,6 +90,9 @@ bool Weapon::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 void Weapon::Update(float elapsedTime)
 {
 	UpdateToRigidBody(elapsedTime);
+
+	// 무기와 교차 체크
+	Intersect();
 
 	ObjConstant objConstant;
 	XMMATRIX world = XMLoadFloat4x4(&m_xmf4x4World);
@@ -109,7 +111,10 @@ void Weapon::Update(float elapsedTime)
 
 void Weapon::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 {
-	if(m_pFollowObject) m_xmf4x4World = m_pFollowObject->GetWorld();
+	if (m_pFollowObject)
+	{
+		m_xmf4x4World = m_pFollowObject->GetWorld();
+	}
 
 	XMMATRIX xmmatWorld = XMLoadFloat4x4(&m_xmf4x4World);
 	XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
@@ -119,17 +124,36 @@ void Weapon::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 	// S * R * T
 	//XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate)));
 	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixMultiply(XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate)), xmmatWorld));
-	//m_xmf4x4World = m_xmf4x4LocalTransform;
 
 	Object::UpdateTransform(&m_xmf4x4World);
-
-	//m_pCollider->SetWorld(m_xmf4x4World);
-
 }
 
 void Weapon::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	Object::Render(elapsedTime, pd3dCommandList);
+}
+
+void Weapon::Intersect()
+{
+	//if (!m_pCollider->GetIsActive())
+	//	return;
+
+	m_pCollider->SetIntersect(0);
+
+	ColliderBox* tmpCollider = std::static_pointer_cast<ColliderBox>(m_pCollider).get();
+
+	for (int i = 0; i < g_ppColliderBoxs.size(); ++i)
+	{
+		if (!g_ppColliderBoxs[i]->GetIsActive() || m_pCollider == g_ppColliderBoxs[i])
+			continue;
+
+		if (IntersectTests::BoxAndBox(*tmpCollider, *g_ppColliderBoxs[i]))
+		{
+			m_pCollider->SetIntersect(1);
+			//g_ppColliderBoxs[i]->SetIntersect(1);
+		}
+		
+	}
 }
 
 void Weapon::Destroy()

@@ -14,7 +14,7 @@
 #include "Material.h"
 #include "AnimationController.h"
 
-//#define COLLIDER_RENDER
+#define COLLIDER_RENDER
 
 #define DIR_FORWARD					0x01
 #define DIR_BACKWARD				0x02
@@ -95,6 +95,10 @@ protected:
 	XMFLOAT4X4 m_xmf4x4LocalTransform = MathHelper::identity4x4();	// 부모로부터 상대 좌표
 
 	XMFLOAT3 m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT3 m_xmf3RenderPosition = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 m_xmf3RenderOffsetPosition = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 m_xmf3RenderOffsetRotation = XMFLOAT3(0, 0, 0);
+
 	XMFLOAT3 m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
 	XMFLOAT3 m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	XMFLOAT3 m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);

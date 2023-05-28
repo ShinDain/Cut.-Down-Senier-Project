@@ -13,7 +13,7 @@ using namespace DirectX;
 #define CHARACTER_MODEL_EXTENTS XMFLOAT3(0.3f, 0.8f, 0.2f)
 #define CHARACTER_MODEL_TYPE Object_Player
 #define CHARACTER_MODEL_COLLIDERTYPE Collider_Box
-#define CHARACTER_MODEL_MASS 20
+#define CHARACTER_MODEL_MASS 40
 #define CHARACTER_MODEL_SCALE XMFLOAT3(10,10,10)
 #define CHARACTER_MODEL_RENDERLAYER RenderLayer::Render_Skinned
 
@@ -22,7 +22,7 @@ using namespace DirectX;
 #define ZOMBIE_MODEL_EXTENTS XMFLOAT3(0.3f, 0.8f, 0.2f)
 #define ZOMBIE_MODEL_TYPE Object_Monster
 #define ZOMBIE_MODEL_COLLIDERTYPE Collider_Box
-#define ZOMBIE_MODEL_MASS 20
+#define ZOMBIE_MODEL_MASS 40
 #define ZOMBIE_MODEL_SCALE XMFLOAT3(10,10,10)
 #define ZOMBIE_MODEL_RENDERLAYER RenderLayer::Render_Skinned
 
@@ -105,7 +105,7 @@ using namespace DirectX;
 #define SERVER_RACK_MODEL_EXTENTS XMFLOAT3(0.35f, 1.1f, 0.3f)
 #define SERVER_RACK_MODEL_TYPE Object_World
 #define SERVER_RACK_MODEL_COLLIDERTYPE Collider_Box
-#define SERVER_RACK_MODEL_MASS 20
+#define SERVER_RACK_MODEL_MASS 80
 #define SERVER_RACK_MODEL_SCALE XMFLOAT3(10,10,10)
 #define SERVER_RACK_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
 

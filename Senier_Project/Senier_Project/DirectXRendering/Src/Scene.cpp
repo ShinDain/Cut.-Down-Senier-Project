@@ -32,16 +32,17 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_pPlayer->m_pAnimationController->SetTrackEnable(2, false);
 	m_pPlayer->m_pAnimationController->SetTrackEnable(3, false);
 	m_pPlayer->m_pAnimationController->m_vpAnimationTracks[2]->SetType(ANIMATION_TYPE_ONCE);
-	//m_pPlayer->m_pAnimationController->m_vpAnimationTracks[3]->SetType(ANIMATION_TYPE_ONCE);
-	m_pPlayer->m_pAnimationController->SetTrackAnimationSet(1, 1);
-	m_pPlayer->m_pAnimationController->SetTrackAnimationSet(0, 0);
+	m_pPlayer->m_pAnimationController->SetTrackAnimationSet(0, Player_Anim_Index_Idle);
+	m_pPlayer->m_pAnimationController->SetTrackAnimationSet(1, Player_Anim_Index_RunForward);
+	m_pPlayer->m_pAnimationController->SetTrackAnimationSet(3, Player_Anim_Index_Falling);
 
 	// 몬스터 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(220, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, 1);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(240, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0),XMFLOAT3(1,1,1), ZOMBIE_MODEL_NAME, 1);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(260, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, 1);
 
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0.2, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90),XMFLOAT3(1,1,1), WEAPON_MODEL_NAME, 0);
+	// 무기
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0.15, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90),XMFLOAT3(1,1,1), WEAPON_MODEL_NAME, 0);
 
 	// 바닥
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1,1,1), nullptr, 0);
@@ -53,7 +54,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
 	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
@@ -541,8 +542,8 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		objectData.objectType = g_DefaultObjectData[pstrFileName].objectType;
 		objectData.colliderType = g_DefaultObjectData[pstrFileName].colliderType;
 		objectData.xmf3Extents = g_DefaultObjectData[pstrFileName].xmf3Extents;
-		objectData.xmf3ColliderOffsetPosition = g_DefaultObjectData[pstrFileName].xmf3ColliderOffsetPosition;
-		objectData.xmf3ColliderOffsetRotation = g_DefaultObjectData[pstrFileName].xmf3ColliderOffsetRotation;
+		objectData.xmf3MeshOffsetPosition = g_DefaultObjectData[pstrFileName].xmf3MeshOffsetPosition;
+		objectData.xmf3MeshOffsetRotation = g_DefaultObjectData[pstrFileName].xmf3MeshOffsetRotation;
 	}
 
 	
@@ -589,9 +590,9 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	case Object_Weapon:
 	{
 		char tmp[64] = "mixamorig:RightHand";
-		std::shared_ptr<Weapon> pWeapon = std::make_shared<Weapon>(pd3dDevice, pd3dCommandList, objectData, tmp, m_vpAllObjs[0], pModelData, nAnimationTracks, nullptr);
+		std::shared_ptr<Weapon> pWeapon = std::make_shared<Weapon>(pd3dDevice, pd3dCommandList, objectData, tmp, m_pPlayer, pModelData, nAnimationTracks, nullptr);
 		pObject = std::static_pointer_cast<Object>(pWeapon);
-		std::static_pointer_cast<Player>(m_vpAllObjs[0])->SetWeapon(pWeapon);
+		m_pPlayer->SetWeapon(pWeapon);
 
 		m_vpAllObjs.emplace_back(pObject);
 		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);

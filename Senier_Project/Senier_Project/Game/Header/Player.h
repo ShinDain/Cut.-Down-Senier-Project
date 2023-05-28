@@ -7,12 +7,34 @@
 #include "Weapon.h"
 #include "../../DirectXRendering/Header/AnimationController.h"
 
+enum PlayerAnimationIndex
+{
+	Player_Anim_Index_Idle,
+	Player_Anim_Index_RunForward,
+	Player_Anim_Index_RunBackward,
+	Player_Anim_Index_RunLeft,
+	Player_Anim_Index_RunRight,
+	Player_Anim_Index_Sprint,
+	Player_Anim_Index_StrafeLeft,
+	Player_Anim_Index_StrafeRight,
+	Player_Anim_Index_JumpUp,
+	Player_Anim_Index_JumpDown,
+	Player_Anim_Index_JumpWhileRunning,
+	Player_Anim_Index_Falling,
+	Player_Anim_Index_IdleCombat,
+	Player_Anim_Index_MeleeOneHand,
+	Player_Anim_Index_MeleeTwoHand,
+	Player_Anim_Index_GetHit,
+	Player_Anim_Index_Death
+};
+
 enum PlayerAnimationState
 {
-	Player_Animation_Idle,
-	Player_Animation_Jump,
-	Player_Animation_Falling,
-	Player_Animation_Land
+	Player_State_Idle,
+	Player_State_Jump,
+	Player_State_Falling,
+	Player_State_Land,
+	Player_State_Melee
 };
 
 
@@ -58,11 +80,9 @@ protected:
 	std::shared_ptr<Weapon> m_pWeapon = nullptr;
 	
 	XMFLOAT3 m_xmf3CameraRotation = XMFLOAT3(0, 0, 0);
-
-	float m_TurnSpeed = 360;
 	bool m_bCanDoubleJump = true;
 
-	PlayerAnimationState m_nAnimationState = PlayerAnimationState::Player_Animation_Idle;
+	PlayerAnimationState m_nAnimationState = PlayerAnimationState::Player_State_Idle;
 
 public:
 	void RotateToMove(float elapsedTime);

@@ -10,8 +10,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = CHARACTER_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CHARACTER_MODEL_SCALE;
 	tmpData.renderLayer = CHARACTER_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0,0,0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0,0,0);
 	g_DefaultObjectData.insert({ CHARACTER_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(CHARACTER_MODEL_NAME);
 
@@ -22,8 +22,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = ZOMBIE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ZOMBIE_MODEL_SCALE;
 	tmpData.renderLayer = ZOMBIE_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ ZOMBIE_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(ZOMBIE_MODEL_NAME);
 
@@ -34,8 +34,10 @@ void CreateObjectDefaultData()
 	tmpData.nMass = WEAPON_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WEAPON_MODEL_SCALE;
 	tmpData.renderLayer = WEAPON_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y / 2 - 1.2f, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y / 2, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ WEAPON_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WEAPON_MODEL_NAME);
 
@@ -46,8 +48,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = CUBE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CUBE_MODEL_SCALE;
 	tmpData.renderLayer = CUBE_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ CUBE_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(CUBE_MODEL_NAME);
 
@@ -58,8 +60,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = GROUND_MODEL_MASS;
 	tmpData.xmf3OffsetScale = GROUND_MODEL_SCALE;
 	tmpData.renderLayer = GROUND_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ GROUND_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(GROUND_MODEL_NAME);
 
@@ -70,8 +72,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = CARPET_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CARPET_MODEL_SCALE;
 	tmpData.renderLayer = CARPET_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ CARPET_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(CARPET_MODEL_NAME);
 
@@ -82,8 +84,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = DRAWER_MODEL_MASS;
 	tmpData.xmf3OffsetScale = DRAWER_MODEL_SCALE;
 	tmpData.renderLayer = DRAWER_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ DRAWER_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(DRAWER_MODEL_NAME);
 
@@ -94,8 +96,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = MECHANICAL_ARM_MODEL_MASS;
 	tmpData.xmf3OffsetScale = MECHANICAL_ARM_MODEL_SCALE;
 	tmpData.renderLayer = MECHANICAL_ARM_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(-1.0f, tmpData.xmf3Extents.y, 0.8f);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(-1.0f, tmpData.xmf3Extents.y, 0.8f);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ MECHANICAL_ARM_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(MECHANICAL_ARM_MODEL_NAME);
 
@@ -106,8 +108,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = OFFICE_CHAIR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = OFFICE_CHAIR_MODEL_SCALE;
 	tmpData.renderLayer = OFFICE_CHAIR_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ OFFICE_CHAIR_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(OFFICE_CHAIR_MODEL_NAME);
 
@@ -118,8 +120,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = DOOR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = DOOR_MODEL_SCALE;
 	tmpData.renderLayer = DOOR_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ DOOR_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(DOOR_MODEL_NAME);
 
@@ -130,8 +132,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = SERVER_RACK_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SERVER_RACK_MODEL_SCALE;
 	tmpData.renderLayer = SERVER_RACK_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ SERVER_RACK_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(SERVER_RACK_MODEL_NAME);
 
@@ -142,8 +144,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = SHELF_CRATE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SHELF_CRATE_MODEL_SCALE;
 	tmpData.renderLayer = SHELF_CRATE_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ SHELF_CRATE_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(SHELF_CRATE_MODEL_NAME);
 
@@ -154,8 +156,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = SHELF_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SHELF_MODEL_SCALE;
 	tmpData.renderLayer = SHELF_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ SHELF_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(SHELF_MODEL_NAME);
 
@@ -166,8 +168,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = STOOL_MODEL_MASS;
 	tmpData.xmf3OffsetScale = STOOL_MODEL_SCALE;
 	tmpData.renderLayer = STOOL_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ STOOL_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(STOOL_MODEL_NAME);
 
@@ -178,8 +180,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = TABLE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = TABLE_MODEL_SCALE;
 	tmpData.renderLayer = TABLE_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ TABLE_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(TABLE_MODEL_NAME);
 
@@ -190,8 +192,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = TABLE_GLASS_MODEL_MASS;
 	tmpData.xmf3OffsetScale = TABLE_GLASS_MODEL_SCALE;
 	tmpData.renderLayer = TABLE_GLASS_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ TABLE_GLASS_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(TABLE_GLASS_MODEL_NAME);
 
@@ -202,8 +204,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = TABLE_SET_MODEL_MASS;
 	tmpData.xmf3OffsetScale = TABLE_SET_MODEL_SCALE;
 	tmpData.renderLayer = TABLE_SET_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ TABLE_SET_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(TABLE_SET_MODEL_NAME);
 
@@ -214,8 +216,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = VASE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = VASE_MODEL_SCALE;
 	tmpData.renderLayer = VASE_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ VASE_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(VASE_MODEL_NAME);
 
@@ -226,8 +228,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = WALL_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WALL_MODEL_SCALE;
 	tmpData.renderLayer = WALL_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(-tmpData.xmf3Extents.x, tmpData.xmf3Extents.y, 0.08f);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(-tmpData.xmf3Extents.x, tmpData.xmf3Extents.y, 0.08f);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ WALL_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WALL_MODEL_NAME);
 
@@ -238,8 +240,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = WALL_WITH_WINDOWS_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WALL_WITH_WINDOWS_MODEL_SCALE;
 	tmpData.renderLayer = WALL_WITH_WINDOWS_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ WALL_WITH_WINDOWS_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WALL_WITH_WINDOWS_MODEL_NAME);
 
@@ -250,8 +252,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = WALL_PILLAR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WALL_PILLAR_MODEL_SCALE;
 	tmpData.renderLayer = WALL_PILLAR_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ WALL_PILLAR_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WALL_PILLAR_MODEL_NAME);
 
@@ -262,8 +264,8 @@ void CreateObjectDefaultData()
 	tmpData.nMass = WALL_PILLAR_3_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WALL_PILLAR_3_MODEL_SCALE;
 	tmpData.renderLayer = WALL_PILLAR_3_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(0.1f, tmpData.xmf3Extents.y, -0.1f);
-	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0.1f, tmpData.xmf3Extents.y, -0.1f);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ WALL_PILLAR_3_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WALL_PILLAR_3_MODEL_NAME);
 

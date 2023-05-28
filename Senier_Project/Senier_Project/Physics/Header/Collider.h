@@ -23,9 +23,6 @@ protected:
 
 	std::shared_ptr<RigidBody> m_pRigidBody = nullptr;
 
-	XMFLOAT3 m_xmf3OffsetPosition = XMFLOAT3(0, 0, 0);
-	XMFLOAT3 m_xmf3OffsetRotate = XMFLOAT3(0, 0, 0);
-
 	XMFLOAT3 m_xmf3Position = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 m_xmf3Scale = XMFLOAT3(1, 1, 1);
 
@@ -37,15 +34,10 @@ protected:
 public:
 	virtual void UpdateWorldTransform();
 
-	void SetOffsetPosition(const XMFLOAT3& xmf3OffsetPosition);
-	void SetOffsetRotate(const XMFLOAT3& xmf3OffsetRotate);
-	
 	void SetWorld(XMFLOAT4X4 xmf4x4World) { m_xmf4x4World = xmf4x4World; }
 
 	const XMVECTOR GetAxis(int index) const;
 
-	const XMFLOAT3& GetOffsetPosition() const { return m_xmf3OffsetPosition; }
-	const XMFLOAT3& GetOffsetRotate() const { return m_xmf3OffsetRotate; }
 	const XMFLOAT4X4& GetWorld() const { return m_xmf4x4World; }
 
 	std::shared_ptr<RigidBody> GetBody() const { return m_pRigidBody; }
@@ -102,7 +94,7 @@ class ColliderPlane : public Collider
 {
 public:
 	ColliderPlane() = delete;
-	ColliderPlane(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Direction, float distance);
+	ColliderPlane(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3Direction, float distance);
 	ColliderPlane(const ColliderPlane& rhs) = delete;
 	ColliderPlane& operator=(const ColliderPlane& rhs) = delete;
 	virtual ~ColliderPlane();
@@ -130,7 +122,7 @@ class ColliderBox : public Collider
 {
 public:
 	ColliderBox() = delete;
-	ColliderBox(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3OffsetPosition, XMFLOAT3 xmf3OffsetRotate, XMFLOAT3 xmf3Extents);
+	ColliderBox(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3Extents);
 	ColliderBox(const ColliderBox& rhs) = delete;
 	ColliderBox& operator=(const ColliderBox& rhs) = delete;
 	virtual ~ColliderBox();
@@ -150,6 +142,8 @@ public:
 	void SetExtents(const XMFLOAT3& xmf3Extents) { m_xmf3Extents = xmf3Extents; }
 	const XMFLOAT3& GetExtents() const { return m_xmf3Extents; }
 
+	void SetOBBOrientation(XMFLOAT4 xmf4Quaternion) { m_d3dOBB.Orientation = xmf4Quaternion; }
+
 	const BoundingOrientedBox& GetOBB() const { return m_d3dOBB; }
 };
 
@@ -157,7 +151,7 @@ class ColliderSphere : public Collider
 {
 public:
 	ColliderSphere() = delete;
-	ColliderSphere(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3OffsetPosition, float radius);
+	ColliderSphere(std::shared_ptr<RigidBody>pBody, float radius);
 	ColliderSphere(const ColliderSphere& rhs) = delete;
 	ColliderSphere& operator=(const ColliderSphere& rhs) = delete;
 	virtual ~ColliderSphere();
