@@ -113,7 +113,7 @@ void Character::IsFalling()
 			XMVECTOR direction = XMVectorSet(0, -1, 0, 0);
 			float distance = 100;
 			bool bIntersect = obb.Intersects(position, direction, distance);
-			if (distance < m_xmf3ColliderExtents.y && bIntersect)
+			if (distance < m_xmf3ColliderExtents.y * 10 && bIntersect)
 			{
 				DoLanding();
 				return;

@@ -190,7 +190,7 @@ void RigidBody::AddVelocity(float x, float y, float z)
 }
 void RigidBody::AddVelocity(XMFLOAT3 addVelocity)
 {
-	if (m_bIsPlatform) return;
+	if (m_bIsPlatform || !m_bPhysics) return;
 	AddVelocity(addVelocity.x, addVelocity.y, addVelocity.z);
 }
 void RigidBody::AddAngleVelocity(float x, float y, float z)

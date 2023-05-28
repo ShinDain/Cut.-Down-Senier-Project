@@ -197,10 +197,10 @@ void Player::Attack()
 		break;
 	}
 
-	m_Acceleration = 0.0f;
+	m_Acceleration = 30.0f;
 
 	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
-	XMVECTOR addVelocity = look * 100.0f;
+	XMVECTOR addVelocity = look * 50.0f;
 	XMFLOAT3 xmf3AddVelocity;
 	XMStoreFloat3(&xmf3AddVelocity, addVelocity);
 	m_pBody->AddVelocity(xmf3AddVelocity);
@@ -362,6 +362,8 @@ void Player::RotateToMove(float elapsedTime)
 	XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
 	float angleBetweenLook = XMVectorGetX(XMVector3AngleBetweenVectors(targetLook, look));
 	angleBetweenLook = XMConvertToDegrees(angleBetweenLook);
+
+	angleBetweenLook *= m_Acceleration / 500;
 
 	if (!XMVectorGetX(XMVectorIsNaN(XMVectorReplicate(angleBetweenLook))))
 	{
