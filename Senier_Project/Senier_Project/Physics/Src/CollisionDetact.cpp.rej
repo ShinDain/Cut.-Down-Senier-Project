@@ -1,0 +1,9 @@
+diff a/Senier_Project/Senier_Project/Physics/Src/CollisionDetact.cpp b/Senier_Project/Senier_Project/Physics/Src/CollisionDetact.cpp	(rejected hunks)
+@@ -273,3 +273,6 @@
+ 	// �ڽ��� ���� ������ ���� �ʴ� ��� return;
+-	if (!box.GetPhysics() && box.GetBody()->GetInvalid())
++	if (!box.GetPhysics() || box.GetBody()->GetInvalid())
++		return 0;
++
++	if (!box.GetBody()->GetIsAwake())
+ 		return 0;

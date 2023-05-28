@@ -99,6 +99,9 @@ public:
 
 	int m_Type = ANIMATION_TYPE_LOOP;		//Once, Loop, PingPong
 
+	float m_AnimationRate = 0.0f;		// [0 - 1]
+	bool m_bAnimationOver = false;
+
 public:
 	void SetEnable(bool bEnable) { m_bEnable = bEnable;	}
 	void SetSpeed(float Speed) { m_Speed = Speed; }
@@ -111,6 +114,9 @@ public:
 	void SetCallbackKeys(int nCallbackKeys);
 	void SetCallbackKey(int nKeyIndex, float KeyTime, void* pData);
 	void SetAnimationCallbackHandler(std::shared_ptr<AnimationCallbackHandler> pCallbackHandler);
+
+	bool GetAnimationOver() { return m_bAnimationOver; }
+	float GetAnimationRate() { return m_AnimationRate; }
 
 };
 
@@ -215,6 +221,24 @@ public:
 	bool GetTrackEnable(int nAnimationTrack)
 	{
 		if (nAnimationTrack < m_vpAnimationTracks.size()) return m_vpAnimationTracks[nAnimationTrack]->m_bEnable;
+	}
+
+	void SetTrackOver(int nAnimationTrack, bool bAnimationOver)
+	{
+		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->m_bAnimationOver = bAnimationOver;
+	}
+	bool GetTrackOver(int nAnimationTrack)
+	{
+		if (nAnimationTrack < m_vpAnimationTracks.size()) return m_vpAnimationTracks[nAnimationTrack]->GetAnimationOver();
+	}
+
+	float GetTrackRate(int nAnimationTrack)
+	{
+		if (nAnimationTrack < m_vpAnimationTracks.size()) return m_vpAnimationTracks[nAnimationTrack]->GetAnimationRate();
+	}
+	void SetTrackRate(int nAnimationTrack, float animationRate)
+	{
+		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->m_AnimationRate = animationRate;
 	}
 };
 

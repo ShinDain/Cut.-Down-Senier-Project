@@ -26,12 +26,13 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	BuildDescriptorHeap(pd3dDevice);
 
 	// 캐릭터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,0,0), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), CHARACTER_MODEL_NAME, 3);
-	//m_vpAllObjs[0]->m_pAnimationController->SetTrackAnimationSet(1, 13);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,0,0), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), CHARACTER_MODEL_NAME, 4);
 	m_pPlayer->m_pAnimationController->SetTrackEnable(0, true);
 	m_pPlayer->m_pAnimationController->SetTrackEnable(1, true);
 	m_pPlayer->m_pAnimationController->SetTrackEnable(2, false);
-	//m_pPlayer->m_pAnimationController->SetTrackAnimationSet(2, 13);
+	m_pPlayer->m_pAnimationController->SetTrackEnable(3, false);
+	m_pPlayer->m_pAnimationController->m_vpAnimationTracks[2]->SetType(ANIMATION_TYPE_ONCE);
+	//m_pPlayer->m_pAnimationController->m_vpAnimationTracks[3]->SetType(ANIMATION_TYPE_ONCE);
 	m_pPlayer->m_pAnimationController->SetTrackAnimationSet(1, 1);
 	m_pPlayer->m_pAnimationController->SetTrackAnimationSet(0, 0);
 
@@ -49,6 +50,10 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
+
+
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
 	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");

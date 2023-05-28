@@ -1,0 +1,80 @@
+diff a/Senier_Project/Senier_Project/Game/Src/Player.cpp b/Senier_Project/Senier_Project/Game/Src/Player.cpp	(rejected hunks)
+@@ -83,37 +83,47 @@
+ 	}
+-
+-	XMVECTOR direction = XMVectorZero();
+-	XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+-	XMVECTOR r = XMLoadFloat3(&m_xmf3Right);
+-
+-	if (dwDirection & DIR_FORWARD)
+-	{
+-		direction = XMVectorAdd(direction, l);
+-	}
+-	if (dwDirection & DIR_BACKWARD)
+-	{
+-		direction = XMVectorAdd(direction, -l);
+-	}
+-	if (dwDirection & DIR_LEFT)
+-	{
+-		direction = XMVectorAdd(direction, -r);
+-	}
+-	if (dwDirection & DIR_RIGHT)
++	else
+ 	{
+-		direction = XMVectorAdd(direction, r);
+-	}
++		XMVECTOR direction = XMVectorZero();
++
++		XMMATRIX xmmatRotate = XMMatrixRotationY(XMConvertToRadians(m_xmf3CameraRotation.y));
++		XMVECTOR camLook = XMVectorSet(0, 0, 1, 0);
++		XMVECTOR camRight = XMVectorSet(1, 0, 0, 0);
++
++		camLook = XMVector3TransformNormal(camLook, xmmatRotate);
++		camRight = XMVector3TransformNormal(camRight, xmmatRotate);
++
++		if (dwDirection & DIR_FORWARD)
++		{
++			direction = XMVectorAdd(direction, camLook);
++		}
++		if (dwDirection & DIR_BACKWARD)
++		{
++			direction = XMVectorAdd(direction, -camLook);
++		}
++		if (dwDirection & DIR_LEFT)
++		{
++			direction = XMVectorAdd(direction, -camRight);
++		}
++		if (dwDirection & DIR_RIGHT)
++		{
++			direction = XMVectorAdd(direction, camRight);
++		}
++
++		// ���� ����
++		direction = XMVector3Normalize(direction);
++		XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
++		XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
++
++		XMVECTOR deltaAccel = direction * m_Acceleration;
++		XMFLOAT3 xmf3deltaAccelXZ;
++		XMStoreFloat3(&xmf3deltaAccelXZ, deltaAccel);
+ 
+-	direction = XMVector3Normalize(direction);
+-
+-	XMVECTOR deltaAccel = direction * m_Acceleration;
+-	//XMFLOAT3 xmf3deltaAccel;
+-	//XMStoreFloat3(&xmf3deltaAccel, deltaAccel);
+-	XMFLOAT3 xmf3deltaAccelXZ;
+-	XMStoreFloat3(&xmf3deltaAccelXZ, deltaAccel);
++		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
++		xmf3Accel.x = xmf3deltaAccelXZ.x;
++		xmf3Accel.z = xmf3deltaAccelXZ.z;
++		m_pBody->SetAcceleration(xmf3Accel);
+ 
+-	XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+-	xmf3Accel.x = xmf3deltaAccelXZ.x;
+-	xmf3Accel.z = xmf3deltaAccelXZ.z;
+-	m_pBody->SetAcceleration(xmf3Accel);
++	}
+ 
++	// move �ִϸ��̼� �����
+ 

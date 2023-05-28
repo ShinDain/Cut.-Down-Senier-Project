@@ -1,0 +1,6 @@
+diff a/Senier_Project/Senier_Project/DirectXRendering/Header/Scene.h b/Senier_Project/Senier_Project/DirectXRendering/Header/Scene.h	(rejected hunks)
+@@ -73,2 +73,4 @@
+ 
++	std::shared_ptr<Player> m_pPlayer = nullptr;
++
+ 	std::shared_ptr<ImgObject> m_pImage = nullptr;

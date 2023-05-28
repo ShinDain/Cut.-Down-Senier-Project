@@ -35,6 +35,7 @@ void Character::Update(float elapsedTime)
 	Object::Update(elapsedTime);
 
 	ApplyCharacterFriction(elapsedTime);
+	IsFalling();
 
 	// 속도 및 위치 변화
 	//IsFalling();
@@ -88,25 +89,41 @@ void Character::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 
 void Character::IsFalling()
 {
-	// 플랫폼 위에 올라가 있다면 
-	// false로, 
-	
-	if (m_xmf3Position.y > 0)
+	if (m_xmf3Position.y < 0)
 	{
-		m_bIsFalling = true;
-		m_MaxSpeedXZ = 75.f;
-		//m_Acceleration = 50.0f;
-		//m_CharacterFriction = 75.0f;
-	}
-	else if(m_xmf3Position.y < 0)
-	{
-		//m_Acceleration = 500.0f;
-		//m_CharacterFriction = 350.0f;
-		m_MaxSpeedXZ = 100.f;
+		
 		m_xmf3Position.y = 0;
-		//m_xmf3Velocity.y = 0;
-		m_bIsFalling = false;
+		DoLanding();
 	}
+	else if (m_xmf3Position.y > 0)
+	{
+		for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
+		{
+			BoundingOrientedBox obb = g_ppColliderBoxs[i]->GetOBB();
+			
+			XMVECTOR position = XMLoadFloat3(&m_xmf3Position);
+			XMVECTOR direction = XMVectorSet(0, -1, 0, 0);
+			float distance = 100;
+			bool bIntersect = obb.Intersects(position, direction, distance);
+			if (distance < 1 && bIntersect)
+			{
+				DoLanding();
+				return;
+			}
+		}
+
+		m_bIsFalling = true;
+		m_CharacterFriction = 30.f;
+		m_Acceleration = 100.f;
+	}
+}
+
+void Character::DoLanding()
+{
+	m_bIsFalling = false;
+	m_MaxSpeedXZ = 100.f;
+	m_CharacterFriction = 350.0f;;
+	m_Acceleration = 500.0f;
 }
 
 void Character::ApplyCharacterFriction(float elapsedTime)

@@ -226,7 +226,7 @@ void CreateObjectDefaultData()
 	tmpData.nMass = WALL_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WALL_MODEL_SCALE;
 	tmpData.renderLayer = WALL_MODEL_RENDERLAYER;
-	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(-tmpData.xmf3Extents.x, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3ColliderOffsetPosition = XMFLOAT3(-tmpData.xmf3Extents.x, tmpData.xmf3Extents.y, 0.08f);
 	tmpData.xmf3ColliderOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ WALL_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WALL_MODEL_NAME);

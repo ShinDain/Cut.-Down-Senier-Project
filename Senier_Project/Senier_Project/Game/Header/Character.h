@@ -42,10 +42,12 @@ public:
 
 	virtual void IsFalling();
 
+	virtual void DoLanding();
+
 protected:
 	float m_MaxSpeedXZ = 100.0f;
 	float m_CharacterFriction = 350.0f;
-	float m_JumpSpeed = 100;
+	float m_JumpSpeed = 75.0f;
 
 	Ray m_floorCheckRay;
 

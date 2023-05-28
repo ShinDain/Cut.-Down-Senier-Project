@@ -174,7 +174,7 @@ using namespace DirectX;
 
 #define WALL_MODEL_NAME "Wall_2"
 #define WALL_MODEL_TEXPATH "Wall"
-#define WALL_MODEL_EXTENTS XMFLOAT3(2.0f, 2.0f, 0.125f)
+#define WALL_MODEL_EXTENTS XMFLOAT3(2.0f, 2.0f, 0.08f)
 #define WALL_MODEL_TYPE Object_World
 #define WALL_MODEL_COLLIDERTYPE Collider_Box
 #define WALL_MODEL_MASS 9999

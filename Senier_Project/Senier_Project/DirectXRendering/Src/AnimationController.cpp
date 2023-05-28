@@ -93,9 +93,11 @@ float AnimationTrack::UpdatePosition(float TrackPosition, float ElapsedTime, flo
 		else
 		{
 			m_Position = TrackPosition + fTrackElapsedTime;
+			m_AnimationRate = m_Position / AnimationLength;
 			if (m_Position > AnimationLength)
 			{
 				m_Position = -ANIMATION_CALLBACK_EPSILON;
+				m_AnimationRate = 0.0f;
 				return (AnimationLength);
 			}
 		}
@@ -104,9 +106,11 @@ float AnimationTrack::UpdatePosition(float TrackPosition, float ElapsedTime, flo
 
 	case ANIMATION_TYPE_ONCE:
 		m_Position = TrackPosition + fTrackElapsedTime;
+		m_AnimationRate = m_Position / AnimationLength;
 		if (m_Position >= AnimationLength) {
 			m_Position = AnimationLength;
-			m_bEnable = false;	
+			m_bAnimationOver = true;
+			m_AnimationRate = 1.0f;
 		}
 		break;
 	case ANIMATION_TYPE_PINGPONG:
@@ -170,7 +174,7 @@ AnimationController::AnimationController(ID3D12Device* pd3dDevice, ID3D12Graphic
 	{
 		m_vpAnimationTracks.emplace_back(std::make_shared<AnimationTrack>());
 	}
-
+	
 	m_pAnimationSets = pModel->m_pAnimationSets;
 
 	m_pModelRootObject = pModel->m_pRootObject;
