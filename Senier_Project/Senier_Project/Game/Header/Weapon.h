@@ -29,6 +29,8 @@ public:
 	virtual void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 
+	virtual void UpdateToRigidBody(float elapsedTime);
+
 	void Intersect();
 
 
@@ -39,6 +41,9 @@ protected:
 
 	char m_FollowObjName[64];
 	std::shared_ptr<Object> m_pFollowObject = nullptr;
+
+
+	XMFLOAT4X4 m_xmf4x4ColliderWorld = MathHelper::identity4x4();
 
 public:
 	void Active();

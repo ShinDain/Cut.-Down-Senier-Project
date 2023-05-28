@@ -70,6 +70,8 @@ bool Weapon::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_pBody = pBody;
 	m_pCollider = pCollider;
 	m_xmf3ColliderExtents = objData.xmf3Extents;
+	m_xmf3RenderOffsetPosition = objData.xmf3MeshOffsetPosition;
+	m_xmf3RenderOffsetRotation = objData.xmf3MeshOffsetRotation;
 
 	m_xmf3Position = objData.xmf3Position;
 	m_xmf3Rotation = objData.xmf3Rotation;
@@ -123,7 +125,18 @@ void Weapon::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 	XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
 	// S * R * T
 	//XMStoreFloat4x4(&m_xmf4x4LocalTransform, XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate)));
-	XMStoreFloat4x4(&m_xmf4x4World, XMMatrixMultiply(XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate)), xmmatWorld));
+	xmmatWorld = XMMatrixMultiply(XMMatrixMultiply(XMMatrixMultiply(xmmatScale, xmmatRotate), xmmatTranslate), xmmatWorld);
+
+	XMStoreFloat4x4(&m_xmf4x4ColliderWorld, xmmatWorld);
+
+	XMMATRIX offset = XMMatrixTranslation(-m_xmf3RenderOffsetPosition.x, -m_xmf3RenderOffsetPosition.y, -m_xmf3RenderOffsetPosition.z);
+	XMMATRIX offsetRotate = XMMatrixRotationRollPitchYaw(m_xmf3RenderOffsetRotation.x, m_xmf3RenderOffsetRotation.y, m_xmf3RenderOffsetRotation.z);
+	xmmatWorld = XMMatrixMultiply(XMMatrixMultiply(offsetRotate, offset), xmmatWorld);
+	XMStoreFloat4x4(&m_xmf4x4World, xmmatWorld);
+
+	XMVECTOR renderPosition = XMVectorSet(0, 0, 0, 1);
+	renderPosition = XMVector3TransformCoord(renderPosition, xmmatWorld);
+	XMStoreFloat3(&m_xmf3RenderPosition, renderPosition);
 
 	Object::UpdateTransform(&m_xmf4x4World);
 }
@@ -131,6 +144,15 @@ void Weapon::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 void Weapon::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	Object::Render(elapsedTime, pd3dCommandList);
+}
+
+void Weapon::UpdateToRigidBody(float elapsedTime)
+{
+	if (m_pCollider)
+	{
+		m_pCollider->SetWorld(m_xmf4x4ColliderWorld);
+		m_pCollider->UpdateWorldTransform();
+	}
 }
 
 void Weapon::Intersect()

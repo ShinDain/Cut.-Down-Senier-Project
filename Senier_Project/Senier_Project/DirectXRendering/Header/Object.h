@@ -14,7 +14,7 @@
 #include "Material.h"
 #include "AnimationController.h"
 
-#define COLLIDER_RENDER
+//#define COLLIDER_RENDER
 
 #define DIR_FORWARD					0x01
 #define DIR_BACKWARD				0x02
@@ -42,7 +42,7 @@ public:
 	virtual void OnResize(float aspectRatio) {}
 	virtual void Animate(float elapsedTime);
 	virtual void Update(float elapsedTime);
-	void UpdateToRigidBody(float elapsedTime);
+	virtual void UpdateToRigidBody(float elapsedTime);
 
 	virtual void ProcessInput(UCHAR* pKeybuffer) {}
 	virtual void KeyDownEvent(WPARAM wParam) {}

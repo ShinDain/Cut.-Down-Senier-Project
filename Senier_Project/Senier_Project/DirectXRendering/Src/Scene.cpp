@@ -42,7 +42,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(260, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, 1);
 
 	// ¹«±â
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0.15, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90),XMFLOAT3(1,1,1), WEAPON_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-0.59f, 0.135f, 0.063f), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90),XMFLOAT3(1,1,1), WEAPON_MODEL_NAME, 0);
 
 	// ¹Ù´Ú
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1,1,1), nullptr, 0);

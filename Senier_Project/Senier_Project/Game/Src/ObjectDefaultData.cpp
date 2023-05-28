@@ -34,9 +34,7 @@ void CreateObjectDefaultData()
 	tmpData.nMass = WEAPON_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WEAPON_MODEL_SCALE;
 	tmpData.renderLayer = WEAPON_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y / 2 - 1.2f, 0);
-	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y / 2, 0);
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
 	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ WEAPON_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WEAPON_MODEL_NAME);
