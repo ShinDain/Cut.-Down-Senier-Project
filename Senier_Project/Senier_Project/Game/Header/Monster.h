@@ -53,6 +53,7 @@ public:
 
 	virtual void Move(DWORD dwDirection);
 	virtual void Jump() {}
+	virtual void Trace(float elapsedTime);
 
 	virtual void Attack();
 	virtual void OnHit();
@@ -60,7 +61,6 @@ public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 
 protected:
-	
 	MonsterAnimationState m_AnimationState = MonsterAnimationState::Monster_State_Idle;
 
 };

@@ -41,7 +41,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 
 	// 몬스터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(50, 0, 150), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(40, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 
@@ -540,8 +540,6 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		objectData.xmf3MeshOffsetPosition = g_DefaultObjectData[pstrFileName].xmf3MeshOffsetPosition;
 		objectData.xmf3MeshOffsetRotation = g_DefaultObjectData[pstrFileName].xmf3MeshOffsetRotation;
 	}
-
-	
 	
 	std::shared_ptr<ModelDataInfo> pModelData;
 	std::shared_ptr<Object> pObject;
@@ -568,6 +566,9 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	{
 		std::shared_ptr<Player> pPlayer = std::make_shared<Player>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 		m_pPlayer = pPlayer;
+
+		g_vpCharacters.emplace_back(pPlayer);
+		g_pPlayer = pPlayer;
 	}
 		break;
 
@@ -578,6 +579,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 
 		g_vpAllObjs.emplace_back(pObject);
 		g_vpMovableObjs.emplace_back(pObject);
+		g_vpCharacters.emplace_back(pObject);
 		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
 	}
 		break;
@@ -601,6 +603,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 
 		g_vpAllObjs.emplace_back(pObject);
 		g_vpMovableObjs.emplace_back(pObject);
+		g_vpWorldObjs.emplace_back(pObject);
 		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
 	}
 	break;
@@ -610,6 +613,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 
 		g_vpAllObjs.emplace_back(pObject);
+		g_vpWorldObjs.emplace_back(pObject);
 		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
 	}
 		break;
@@ -634,38 +638,50 @@ void Scene::GenerateContact()
 	m_CollisionData.restitution = 0.1f;
 	m_CollisionData.tolerance = 0.1f;
 
-	// 플레이어 검사
-	for (int i = 0; i < g_ppColliderPlanes.size(); ++i)
+	// 캐릭터 검사
+	for (int k = 0; k < g_vpCharacters.size(); ++k)
 	{
-		if (m_CollisionData.ContactCnt() > nContactCnt) return;
-		CollisionDetector::BoxAndHalfSpace(*g_ppColliderBoxs[0], *g_ppColliderPlanes[i], m_CollisionData);
-	}
-	for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
-	{
-		if (m_CollisionData.ContactCnt() > nContactCnt) return;
+		std::shared_ptr<ColliderBox> characterBox = std::static_pointer_cast<ColliderBox>(g_vpCharacters[k]->GetCollider());
 
-		CollisionDetector::BoxAndBox(*g_ppColliderBoxs[0], *g_ppColliderBoxs[i], m_CollisionData);
-	}
+		for (int i = 0; i < g_ppColliderPlanes.size(); ++i)
+		{
+			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+			CollisionDetector::BoxAndHalfSpace(*characterBox, *g_ppColliderPlanes[i], m_CollisionData);
+		}
+		for (int i = 0; i < g_ppColliderBoxs.size(); ++i)
+		{
+			if (characterBox == g_ppColliderBoxs[i]) continue;
 
+			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+			CollisionDetector::BoxAndBox(*characterBox, *g_ppColliderBoxs[i], m_CollisionData);
+		}
+
+	}
 
 	m_CollisionData.friction = 0.9f;
 	// 평면과의 검사
 	for (int i = 0; i < g_ppColliderPlanes.size(); ++i)
 	{
-		for (int j = 1; j < g_ppColliderBoxs.size(); ++j)
+		for (int k = 0; k < g_vpWorldObjs.size(); ++k)
 		{
+			std::shared_ptr<ColliderBox> colliderBox = std::static_pointer_cast<ColliderBox>(g_vpWorldObjs[k]->GetCollider());
+			if (!colliderBox) continue;
+
 			if (m_CollisionData.ContactCnt() > nContactCnt) return;
-			CollisionDetector::BoxAndHalfSpace(*g_ppColliderBoxs[j], *g_ppColliderPlanes[i], m_CollisionData);
+			CollisionDetector::BoxAndHalfSpace(*colliderBox, *g_ppColliderPlanes[i], m_CollisionData);
 		}
 	}
 	// 박스끼리 검사
-	for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
+	for (int i = 0; i < g_ppColliderBoxs.size(); ++i)
 	{
-		for (int j = i + 1; j < g_ppColliderBoxs.size(); ++j)
+		for (int k = 0; k < g_vpWorldObjs.size(); ++k)
 		{
-			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+			std::shared_ptr<ColliderBox> colliderBox = std::static_pointer_cast<ColliderBox>(g_vpWorldObjs[k]->GetCollider());
+			if (!colliderBox) continue;
+			if (colliderBox == g_ppColliderBoxs[i]) continue;
 
-			CollisionDetector::BoxAndBox(*g_ppColliderBoxs[i], *g_ppColliderBoxs[j], m_CollisionData);
+			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+			CollisionDetector::BoxAndBox(*colliderBox, *g_ppColliderBoxs[i], m_CollisionData);
 		}
 	}
 }

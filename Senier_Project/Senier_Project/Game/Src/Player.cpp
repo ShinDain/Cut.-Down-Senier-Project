@@ -114,19 +114,8 @@ void Player::Move(DWORD dwDirection)
 			direction = XMVectorAdd(direction, camRight);
 		}
 
-		if (m_Acceleration < 30.0f)
-		{
-			float a = 0;
-		}
-		if (m_CharacterFriction < 100.0f)
-		{
-			float a = 0;
-		}
-
 		// 진행 방향
 		direction = XMVector3Normalize(direction);
-		XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
-		XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
 
 		XMVECTOR deltaAccel = direction * m_Acceleration;
 		XMFLOAT3 xmf3deltaAccelXZ;

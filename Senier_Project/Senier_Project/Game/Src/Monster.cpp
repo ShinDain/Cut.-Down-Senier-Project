@@ -17,6 +17,7 @@ Monster::Monster(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 	m_pAnimationController->SetTrackAnimationSet(0, Monster_Anim_Index_Idle);
 	m_pAnimationController->SetTrackAnimationSet(1, Monster_Anim_Index_Run);
 	m_pAnimationController->SetTrackAnimationSet(2, Monster_Anim_Index_Hit1);
+
 }
 
 Monster::~Monster()
@@ -27,6 +28,14 @@ Monster::~Monster()
 void Monster::Update(float elapsedTime)
 {
 	Character::Update(elapsedTime);
+
+	Trace(elapsedTime);
+
+	{
+		XMFLOAT3 tmp =	m_pBody->GetVelocity();
+		XMFLOAT3 tmp2 =	m_pBody->GetAcceleration();
+		float a = 0;
+	}
 }
 
 void Monster::Destroy()
@@ -88,10 +97,41 @@ void Monster::UpdateAnimationTrack(float elapsedTime)
 
 }
 
-
-
 void Monster::Move(DWORD dwDirection)
 {
+}
+
+void Monster::Trace(float elapsedTime)
+{
+	XMFLOAT3 xmf3TargetPosition = g_pPlayer->GetPosition();
+	xmf3TargetPosition.y = 0;
+	XMVECTOR targetPosition = XMLoadFloat3(&xmf3TargetPosition);
+
+	XMFLOAT3 xmf3MyPosition = m_xmf3Position;
+	xmf3MyPosition.y = 0;
+	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
+	
+	XMVECTOR accelDir = targetPosition - myPosition;
+	if (XMVectorGetX(XMVector3Length(accelDir)) < 25)
+	{
+		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+		xmf3Accel.x = 0;
+		xmf3Accel.z = 0;
+		m_pBody->SetAcceleration(xmf3Accel);
+		return;
+	}
+
+	accelDir = XMVector3Normalize(accelDir);
+	XMVECTOR deltaAccelXZ = accelDir * m_Acceleration;
+	XMFLOAT3 xmf3DeltaAccelXZ;
+	XMStoreFloat3(&xmf3DeltaAccelXZ, deltaAccelXZ);
+	
+
+	XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+	xmf3Accel.x = xmf3DeltaAccelXZ.x;
+	xmf3Accel.z = xmf3DeltaAccelXZ.z;
+	m_pBody->SetAcceleration(xmf3Accel);
+
 }
 
 void Monster::Attack()

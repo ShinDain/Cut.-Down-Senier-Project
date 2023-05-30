@@ -85,9 +85,6 @@
     <ClCompile Include="DirectXRendering\Src\Object.cpp">
       <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
-    <ClCompile Include="DirectXRendering\Src\Scene.cpp">
-      <Filter>DirectXRendering\Src</Filter>
-    </ClCompile>
     <ClCompile Include="DirectXRendering\Src\Shader.cpp">
       <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
@@ -126,6 +123,9 @@
       <Filter>Game\Src</Filter>
     </ClCompile>
     <ClCompile Include="DirectXRendering\Src\DepthMap.cpp">
+      <Filter>DirectXRendering\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectXRendering\Src\Scene.cpp">
       <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
   </ItemGroup>

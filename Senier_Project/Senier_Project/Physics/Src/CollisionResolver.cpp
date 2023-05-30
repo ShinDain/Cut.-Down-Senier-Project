@@ -189,7 +189,7 @@ void CollisionResolver::AdjustPositions(std::vector<std::shared_ptr<Contact>> pC
 							XMVECTOR contactNormal = XMLoadFloat3(&BodyContacts[j]->GetContactNormal());
 							float newDepth = BodyContacts[j]->GetDepth();
 							newDepth += XMVectorGetX(XMVector3Dot(contactNormal, deltaPosition)) * (k ? 1 : -1);
-							BodyContacts[j]->SetDepth(newDepth);
+ 							BodyContacts[j]->SetDepth(newDepth);
 						}
 					}
 				}
@@ -226,7 +226,4 @@ void CollisionResolver::AdjustPositions(std::vector<std::shared_ptr<Contact>> pC
 
 		++m_nPositionIterationCnt;
 	}
-
-
-
 }

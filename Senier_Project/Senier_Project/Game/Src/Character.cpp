@@ -35,22 +35,6 @@ void Character::Update(float elapsedTime)
 	RotateToMove(elapsedTime);
 	IsFalling();
 	UpdateAnimationTrack(elapsedTime);
-
-	// 속도 및 위치 변화
-	//IsFalling();
-	//CalcVelocityAndPosition(elapsedTime);
-	/*UpdateToRigidBody(elapsedTime);
-	
-	ObjConstant objConstant;
-	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
-	if (m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
-
-	if (m_pSibling) {
-		m_pSibling->Update(elapsedTime);
-	}
-	if (m_pChild) {
-		m_pChild->Update(elapsedTime);
-	}*/
 }
 
 void Character::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
@@ -204,7 +188,7 @@ void Character::BlendWithIdleMovement(float maxWeight)
 	XMVECTOR velocity = XMLoadFloat3(&xmf3Velocity);
 	weight = XMVectorGetX(XMVector3Length(velocity)) / m_MaxSpeedXZ;
 
-	if (weight < 0.1f)
+	if (weight < FLT_EPSILON)
 		weight = 0;
 	else if (weight > maxWeight)
 		weight = maxWeight;
