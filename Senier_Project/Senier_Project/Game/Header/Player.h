@@ -75,7 +75,7 @@ public:
 
 	virtual void DoLanding();
 
-	virtual void UpdateAnimationTrack();
+	virtual void UpdateAnimationTrack(float elapsedTime);
 
 protected:
 	std::shared_ptr<Weapon> m_pWeapon = nullptr;

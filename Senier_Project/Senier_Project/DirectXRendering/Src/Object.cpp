@@ -306,7 +306,6 @@ std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dD
 				Object::LoadAnimationFromFile(pInFile, pModelData);
 
 				pModelData->PrepareSkinning();
-
 			}
 			else if (!strcmp(pstrToken, "</Animation>:"))
 			{
@@ -319,6 +318,7 @@ std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dD
 		}
 	}
 
+	
 
 	return pModelData;
 }
@@ -553,18 +553,22 @@ void Object::Destroy()
 {
 	m_bIsAlive = false;
 
-	if(m_pChild) m_pChild->Destroy();
-	if(m_pSibling) m_pSibling->Destroy();
-
 	if(m_pMesh) m_pMesh.reset();
 	for (int i = 0; i < m_vpMaterials.size(); ++i)
 		m_vpMaterials[i].reset();
 
-	if(m_pAnimationController) m_pAnimationController->Destroy();
-	m_pObjectCB.reset();
+	if (m_pAnimationController)	m_pAnimationController.reset();
+	if(m_pObjectCB) m_pObjectCB.reset();
 
-	if(m_pCollider) m_pCollider->Destroy();
-	if (m_pBody) m_pBody->Destroy();
+	if(m_pCollider) m_pCollider.reset();
+	if (m_pBody)
+	{
+		m_pBody->Destroy();
+		m_pBody.reset();
+	}
+
+	if (m_pChild) m_pChild->Destroy();
+	if (m_pSibling) m_pSibling->Destroy();
 }
 
 void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData)

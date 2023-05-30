@@ -33,7 +33,7 @@ public:
 	virtual void ProcessInput(UCHAR* pKeybuffer) {}
 	virtual void KeyDownEvent(WPARAM wParam) {}
 
-	virtual void UpdateAnimationTrack() {}
+	virtual void UpdateAnimationTrack(float elapsedTime) {}
 	virtual void UnableAnimationTrack(int nAnimationTrack);
 
 public:
@@ -57,6 +57,8 @@ protected:
 
 	Ray m_floorCheckRay;
 
+	float m_DestroyTime = 0.0f;
+	float m_ElapsedDestroyTime = 0.0f;
 
 	void ApplyCharacterFriction(float elapsedTime);
 	void CalcVelocityAndPosition(float elapsedTime);

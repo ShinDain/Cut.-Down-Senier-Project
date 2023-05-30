@@ -195,6 +195,7 @@ AnimationController::AnimationController(ID3D12Device* pd3dDevice, ID3D12Graphic
 
 AnimationController::~AnimationController()
 {
+	Destroy();
 }
 
 void AnimationController::AdvanceTime(float ElapsedTime, Object* pRootGameObject)

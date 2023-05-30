@@ -186,7 +186,7 @@ void Weapon::Intersect(XMFLOAT3 xmf3PlayerLook)
 			m_pCollider->SetIntersect(1);
 			objCollider->SetIntersect(1);
 #endif
-			g_vpAllObjs[i]->ApplyDamage(10, xmf3PlayerLook);
+			g_vpAllObjs[i]->ApplyDamage(m_Power, xmf3PlayerLook);
 		}
 	}
 }

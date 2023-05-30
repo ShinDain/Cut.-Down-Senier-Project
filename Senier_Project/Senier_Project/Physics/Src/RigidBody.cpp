@@ -39,6 +39,7 @@ RigidBody::RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 x
 
 RigidBody::~RigidBody()
 {
+	Destroy();
 }
 
 void RigidBody::Update(float elapsedTime)

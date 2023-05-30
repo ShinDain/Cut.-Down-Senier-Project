@@ -31,10 +31,10 @@ void Monster::Update(float elapsedTime)
 
 void Monster::Destroy()
 {
-	Character::Destroy();
+	Object::Destroy();
 }
 
-void Monster::UpdateAnimationTrack()
+void Monster::UpdateAnimationTrack(float elapsedTime)
 {
 	switch (m_AnimationState)
 	{
@@ -70,6 +70,17 @@ void Monster::UpdateAnimationTrack()
 	}
 		break;
 	case Monster_State_Death:
+	{
+		if (m_pAnimationController->GetTrackOver(2))
+		{
+			//UnableAnimationTrack(2);
+			//m_AnimationState = MonsterAnimationState::Monster_State_Idle;
+
+			m_ElapsedDestroyTime += elapsedTime;
+			if (m_ElapsedDestroyTime > m_DestroyTime)
+				m_bIsAlive = false;
+		}
+	}
 		break;
 	default:
 		break;
@@ -99,13 +110,25 @@ void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
 	Object::ApplyDamage(power, xmf3DamageDirection);
 
-	m_AnimationState = MonsterAnimationState::Monster_State_Hit;
-	m_pAnimationController->SetTrackAnimationSet(2, MonsterAnimationIndex::Monster_Anim_Index_Hit2);
-	m_pAnimationController->SetTrackEnable(2, true);
-	m_pAnimationController->SetTrackPosition(2, 0.1f);
-	m_pAnimationController->SetTrackSpeed(2, 1.5f);
-	m_pAnimationController->SetTrackWeight(2, 1);
-
 	m_pAnimationController->SetTrackEnable(0, false);
 	m_pAnimationController->SetTrackEnable(1, false);
+
+	if (m_HP > 0)
+	{
+		m_AnimationState = MonsterAnimationState::Monster_State_Hit;
+		UnableAnimationTrack(2);
+		m_pAnimationController->SetTrackEnable(2, true);
+		m_pAnimationController->SetTrackAnimationSet(2, MonsterAnimationIndex::Monster_Anim_Index_Hit2);
+		m_pAnimationController->SetTrackSpeed(2, 1.5f);
+		m_pAnimationController->SetTrackWeight(2, 1);
+	}
+	else
+	{
+		m_AnimationState = MonsterAnimationState::Monster_State_Death;
+		UnableAnimationTrack(2);
+		m_pAnimationController->SetTrackEnable(2, true);
+		m_pAnimationController->SetTrackAnimationSet(2, MonsterAnimationIndex::Monster_Anim_Index_FallingBack);
+		m_pAnimationController->SetTrackSpeed(2, 1);
+		m_pAnimationController->SetTrackWeight(2, 1);
+	}
 }

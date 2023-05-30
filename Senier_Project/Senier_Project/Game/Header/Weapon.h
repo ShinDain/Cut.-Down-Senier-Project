@@ -42,6 +42,7 @@ protected:
 	char m_FollowObjName[64];
 	std::shared_ptr<Object> m_pFollowObject = nullptr;
 
+	float m_Power = 100;
 
 	XMFLOAT4X4 m_xmf4x4ColliderWorld = MathHelper::identity4x4();
 

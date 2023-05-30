@@ -42,6 +42,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	// 몬스터 테스트
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(40, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
@@ -116,7 +118,7 @@ void Scene::Update(float totalTime ,float elapsedTime)
 {
 #if defined(_DEBUG)
 	ClearObjectLayer();
-	m_refCnt = g_LoadedModelData[CHARACTER_MODEL_NAME]->m_pRootObject.use_count();
+	m_refCnt = g_LoadedModelData[ZOMBIE_MODEL_NAME]->m_pRootObject.use_count();
 	m_size = g_vpAllObjs.size();
 
 	m_tTime += elapsedTime;
@@ -129,9 +131,6 @@ void Scene::Update(float totalTime ,float elapsedTime)
 	}
 
 	m_pPlayer->Update(elapsedTime);
-
-	// 교차 검사
-	//Intersect();
 
 	// 충돌 검사
 	GenerateContact();
@@ -281,6 +280,9 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 	//pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pShadowPassCB->Resource()->GetGPUVirtualAddress());
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
 	{
+		if (!m_vObjectLayer[RenderLayer::Render_Static][i]->GetIsAlive())
+			continue;
+
 		m_vObjectLayer[RenderLayer::Render_Static][i]->UpdateTransform(NULL);
 		m_vObjectLayer[RenderLayer::Render_Static][i]->Render(elapsedTime, pd3dCommandList);
 	}
@@ -288,6 +290,9 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 	g_Shaders[ShaderType::Shader_TextureMesh]->ChangeShader(pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_TextureMesh].size(); ++i)
 	{
+		if (!m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->GetIsAlive())
+			continue;
+
 		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->UpdateTransform(NULL);
 		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(elapsedTime, pd3dCommandList);
 	}
@@ -296,6 +301,8 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 	{
 		if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
 		{
+			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->GetIsAlive())
+				continue;
 			// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
 			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(elapsedTime);
 			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
@@ -683,28 +690,28 @@ void Scene::ClearObjectLayer()
 		}
 	}*/
 
-	// 전체 순회
-	for (int i = 0; i < g_vpAllObjs.size(); ++i)
-	{
-		if (!g_vpAllObjs[i]->GetIsAlive())
-		{
-			g_vpAllObjs[i]->Destroy();
-			g_vpAllObjs.erase(g_vpAllObjs.begin() + i);
-		}
-	}
+	//// 전체 순회
+	//for (int i = 0; i < g_vpAllObjs.size(); ++i)
+	//{
+	//	if (!g_vpAllObjs[i]->GetIsAlive())
+	//	{
+	//		g_vpAllObjs[i]->Destroy();
+	//		g_vpAllObjs.erase(g_vpAllObjs.begin() + i);
+	//	}
+	//}
 
-	// 레이어 순회
-	for (int i = 0; i < RenderLayer::Render_Count; ++i)
-	{
-		for (int j = 0; j < m_vObjectLayer[i].size(); ++j)
-		{
-			if (!m_vObjectLayer[i][j]->GetIsAlive())
-			{
-				m_vObjectLayer[i][j]->Destroy();
-				m_vObjectLayer[i].erase(m_vObjectLayer[i].begin() + j);
-			}
-		}
-	}
+	//// 레이어 순회
+	//for (int i = 0; i < RenderLayer::Render_Count; ++i)
+	//{
+	//	for (int j = 0; j < m_vObjectLayer[i].size(); ++j)
+	//	{
+	//		if (!m_vObjectLayer[i][j]->GetIsAlive())
+	//		{
+	//			m_vObjectLayer[i][j]->Destroy();
+	//			m_vObjectLayer[i].erase(m_vObjectLayer[i].begin() + j);
+	//		}
+	//	}
+	//}
 }
 
 void Scene::Intersect()

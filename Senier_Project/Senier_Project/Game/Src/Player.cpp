@@ -43,14 +43,17 @@ void Player::Update(float elapsedTime)
 
 void Player::Destroy()
 {
-	Character::Destroy();
+	Object::Destroy();
 
-	if(m_pWeapon) m_pWeapon->Destroy();
-	m_pWeapon.reset();
+	//if(m_pWeapon) m_pWeapon->Destroy();
+	//m_pWeapon.reset();
 }
 
 void Player::ProcessInput(UCHAR* pKeybuffer)
 {
+	if (m_nAnimationState == PlayerAnimationState::Player_State_Death)
+		return;
+
 	DWORD dwDirection = 0;
 	if (pKeybuffer['W'] & 0xF0) dwDirection |= DIR_FORWARD;
 	if (pKeybuffer['S'] & 0xF0) dwDirection |= DIR_BACKWARD;
@@ -70,6 +73,10 @@ void Player::KeyDownEvent(WPARAM wParam)
 	{
 		ApplyDamage(10, XMFLOAT3(0, 0, -1));
 	}
+
+	if (!m_bIsAlive)
+		return;
+
 	if(wParam == VK_SPACE)
 		Jump();
 }
@@ -220,11 +227,23 @@ void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	m_pAnimationController->SetTrackEnable(0, false);
 	m_pAnimationController->SetTrackEnable(1, false);
 
-	m_nAnimationState = PlayerAnimationState::Player_State_Hit;
-	UnableAnimationTrack(2);
-	m_pAnimationController->SetTrackEnable(2, true);
-	m_pAnimationController->SetTrackAnimationSet(2, Player_Anim_Index_GetHit);
-	m_pAnimationController->SetTrackWeight(2, 1);
+	if (m_HP > 0)
+	{
+		m_nAnimationState = PlayerAnimationState::Player_State_Hit;
+		UnableAnimationTrack(2);
+		m_pAnimationController->SetTrackEnable(2, true);
+		m_pAnimationController->SetTrackAnimationSet(2, Player_Anim_Index_GetHit);
+		m_pAnimationController->SetTrackWeight(2, 1);
+	}
+	else
+	{
+		m_nAnimationState = PlayerAnimationState::Player_State_Death;
+		UnableAnimationTrack(2);
+		m_pAnimationController->SetTrackEnable(2, true);
+		m_pAnimationController->SetTrackAnimationSet(2, Player_Anim_Index_Death);
+		m_pAnimationController->SetTrackWeight(2, 1);
+	}
+	
 }
 
 void Player::DoLanding()
@@ -256,7 +275,7 @@ void Player::DoLanding()
 
 }
 
-void Player::UpdateAnimationTrack()
+void Player::UpdateAnimationTrack(float elapsedTime)
 {
 	switch (m_nAnimationState)
 	{
@@ -362,6 +381,20 @@ void Player::UpdateAnimationTrack()
 			UnableAnimationTrack(2);
 
 			m_nAnimationState = PlayerAnimationState::Player_State_Idle;
+		}
+	}
+		break;
+
+	case Player_State_Death:
+	{
+		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+		m_pBody->SetAcceleration(XMFLOAT3(0, xmf3Accel.y, 0));
+
+		if (m_pAnimationController->GetTrackOver(2))
+		{
+			m_ElapsedDestroyTime += elapsedTime;
+			if (m_ElapsedDestroyTime > m_DestroyTime)
+				m_bIsAlive = false;
 		}
 	}
 		break;

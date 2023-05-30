@@ -34,7 +34,7 @@ void Character::Update(float elapsedTime)
 	ApplyCharacterFriction(elapsedTime);
 	RotateToMove(elapsedTime);
 	IsFalling();
-	UpdateAnimationTrack();
+	UpdateAnimationTrack(elapsedTime);
 
 	// 속도 및 위치 변화
 	//IsFalling();
@@ -172,7 +172,7 @@ void Character::RotateToMove(float elapsedTime)
 		XMVECTOR velocity = XMLoadFloat3(&xmf3Velcity);
 		float velocityLength = XMVectorGetX(XMVector3Length(velocity));
 
-		if(angleBetweenLook > 5)
+		if(fabs(angleBetweenLook) > 10)
 			angleBetweenLook = angleBetweenLook / 5;
 
 		// 값이 너무 커지지 않도록

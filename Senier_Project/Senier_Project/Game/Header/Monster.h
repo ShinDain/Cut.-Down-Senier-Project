@@ -45,7 +45,7 @@ public:
 
 	virtual void Destroy();
 
-	virtual void UpdateAnimationTrack();
+	virtual void UpdateAnimationTrack(float elapsedTime);
 
 public:
 	virtual void ProcessInput(UCHAR* pKeybuffer) {}
