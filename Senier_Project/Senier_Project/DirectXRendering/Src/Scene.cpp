@@ -577,6 +577,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		pObject = std::static_pointer_cast<Object>(pMonster);
 
 		g_vpAllObjs.emplace_back(pObject);
+		g_vpMovableObjs.emplace_back(pObject);
 		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
 	}
 		break;
@@ -593,6 +594,16 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
 	}
 	break;	
+
+	case Object_Movable:
+	{
+		pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+
+		g_vpAllObjs.emplace_back(pObject);
+		g_vpMovableObjs.emplace_back(pObject);
+		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
+	}
+	break;
 
 	default:
 	{

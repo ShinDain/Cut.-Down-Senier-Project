@@ -47,6 +47,7 @@ public:
 
 	virtual void DoLanding();
 	virtual	void RotateToMove(float elapsedTime);
+	virtual	void RotateToTargetLook(float elapsedTime, XMFLOAT3 xmf3TargetLook, float divideConst);
 
 	virtual void BlendWithIdleMovement(float maxWeight);
 
@@ -57,6 +58,7 @@ protected:
 
 	Ray m_floorCheckRay;
 
+	float m_TurnSpeed = 100;
 	float m_DestroyTime = 0.0f;
 	float m_ElapsedDestroyTime = 0.0f;
 

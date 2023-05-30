@@ -12,11 +12,6 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 }
 
-//Object::Object(const Object& rhs)
-//{
-//	m_Mass = rhs.m_Mass;
-//}
-
 Object::~Object()
 {
 	Destroy();
@@ -737,7 +732,7 @@ void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 
 	XMVECTOR damageDirection = XMLoadFloat3(&xmf3DamageDirection);
 	damageDirection = XMVector3Normalize(damageDirection);
-	XMVECTOR deltaVelocity = damageDirection * power * 10;
+	XMVECTOR deltaVelocity = damageDirection * power * 5;
 
 	XMFLOAT3 xmf3DeltaVelocity;
 	XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);

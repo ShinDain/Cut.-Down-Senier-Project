@@ -108,6 +108,9 @@ void Monster::OnDeath()
 
 void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
+	if (m_AnimationState == MonsterAnimationState::Monster_State_Death)
+		return;
+
 	Object::ApplyDamage(power, xmf3DamageDirection);
 
 	m_pAnimationController->SetTrackEnable(0, false);

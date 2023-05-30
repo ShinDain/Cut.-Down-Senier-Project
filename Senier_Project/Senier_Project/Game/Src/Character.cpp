@@ -104,6 +104,7 @@ void Character::UnableAnimationTrack(int nAnimationTrack)
 
 	m_pAnimationController->SetTrackOver(nAnimationTrack, false);
 	m_pAnimationController->SetTrackEnable(nAnimationTrack, false);
+	m_pAnimationController->SetTrackSpeed(nAnimationTrack, 1);
 	m_pAnimationController->SetTrackRate(nAnimationTrack, 0);
 	m_pAnimationController->SetTrackWeight(nAnimationTrack, 0);
 	m_pAnimationController->SetTrackPosition(nAnimationTrack, 0);
@@ -150,17 +151,27 @@ void Character::DoLanding()
 void Character::RotateToMove(float elapsedTime)
 {
 	// 진행 방향
-	XMVECTOR l = XMVectorSet(0, 0, 1, 0);
-	XMVECTOR targetLook = XMLoadFloat3(&m_pBody->GetAcceleration());
+	XMFLOAT3 xmf3TargetLook = m_pBody->GetAcceleration();
+	XMVECTOR targetLook = XMLoadFloat3(&xmf3TargetLook);
 	if (XMVectorGetX(XMVector3Length(targetLook)) <= 0)
 		return;
+	else
+	{
+		RotateToTargetLook(elapsedTime, xmf3TargetLook, 7);
+	}
 
+}
+
+void Character::RotateToTargetLook(float elapsedTime, XMFLOAT3 xmf3TargetLook, float divideConst)
+{
+	XMVECTOR targetLook = XMLoadFloat3(&xmf3TargetLook);
+	targetLook = XMVector3Normalize(targetLook);
 	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
 	XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
 	float angleBetweenLook = XMVectorGetX(XMVector3AngleBetweenVectors(targetLook, look));
 	angleBetweenLook = XMConvertToDegrees(angleBetweenLook);
 
-	angleBetweenLook *= m_Acceleration / 500;
+	angleBetweenLook *= m_TurnSpeed;
 
 	if (!XMVectorGetX(XMVectorIsNaN(XMVectorReplicate(angleBetweenLook))))
 	{
@@ -172,8 +183,8 @@ void Character::RotateToMove(float elapsedTime)
 		XMVECTOR velocity = XMLoadFloat3(&xmf3Velcity);
 		float velocityLength = XMVectorGetX(XMVector3Length(velocity));
 
-		if(fabs(angleBetweenLook) > 10)
-			angleBetweenLook = angleBetweenLook / 5;
+		if (fabs(angleBetweenLook) > 10)
+			angleBetweenLook = angleBetweenLook / divideConst;
 
 		// 값이 너무 커지지 않도록
 		float tmp = (int)(m_xmf3Rotation.y + angleBetweenLook) % 360;
@@ -207,26 +218,25 @@ void Character::ApplyCharacterFriction(float elapsedTime)
 	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
 	XMFLOAT3 xmf3VelocityXZ = XMFLOAT3(xmf3Velocity.x, 0, xmf3Velocity.z);
 	XMVECTOR velocityXZ = XMLoadFloat3(&xmf3VelocityXZ);
+	
+	XMVECTOR direction = XMVector3Normalize(velocityXZ);
+	XMVECTOR friction = -direction;
+	friction = m_CharacterFriction * friction * elapsedTime;
+
+	if (XMVectorGetX(XMVector3Length(friction)) > XMVectorGetX(XMVector3Length(velocityXZ)))
+		friction = XMVector3Normalize(friction) * XMVectorGetX(XMVector3Length(velocityXZ));
+
+	velocityXZ = velocityXZ + friction;
+	XMFLOAT3 newVelocity;
+	XMStoreFloat3(&newVelocity, velocityXZ);
+	newVelocity.y = xmf3Velocity.y;
+	m_pBody->SetVelocity(newVelocity);
+	
 	// 최대 속도 제한
 	if (XMVectorGetX(XMVector3Length(velocityXZ)) > m_MaxSpeedXZ)
 	{
 		XMVECTOR direction = XMVector3Normalize(velocityXZ);
 		velocityXZ = direction * m_MaxSpeedXZ;
-		XMFLOAT3 newVelocity;
-		XMStoreFloat3(&newVelocity, velocityXZ);
-		newVelocity.y = xmf3Velocity.y;
-		m_pBody->SetVelocity(newVelocity);
-	}
-	else
-	{
-		XMVECTOR direction = XMVector3Normalize(velocityXZ);
-		XMVECTOR friction = -direction;
-		friction = m_CharacterFriction * friction * elapsedTime;
-
-		if (XMVectorGetX(XMVector3Length(friction)) > XMVectorGetX(XMVector3Length(velocityXZ)))
-			friction = XMVector3Normalize(friction) * XMVectorGetX(XMVector3Length(velocityXZ));
-
-		velocityXZ = velocityXZ + friction;
 		XMFLOAT3 newVelocity;
 		XMStoreFloat3(&newVelocity, velocityXZ);
 		newVelocity.y = xmf3Velocity.y;

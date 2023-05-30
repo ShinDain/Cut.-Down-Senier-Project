@@ -69,6 +69,8 @@ public:
 	void ChangeToJumpState();
 
 	virtual void Attack();
+	void RotateToObj();
+
 	virtual void OnHit();
 	virtual void OnDeath();
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
@@ -84,6 +86,8 @@ protected:
 	bool m_bCanDoubleJump = true;
 
 	PlayerAnimationState m_nAnimationState = PlayerAnimationState::Player_State_Idle;
+
+	BoundingSphere m_ObjectSearchSphere;
 
 public:
 

@@ -22,6 +22,7 @@ public:
 protected:
 
 	std::shared_ptr<RigidBody> m_pRigidBody = nullptr;
+	BoundingSphere m_BoundingSphere;
 
 	XMFLOAT3 m_xmf3Position = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 m_xmf3Scale = XMFLOAT3(1, 1, 1);
@@ -37,10 +38,10 @@ public:
 	void SetWorld(XMFLOAT4X4 xmf4x4World) { m_xmf4x4World = xmf4x4World; }
 
 	const XMVECTOR GetAxis(int index) const;
-
 	const XMFLOAT4X4& GetWorld() const { return m_xmf4x4World; }
-
 	std::shared_ptr<RigidBody> GetBody() const { return m_pRigidBody; }
+	BoundingSphere GetBoundingSphere() { return m_BoundingSphere; }
+
 
 	void SetIsActive(bool bIsActive) { m_bIsActive = bIsActive; }
 	const bool GetIsActive() { return m_bIsActive; }

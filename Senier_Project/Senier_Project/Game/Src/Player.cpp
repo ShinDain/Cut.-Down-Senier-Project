@@ -28,6 +28,8 @@ bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_pAnimationController->SetTrackAnimationSet(1, Player_Anim_Index_RunForward);
 	m_pAnimationController->SetTrackAnimationSet(3, Player_Anim_Index_Falling);
 
+	m_ObjectSearchSphere.Center = m_xmf3Position;
+	m_ObjectSearchSphere.Radius = 20.0f;
 
 	return true;
 }
@@ -35,9 +37,6 @@ bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 void Player::Update(float elapsedTime)
 {
 	Character::Update(elapsedTime);
-
-	RotateToMove(elapsedTime);
-
 	m_pWeapon->Intersect(m_xmf3Look);
 }
 
@@ -59,7 +58,6 @@ void Player::ProcessInput(UCHAR* pKeybuffer)
 	if (pKeybuffer['S'] & 0xF0) dwDirection |= DIR_BACKWARD;
 	if (pKeybuffer['A'] & 0xF0) dwDirection |= DIR_LEFT;
 	if (pKeybuffer['D'] & 0xF0) dwDirection |= DIR_RIGHT;
-
 
 	Move(dwDirection);
 
@@ -199,17 +197,61 @@ void Player::Attack()
 		m_pAnimationController->SetTrackEnable(2, true);
 		m_pAnimationController->SetTrackAnimationSet(2, Player_Anim_Index_MeleeOneHand);
 		m_pAnimationController->SetTrackWeight(2, 1);
+		m_pAnimationController->SetTrackSpeed(2, 1.5f);
 		break;
 	}
 
-	m_Acceleration = 1.0f;
-
-	// 약간의 전진 -> 몬스터와의 거리에 따라 조절 필요
-	/*XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
-	XMVECTOR addVelocity = look * 50.0f;
+	m_Acceleration = 30.0f;
+	// 공격 시 오브젝트 방향으로 자동 회전
+	RotateToObj();
+	m_TurnSpeed = 0;
+	
+	// 약간의 전진
+	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+	XMVECTOR addVelocity = look * 20.f;
 	XMFLOAT3 xmf3AddVelocity;
 	XMStoreFloat3(&xmf3AddVelocity, addVelocity);
-	m_pBody->AddVelocity(xmf3AddVelocity);*/
+	m_pBody->AddVelocity(xmf3AddVelocity);
+}
+
+void Player::RotateToObj()
+{
+	XMFLOAT3 xmf3MyPosition = m_xmf3Position;
+	xmf3MyPosition.y = 0;
+	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
+	
+	float closestDistance = 9999;
+	int closestIdx = -1;
+	for (int i = 0; i < g_vpMovableObjs.size(); ++i)
+	{
+		XMFLOAT3 xmf3TmpPosition = g_vpMovableObjs[i]->GetPosition();
+		xmf3TmpPosition.y = 0;
+		XMVECTOR tmpPosition = XMLoadFloat3(&xmf3TmpPosition);
+
+		float distance = XMVectorGetX(XMVector3Length(tmpPosition - myPosition));
+		if (distance < closestDistance)
+		{
+			closestDistance = distance;
+			closestIdx = i;
+		}
+	}
+	if (closestDistance > 25)
+		return;
+
+	XMFLOAT3 xmf3TargetPosition = g_vpMovableObjs[closestIdx]->GetPosition();
+	xmf3TargetPosition.y = 0;
+	XMVECTOR targetPosition = XMLoadFloat3(&xmf3TargetPosition);
+	XMFLOAT3 xmf3TargetLook;
+	XMStoreFloat3(&xmf3TargetLook, targetPosition - myPosition);
+
+	RotateToTargetLook(0.0f, xmf3TargetLook, 1);
+
+	// 약간의 전진 -> 몬스터와의 거리에 따라 조절 필요
+	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+	XMVECTOR addVelocity = look * closestDistance * 2.0f;
+	XMFLOAT3 xmf3AddVelocity;
+	XMStoreFloat3(&xmf3AddVelocity, addVelocity);
+	m_pBody->AddVelocity(xmf3AddVelocity);
 }
 
 void Player::OnHit()
@@ -270,6 +312,7 @@ void Player::DoLanding()
 		break;
 	default:
 		m_Acceleration = 500.0f;
+		m_TurnSpeed = 1;
 		break;
 	}
 

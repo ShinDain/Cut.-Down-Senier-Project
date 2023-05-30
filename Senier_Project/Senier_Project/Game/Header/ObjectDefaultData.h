@@ -38,7 +38,7 @@ using namespace DirectX;
 #define CUBE_MODEL_NAME "Cube"
 #define CUBE_MODEL_TEXPATH ""
 #define CUBE_MODEL_EXTENTS XMFLOAT3(0.5f, 0.5f, 0.5f)
-#define CUBE_MODEL_TYPE Object_World
+#define CUBE_MODEL_TYPE Object_Movable
 #define CUBE_MODEL_COLLIDERTYPE Collider_Box
 #define CUBE_MODEL_MASS 10
 #define CUBE_MODEL_SCALE XMFLOAT3(1,1,1)
@@ -67,7 +67,7 @@ using namespace DirectX;
 #define DRAWER_MODEL_NAME "Drawer_2"
 #define DRAWER_MODEL_TEXPATH "DrawerAndTable"
 #define DRAWER_MODEL_EXTENTS XMFLOAT3(0.4f, 0.45f, 0.45f)
-#define DRAWER_MODEL_TYPE Object_World
+#define DRAWER_MODEL_TYPE Object_Movable
 #define DRAWER_MODEL_COLLIDERTYPE Collider_Box
 #define DRAWER_MODEL_MASS 20
 #define DRAWER_MODEL_SCALE XMFLOAT3(10,10,10)
@@ -85,7 +85,7 @@ using namespace DirectX;
 #define OFFICE_CHAIR_MODEL_NAME "office_chair"
 #define OFFICE_CHAIR_MODEL_TEXPATH "Chair"
 #define OFFICE_CHAIR_MODEL_EXTENTS XMFLOAT3(0.4f, 0.65f, 0.4f)
-#define OFFICE_CHAIR_MODEL_TYPE Object_World
+#define OFFICE_CHAIR_MODEL_TYPE Object_Movable
 #define OFFICE_CHAIR_MODEL_COLLIDERTYPE Collider_Box
 #define OFFICE_CHAIR_MODEL_MASS 3
 #define OFFICE_CHAIR_MODEL_SCALE XMFLOAT3(10,10,10)
@@ -103,7 +103,7 @@ using namespace DirectX;
 #define SERVER_RACK_MODEL_NAME "Server_Rack"
 #define SERVER_RACK_MODEL_TEXPATH "Server_Rack"
 #define SERVER_RACK_MODEL_EXTENTS XMFLOAT3(0.35f, 1.1f, 0.3f)
-#define SERVER_RACK_MODEL_TYPE Object_World
+#define SERVER_RACK_MODEL_TYPE Object_Movable
 #define SERVER_RACK_MODEL_COLLIDERTYPE Collider_Box
 #define SERVER_RACK_MODEL_MASS 80
 #define SERVER_RACK_MODEL_SCALE XMFLOAT3(10,10,10)
@@ -130,7 +130,7 @@ using namespace DirectX;
 #define STOOL_MODEL_NAME "Stool"
 #define STOOL_MODEL_TEXPATH "Chair"
 #define STOOL_MODEL_EXTENTS XMFLOAT3(0.2f, 0.5f, 0.2f)
-#define STOOL_MODEL_TYPE Object_World
+#define STOOL_MODEL_TYPE Object_Movable
 #define STOOL_MODEL_COLLIDERTYPE Collider_Box
 #define STOOL_MODEL_MASS 5
 #define STOOL_MODEL_SCALE XMFLOAT3(10,10,10)
@@ -166,7 +166,7 @@ using namespace DirectX;
 #define VASE_MODEL_NAME "Vase"
 #define VASE_MODEL_TEXPATH "Vase"
 #define VASE_MODEL_EXTENTS XMFLOAT3(0.2f, 0.5f, 0.2f)
-#define VASE_MODEL_TYPE Object_World
+#define VASE_MODEL_TYPE Object_Movable
 #define VASE_MODEL_COLLIDERTYPE Collider_Box
 #define VASE_MODEL_MASS 5
 #define VASE_MODEL_SCALE XMFLOAT3(10,10,10)

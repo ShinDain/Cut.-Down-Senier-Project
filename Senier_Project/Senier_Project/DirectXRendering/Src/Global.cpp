@@ -8,6 +8,7 @@ std::vector<std::shared_ptr<ColliderBox>> g_ppColliderBoxs;
 std::vector<std::shared_ptr<ColliderSphere>> g_ppColliderSpheres;
 
 std::vector<std::shared_ptr<Object>> g_vpAllObjs;
+std::vector<std::shared_ptr<Object>> g_vpMovableObjs;
 
 std::map<const char*, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;
 
