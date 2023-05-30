@@ -118,6 +118,14 @@ protected:
 
 	bool m_bIsFalling = false;
 	bool m_bIsAlive = true;
+
+	// ===================================
+	float m_HP = 100.0f;
+
+	float m_InvincibleTime = 0.5f;
+	float m_ElapsedInvincibleTime = 0.0f;
+	bool m_bInvincible = false;
+
 	
 public:
 	virtual void Move(DWORD dwDirection) {}
@@ -188,6 +196,9 @@ public:
 	void SetIsFalling(bool IsFalling) { m_bIsFalling = IsFalling; }
 	void SetIsAlive(bool IsAlive) { m_bIsAlive = IsAlive; }
 
+	void SetHP(float hp) { m_HP = hp; }
+	void SetInvincible(bool bInvincible) { m_bInvincible = bInvincible; }
+
 
 	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
 	const XMFLOAT4X4& GetParentWorld() { return m_xmf4x4ParentWorld; }
@@ -210,6 +221,9 @@ public:
 
 	bool GetIsFalling() { return m_bIsFalling; }
 	bool GetIsAlive() { return m_bIsAlive; }
+
+	const float& GetHP() { return m_HP; }
+	bool GetInvincible() { return m_bInvincible; }
 };
 
 

@@ -33,6 +33,9 @@ public:
 	virtual void ProcessInput(UCHAR* pKeybuffer) {}
 	virtual void KeyDownEvent(WPARAM wParam) {}
 
+	virtual void UpdateAnimationTrack() {}
+	virtual void UnableAnimationTrack(int nAnimationTrack);
+
 public:
 	virtual void Move(DWORD dwDirection) {}
 	virtual void Jump() {}
@@ -43,6 +46,9 @@ public:
 	virtual void IsFalling();
 
 	virtual void DoLanding();
+	virtual	void RotateToMove(float elapsedTime);
+
+	virtual void BlendWithIdleMovement(float maxWeight);
 
 protected:
 	float m_MaxSpeedXZ = 100.0f;

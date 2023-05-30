@@ -34,7 +34,9 @@ enum PlayerAnimationState
 	Player_State_Jump,
 	Player_State_Falling,
 	Player_State_Land,
-	Player_State_Melee
+	Player_State_Melee,
+	Player_State_Hit,
+	Player_State_Death
 };
 
 
@@ -65,16 +67,15 @@ public:
 	virtual void Move(DWORD dwDirection);
 	virtual void Jump();
 	void ChangeToJumpState();
-	void BlendWithIdleMovement(float maxWeight);
-	
+
 	virtual void Attack();
 	virtual void OnHit();
 	virtual void OnDeath();
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 
 	virtual void DoLanding();
 
-	void UpdateAnimationTrack();
-	void UnableAnimationTrack(int nAnimationTrack);
+	virtual void UpdateAnimationTrack();
 
 protected:
 	std::shared_ptr<Weapon> m_pWeapon = nullptr;
@@ -85,8 +86,6 @@ protected:
 	PlayerAnimationState m_nAnimationState = PlayerAnimationState::Player_State_Idle;
 
 public:
-	void RotateToMove(float elapsedTime);
-
 
 	std::shared_ptr<Weapon> GetWeapon() { return m_pWeapon; }
 	XMFLOAT3 GetCameraRotation() {	return m_xmf3CameraRotation;}

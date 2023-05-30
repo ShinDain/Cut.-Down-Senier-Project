@@ -114,9 +114,16 @@ void Object::Animate(float elapsedTime)
 
 void Object::Update(float elapsedTime)
 {
-	//UpdateTransform(NULL);
-	//IsFalling();
-	//ApplyGravity(elapsedTime);
+	// 무적 시간 경과 누적
+	if (m_bInvincible)
+	{
+		m_ElapsedInvincibleTime += elapsedTime;
+		if (m_InvincibleTime <= m_ElapsedInvincibleTime)
+		{
+			m_ElapsedInvincibleTime = 0.0f;
+			m_bInvincible = false;
+		}
+	}
 
 	UpdateToRigidBody(elapsedTime);
 
@@ -719,9 +726,14 @@ void Object::IsFalling()
 
 void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
+	// 체력 감소
+	m_HP -= power;
+	// 피격 무적
+	m_bInvincible = true;
+
 	XMVECTOR damageDirection = XMLoadFloat3(&xmf3DamageDirection);
 	damageDirection = XMVector3Normalize(damageDirection);
-	XMVECTOR deltaVelocity = damageDirection * power;
+	XMVECTOR deltaVelocity = damageDirection * power * 10;
 
 	XMFLOAT3 xmf3DeltaVelocity;
 	XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);

@@ -5,6 +5,30 @@
 #include "../../Common/Header/D3DUtil.h"
 #include "Character.h"
 
+enum MonsterAnimationIndex
+{
+	Monster_Anim_Index_Idle,
+	Monster_Anim_Index_Walk1,
+	Monster_Anim_Index_Walk2,
+	Monster_Anim_Index_Run,
+	Monster_Anim_Index_Attack,
+	Monster_Anim_Index_FallingBack,
+	Monster_Anim_Index_FallingForward,
+	Monster_Anim_Index_Hit1,
+	Monster_Anim_Index_Hit2
+};
+
+enum MonsterAnimationState
+{
+	Monster_State_Idle,
+	Monster_State_Jump,
+	Monster_State_Falling,
+	Monster_State_Land,
+	Monster_State_Melee,
+	Monster_State_Hit,
+	Monster_State_Death
+};
+
 class Monster : public Character
 {
 public:
@@ -21,6 +45,8 @@ public:
 
 	virtual void Destroy();
 
+	virtual void UpdateAnimationTrack();
+
 public:
 	virtual void ProcessInput(UCHAR* pKeybuffer) {}
 	virtual void KeyDownEvent(WPARAM wParam) {}
@@ -31,7 +57,11 @@ public:
 	virtual void Attack();
 	virtual void OnHit();
 	virtual void OnDeath();
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 
+protected:
+	
+	MonsterAnimationState m_AnimationState = MonsterAnimationState::Monster_State_Idle;
 
 };
 

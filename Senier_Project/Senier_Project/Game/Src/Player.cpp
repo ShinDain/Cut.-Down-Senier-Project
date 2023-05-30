@@ -19,6 +19,15 @@ Player::~Player()
 bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
 	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+	m_pAnimationController->SetTrackEnable(0, true);
+	m_pAnimationController->SetTrackEnable(1, true);
+	m_pAnimationController->SetTrackEnable(2, false);
+	m_pAnimationController->SetTrackEnable(3, false);
+	m_pAnimationController->m_vpAnimationTracks[2]->SetType(ANIMATION_TYPE_ONCE);
+	m_pAnimationController->SetTrackAnimationSet(0, Player_Anim_Index_Idle);
+	m_pAnimationController->SetTrackAnimationSet(1, Player_Anim_Index_RunForward);
+	m_pAnimationController->SetTrackAnimationSet(3, Player_Anim_Index_Falling);
+
 
 	return true;
 }
@@ -28,7 +37,6 @@ void Player::Update(float elapsedTime)
 	Character::Update(elapsedTime);
 
 	RotateToMove(elapsedTime);
-	UpdateAnimationTrack();
 
 	m_pWeapon->Intersect(m_xmf3Look);
 }
@@ -58,11 +66,10 @@ void Player::ProcessInput(UCHAR* pKeybuffer)
 
 void Player::KeyDownEvent(WPARAM wParam)
 {
-	/*if (wParam == 'K')
+	if (wParam == 'K')
 	{
-		tmpCnt = (tmpCnt + 1) % 17;
-		m_pAnimationController->SetTrackAnimationSet(0, tmpCnt);
-	}*/
+		ApplyDamage(10, XMFLOAT3(0, 0, -1));
+	}
 	if(wParam == VK_SPACE)
 		Jump();
 }
@@ -102,6 +109,15 @@ void Player::Move(DWORD dwDirection)
 			direction = XMVectorAdd(direction, camRight);
 		}
 
+		if (m_Acceleration < 30.0f)
+		{
+			float a = 0;
+		}
+		if (m_CharacterFriction < 100.0f)
+		{
+			float a = 0;
+		}
+
 		// 진행 방향
 		direction = XMVector3Normalize(direction);
 		XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
@@ -115,9 +131,7 @@ void Player::Move(DWORD dwDirection)
 		xmf3Accel.x = xmf3deltaAccelXZ.x;
 		xmf3Accel.z = xmf3deltaAccelXZ.z;
 		m_pBody->SetAcceleration(xmf3Accel);
-
 	}
-
 }
 
 void Player::Jump()
@@ -148,26 +162,10 @@ void Player::ChangeToJumpState()
 	m_pAnimationController->SetTrackEnable(2, true);
 	m_pAnimationController->SetTrackWeight(2, 1);
 
+	m_pAnimationController->SetTrackEnable(0, false);
+	m_pAnimationController->SetTrackEnable(1, false);
+
 	UnableAnimationTrack(3);
-}
-
-void Player::BlendWithIdleMovement(float maxWeight)
-{
-	m_pAnimationController->SetTrackEnable(0, true);
-	m_pAnimationController->SetTrackEnable(1, true);
-
-	float weight = maxWeight;
-	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
-	xmf3Velocity.y = 0;
-	XMVECTOR velocity = XMLoadFloat3(&xmf3Velocity);
-	weight = XMVectorGetX(XMVector3Length(velocity)) / m_MaxSpeedXZ;
-
-	if (weight < 0.1f)
-		weight = 0;
-	else if (weight > maxWeight)
-		weight = maxWeight;
-	m_pAnimationController->SetTrackWeight(0, maxWeight - weight);
-	m_pAnimationController->SetTrackWeight(1, weight);
 }
 
 void Player::Attack()
@@ -197,13 +195,14 @@ void Player::Attack()
 		break;
 	}
 
-	m_Acceleration = 30.0f;
+	m_Acceleration = 1.0f;
 
-	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+	// 약간의 전진 -> 몬스터와의 거리에 따라 조절 필요
+	/*XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
 	XMVECTOR addVelocity = look * 50.0f;
 	XMFLOAT3 xmf3AddVelocity;
 	XMStoreFloat3(&xmf3AddVelocity, addVelocity);
-	m_pBody->AddVelocity(xmf3AddVelocity);
+	m_pBody->AddVelocity(xmf3AddVelocity);*/
 }
 
 void Player::OnHit()
@@ -212,6 +211,20 @@ void Player::OnHit()
 
 void Player::OnDeath()
 {
+}
+
+void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+{
+	Object::ApplyDamage(power, xmf3DamageDirection);
+
+	m_pAnimationController->SetTrackEnable(0, false);
+	m_pAnimationController->SetTrackEnable(1, false);
+
+	m_nAnimationState = PlayerAnimationState::Player_State_Hit;
+	UnableAnimationTrack(2);
+	m_pAnimationController->SetTrackEnable(2, true);
+	m_pAnimationController->SetTrackAnimationSet(2, Player_Anim_Index_GetHit);
+	m_pAnimationController->SetTrackWeight(2, 1);
 }
 
 void Player::DoLanding()
@@ -255,20 +268,15 @@ void Player::UpdateAnimationTrack()
 		break;
 	case Player_State_Jump:
 	{
-		m_pAnimationController->SetTrackEnable(0, false);
-		m_pAnimationController->SetTrackEnable(1, false);
-
 		m_pAnimationController->SetTrackAnimationSet(2, Player_Anim_Index_JumpUp);
 		// 낙하 애니메이션과 블랜딩
 		if (m_pAnimationController->GetTrackRate(2) > 0.8f)
 		{
 			m_pAnimationController->SetTrackEnable(3, true);
 
-			float weight = (1.0f - m_pAnimationController->GetTrackRate(2)) * 5;
-			if (weight > 1)
-				weight = 1; 
-			m_pAnimationController->SetTrackWeight(2, weight);
-			m_pAnimationController->SetTrackWeight(3, 1 - weight);
+			float weight = (m_pAnimationController->GetTrackRate(2) - 0.8f) * 5;
+			m_pAnimationController->SetTrackWeight(2, 1 - weight);
+			m_pAnimationController->SetTrackWeight(3, weight);
 		}
 		// jump_up 애니메이션 종료
 		if (m_pAnimationController->GetTrackOver(2))
@@ -292,18 +300,16 @@ void Player::UpdateAnimationTrack()
 		{
 			m_pAnimationController->SetTrackEnable(3, false);
 
-			float weight = (1.0f - trackRate);
-			if (weight > 1)
-				weight = 1;
-			m_pAnimationController->SetTrackWeight(2, weight);
+			float weight = (trackRate - 0.2f) * 1.25f;
+			m_pAnimationController->SetTrackWeight(2, 1 - weight);
 
-			float moveWeight = 1 - weight;
-			BlendWithIdleMovement(moveWeight);
+			BlendWithIdleMovement(weight);
 		}
 		else
 		{
-			m_pAnimationController->SetTrackWeight(2, trackRate * 5);
-			m_pAnimationController->SetTrackWeight(3, 1 - (trackRate * 5));
+			float weight = trackRate * 5;
+			m_pAnimationController->SetTrackWeight(2, weight);
+			m_pAnimationController->SetTrackWeight(3, 1 - weight);
 		}
 
 		if (m_pAnimationController->GetTrackOver(2))
@@ -317,69 +323,50 @@ void Player::UpdateAnimationTrack()
 
 	case Player_State_Melee:
 	{
-		if (m_pAnimationController->GetTrackRate(2) > 0.6f)
+		float trackRate = m_pAnimationController->GetTrackRate(2);
+		if (trackRate > 0.6f)
 		{
 			m_pWeapon->SetActive(false);
+
+			float weight = (trackRate - 0.6f) * 2.5f;
+			m_pAnimationController->SetTrackWeight(2, 1 - weight);
+
+			BlendWithIdleMovement(weight);
 		}
-		else
+		else if(trackRate > 0.2f)
 		{
 			m_pWeapon->SetActive(true);
 		}
+
 		if (m_pAnimationController->GetTrackOver(2))
 		{
-			m_pAnimationController->SetTrackEnable(0, true);
-			m_pAnimationController->SetTrackEnable(1, true);
-
 			UnableAnimationTrack(2);
-			m_Acceleration = 500.0f;
 
 			m_nAnimationState = PlayerAnimationState::Player_State_Idle;
 		}
 	}
 		break;
+
+	case Player_State_Hit:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(2);
+		if (trackRate > 0.6f)
+		{
+			float weight = (trackRate - 0.6f) * 2.5f;
+			m_pAnimationController->SetTrackWeight(2, 1 - weight);
+
+			BlendWithIdleMovement(weight);
+		}
+		if (m_pAnimationController->GetTrackOver(2))
+		{
+			UnableAnimationTrack(2);
+
+			m_nAnimationState = PlayerAnimationState::Player_State_Idle;
+		}
+	}
+		break;
+
 	default:
 		break;
-	}
-}
-
-void Player::UnableAnimationTrack(int nAnimationTrack)
-{
-	// Track default화
-	
-	m_pAnimationController->SetTrackOver(nAnimationTrack, false);
-	m_pAnimationController->SetTrackEnable(nAnimationTrack, false);
-	m_pAnimationController->SetTrackRate(nAnimationTrack, 0);
-	m_pAnimationController->SetTrackWeight(nAnimationTrack, 0);
-	m_pAnimationController->SetTrackPosition(nAnimationTrack, 0);
-}
-
-void Player::RotateToMove(float elapsedTime)
-{
-	// 진행 방향
-	XMVECTOR l = XMVectorSet(0, 0, 1, 0);
-	XMVECTOR targetLook = XMLoadFloat3(&m_pBody->GetAcceleration());
-	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
-	XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
-	float angleBetweenLook = XMVectorGetX(XMVector3AngleBetweenVectors(targetLook, look));
-	angleBetweenLook = XMConvertToDegrees(angleBetweenLook);
-
-	angleBetweenLook *= m_Acceleration / 500;
-
-	if (!XMVectorGetX(XMVectorIsNaN(XMVectorReplicate(angleBetweenLook))))
-	{
-		if (XMVectorGetX(XMVector3Dot(targetLook, right)) < 0)
-			angleBetweenLook *= -1;
-
-		XMFLOAT3 xmf3Velcity = m_pBody->GetVelocity();
-		xmf3Velcity.y = 0;
-		XMVECTOR velocity = XMLoadFloat3(&xmf3Velcity);
-		float velocityLength = XMVectorGetX(XMVector3Length(velocity));
-
-		angleBetweenLook = angleBetweenLook / 5;
-
-		// 값이 너무 커지지 않도록
-		float tmp = (int)(m_xmf3Rotation.y + angleBetweenLook) % 360;
-
-		SetRotate(XMFLOAT3(m_xmf3Rotation.x, tmp, m_xmf3Rotation.z));
 	}
 }

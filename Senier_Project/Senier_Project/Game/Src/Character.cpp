@@ -32,7 +32,9 @@ void Character::Update(float elapsedTime)
 	Object::Update(elapsedTime);
 
 	ApplyCharacterFriction(elapsedTime);
+	RotateToMove(elapsedTime);
 	IsFalling();
+	UpdateAnimationTrack();
 
 	// 속도 및 위치 변화
 	//IsFalling();
@@ -96,6 +98,17 @@ void Character::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 
 }
 
+void Character::UnableAnimationTrack(int nAnimationTrack)
+{
+	// Track default화
+
+	m_pAnimationController->SetTrackOver(nAnimationTrack, false);
+	m_pAnimationController->SetTrackEnable(nAnimationTrack, false);
+	m_pAnimationController->SetTrackRate(nAnimationTrack, 0);
+	m_pAnimationController->SetTrackWeight(nAnimationTrack, 0);
+	m_pAnimationController->SetTrackPosition(nAnimationTrack, 0);
+}
+
 void Character::IsFalling()
 {
 	if (m_xmf3RenderPosition.y < 0)
@@ -132,6 +145,60 @@ void Character::DoLanding()
 	m_MaxSpeedXZ = 100.f;
 	m_CharacterFriction = 350.0f;;
 	m_Acceleration = 500.0f;
+}
+
+void Character::RotateToMove(float elapsedTime)
+{
+	// 진행 방향
+	XMVECTOR l = XMVectorSet(0, 0, 1, 0);
+	XMVECTOR targetLook = XMLoadFloat3(&m_pBody->GetAcceleration());
+	if (XMVectorGetX(XMVector3Length(targetLook)) <= 0)
+		return;
+
+	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+	XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
+	float angleBetweenLook = XMVectorGetX(XMVector3AngleBetweenVectors(targetLook, look));
+	angleBetweenLook = XMConvertToDegrees(angleBetweenLook);
+
+	angleBetweenLook *= m_Acceleration / 500;
+
+	if (!XMVectorGetX(XMVectorIsNaN(XMVectorReplicate(angleBetweenLook))))
+	{
+		if (XMVectorGetX(XMVector3Dot(targetLook, right)) < 0)
+			angleBetweenLook *= -1;
+
+		XMFLOAT3 xmf3Velcity = m_pBody->GetVelocity();
+		xmf3Velcity.y = 0;
+		XMVECTOR velocity = XMLoadFloat3(&xmf3Velcity);
+		float velocityLength = XMVectorGetX(XMVector3Length(velocity));
+
+		if(angleBetweenLook > 5)
+			angleBetweenLook = angleBetweenLook / 5;
+
+		// 값이 너무 커지지 않도록
+		float tmp = (int)(m_xmf3Rotation.y + angleBetweenLook) % 360;
+
+		SetRotate(XMFLOAT3(m_xmf3Rotation.x, tmp, m_xmf3Rotation.z));
+	}
+}
+
+void Character::BlendWithIdleMovement(float maxWeight)
+{
+	m_pAnimationController->SetTrackEnable(0, true);
+	m_pAnimationController->SetTrackEnable(1, true);
+
+	float weight = maxWeight;
+	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+	xmf3Velocity.y = 0;
+	XMVECTOR velocity = XMLoadFloat3(&xmf3Velocity);
+	weight = XMVectorGetX(XMVector3Length(velocity)) / m_MaxSpeedXZ;
+
+	if (weight < 0.1f)
+		weight = 0;
+	else if (weight > maxWeight)
+		weight = maxWeight;
+	m_pAnimationController->SetTrackWeight(0, maxWeight - weight);
+	m_pAnimationController->SetTrackWeight(1, weight);
 }
 
 void Character::ApplyCharacterFriction(float elapsedTime)

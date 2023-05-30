@@ -169,6 +169,9 @@ void Weapon::Intersect(XMFLOAT3 xmf3PlayerLook)
 
 	for (int i = 0; i < g_vpAllObjs.size(); ++i)
 	{
+		if (g_vpAllObjs[i]->GetInvincible())
+			continue;	
+
 		ColliderBox* objCollider = std::static_pointer_cast<ColliderBox>(g_vpAllObjs[i]->GetCollider()).get();
 
 		if (!objCollider)

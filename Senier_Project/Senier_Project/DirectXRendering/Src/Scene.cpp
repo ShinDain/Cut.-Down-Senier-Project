@@ -26,15 +26,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	BuildDescriptorHeap(pd3dDevice);
 
 	// 캐릭터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,0,0), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), CHARACTER_MODEL_NAME, 4);
-	m_pPlayer->m_pAnimationController->SetTrackEnable(0, true);
-	m_pPlayer->m_pAnimationController->SetTrackEnable(1, true);
-	m_pPlayer->m_pAnimationController->SetTrackEnable(2, false);
-	m_pPlayer->m_pAnimationController->SetTrackEnable(3, false);
-	m_pPlayer->m_pAnimationController->m_vpAnimationTracks[2]->SetType(ANIMATION_TYPE_ONCE);
-	m_pPlayer->m_pAnimationController->SetTrackAnimationSet(0, Player_Anim_Index_Idle);
-	m_pPlayer->m_pAnimationController->SetTrackAnimationSet(1, Player_Anim_Index_RunForward);
-	m_pPlayer->m_pAnimationController->SetTrackAnimationSet(3, Player_Anim_Index_Falling);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,0,0), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), CHARACTER_MODEL_NAME, PLAYER_TRACK_CNT);
 
 	// 무기
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-0.59f, 0.135f, 0.063f), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90), XMFLOAT3(1, 1, 1), WEAPON_MODEL_NAME, 0);
@@ -49,7 +41,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 
 	// 몬스터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, 1);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
@@ -498,7 +490,7 @@ void Scene::LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 		else if (!strcmp(pstrToken, "</Frame>"))
 		{
 			if (!strcmp(pstrObjectName, ZOMBIE_MODEL_NAME))
-				CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, xmf3Scale, pstrObjectName, 1);
+				CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, xmf3Scale, pstrObjectName, ZOMBIE_TRACK_CNT);
 			else
 				CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, xmf3Scale, pstrObjectName, 0);
 		}
