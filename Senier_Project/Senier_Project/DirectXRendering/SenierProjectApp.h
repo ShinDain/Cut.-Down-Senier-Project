@@ -29,6 +29,9 @@ protected:
 	virtual void ProcessInput() override;
 	virtual void KeyDownEvent(WPARAM wParam) override;
 
+	virtual void LeftButtonDownEvent() override;
+	virtual void RightButtonDownEvent() override;
+
 private:
 
 	std::unique_ptr<Scene> m_Scene;

@@ -39,6 +39,12 @@ enum PlayerAnimationState
 	Player_State_Death
 };
 
+#define PLAYER_IDLE_TRACK 0
+#define PLAYER_MOVE_TRACK 1
+#define PLAYER_LOOP_TRACK 2
+#define PLAYER_ONCE_TRACK_1 3
+#define PLAYER_ONCE_TRACK_2 4
+#define PLAYER_ONCE_TRACK_3 5
 
 class Player : public Character
 {
@@ -63,6 +69,8 @@ public:
 public:
 	virtual void ProcessInput(UCHAR* pKeybuffer);
 	virtual void KeyDownEvent(WPARAM wParam);
+	void LeftButtonDownEvent();
+	void RightButtonDownEvent();
 
 	virtual void Move(DWORD dwDirection);
 	virtual void Jump();
@@ -85,8 +93,14 @@ protected:
 	XMFLOAT3 m_xmf3CameraRotation = XMFLOAT3(0, 0, 0);
 	bool m_bCanDoubleJump = true;
 
-	PlayerAnimationState m_nAnimationState = PlayerAnimationState::Player_State_Idle;
+	UINT m_nMaxAttackCombo = 2;
+	UINT m_nAttackCombo = 0;
+	bool m_bCombeAttack = false;
 
+	UINT m_nCurAttackTrack = 0;
+	UINT m_nNextAttackTrack = 0;
+
+	PlayerAnimationState m_nAnimationState = PlayerAnimationState::Player_State_Idle;
 	BoundingSphere m_ObjectSearchSphere;
 
 public:

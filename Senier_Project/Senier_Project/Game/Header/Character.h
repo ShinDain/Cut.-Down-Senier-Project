@@ -3,6 +3,9 @@
 #include "../../Common/Header/D3DUtil.h"
 #include "../../DirectXRendering/Header/Object.h"
 
+#define CHARACTER_IDLE_TRACK 0
+#define CHARACTER_MOVE_TRACK 1
+
 struct Ray
 {
 	XMFLOAT3 xmf3Start = XMFLOAT3(0, 0, 0);
@@ -30,7 +33,7 @@ public:
 	virtual void Update(float elapsedTime);
 	virtual void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
 
-	virtual void ProcessInput(UCHAR* pKeybuffer) {}
+	virtual void ProcessInput(UINT msg, UCHAR* pKeybuffer) {}
 	virtual void KeyDownEvent(WPARAM wParam) {}
 
 	virtual void UpdateAnimationTrack(float elapsedTime) {}

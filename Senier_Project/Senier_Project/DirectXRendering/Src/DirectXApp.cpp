@@ -361,8 +361,10 @@ LRESULT DirectXApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return 0;
 
 	case WM_LBUTTONDOWN:
+		LeftButtonDownEvent();
 	case WM_MBUTTONDOWN:
 	case WM_RBUTTONDOWN:
+		RightButtonDownEvent();
 	case WM_LBUTTONUP:
 	case WM_MBUTTONUP:
 	case WM_RBUTTONUP:

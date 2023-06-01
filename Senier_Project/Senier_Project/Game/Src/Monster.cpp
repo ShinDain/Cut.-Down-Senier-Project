@@ -29,7 +29,8 @@ void Monster::Update(float elapsedTime)
 {
 	Character::Update(elapsedTime);
 
-	Trace(elapsedTime);
+	// 플레이어 추적
+	//Trace(elapsedTime);
 
 	{
 		XMFLOAT3 tmp =	m_pBody->GetVelocity();
@@ -103,6 +104,7 @@ void Monster::Move(DWORD dwDirection)
 
 void Monster::Trace(float elapsedTime)
 {
+	// 맹목적으로 플레이어를 추적한다.
 	XMFLOAT3 xmf3TargetPosition = g_pPlayer->GetPosition();
 	xmf3TargetPosition.y = 0;
 	XMVECTOR targetPosition = XMLoadFloat3(&xmf3TargetPosition);

@@ -22,7 +22,7 @@
 #include "../../Physics/Header/CollisionDetact.h"
 #include "../../Physics/Header/CollisionResolver.h"
 
-#define PLAYER_TRACK_CNT 4
+#define PLAYER_TRACK_CNT 6
 #define ZOMBIE_TRACK_CNT 3
 
 class Scene
@@ -48,6 +48,8 @@ public:
 
 	void ProcessInput(UCHAR* pKeybuffer);
 	void KeyDownEvent(WPARAM wParam);
+	void LeftButtonDownEvent();
+	void RightButtonDownEvent();
 
 	void LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName);
 

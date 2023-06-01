@@ -179,8 +179,8 @@ void Character::RotateToTargetLook(float elapsedTime, XMFLOAT3 xmf3TargetLook, f
 
 void Character::BlendWithIdleMovement(float maxWeight)
 {
-	m_pAnimationController->SetTrackEnable(0, true);
-	m_pAnimationController->SetTrackEnable(1, true);
+	m_pAnimationController->SetTrackEnable(CHARACTER_IDLE_TRACK, true);
+	m_pAnimationController->SetTrackEnable(CHARACTER_MOVE_TRACK, true);
 
 	float weight = maxWeight;
 	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
@@ -192,8 +192,8 @@ void Character::BlendWithIdleMovement(float maxWeight)
 		weight = 0;
 	else if (weight > maxWeight)
 		weight = maxWeight;
-	m_pAnimationController->SetTrackWeight(0, maxWeight - weight);
-	m_pAnimationController->SetTrackWeight(1, weight);
+	m_pAnimationController->SetTrackWeight(CHARACTER_IDLE_TRACK, maxWeight - weight);
+	m_pAnimationController->SetTrackWeight(CHARACTER_MOVE_TRACK, weight);
 }
 
 void Character::ApplyCharacterFriction(float elapsedTime)

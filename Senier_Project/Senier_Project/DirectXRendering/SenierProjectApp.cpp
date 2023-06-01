@@ -195,6 +195,16 @@ void SenierProjectApp::KeyDownEvent(WPARAM wParam)
 
 }
 
+void SenierProjectApp::LeftButtonDownEvent()
+{
+	if (m_Scene) m_Scene->LeftButtonDownEvent();
+}
+
+void SenierProjectApp::RightButtonDownEvent()
+{
+	if (m_Scene) m_Scene->RightButtonDownEvent();
+}
+
 
 
 
