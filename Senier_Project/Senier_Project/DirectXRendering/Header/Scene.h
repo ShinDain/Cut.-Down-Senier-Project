@@ -23,7 +23,7 @@
 #include "../../Physics/Header/CollisionResolver.h"
 
 #define PLAYER_TRACK_CNT 6
-#define ZOMBIE_TRACK_CNT 3
+#define ZOMBIE_TRACK_CNT 4
 
 class Scene
 {

@@ -128,7 +128,7 @@ void Character::DoLanding()
 {
 	m_bIsFalling = false;
 	m_MaxSpeedXZ = 100.f;
-	m_CharacterFriction = 350.0f;;
+	m_CharacterFriction = 350.0f;
 	m_Acceleration = 500.0f;
 }
 

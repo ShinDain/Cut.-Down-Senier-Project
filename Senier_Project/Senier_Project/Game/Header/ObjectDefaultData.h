@@ -28,11 +28,11 @@ using namespace DirectX;
 
 #define WEAPON_MODEL_NAME "Katana"
 #define WEAPON_MODEL_TEXPATH "Katana"
-#define WEAPON_MODEL_EXTENTS XMFLOAT3(0.2f, 2.7f, 0.2f)
+#define WEAPON_MODEL_EXTENTS XMFLOAT3(0.3f, 3.2f, 0.2f)
 #define WEAPON_MODEL_TYPE Object_Weapon
 #define WEAPON_MODEL_COLLIDERTYPE Collider_Box
 #define WEAPON_MODEL_MASS 9999
-#define WEAPON_MODEL_SCALE XMFLOAT3(0.2,0.2,0.2)
+#define WEAPON_MODEL_SCALE XMFLOAT3(0.3f, 0.3f, 0.3f)
 #define WEAPON_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
 
 #define CUBE_MODEL_NAME "Cube"

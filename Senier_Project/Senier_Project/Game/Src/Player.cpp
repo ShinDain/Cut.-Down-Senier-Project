@@ -1,5 +1,12 @@
 #include "../Header/Player.h"
 
+#define PLAYER_IDLE_TRACK 0
+#define PLAYER_MOVE_TRACK 1
+#define PLAYER_LOOP_TRACK 2
+#define PLAYER_ONCE_TRACK_1 3
+#define PLAYER_ONCE_TRACK_2 4
+#define PLAYER_ONCE_TRACK_3 5
+
 Player::Player()
 {
 }
@@ -204,7 +211,7 @@ void Player::Attack()
 			return;
 		m_nAttackCombo += 1;
 		m_bCombeAttack = true;
-		return;
+		//return;
 	}
 		break;
 	default:
@@ -219,6 +226,7 @@ void Player::Attack()
 		break;
 	}
 
+	m_TurnSpeed = 1;
 	m_Acceleration = 30.0f;
 	// 공격 시 오브젝트 방향으로 자동 회전
 	RotateToObj();
@@ -253,7 +261,7 @@ void Player::RotateToObj()
 			closestIdx = i;
 		}
 	}
-	if (closestDistance > 25)
+	if (closestDistance > m_AttackRange)
 		return;
 
 	XMFLOAT3 xmf3TargetPosition = g_vpMovableObjs[closestIdx]->GetPosition();
@@ -282,6 +290,9 @@ void Player::OnDeath()
 
 void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
+	if (m_bInvincible)
+		return;
+
 	Object::ApplyDamage(power, xmf3DamageDirection);
 
 	m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, false);
@@ -290,7 +301,10 @@ void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	if (m_HP > 0)
 	{
 		m_nAnimationState = PlayerAnimationState::Player_State_Hit;
-		UnableAnimationTrack(3);
+		UnableAnimationTrack(PLAYER_LOOP_TRACK);
+		UnableAnimationTrack(PLAYER_ONCE_TRACK_1);
+		UnableAnimationTrack(PLAYER_ONCE_TRACK_2);
+		UnableAnimationTrack(PLAYER_ONCE_TRACK_3);
 		m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_1, true);
 		m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_GetHit);
 		m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1);
@@ -298,7 +312,10 @@ void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	else
 	{
 		m_nAnimationState = PlayerAnimationState::Player_State_Death;
-		UnableAnimationTrack(3);
+		UnableAnimationTrack(PLAYER_LOOP_TRACK);
+		UnableAnimationTrack(PLAYER_ONCE_TRACK_1);
+		UnableAnimationTrack(PLAYER_ONCE_TRACK_2);
+		UnableAnimationTrack(PLAYER_ONCE_TRACK_3);
 		m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_1, true);
 		m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_Death);
 		m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1);
@@ -338,6 +355,8 @@ void Player::DoLanding()
 
 void Player::UpdateAnimationTrack(float elapsedTime)
 {
+	m_pWeapon->SetActive(false);
+
 	switch (m_nAnimationState)
 	{
 	case Player_State_Idle:
@@ -424,8 +443,6 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 			// 추가 입력 없는 경우 마무리 동작으로 블랜딩
 			else
 			{
-				m_pWeapon->SetActive(false);
-
 				float weight = (trackRate - 0.6f) * 2.5f;
 				m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1 + m_nCurAttackTrack, 1 - weight);
 

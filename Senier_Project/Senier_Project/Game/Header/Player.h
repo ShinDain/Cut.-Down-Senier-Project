@@ -39,13 +39,6 @@ enum PlayerAnimationState
 	Player_State_Death
 };
 
-#define PLAYER_IDLE_TRACK 0
-#define PLAYER_MOVE_TRACK 1
-#define PLAYER_LOOP_TRACK 2
-#define PLAYER_ONCE_TRACK_1 3
-#define PLAYER_ONCE_TRACK_2 4
-#define PLAYER_ONCE_TRACK_3 5
-
 class Player : public Character
 {
 public:
@@ -96,6 +89,7 @@ protected:
 	UINT m_nMaxAttackCombo = 2;
 	UINT m_nAttackCombo = 0;
 	bool m_bCombeAttack = false;
+	float m_AttackRange = 30.0f;
 
 	UINT m_nCurAttackTrack = 0;
 	UINT m_nNextAttackTrack = 0;
