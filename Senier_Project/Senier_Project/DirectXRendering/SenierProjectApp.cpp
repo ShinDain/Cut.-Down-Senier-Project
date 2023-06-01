@@ -100,7 +100,7 @@ void SenierProjectApp::Update(float elapsedTime)
 	posX = m_DebugText->GetTextUIPosX(2);
 	posY = m_DebugText->GetTextUIPosY(2);
 	wcscpy_s(totalTimeText, L"vecCnt : ");
-	int vecCnt = m_Scene->m_size;
+	int vecCnt = g_vpAllObjs.size();
 	wcscat_s(totalTimeText, std::to_wstring(vecCnt).c_str());
 	m_DebugText->UpdateTextUI(totalTimeText, posX, posY, 2);
 #endif

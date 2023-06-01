@@ -117,8 +117,7 @@ public:
 public:
 
 	int m_refCnt = 0;
-	int m_size = 0;
-	
+
 	float m_tTime = 0;
 #endif
 };

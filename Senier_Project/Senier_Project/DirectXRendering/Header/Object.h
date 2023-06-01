@@ -110,6 +110,7 @@ protected:
 	// 물리 연산 관련
 	std::shared_ptr<RigidBody> m_pBody = nullptr;
 	std::shared_ptr<Collider> m_pCollider = nullptr;
+	ColliderType m_nColliderType = Collider_None;
 	XMFLOAT3 m_xmf3ColliderExtents = XMFLOAT3(0, 0, 0);
 
 	float m_Mass = 1.0f;
@@ -218,6 +219,7 @@ public:
 
 	std::shared_ptr<RigidBody> GetBody() { return m_pBody; }
 	std::shared_ptr<Collider> GetCollider() { return m_pCollider; }
+	ColliderType GetColliderType() { return m_nColliderType; }
 
 	bool GetIsFalling() { return m_bIsFalling; }
 	bool GetIsAlive() { return m_bIsAlive; }

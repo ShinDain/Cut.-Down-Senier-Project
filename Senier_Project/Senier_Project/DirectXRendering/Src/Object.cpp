@@ -34,6 +34,7 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	std::shared_ptr<RigidBody> pBody;
 
 	// 충돌체 타입에 따라 
+	m_nColliderType = objData.colliderType;
 	switch (objData.colliderType)
 	{
 	case Collider_Plane:
