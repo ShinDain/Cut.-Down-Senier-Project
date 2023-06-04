@@ -167,12 +167,12 @@ void Weapon::Intersect(XMFLOAT3 xmf3PlayerLook)
 
 	ColliderBox* tmpCollider = std::static_pointer_cast<ColliderBox>(m_pCollider).get();
 
-	for (int i = 0; i < g_vpAllObjs.size(); ++i)
+	for (int i = 0; i < g_vpMovableObjs.size(); ++i)
 	{
-		if (g_vpAllObjs[i]->GetInvincible())
+		if (g_vpMovableObjs[i]->GetInvincible())
 			continue;	
 
-		ColliderBox* objCollider = std::static_pointer_cast<ColliderBox>(g_vpAllObjs[i]->GetCollider()).get();
+		ColliderBox* objCollider = std::static_pointer_cast<ColliderBox>(g_vpMovableObjs[i]->GetCollider()).get();
 
 		if (!objCollider)
 			continue;
@@ -186,7 +186,7 @@ void Weapon::Intersect(XMFLOAT3 xmf3PlayerLook)
 			m_pCollider->SetIntersect(1);
 			objCollider->SetIntersect(1);
 #endif
-			g_vpAllObjs[i]->ApplyDamage(m_Power, xmf3PlayerLook);
+			g_vpMovableObjs[i]->ApplyDamage(m_Power, xmf3PlayerLook);
 		}
 	}
 }

@@ -123,6 +123,9 @@ void Object::Update(float elapsedTime)
 
 	UpdateToRigidBody(elapsedTime);
 
+	if (m_HP <= 0)
+		m_bIsAlive = false;
+
 	ObjConstant objConstant;
 	XMMATRIX world = XMLoadFloat4x4(&m_xmf4x4World);
 	XMMATRIX inverseTransWorld = XMMatrixInverse(nullptr, XMMatrixTranspose(world));
@@ -549,11 +552,15 @@ void Object::Destroy()
 {
 	m_bIsAlive = false;
 
-	if(m_pMesh) m_pMesh.reset();
+	if(m_pMesh)
+		m_pMesh.reset();
 	for (int i = 0; i < m_vpMaterials.size(); ++i)
 		m_vpMaterials[i].reset();
 
-	if (m_pAnimationController)	m_pAnimationController.reset();
+	if (m_pAnimationController)
+	{
+		m_pAnimationController.reset();
+	}
 	if(m_pObjectCB) m_pObjectCB.reset();
 
 	if(m_pCollider) m_pCollider.reset();
@@ -563,8 +570,46 @@ void Object::Destroy()
 		m_pBody.reset();
 	}
 
-	if (m_pChild) m_pChild->Destroy();
-	if (m_pSibling) m_pSibling->Destroy();
+	if (m_pChild)
+	{
+		m_pChild->Destroy();
+	}
+	if (m_pSibling)
+	{
+		m_pSibling->Destroy();
+	}
+}
+
+void Object::DestroyRunTime()
+{
+	m_bIsAlive = false;
+
+	if (m_pMesh)
+		m_pMesh.reset();
+	for (int i = 0; i < m_vpMaterials.size(); ++i)
+		m_vpMaterials[i].reset();
+
+	if (m_pAnimationController)
+	{
+		m_pAnimationController.reset();
+	}
+	if (m_pObjectCB) m_pObjectCB.reset();
+
+	if (m_pCollider) m_pCollider.reset();
+	if (m_pBody)
+	{
+		m_pBody->Destroy();
+		m_pBody.reset();
+	}
+
+	if (m_pChild)
+	{
+		m_pChild.reset();
+	}
+	if (m_pSibling)
+	{
+		m_pSibling.reset();
+	}
 }
 
 void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData)

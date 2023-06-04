@@ -41,13 +41,14 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 
 	// 몬스터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(50, 0, 150), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(40, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 0, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
 	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
@@ -119,7 +120,7 @@ void Scene::Update(float totalTime ,float elapsedTime)
 {
 #if defined(_DEBUG)
 	ClearObjectLayer();
-	m_refCnt = g_LoadedModelData[ZOMBIE_MODEL_NAME]->m_pRootObject.use_count();
+	//m_refCnt = g_LoadedModelData[ZOMBIE_MODEL_NAME]->m_pRootObject.use_count();
 
 	m_tTime += elapsedTime;
 
@@ -416,11 +417,6 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 void Scene::KeyDownEvent(WPARAM wParam)
 {
 	m_pPlayer->KeyDownEvent(wParam);
-
-	/*for (int i = 0; i < m_vpAllObjs.size(); ++i)
-	{
-		m_vpAllObjs[i]->KeyDownEvent(wParam);
-	}*/
 }
 
 void Scene::LeftButtonDownEvent()
@@ -653,6 +649,8 @@ void Scene::GenerateContact()
 	{
 		std::shared_ptr<ColliderBox> characterBox = std::static_pointer_cast<ColliderBox>(g_vpCharacters[k]->GetCollider());
 
+		if (!characterBox) continue;
+
 		for (int i = 0; i < g_ppColliderPlanes.size(); ++i)
 		{
 			if (m_CollisionData.ContactCnt() > nContactCnt) return;
@@ -689,7 +687,7 @@ void Scene::GenerateContact()
 			if (g_vpWorldObjs[k]->GetColliderType() != ColliderType::Collider_Box)
 				continue;
 			std::shared_ptr<ColliderBox> colliderBox = std::static_pointer_cast<ColliderBox>(g_vpWorldObjs[k]->GetCollider());
-			if (colliderBox == g_ppColliderBoxs[i]) continue;
+			if (!colliderBox || colliderBox == g_ppColliderBoxs[i]) continue;
 
 			if (m_CollisionData.ContactCnt() > nContactCnt) return;
 			CollisionDetector::BoxAndBox(*colliderBox, *g_ppColliderBoxs[i], m_CollisionData);
@@ -706,7 +704,7 @@ void Scene::ProcessPhysics(float elapsedTime)
 
 void Scene::ClearObjectLayer()
 {
-	/*for (int j = 0; j < g_ppColliderBoxs.size(); ++j)
+	for (int j = 0; j < g_ppColliderBoxs.size(); ++j)
 	{
 		if (g_ppColliderBoxs[j]->GetBody()->GetInvalid())
 		{
@@ -726,30 +724,30 @@ void Scene::ClearObjectLayer()
 		{
 			g_ppColliderPlanes.erase(g_ppColliderPlanes.begin() + j);
 		}
-	}*/
+	}
 
-	//// 전체 순회
-	//for (int i = 0; i < g_vpAllObjs.size(); ++i)
-	//{
-	//	if (!g_vpAllObjs[i]->GetIsAlive())
-	//	{
-	//		g_vpAllObjs[i]->Destroy();
-	//		g_vpAllObjs.erase(g_vpAllObjs.begin() + i);
-	//	}
-	//}
+	// 전체 순회
+	for (int i = 0; i < g_vpAllObjs.size(); ++i)
+	{
+		if (!g_vpAllObjs[i]->GetIsAlive())
+		{
+			g_vpAllObjs[i]->DestroyRunTime();
+			g_vpAllObjs.erase(g_vpAllObjs.begin() + i);
+		}
+	}
 
-	//// 레이어 순회
-	//for (int i = 0; i < RenderLayer::Render_Count; ++i)
-	//{
-	//	for (int j = 0; j < m_vObjectLayer[i].size(); ++j)
-	//	{
-	//		if (!m_vObjectLayer[i][j]->GetIsAlive())
-	//		{
-	//			m_vObjectLayer[i][j]->Destroy();
-	//			m_vObjectLayer[i].erase(m_vObjectLayer[i].begin() + j);
-	//		}
-	//	}
-	//}
+	// 레이어 순회
+	for (int i = 0; i < RenderLayer::Render_Count; ++i)
+	{
+		for (int j = 0; j < m_vObjectLayer[i].size(); ++j)
+		{
+			if (!m_vObjectLayer[i][j]->GetIsAlive())
+			{
+				m_vObjectLayer[i][j]->DestroyRunTime();
+				m_vObjectLayer[i].erase(m_vObjectLayer[i].begin() + j);
+			}
+		}
+	}
 }
 
 void Scene::Intersect()

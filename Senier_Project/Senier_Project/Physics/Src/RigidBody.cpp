@@ -168,6 +168,7 @@ void RigidBody::ClearContact()
 void RigidBody::Destroy()
 {
 	ClearContact();
+	m_bInvalid = true;
 }
 
 void RigidBody::SetRotateInertia(XMFLOAT4X4 xmf4x4RotateInertia)

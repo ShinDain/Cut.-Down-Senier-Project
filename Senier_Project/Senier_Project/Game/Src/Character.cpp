@@ -22,6 +22,7 @@ bool Character::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 	m_pBody->SetIsCharacter(true);
 
+	m_HP = 100.0f;
 	m_Acceleration = 500.0f;
 
 	return true;

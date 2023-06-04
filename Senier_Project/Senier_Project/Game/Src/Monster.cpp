@@ -89,8 +89,9 @@ void Monster::UpdateAnimationTrack(float elapsedTime)
 		// 시작 블랜드
 		else if (trackRate < 0.3f)
 		{
-			float weight = trackRate * 10 / 3;
+			RotateToPlayer();
 
+			float weight = trackRate * 10 / 3;
 			BlendWithIdleMovement(1 - weight);
 			m_pAnimationController->SetTrackWeight(ZOMBIE_ONCE_TRACK_1, weight);
 		}
@@ -281,7 +282,6 @@ void Monster::Attack()
 	case Monster_State_Melee:
 		break;
 	default:
-		RotateToPlayer();
 		m_AnimationState = MonsterAnimationState::Monster_State_Melee;
 		UnableAnimationTrack(ZOMBIE_ONCE_TRACK_1);
 		m_pAnimationController->SetTrackEnable(ZOMBIE_ONCE_TRACK_1, true);

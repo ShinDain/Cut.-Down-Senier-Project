@@ -62,8 +62,6 @@ protected:
 	Ray m_floorCheckRay;
 
 	float m_TurnSpeed = 1;
-	float m_DestroyTime = 0.0f;
-	float m_ElapsedDestroyTime = 0.0f;
 
 	void ApplyCharacterFriction(float elapsedTime);
 	void CalcVelocityAndPosition(float elapsedTime);

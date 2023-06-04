@@ -57,6 +57,7 @@ public:
 	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject, const char* pstrFileName, const char* pstrTexPath);
 
 	virtual void Destroy();
+	virtual void DestroyRunTime();
 
 protected:
 	virtual void OnPrepareRender(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
@@ -121,7 +122,10 @@ protected:
 	bool m_bIsAlive = true;
 
 	// ===================================
-	float m_HP = 100.0f;
+	float m_HP = 20.0f;
+
+	float m_DestroyTime = 0.0f;
+	float m_ElapsedDestroyTime = 0.0f;
 
 	float m_InvincibleTime = 0.5f;
 	float m_ElapsedInvincibleTime = 0.0f;
