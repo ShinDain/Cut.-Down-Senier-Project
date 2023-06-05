@@ -773,6 +773,9 @@ void Object::IsFalling()
 
 void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
+	if (m_bInvincible)
+		return;
+
 	// 체력 감소
 	m_HP -= power;
 	// 피격 무적

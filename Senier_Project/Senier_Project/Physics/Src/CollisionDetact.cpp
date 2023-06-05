@@ -1,5 +1,7 @@
 #include "../Header/CollisionDetact.h"
 
+#define OBJECT_CRASH_LENGTH -65
+
 float TransformToAxis(const ColliderBox& box, FXMVECTOR direction)
 {
 	float projectLength = 0;
@@ -83,7 +85,8 @@ void fillPointFaceBoxBox(
 	const FXMVECTOR toCentre,
 	CollisionData& pData,
 	int best,
-	float depth
+	float depth,
+	Character* pCharacter
 )
 {
 	XMVECTOR normal = box1.GetAxis(best);
@@ -116,6 +119,13 @@ void fillPointFaceBoxBox(
 		pBody2 = nullptr;
 
 	assert(pBody1 != nullptr || pBody2 != nullptr);
+
+	if (pCharacter != nullptr && pBody2)
+	{
+		float fallingSpeed = pBody2->GetVelocity().y;
+		if (!pBody2->GetIsCharacter() && fallingSpeed < OBJECT_CRASH_LENGTH)
+			pCharacter->CrashWithObject(depth, xmf3ContactNormal);
+	}
 
 	pData.addContact(pBody1, pBody2, pData.friction, pData.restitution, xmf3ContactPoint, xmf3ContactNormal, depth);
 }
@@ -321,7 +331,7 @@ int CollisionDetector::BoxAndHalfSpace(const ColliderBox& box, const ColliderPla
 	return contactCnt;
 }
 
-int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box2, CollisionData& pData)
+int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box2, CollisionData& pData, Character* pCharacter)
 {
 	if (box1.GetBody()->GetInvalid() || box2.GetBody()->GetInvalid())
 		return 0;
@@ -366,13 +376,13 @@ int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box
 
 	if (best < 3)
 	{
-		fillPointFaceBoxBox(box1, box2, toCentre, pData, best, pen);
+		fillPointFaceBoxBox(box1, box2, toCentre, pData, best, pen, pCharacter);
 		return 1;
 	}
 	else if (best < 6)
 	{
 		// 반대 방향
-		fillPointFaceBoxBox(box2, box1, -toCentre, pData, best - 3, pen);
+		fillPointFaceBoxBox(box2, box1, -toCentre, pData, best - 3, pen, pCharacter);
 		return 1;
 	}
 	else
@@ -444,7 +454,17 @@ int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box
 
 		assert(pBody1 != nullptr || pBody2 != nullptr);
 
+
+		// 캐릭터가 물체와 충돌
+		if (pCharacter != nullptr && pBody2)
+		{
+			float fallingSpeed = pBody2->GetVelocity().y;
+			if (!pBody2->GetIsCharacter() && fallingSpeed < OBJECT_CRASH_LENGTH)
+				pCharacter->CrashWithObject(pen, xmf3ContactNormal);
+		}
+
 		pData.addContact(pBody1, pBody2, pData.friction, pData.restitution, xmf3ContactPoint, xmf3ContactNormal, pen);
+		return 1;
 	}
 
 

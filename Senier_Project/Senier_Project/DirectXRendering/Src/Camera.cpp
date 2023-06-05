@@ -335,14 +335,10 @@ void Third_Person_Camera::Update(float Etime)
 			best = distance;
 		}
 	}
-	if (best == 0 || best > m_OffsetLength)
+	if (best > m_OffsetLength)
 	{
 		best = m_OffsetLength;
-		//m_Pitch = 0;
 	}
-	else
-		best -= 1.f;
-	//cameraOffsetLength -= best;
 	cameraOffsetLength = best;
 
 	newPos = XMLoadFloat3(&xmf3ObjectPos);

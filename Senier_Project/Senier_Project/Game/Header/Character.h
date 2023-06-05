@@ -61,6 +61,17 @@ protected:
 
 	float m_TurnSpeed = 1;
 
+	bool m_bCrashWithObject = false;
+	float m_CrashPower = 0;
+	XMFLOAT3 m_xmf3CrashDirection = { 0,0,0 };
+
 	void ApplyCharacterFriction(float elapsedTime);
 	void CalcVelocityAndPosition(float elapsedTime);
+
+public:
+	void CrashWithObject(float crashPower, XMFLOAT3 xmf3CrashDirection);
+
+	void SetCrashWithObject(bool bCrashWithObject) { m_bCrashWithObject = bCrashWithObject; }
+	void SetCrashPower(float crashPower) { m_CrashPower = crashPower; }
+	void SetCrashDirection(XMFLOAT3 xmf3CrashDirection) { m_xmf3CrashDirection = xmf3CrashDirection; }
 };

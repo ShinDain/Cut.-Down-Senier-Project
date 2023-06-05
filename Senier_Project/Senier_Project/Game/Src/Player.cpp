@@ -375,7 +375,7 @@ void Player::InitializeState()
 
 void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
-	if (m_bInvincible)
+	if (m_bInvincible || m_nAnimationState == Player_State_Death)
 		return;
 
 	Object::ApplyDamage(power, xmf3DamageDirection);

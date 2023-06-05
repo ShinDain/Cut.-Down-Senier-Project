@@ -1,6 +1,9 @@
-#pragma once
+#ifndef COLLISIONDETACT_H
+
+#define COLLISIONDETACT_H
 
 #include "../../Common/Header/D3DUtil.h"
+#include "../../Game/Header/Character.h"
 #include "Collider.h"
 #include "Contact.h"
 
@@ -55,7 +58,7 @@ public:
 	static int BoxAndBox(
 		const ColliderBox& box1,
 		const ColliderBox& box2,
-		CollisionData& pData);
+		CollisionData& pData, Character* pCharacter);
 
 	static int BoxAndSphere(
 		const ColliderBox& box,
@@ -63,3 +66,5 @@ public:
 		CollisionData& pData);
 
 };
+
+#endif

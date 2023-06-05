@@ -187,6 +187,7 @@ void Weapon::Intersect(XMFLOAT3 xmf3PlayerLook)
 			objCollider->SetIntersect(1);
 #endif
 			g_vpMovableObjs[i]->ApplyDamage(m_Power, xmf3PlayerLook);
+			g_vpMovableObjs[i]->GetBody()->SetIsAwake(true);
 		}
 	}
 }

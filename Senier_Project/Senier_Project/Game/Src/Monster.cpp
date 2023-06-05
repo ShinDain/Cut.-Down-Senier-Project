@@ -331,7 +331,7 @@ void Monster::RotateToPlayer()
 
 void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
-	if (m_AnimationState == MonsterAnimationState::Monster_State_Death)
+	if (m_AnimationState == MonsterAnimationState::Monster_State_Death || m_bInvincible)
 		return;
 
 	Object::ApplyDamage(power, xmf3DamageDirection);

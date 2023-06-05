@@ -30,12 +30,45 @@ bool Character::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 void Character::Update(float elapsedTime)
 {
-	Object::Update(elapsedTime);
+	// 무적 시간 경과 누적
+	if (m_bInvincible)
+	{
+		m_ElapsedInvincibleTime += elapsedTime;
+		if (m_InvincibleTime <= m_ElapsedInvincibleTime)
+		{
+			m_ElapsedInvincibleTime = 0.0f;
+			m_bInvincible = false;
+		}
+	}
+
+	UpdateToRigidBody(elapsedTime);
+
+	ObjConstant objConstant;
+	XMMATRIX world = XMLoadFloat4x4(&m_xmf4x4World);
+	XMMATRIX inverseTransWorld = XMMatrixInverse(nullptr, XMMatrixTranspose(world));
+	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(world));
+	XMStoreFloat4x4(&objConstant.InverseTransWorld, XMMatrixTranspose(inverseTransWorld));
+	if (m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
+
+	if (m_pSibling) {
+		m_pSibling->Update(elapsedTime);
+	}
+	if (m_pChild) {
+		m_pChild->Update(elapsedTime);
+	}
 
 	ApplyCharacterFriction(elapsedTime);
 	RotateToMove(elapsedTime);
 	IsFalling();
 	UpdateAnimationTrack(elapsedTime);
+
+	if (m_bCrashWithObject)
+	{
+		ApplyDamage(m_CrashPower, m_xmf3CrashDirection);
+		m_bCrashWithObject = false;
+		m_CrashPower = 0;
+		m_xmf3CrashDirection = { 0,0,0 };
+	}
 }
 
 void Character::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
@@ -247,4 +280,14 @@ void Character::CalcVelocityAndPosition(float elapsedTime)
 
 	//// 최대 속도 제한 및 마찰력 
 	//ApplyCharacterFriction(elapsedTime);
+}
+
+void Character::CrashWithObject(float crashPower, XMFLOAT3 xmf3CrashDirection)
+{
+	m_bCrashWithObject = true;
+	//m_CrashPower = crashPower * 10;
+
+	// 일단 20으로 고정
+	m_CrashPower = 20;
+	m_xmf3CrashDirection = xmf3CrashDirection;
 }
