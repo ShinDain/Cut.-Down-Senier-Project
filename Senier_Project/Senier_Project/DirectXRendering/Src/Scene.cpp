@@ -50,12 +50,15 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 0, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	
 	// 아이템 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
-	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
+	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 
 	std::shared_ptr<ImgObject> imgobj = std::make_shared<ImgObject>();
 	imgobj->Initialize(pd3dDevice, pd3dCommandList, 1900, 1024, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 500, 500);
@@ -712,9 +715,7 @@ void Scene::GenerateContact()
 
 void Scene::ProcessPhysics(float elapsedTime)
 {
-
 	m_pCollisionResolver->ResolveContacts(m_CollisionData.pContacts, elapsedTime);
-
 }
 
 void Scene::ClearObjectLayer()
@@ -750,6 +751,30 @@ void Scene::ClearObjectLayer()
 			g_vpAllObjs.erase(g_vpAllObjs.begin() + i);
 		}
 	}
+	for (int i = 0; i < g_vpMovableObjs.size(); ++i)
+	{
+		if (!g_vpMovableObjs[i]->GetIsAlive())
+		{
+			g_vpMovableObjs[i]->DestroyRunTime();
+			g_vpMovableObjs.erase(g_vpMovableObjs.begin() + i);
+		}
+	}
+	for (int i = 0; i < g_vpCharacters.size(); ++i)
+	{
+		if (!g_vpCharacters[i]->GetIsAlive())
+		{
+			g_vpCharacters[i]->DestroyRunTime();
+			g_vpCharacters.erase(g_vpCharacters.begin() + i);
+		}
+	}
+	for (int i = 0; i < g_vpWorldObjs.size(); ++i)
+	{
+		if (!g_vpWorldObjs[i]->GetIsAlive())
+		{
+			g_vpWorldObjs[i]->DestroyRunTime();
+			g_vpWorldObjs.erase(g_vpWorldObjs.begin() + i);
+		}
+	}
 
 	// 레이어 순회
 	for (int i = 0; i < RenderLayer::Render_Count; ++i)
@@ -760,30 +785,6 @@ void Scene::ClearObjectLayer()
 			{
 				m_vObjectLayer[i][j]->DestroyRunTime();
 				m_vObjectLayer[i].erase(m_vObjectLayer[i].begin() + j);
-			}
-		}
-	}
-}
-
-void Scene::Intersect()
-{
-	for (int i = 0; i < g_ppColliderBoxs.size(); ++i)
-	{
-		g_ppColliderBoxs[i]->SetIntersect(0);
-	}
-
-	for (int i = 0; i < g_ppColliderBoxs.size() - 1; ++i)
-	{
-		if (!g_ppColliderBoxs[i]->GetIsActive())
-			continue;
-		for (int k = i + 1; k < g_ppColliderBoxs.size(); ++k)
-		{
-			if (!g_ppColliderBoxs[k]->GetIsActive())
-				continue;
-			if (IntersectTests::BoxAndBox(*g_ppColliderBoxs[i], *g_ppColliderBoxs[k]))
-			{
-				g_ppColliderBoxs[i]->SetIntersect(1);
-				g_ppColliderBoxs[k]->SetIntersect(1);
 			}
 		}
 	}

@@ -62,8 +62,6 @@ public:
 
 	void ClearObjectLayer();
 
-	void Intersect();
-
 private:
 
 	XMFLOAT4X4 m_xmf4x4ViewProj = MathHelper::identity4x4();

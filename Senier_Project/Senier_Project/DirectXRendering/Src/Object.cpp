@@ -25,7 +25,6 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 	if (pModelData)
 	{
-
 		SetChild(pModelData->m_pRootObject);
 		if (nAnimationTracks > 0)
 			m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);

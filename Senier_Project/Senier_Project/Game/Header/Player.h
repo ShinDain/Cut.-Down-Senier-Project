@@ -99,8 +99,6 @@ protected:
 	PlayerAnimationState m_nAnimationState = PlayerAnimationState::Player_State_Idle;
 	BoundingSphere m_ObjectSearchSphere;
 
-	
-
 public:
 
 	std::shared_ptr<Weapon> GetWeapon() { return m_pWeapon; }

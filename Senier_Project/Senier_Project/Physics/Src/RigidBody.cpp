@@ -49,7 +49,7 @@ void RigidBody::Update(float elapsedTime)
 	if (!m_bIsAwake)
 		return;
 
-	if (m_ElapsedTimeAfterCreated > 0.1f && !m_bIsCharacter && !m_bIsPlatform)
+	if (m_ElapsedTimeAfterCreated > 0.0f && !m_bIsCharacter && !m_bIsPlatform)
 		m_bCanSleep = true;
 
 	if (m_bIsCharacter)

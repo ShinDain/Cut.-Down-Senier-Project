@@ -48,6 +48,7 @@ bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 void Player::Update(float elapsedTime)
 {
 	Character::Update(elapsedTime);
+	m_ObjectSearchSphere.Center = m_xmf3Position;
 	if(m_pWeapon) m_pWeapon->Intersect(m_xmf3Look);
 }
 
@@ -243,7 +244,7 @@ void Player::Attack()
 void Player::RotateToObj()
 {
 	XMFLOAT3 xmf3MyPosition = m_xmf3Position;
-	xmf3MyPosition.y = 0;
+	//xmf3MyPosition.y = 0;
 	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
 	
 	float closestDistance = 9999;
@@ -251,7 +252,7 @@ void Player::RotateToObj()
 	for (int i = 0; i < g_vpMovableObjs.size(); ++i)
 	{
 		XMFLOAT3 xmf3TmpPosition = g_vpMovableObjs[i]->GetPosition();
-		xmf3TmpPosition.y = 0;
+		//xmf3TmpPosition.y = 0;
 		XMVECTOR tmpPosition = XMLoadFloat3(&xmf3TmpPosition);
 
 		float distance = XMVectorGetX(XMVector3Length(tmpPosition - myPosition));
@@ -264,6 +265,8 @@ void Player::RotateToObj()
 	if (closestDistance > m_AttackRange)
 		return;
 
+	xmf3MyPosition.y = 0;
+	myPosition = XMLoadFloat3(&xmf3MyPosition);
 	XMFLOAT3 xmf3TargetPosition = g_vpMovableObjs[closestIdx]->GetPosition();
 	xmf3TargetPosition.y = 0;
 	XMVECTOR targetPosition = XMLoadFloat3(&xmf3TargetPosition);
