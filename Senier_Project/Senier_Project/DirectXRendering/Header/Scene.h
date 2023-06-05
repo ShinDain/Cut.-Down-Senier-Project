@@ -23,7 +23,7 @@
 #include "../../Physics/Header/CollisionDetact.h"
 #include "../../Physics/Header/CollisionResolver.h"
 
-#define PLAYER_TRACK_CNT 6
+#define PLAYER_TRACK_CNT 7
 #define ZOMBIE_TRACK_CNT 4
 
 class Scene
@@ -49,6 +49,7 @@ public:
 
 	void ProcessInput(UCHAR* pKeybuffer);
 	void KeyDownEvent(WPARAM wParam);
+	void KeyUpEvent(WPARAM wParam);
 	void LeftButtonDownEvent();
 	void RightButtonDownEvent();
 
@@ -115,7 +116,8 @@ public:
 #if defined(_DEBUG) | defined(DEBUG)
 public:
 
-	int m_refCnt = 0;
+	float m_refCnt = 0;
+	float m_DebugValue = 0;
 
 	float m_tTime = 0;
 #endif

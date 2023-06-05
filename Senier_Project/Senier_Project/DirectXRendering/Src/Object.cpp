@@ -32,6 +32,7 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	std::shared_ptr<Collider> pCollider;
 	std::shared_ptr<RigidBody> pBody;
 
+	m_nObjectType = objData.objectType;
 	// 충돌체 타입에 따라 
 	m_nColliderType = objData.colliderType;
 	switch (objData.colliderType)
@@ -95,6 +96,8 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 	BuildConstantBuffers(pd3dDevice);
 
+	UpdateToRigidBody(0.0f);
+
 	return true;
 }
 
@@ -109,6 +112,9 @@ void Object::Animate(float elapsedTime)
 
 void Object::Update(float elapsedTime)
 {
+	if (m_HP <= 0)
+		m_bIsAlive = false;
+
 	// 무적 시간 경과 누적
 	if (m_bInvincible)
 	{
@@ -120,10 +126,8 @@ void Object::Update(float elapsedTime)
 		}
 	}
 
-	UpdateToRigidBody(elapsedTime);
-
-	if (m_HP <= 0)
-		m_bIsAlive = false;
+	if(m_nObjectType != ObjectType::Object_World)
+		UpdateToRigidBody(elapsedTime);
 
 	ObjConstant objConstant;
 	XMMATRIX world = XMLoadFloat4x4(&m_xmf4x4World);
@@ -156,7 +160,6 @@ void Object::UpdateToRigidBody(float elapsedTime)
 		m_xmf4Orientation = m_pBody->GetOrientation();
 		m_xmf3Rotation = m_pBody->GetRotate();
 		m_xmf3Scale = m_pBody->GetScale();
-
 	}
 	else
 	{

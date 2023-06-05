@@ -62,6 +62,7 @@ public:
 public:
 	virtual void ProcessInput(UCHAR* pKeybuffer);
 	virtual void KeyDownEvent(WPARAM wParam);
+	virtual void KeyUpEvent(WPARAM wParam);
 	void LeftButtonDownEvent();
 	void RightButtonDownEvent();
 
@@ -73,20 +74,34 @@ public:
 	void RotateToObj();
 	void AcquireItem(UINT itemType);
 
+	void InitializeState();
+
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 
 	virtual void DoLanding();
 
 	virtual void UpdateAnimationTrack(float elapsedTime);
+	virtual void BlendWithIdleMovement(float maxWeight);
+
 
 protected:
-
 	UINT m_nScore = 0;
+
+	bool m_bIgnoreInput = false;
 
 	std::shared_ptr<Weapon> m_pWeapon = nullptr;
 	
 	XMFLOAT3 m_xmf3CameraRotation = XMFLOAT3(0, 0, 0);
 	bool m_bCanDoubleJump = true;
+
+	float m_DefaultSpeed = 80.0f;
+	bool m_bSprint = false;
+	float m_SprintSpeed = 120.0f;
+	bool m_bDecreaseMaxSpeed = false;
+
+	bool m_bDashToIdle = false;
+	float m_TransitionTime = 0.5f;
+	float m_ElapsedTransitionTime = 0.0f;
 
 	UINT m_nMaxAttackCombo = 2;
 	UINT m_nAttackCombo = 0;

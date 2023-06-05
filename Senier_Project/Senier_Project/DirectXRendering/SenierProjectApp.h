@@ -28,6 +28,7 @@ protected:
 
 	virtual void ProcessInput() override;
 	virtual void KeyDownEvent(WPARAM wParam) override;
+	virtual void KeyUpEvent(WPARAM wParam) override;
 
 	virtual void LeftButtonDownEvent() override;
 	virtual void RightButtonDownEvent() override;

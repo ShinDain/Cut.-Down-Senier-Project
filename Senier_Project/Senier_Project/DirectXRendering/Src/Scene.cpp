@@ -58,7 +58,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
-	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
+	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 
 	std::shared_ptr<ImgObject> imgobj = std::make_shared<ImgObject>();
 	imgobj->Initialize(pd3dDevice, pd3dCommandList, 1900, 1024, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 500, 500);
@@ -125,33 +125,40 @@ void Scene::OnResize(float aspectRatio, float newWidth, float newHeight)
 
 void Scene::Update(float totalTime ,float elapsedTime)
 {
-#if defined(_DEBUG)
 	ClearObjectLayer();
-	//m_refCnt = g_LoadedModelData[ZOMBIE_MODEL_NAME]->m_pRootObject.use_count();
 
-	m_tTime += elapsedTime;
-
-#endif
-
-	for (int i = 0; i < g_vpAllObjs.size(); ++i)
-	{
-		if (g_vpAllObjs[i]) g_vpAllObjs[i]->Update(elapsedTime);
-	}
-
-	m_pPlayer->Update(elapsedTime);
-
-	// 충돌 검사
-	GenerateContact();
-	ProcessPhysics(elapsedTime);
-	
 	m_pCamera->Update(elapsedTime);
-
 	// 패스버퍼 업데이트
 	UpdatePassCB(totalTime, elapsedTime);
 	UpdateShadowPassCB(totalTime, elapsedTime);
 
 	// ImageObject 렌더를 위한  직교 투영행렬 업데이트
 	m_xmf4x4ImgObjMat = m_pCamera->GetOrtho4x4f();
+
+#if defined(_DEBUG)
+	XMFLOAT3 xmf3PlayerPosition = g_pPlayer->GetPosition();
+	m_refCnt = xmf3PlayerPosition.x;
+	//m_DebugValue = m_pCamera->GetPosition3f().x;
+
+	m_tTime += elapsedTime;
+
+#endif
+	for (int i = 0; i < g_vpAllObjs.size(); ++i)
+	{
+		if (g_vpAllObjs[i]) g_vpAllObjs[i]->Update(elapsedTime);
+	}
+	m_pPlayer->Update(elapsedTime);
+
+	// 충돌 검사
+	GenerateContact();
+	ProcessPhysics(elapsedTime);
+
+#if defined(_DEBUG)
+	xmf3PlayerPosition = g_pPlayer->GetPosition();
+	m_DebugValue = xmf3PlayerPosition.x;
+#endif
+
+
 }
 
 void Scene::UpdatePassCB(float totalTime, float elapsedTime)
@@ -282,10 +289,32 @@ void Scene::UpdateShadowPassCB(float totalTime, float elapsedTime)
 
 void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-
-	g_Shaders[ShaderType::Shader_Static]->ChangeShader(pd3dCommandList);
+	g_Shaders[ShaderType::Shader_Skinned]->ChangeShader(pd3dCommandList);
 	pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
 	//pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pShadowPassCB->Resource()->GetGPUVirtualAddress());
+
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
+	{
+		if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
+		{
+			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->GetIsAlive())
+				continue;
+			// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
+			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(elapsedTime);
+			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
+				m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
+			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(elapsedTime, pd3dCommandList);
+		}
+	}
+
+	// 플레이어 렌더링
+	{
+		m_pPlayer->Animate(elapsedTime);
+		if (!m_pPlayer->m_pAnimationController)
+			m_pPlayer->UpdateTransform(NULL);
+		m_pPlayer->Render(elapsedTime, pd3dCommandList);
+	}
+
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
 	{
 		if (!m_vObjectLayer[RenderLayer::Render_Static][i]->GetIsAlive())
@@ -305,26 +334,6 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(elapsedTime, pd3dCommandList);
 	}
 
-	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
-	{
-		if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
-		{
-			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->GetIsAlive())
-				continue;
-			// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
-			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(elapsedTime);
-			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
-				m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
-			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(elapsedTime, pd3dCommandList);
-		}
-	}
-
-	{
-		m_pPlayer->Animate(elapsedTime);
-		if (!m_pPlayer->m_pAnimationController)
-			m_pPlayer->UpdateTransform(NULL);
-		m_pPlayer->Render(elapsedTime, pd3dCommandList);
-	}
 	// img 오브젝트
 	/*{
 		g_Shaders[ShaderType::Shader_Image]->ChangeShader(pd3dCommandList);
@@ -423,7 +432,12 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 
 void Scene::KeyDownEvent(WPARAM wParam)
 {
-	m_pPlayer->KeyDownEvent(wParam);
+	if(m_pPlayer) m_pPlayer->KeyDownEvent(wParam);
+}
+
+void Scene::KeyUpEvent(WPARAM wParam)
+{
+	if (m_pPlayer) m_pPlayer->KeyUpEvent(wParam);
 }
 
 void Scene::LeftButtonDownEvent()

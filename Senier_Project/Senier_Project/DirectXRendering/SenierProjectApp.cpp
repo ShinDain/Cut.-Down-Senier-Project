@@ -51,6 +51,7 @@ bool SenierProjectApp::Initialize()
 	m_DebugText->AddTextUI(L"Total Time : 0", 10, 0);
 	m_DebugText->AddTextUI(L"refCnt : 0", 10, 20);
 	m_DebugText->AddTextUI(L"vecCnt : 0", 10, 40);
+	m_DebugText->AddTextUI(L"vecCnt : 0", 10, 60);
 
 #endif
 
@@ -93,16 +94,23 @@ void SenierProjectApp::Update(float elapsedTime)
 	posX = m_DebugText->GetTextUIPosX(1);
 	posY = m_DebugText->GetTextUIPosY(1);
 	wcscpy_s(totalTimeText, L"refCnt : ");
-	int refCnt = m_Scene->m_refCnt;
+	float refCnt = m_Scene->m_refCnt;
 	wcscat_s(totalTimeText, std::to_wstring(refCnt).c_str());
 	m_DebugText->UpdateTextUI(totalTimeText, posX, posY, 1);
 
 	posX = m_DebugText->GetTextUIPosX(2);
 	posY = m_DebugText->GetTextUIPosY(2);
+	wcscpy_s(totalTimeText, L"refCnt : ");
+	float debugValue = m_Scene->m_DebugValue;
+	wcscat_s(totalTimeText, std::to_wstring(debugValue).c_str());
+	m_DebugText->UpdateTextUI(totalTimeText, posX, posY, 2);
+
+	posX = m_DebugText->GetTextUIPosX(3);
+	posY = m_DebugText->GetTextUIPosY(3);
 	wcscpy_s(totalTimeText, L"vecCnt : ");
 	int vecCnt = g_vpAllObjs.size();
 	wcscat_s(totalTimeText, std::to_wstring(vecCnt).c_str());
-	m_DebugText->UpdateTextUI(totalTimeText, posX, posY, 2);
+	m_DebugText->UpdateTextUI(totalTimeText, posX, posY, 3);
 #endif
 }
 
@@ -193,6 +201,11 @@ void SenierProjectApp::KeyDownEvent(WPARAM wParam)
 {
 	if (m_Scene) m_Scene->KeyDownEvent(wParam);
 
+}
+
+void SenierProjectApp::KeyUpEvent(WPARAM wParam)
+{
+	if (m_Scene) m_Scene->KeyUpEvent(wParam);
 }
 
 void SenierProjectApp::LeftButtonDownEvent()

@@ -222,7 +222,6 @@ void Character::ApplyCharacterFriction(float elapsedTime)
 	{
 		XMVECTOR direction = XMVector3Normalize(velocityXZ);
 		velocityXZ = direction * m_MaxSpeedXZ;
-		XMFLOAT3 newVelocity;
 		XMStoreFloat3(&newVelocity, velocityXZ);
 		newVelocity.y = xmf3Velocity.y;
 		m_pBody->SetVelocity(newVelocity);

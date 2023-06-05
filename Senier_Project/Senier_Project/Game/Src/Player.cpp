@@ -2,10 +2,11 @@
 
 #define PLAYER_IDLE_TRACK 0
 #define PLAYER_MOVE_TRACK 1
-#define PLAYER_LOOP_TRACK 2
-#define PLAYER_ONCE_TRACK_1 3
-#define PLAYER_ONCE_TRACK_2 4
-#define PLAYER_ONCE_TRACK_3 5
+#define PLAYER_SPRINT_TRACK 2
+#define PLAYER_LOOP_TRACK 3
+#define PLAYER_ONCE_TRACK_1 4
+#define PLAYER_ONCE_TRACK_2 5
+#define PLAYER_ONCE_TRACK_3 6
 
 Player::Player()
 {
@@ -28,6 +29,7 @@ bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 	m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, true);	// idle
 	m_pAnimationController->SetTrackEnable(PLAYER_MOVE_TRACK, true);	// move
+	m_pAnimationController->SetTrackEnable(PLAYER_SPRINT_TRACK, false);	// sprint
 	m_pAnimationController->SetTrackEnable(PLAYER_LOOP_TRACK, false);	// fall loop
 	m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_1, false);	// once 1
 	m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_2, false);	// once 2
@@ -37,10 +39,13 @@ bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_pAnimationController->m_vpAnimationTracks[PLAYER_ONCE_TRACK_3]->SetType(ANIMATION_TYPE_ONCE);
 	m_pAnimationController->SetTrackAnimationSet(PLAYER_IDLE_TRACK, Player_Anim_Index_Idle);
 	m_pAnimationController->SetTrackAnimationSet(PLAYER_MOVE_TRACK, Player_Anim_Index_RunForward);
+	m_pAnimationController->SetTrackAnimationSet(PLAYER_SPRINT_TRACK, Player_Anim_Index_Sprint);
 	m_pAnimationController->SetTrackAnimationSet(PLAYER_LOOP_TRACK, Player_Anim_Index_Falling);
 
 	m_ObjectSearchSphere.Center = m_xmf3Position;
 	m_ObjectSearchSphere.Radius = 20.0f;
+
+	m_JumpSpeed = 150.0f;
 
 	return true;
 }
@@ -50,19 +55,35 @@ void Player::Update(float elapsedTime)
 	Character::Update(elapsedTime);
 	m_ObjectSearchSphere.Center = m_xmf3Position;
 	if(m_pWeapon) m_pWeapon->Intersect(m_xmf3Look);
+
+	if (m_bDecreaseMaxSpeed)
+	{
+		XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+		xmf3Velocity.y = 0;
+		XMVECTOR velocity = XMLoadFloat3(&xmf3Velocity);
+		float length = XMVectorGetX(XMVector3Length(velocity));
+
+		m_MaxSpeedXZ -= 1;
+		if (m_MaxSpeedXZ < m_DefaultSpeed || length < m_DefaultSpeed)
+		{
+			m_bSprint = false;
+			m_MaxSpeedXZ = m_DefaultSpeed;
+			m_bDecreaseMaxSpeed = false;
+		}
+	}
 }
 
 void Player::Destroy()
 {
 	Object::Destroy();
 
-	//if(m_pWeapon) m_pWeapon->Destroy();
-	//m_pWeapon.reset();
+	if(m_pWeapon) m_pWeapon->Destroy();
+	m_pWeapon.reset();
 }
 
 void Player::ProcessInput(UCHAR* pKeybuffer)
 {
-	if (m_nAnimationState == PlayerAnimationState::Player_State_Death)
+	if (m_bIgnoreInput)
 		return;
 
 	DWORD dwDirection = 0;
@@ -77,6 +98,9 @@ void Player::ProcessInput(UCHAR* pKeybuffer)
 
 void Player::KeyDownEvent(WPARAM wParam)
 {
+	if (m_bIgnoreInput)
+		return;
+
 #if defined(_DEBUG) || defined(DEBUG)
 	if (wParam == 'K')
 	{
@@ -87,19 +111,46 @@ void Player::KeyDownEvent(WPARAM wParam)
 	if (!m_bIsAlive)
 		return;
 
-	// Space / 점프
-	if(wParam == VK_SPACE)
+	switch (wParam)
+	{
+	case VK_SPACE:
 		Jump();
+		break;
+	case VK_SHIFT:
+		m_bSprint = true;
+		m_MaxSpeedXZ = m_SprintSpeed;
+		break;
+	default:
+		break;
+	}
+}
+
+void Player::KeyUpEvent(WPARAM wParam)
+{
+	switch (wParam)
+	{
+	case VK_SHIFT:
+		m_bDecreaseMaxSpeed = true;
+		break;
+	default:
+		break;
+	}
 }
 
 void Player::LeftButtonDownEvent()
 {
+	if (m_bIgnoreInput)
+		return;
+
 	// 좌클릭 공격
 	Attack();
 }
 
 void Player::RightButtonDownEvent()
 {
+	if (m_bIgnoreInput)
+		return;
+
 }
 
 void Player::Move(DWORD dwDirection)
@@ -181,6 +232,7 @@ void Player::ChangeToJumpState()
 
 	m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, false);
 	m_pAnimationController->SetTrackEnable(PLAYER_MOVE_TRACK, false);
+	m_pAnimationController->SetTrackEnable(PLAYER_SPRINT_TRACK, false);
 
 	UnableAnimationTrack(PLAYER_LOOP_TRACK);
 }
@@ -189,17 +241,18 @@ void Player::Attack()
 {
 	m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, false);
 	m_pAnimationController->SetTrackEnable(PLAYER_MOVE_TRACK, false);
+	m_pAnimationController->SetTrackEnable(PLAYER_SPRINT_TRACK, false);
 
 	switch (m_nAnimationState)
 	{
 	//case Player_State_Idle:
 	//	break;
-	//case Player_State_Jump:
-	//	break;
-	//case Player_State_Falling:
-	//	break;
-	//case Player_State_Land:
-	//	break;
+	case Player_State_Jump:
+		return;
+	case Player_State_Falling:
+		return;
+	case Player_State_Land:
+		return;
 	case Player_State_Melee:
 	{
 		// 선입력 방지
@@ -212,7 +265,6 @@ void Player::Attack()
 			return;
 		m_nAttackCombo += 1;
 		m_bCombeAttack = true;
-		//return;
 	}
 		break;
 	default:
@@ -293,6 +345,34 @@ void Player::AcquireItem(UINT itemType)
 	}
 }
 
+void Player::InitializeState()
+{
+	UnableAnimationTrack(PLAYER_IDLE_TRACK);
+	UnableAnimationTrack(PLAYER_MOVE_TRACK);
+	UnableAnimationTrack(PLAYER_LOOP_TRACK);
+	UnableAnimationTrack(PLAYER_ONCE_TRACK_1);
+	UnableAnimationTrack(PLAYER_ONCE_TRACK_2);
+	UnableAnimationTrack(PLAYER_ONCE_TRACK_3);
+
+	m_pWeapon->SetActive(false);
+	m_bIgnoreInput = false;
+
+	m_nAttackCombo = 0;
+	m_bCombeAttack = false;
+
+	m_bIsFalling = false;
+	m_bCanDoubleJump = true;
+	m_MaxSpeedXZ = m_DefaultSpeed;
+	m_CharacterFriction = 350.0f;
+
+	m_Acceleration = 500.0f;
+	m_TurnSpeed = 1;
+
+	// 일반 상태로 강제 초기화
+	m_nAnimationState = Player_State_Idle;
+	BlendWithIdleMovement(1);
+}
+
 void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
 	if (m_bInvincible)
@@ -300,8 +380,16 @@ void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 
 	Object::ApplyDamage(power, xmf3DamageDirection);
 
+	m_bIgnoreInput = true;
+
+	XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+	xmf3Accel.x = 0;
+	xmf3Accel.z = 0;
+	m_pBody->SetAcceleration(xmf3Accel);
+
 	m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, false);
 	m_pAnimationController->SetTrackEnable(PLAYER_MOVE_TRACK, false);
+	m_pAnimationController->SetTrackEnable(PLAYER_SPRINT_TRACK, false);
 
 	if (m_HP > 0)
 	{
@@ -332,9 +420,9 @@ void Player::DoLanding()
 {
 	m_bIsFalling = false;
 	m_bCanDoubleJump = true;
-	m_MaxSpeedXZ = 100.f;
 	m_CharacterFriction = 350.0f;
-	
+	m_Acceleration = 500.0f;
+	m_TurnSpeed = 1;
 
 	switch (m_nAnimationState)
 	{
@@ -349,10 +437,10 @@ void Player::DoLanding()
 	//case Player_State_Land:
 	//	break;
 	case Player_State_Melee:
+		m_Acceleration = 30.0f;
+		m_TurnSpeed = 0;
 		break;
 	default:
-		m_Acceleration = 500.0f;
-		m_TurnSpeed = 1;
 		break;
 	}
 
@@ -494,6 +582,7 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 			m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1 - weight);
 
 			BlendWithIdleMovement(weight);
+			m_bIgnoreInput = false;
 		}
 		if (m_pAnimationController->GetTrackOver(PLAYER_ONCE_TRACK_1))
 		{
@@ -520,5 +609,51 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 
 	default:
 		break;
+	}
+}
+
+void Player::BlendWithIdleMovement(float maxWeight)
+{
+	m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, true);
+	m_pAnimationController->SetTrackEnable(PLAYER_MOVE_TRACK, true);
+	if (m_bSprint)
+		m_pAnimationController->SetTrackEnable(PLAYER_SPRINT_TRACK, true);
+	else
+		m_pAnimationController->SetTrackEnable(PLAYER_SPRINT_TRACK, false);
+
+	float weight = maxWeight;
+	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+	xmf3Velocity.y = 0;
+	XMVECTOR velocity = XMLoadFloat3(&xmf3Velocity);
+	float length = XMVectorGetX(XMVector3Length(velocity));
+
+	if (m_bSprint)
+		weight = length / m_SprintSpeed;
+	else
+		weight = length / m_DefaultSpeed;
+
+	if (weight < FLT_EPSILON)
+		weight = 0;
+	else if (weight > maxWeight)
+		weight = maxWeight;
+	if (m_bSprint)
+	{
+		if (weight <= 0.66f)
+		{
+			m_pAnimationController->SetTrackWeight(PLAYER_IDLE_TRACK, maxWeight - (weight / 2 * 3));
+			m_pAnimationController->SetTrackWeight(PLAYER_MOVE_TRACK, weight / 2 * 3);
+			m_pAnimationController->SetTrackWeight(PLAYER_SPRINT_TRACK, 0);
+		}
+		else
+		{
+			m_pAnimationController->SetTrackWeight(PLAYER_IDLE_TRACK, 0);
+			m_pAnimationController->SetTrackWeight(PLAYER_MOVE_TRACK, maxWeight - (weight - 0.66f) * 3);
+			m_pAnimationController->SetTrackWeight(PLAYER_SPRINT_TRACK, (weight - 0.66f) * 3);
+		}
+	}
+	else
+	{
+		m_pAnimationController->SetTrackWeight(PLAYER_IDLE_TRACK, maxWeight - weight);
+		m_pAnimationController->SetTrackWeight(PLAYER_MOVE_TRACK, weight);
 	}
 }

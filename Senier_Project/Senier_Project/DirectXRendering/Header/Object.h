@@ -14,7 +14,7 @@
 #include "Material.h"
 #include "AnimationController.h"
 
-#define COLLIDER_RENDER
+//#define COLLIDER_RENDER
 
 #define DIR_FORWARD					0x01
 #define DIR_BACKWARD				0x02
@@ -46,6 +46,7 @@ public:
 
 	virtual void ProcessInput(UCHAR* pKeybuffer) {}
 	virtual void KeyDownEvent(WPARAM wParam) {}
+	virtual void KeyUpEvent(WPARAM wParam) {}
 
 	virtual void UpdateTransform(XMFLOAT4X4 *pxmf4x4Parent = NULL);
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
@@ -113,6 +114,8 @@ protected:
 	std::shared_ptr<Collider> m_pCollider = nullptr;
 	ColliderType m_nColliderType = Collider_None;
 	XMFLOAT3 m_xmf3ColliderExtents = XMFLOAT3(0, 0, 0);
+
+	ObjectType m_nObjectType = Object_None;
 
 	float m_Mass = 1.0f;
 

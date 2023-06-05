@@ -58,6 +58,7 @@ protected:
 
 	virtual void ProcessInput() {}
 	virtual void KeyDownEvent(WPARAM wParam) {};
+	virtual void KeyUpEvent(WPARAM wParam) {};
 
 	virtual void LeftButtonDownEvent() {};
 	virtual void RightButtonDownEvent() {};
