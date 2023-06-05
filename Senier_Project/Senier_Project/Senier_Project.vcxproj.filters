@@ -128,6 +128,9 @@
     <ClCompile Include="DirectXRendering\Src\Scene.cpp">
       <Filter>DirectXRendering\Src</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Src\Item.cpp">
+      <Filter>Game\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Physics\Header\Collider.h">
@@ -225,6 +228,9 @@
     </ClInclude>
     <ClInclude Include="DirectXRendering\Header\DepthMap.h">
       <Filter>DirectXRendering\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Header\Item.h">
+      <Filter>Game\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -6,8 +6,6 @@
 #include "../../DirectXRendering/Header/Object.h"
 #include "../../Physics/Header/CollisionDetact.h"
 
-
-
 class Weapon : public Object
 {
 public:

@@ -208,6 +208,15 @@ using namespace DirectX;
 #define WALL_PILLAR_3_MODEL_SCALE XMFLOAT3(10,10,10)
 #define WALL_PILLAR_3_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
 
+#define ITEM_MODEL_NAME "TmpItem"
+#define ITEM_MODEL_TEXPATH ""
+#define ITEM_MODEL_EXTENTS XMFLOAT3(0.3f, 0.8f, 0.2f)
+#define ITEM_MODEL_TYPE Object_Item
+#define ITEM_MODEL_COLLIDERTYPE Collider_None
+#define ITEM_MODEL_MASS 9999
+#define ITEM_MODEL_SCALE XMFLOAT3(10,10,10)
+#define ITEM_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
+
 void CreateObjectDefaultData();
 
 #endif // !OBJECTDATA_H

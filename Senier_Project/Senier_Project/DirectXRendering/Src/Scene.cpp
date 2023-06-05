@@ -46,9 +46,13 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(40, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 
+	// 월드 오브젝트 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 0, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
+	
+	// 아이템 테스트
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
 	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
@@ -609,6 +613,17 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 
 		g_vpAllObjs.emplace_back(pObject);
 		g_vpMovableObjs.emplace_back(pObject);
+		g_vpWorldObjs.emplace_back(pObject);
+		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
+	}
+	break;
+
+	case Object_Item:
+	{
+		std::shared_ptr<Item> pItem = std::make_shared<Item>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+		pObject = std::static_pointer_cast<Object>(pItem);
+
+		g_vpAllObjs.emplace_back(pObject);
 		g_vpWorldObjs.emplace_back(pObject);
 		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
 	}

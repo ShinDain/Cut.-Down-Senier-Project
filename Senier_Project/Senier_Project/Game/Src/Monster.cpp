@@ -329,14 +329,6 @@ void Monster::RotateToPlayer()
 	RotateToTargetLook(0.0f, xmf3TargetLook, 1);
 }
 
-void Monster::OnHit()
-{
-}
-
-void Monster::OnDeath()
-{
-}
-
 void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
 	if (m_AnimationState == MonsterAnimationState::Monster_State_Death)

@@ -280,12 +280,14 @@ void Player::RotateToObj()
 	m_pBody->AddVelocity(xmf3AddVelocity);
 }
 
-void Player::OnHit()
+void Player::AcquireItem(UINT itemType)
 {
-}
-
-void Player::OnDeath()
-{
+	switch (itemType)
+	{
+	default:
+		m_nScore += 100;
+		break;
+	}
 }
 
 void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)

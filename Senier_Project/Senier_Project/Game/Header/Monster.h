@@ -61,8 +61,6 @@ public:
 	void CreateAttackSphere();
 	void RotateToPlayer();
 
-	virtual void OnHit();
-	virtual void OnDeath();
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 
 protected:

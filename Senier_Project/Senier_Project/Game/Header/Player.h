@@ -71,9 +71,8 @@ public:
 
 	virtual void Attack();
 	void RotateToObj();
+	void AcquireItem(UINT itemType);
 
-	virtual void OnHit();
-	virtual void OnDeath();
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 
 	virtual void DoLanding();
@@ -81,6 +80,9 @@ public:
 	virtual void UpdateAnimationTrack(float elapsedTime);
 
 protected:
+
+	UINT m_nScore = 0;
+
 	std::shared_ptr<Weapon> m_pWeapon = nullptr;
 	
 	XMFLOAT3 m_xmf3CameraRotation = XMFLOAT3(0, 0, 0);
@@ -97,10 +99,13 @@ protected:
 	PlayerAnimationState m_nAnimationState = PlayerAnimationState::Player_State_Idle;
 	BoundingSphere m_ObjectSearchSphere;
 
+	
+
 public:
 
 	std::shared_ptr<Weapon> GetWeapon() { return m_pWeapon; }
 	XMFLOAT3 GetCameraRotation() {	return m_xmf3CameraRotation;}
+	UINT GetScore() { return m_nScore; }
 
 	void SetWeapon(std::shared_ptr<Weapon> pWeapon) { m_pWeapon = pWeapon; }
 	void SetCameraRotation(XMFLOAT3 xmf3CameraRotation) { m_xmf3CameraRotation = xmf3CameraRotation; }

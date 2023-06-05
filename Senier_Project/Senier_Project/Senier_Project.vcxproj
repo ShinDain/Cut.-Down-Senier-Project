@@ -37,6 +37,7 @@
     <ClCompile Include="DirectXRendering\Src\Scene.cpp" />
     <ClCompile Include="DirectXRendering\Src\Shader.cpp" />
     <ClCompile Include="Game\Src\Character.cpp" />
+    <ClCompile Include="Game\Src\Item.cpp" />
     <ClCompile Include="Game\Src\Monster.cpp" />
     <ClCompile Include="Game\Src\ObjectDefaultData.cpp" />
     <ClCompile Include="Game\Src\Player.cpp" />
@@ -72,6 +73,7 @@
     <ClInclude Include="DirectXRendering\Header\Shader.h" />
     <ClInclude Include="DirectXRendering\SenierProjectApp.h" />
     <ClInclude Include="Game\Header\Character.h" />
+    <ClInclude Include="Game\Header\Item.h" />
     <ClInclude Include="Game\Header\Monster.h" />
     <ClInclude Include="Game\Header\ObjectDefaultData.h" />
     <ClInclude Include="Game\Header\Player.h" />

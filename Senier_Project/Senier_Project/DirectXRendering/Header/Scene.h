@@ -16,6 +16,7 @@
 #include "../../Game/Header/Weapon.h"
 #include "../../Game/Header/Player.h"
 #include "../../Game/Header/Monster.h"
+#include "../../Game/Header/Item.h"
 
 #include "../../Physics/Header/Contact.h"
 #include "../../Physics/Header/Collider.h"

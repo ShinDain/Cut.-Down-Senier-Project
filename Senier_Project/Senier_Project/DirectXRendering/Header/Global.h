@@ -16,6 +16,7 @@ class ColliderBox;
 class ColliderSphere;
 class ModelDataInfo;
 class Object;
+class Player;
 
 extern std::vector<std::shared_ptr<ColliderPlane>> g_ppColliderPlanes;
 extern std::vector<std::shared_ptr<ColliderBox>> g_ppColliderBoxs;

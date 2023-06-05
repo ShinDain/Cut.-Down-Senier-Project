@@ -266,5 +266,16 @@ void CreateObjectDefaultData()
 	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
 	g_DefaultObjectData.insert({ WALL_PILLAR_3_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WALL_PILLAR_3_MODEL_NAME);
-
+	
+	tmpData.pstrTexPath = ITEM_MODEL_TEXPATH;
+	tmpData.xmf3Extents = ITEM_MODEL_EXTENTS;
+	tmpData.objectType = ITEM_MODEL_TYPE;
+	tmpData.colliderType = ITEM_MODEL_COLLIDERTYPE;
+	tmpData.nMass = ITEM_MODEL_MASS;
+	tmpData.xmf3OffsetScale = ITEM_MODEL_SCALE;
+	tmpData.renderLayer = ITEM_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	g_DefaultObjectData.insert({ ITEM_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(ITEM_MODEL_NAME);
 }

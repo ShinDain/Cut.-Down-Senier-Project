@@ -43,8 +43,6 @@ public:
 	virtual void Move(DWORD dwDirection) {}
 	virtual void Jump() {}
 	virtual void Attack() {}
-	virtual void OnHit() {}
-	virtual void OnDeath() {}
 
 	virtual void IsFalling();
 
