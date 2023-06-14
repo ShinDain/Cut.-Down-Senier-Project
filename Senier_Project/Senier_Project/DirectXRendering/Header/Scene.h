@@ -17,6 +17,7 @@
 #include "../../Game/Header/Player.h"
 #include "../../Game/Header/Monster.h"
 #include "../../Game/Header/Item.h"
+#include "../../Game/header/CuttedObject.h"
 
 #include "../../Physics/Header/Contact.h"
 #include "../../Physics/Header/Collider.h"
@@ -43,7 +44,6 @@ public:
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 	void RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList);
 
-
 	void UpdatePassCB(float totalTime, float elapsedTime);
 	void UpdateShadowPassCB(float totalTime, float elapsedTime);
 
@@ -56,6 +56,9 @@ public:
 	void LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName);
 
 	std::shared_ptr<Object> CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotation, XMFLOAT3 xmf3Scale, const char* pstrFileName, int nAnimationTracks);
+
+	std::shared_ptr<Object> CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 		XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotation, XMFLOAT3 xmf3Scale, const char* pstrFileName, int nAnimationTracks);
 
 	void GenerateContact();

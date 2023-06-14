@@ -37,6 +37,7 @@
     <ClCompile Include="DirectXRendering\Src\Scene.cpp" />
     <ClCompile Include="DirectXRendering\Src\Shader.cpp" />
     <ClCompile Include="Game\Src\Character.cpp" />
+    <ClCompile Include="Game\Src\CuttedObject.cpp" />
     <ClCompile Include="Game\Src\Item.cpp" />
     <ClCompile Include="Game\Src\Monster.cpp" />
     <ClCompile Include="Game\Src\ObjectDefaultData.cpp" />
@@ -73,6 +74,7 @@
     <ClInclude Include="DirectXRendering\Header\Shader.h" />
     <ClInclude Include="DirectXRendering\SenierProjectApp.h" />
     <ClInclude Include="Game\Header\Character.h" />
+    <ClInclude Include="Game\Header\CuttedObject.h" />
     <ClInclude Include="Game\Header\Item.h" />
     <ClInclude Include="Game\Header\Monster.h" />
     <ClInclude Include="Game\Header\ObjectDefaultData.h" />
@@ -88,6 +90,16 @@
   <ItemGroup>
     <FxCompile Include="Shader\Common.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shader\CuttedSkinnedMesh.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="Shader\CuttedStaticMesh.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="Shader\default.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

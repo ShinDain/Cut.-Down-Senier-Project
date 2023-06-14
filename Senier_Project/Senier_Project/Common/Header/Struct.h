@@ -38,6 +38,9 @@ enum ShaderType : UINT
 	Shader_Image,
 	Shader_WireFrame,
 	Shader_DepthMap,
+	Shader_CuttedStatic,
+	Shader_CuttedTextureMesh,
+	Shader_CuttedSkinned,
 	Shader_Count
 };
 
@@ -48,6 +51,9 @@ enum RenderLayer : UINT
 	Render_Skinned,
 	Render_Image,
 	Render_WireFrame,
+	Render_CuttedStatic,
+	Render_CuttedTexture,
+	Render_CuttedSkinned,
 	Render_Count
 };
 
@@ -105,10 +111,25 @@ struct MatConstant
 
 	DirectX::XMFLOAT4X4 MatTransform = MathHelper::identity4x4();
 
-	UINT DiffuseMapIndex = 0;
-	UINT NormalMapIndex = 0;
-	UINT MaterialPad1;
-	UINT MaterialPad2;
+	//UINT DiffuseMapIndex = 0;
+	//UINT NormalMapIndex = 0;
+	//UINT MaterialPad1;
+	//UINT MaterialPad2;
+};
+
+struct CuttedConstant
+{
+	UINT PlaneCnt = 0;
+	float PlaneDirection_1 = 1;
+	float PlaneDirection_2 = 1;
+	float PlaneDirection_3 = 1;
+	
+	XMFLOAT3 xmf3PlaneNormal_1 = XMFLOAT3(0, 0, 0);
+	float PlaneDistance_1 = 0;
+	XMFLOAT3 xmf3PlaneNormal_2 = XMFLOAT3(0, 0, 0);
+	float PlaneDistance_2 = 0;
+	XMFLOAT3 xmf3PlaneNormal_3 = XMFLOAT3(0, 0, 0);
+	float PlaneDistance_3 = 0;
 };
 
 struct BoneBindPoseOffsetConstant

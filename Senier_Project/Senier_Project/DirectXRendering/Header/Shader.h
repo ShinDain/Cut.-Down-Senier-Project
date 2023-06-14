@@ -86,6 +86,7 @@ public:
 	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList) 
 	{ 
 		Shader::ChangeShader(pd3dCommandList); 
+		g_curShader = m_Type;
 	}
 
 protected:
@@ -154,4 +155,67 @@ protected:
 	virtual bool BuildShadersAndInputLayout();
 	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
 	virtual bool BuildPSO(ID3D12Device* pd3dDevice);
+};
+
+// 잘린 오브젝트
+// 
+// 스태틱 메시 셰이더
+
+class CuttedStaticMeshShader : public Shader
+{
+public:
+	CuttedStaticMeshShader();
+	CuttedStaticMeshShader(const CuttedStaticMeshShader& rhs) = delete;
+	CuttedStaticMeshShader& operator=(const CuttedStaticMeshShader& rhs) = delete;
+	virtual ~CuttedStaticMeshShader();
+
+	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList)
+	{
+		Shader::ChangeShader(pd3dCommandList);
+		g_curShader = m_Type;
+	}
+protected:
+	virtual bool BuildShadersAndInputLayout();
+	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
+	virtual bool BuildPSO(ID3D12Device* pd3dDevice);
+};
+// 텍스쳐 스태틱 메시 셰이더
+
+class CuttedTextureMeshShader : public CuttedStaticMeshShader
+{
+public:
+	CuttedTextureMeshShader();
+	CuttedTextureMeshShader(const CuttedTextureMeshShader& rhs) = delete;
+	CuttedTextureMeshShader& operator=(const CuttedTextureMeshShader& rhs) = delete;
+	virtual ~CuttedTextureMeshShader();
+
+	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList)
+	{
+		Shader::ChangeShader(pd3dCommandList);
+		g_curShader = m_Type;
+	}
+protected:
+	virtual bool BuildShadersAndInputLayout();
+	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
+};
+
+// 스키닝 메시 셰이더
+
+class CuttedSkinnedMeshShader : public CuttedStaticMeshShader
+{
+public:
+	CuttedSkinnedMeshShader();
+	CuttedSkinnedMeshShader(const CuttedSkinnedMeshShader& rhs) = delete;
+	CuttedSkinnedMeshShader& operator=(const CuttedSkinnedMeshShader& rhs) = delete;
+	virtual ~CuttedSkinnedMeshShader();
+
+	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList)
+	{
+		Shader::ChangeShader(pd3dCommandList);
+		g_curShader = m_Type;
+	}
+
+protected:
+	virtual bool BuildShadersAndInputLayout();
+	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
 };

@@ -190,6 +190,7 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 		//XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotation.x), XMConvertToRadians(m_xmf3Rotation.y), XMConvertToRadians(m_xmf3Rotation.z));
 		XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
 		// S * R * T
+		//xmmatRotate = XMMatrixMultiply(xmmatRotate, xmmatOrientation);
 		world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate));
 		//world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate));
 

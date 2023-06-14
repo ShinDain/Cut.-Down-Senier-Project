@@ -80,8 +80,7 @@ bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 
 void Material::MaterialSet(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-
-	if (m_pShader && g_curShader != m_nShaderType && g_curShader != ShaderType::Shader_DepthMap) 
+	if (m_pShader && g_curShader != m_nShaderType && g_curShader < ShaderType::Shader_DepthMap)
 		m_pShader->ChangeShader(pd3dCommandList);
 
 	if(m_pMatCB) pd3dCommandList->SetGraphicsRootConstantBufferView(2, m_pMatCB->Resource()->GetGPUVirtualAddress());

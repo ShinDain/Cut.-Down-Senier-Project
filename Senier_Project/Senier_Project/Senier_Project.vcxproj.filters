@@ -131,6 +131,9 @@
     <ClCompile Include="Game\Src\Item.cpp">
       <Filter>Game\Src</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Src\CuttedObject.cpp">
+      <Filter>Game\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Physics\Header\Collider.h">
@@ -232,6 +235,9 @@
     <ClInclude Include="Game\Header\Item.h">
       <Filter>Game\Header</Filter>
     </ClInclude>
+    <ClInclude Include="Game\Header\CuttedObject.h">
+      <Filter>Game\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\default.hlsl">
@@ -253,6 +259,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shader\Common.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\CuttedSkinnedMesh.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\CuttedStaticMesh.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

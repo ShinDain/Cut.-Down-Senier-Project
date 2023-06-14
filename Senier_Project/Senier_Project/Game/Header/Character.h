@@ -57,7 +57,7 @@ protected:
 	float m_CharacterFriction = 350.0f;
 	float m_JumpSpeed = 100.0f;
 
-	Ray m_floorCheckRay;
+	//Ray m_floorCheckRay;
 
 	float m_TurnSpeed = 1;
 

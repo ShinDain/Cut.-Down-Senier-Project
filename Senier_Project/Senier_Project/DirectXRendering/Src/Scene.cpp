@@ -26,7 +26,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	BuildDescriptorHeap(pd3dDevice);
 
 	// 캐릭터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,15,0), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), CHARACTER_MODEL_NAME, PLAYER_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,15, -20), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), CHARACTER_MODEL_NAME, PLAYER_TRACK_CNT);
 
 	// 무기
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-0.59f, 0.135f, 0.063f), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90), XMFLOAT3(1, 1, 1), WEAPON_MODEL_NAME, 0);
@@ -39,6 +39,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
+	CreateCuttedObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 
 	// 몬스터 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
@@ -58,7 +60,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
-	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
+	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 
 	std::shared_ptr<ImgObject> imgobj = std::make_shared<ImgObject>();
 	imgobj->Initialize(pd3dDevice, pd3dCommandList, 1900, 1024, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 500, 500);
@@ -315,6 +317,7 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		m_pPlayer->Render(elapsedTime, pd3dCommandList);
 	}
 
+	g_Shaders[ShaderType::Shader_Static]->ChangeShader(pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
 	{
 		if (!m_vObjectLayer[RenderLayer::Render_Static][i]->GetIsAlive())
@@ -332,6 +335,36 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 
 		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->UpdateTransform(NULL);
 		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(elapsedTime, pd3dCommandList);
+	}
+
+	g_Shaders[ShaderType::Shader_CuttedStatic]->ChangeShader(pd3dCommandList);
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedStatic].size(); ++i)
+	{
+		if (!m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->GetIsAlive())
+			continue;
+
+		m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->UpdateTransform(NULL);
+		m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->Render(elapsedTime, pd3dCommandList);
+	}
+
+	g_Shaders[ShaderType::Shader_CuttedTextureMesh]->ChangeShader(pd3dCommandList);
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedTexture].size(); ++i)
+	{
+		if (!m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->GetIsAlive())
+			continue;
+
+		m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->UpdateTransform(NULL);
+		m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->Render(elapsedTime, pd3dCommandList);
+	}
+
+	g_Shaders[ShaderType::Shader_CuttedSkinned]->ChangeShader(pd3dCommandList);
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedSkinned].size(); ++i)
+	{
+		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->GetIsAlive())
+			continue;
+
+		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->UpdateTransform(NULL);
+		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Render(elapsedTime, pd3dCommandList);
 	}
 
 	// img 오브젝트
@@ -660,6 +693,79 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	return pObject;
 }
 
+std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotation, XMFLOAT3 xmf3Scale, const char* pstrFileName, int nAnimationTracks)
+{
+	ObjectInitData objectData;
+	if (pstrFileName == nullptr)
+		return nullptr;
+
+	objectData.xmf3Position = xmf3Position;
+	objectData.xmf3Rotation = xmf3Rotation;
+	objectData.xmf4Orientation = xmf4Orientation;
+	objectData.xmf3Scale = g_DefaultObjectData[pstrFileName].xmf3OffsetScale;
+	objectData.xmf3Scale.x *= xmf3Scale.x;
+	objectData.xmf3Scale.y *= xmf3Scale.y;
+	objectData.xmf3Scale.z *= xmf3Scale.z;
+	objectData.nMass = g_DefaultObjectData[pstrFileName].nMass;
+	objectData.objectType = g_DefaultObjectData[pstrFileName].objectType;
+	objectData.colliderType = g_DefaultObjectData[pstrFileName].colliderType;
+	objectData.xmf3Extents = g_DefaultObjectData[pstrFileName].xmf3Extents;
+	objectData.xmf3MeshOffsetPosition = g_DefaultObjectData[pstrFileName].xmf3MeshOffsetPosition;
+	objectData.xmf3MeshOffsetRotation = g_DefaultObjectData[pstrFileName].xmf3MeshOffsetRotation;
+
+	std::shared_ptr<ModelDataInfo> pModelData;
+	std::shared_ptr<Object> pObject;
+
+	if (g_LoadedModelData.find(pstrFileName) == g_LoadedModelData.end())
+	{
+		// 모델 로드
+		pModelData = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, pstrFileName, g_DefaultObjectData[pstrFileName].pstrTexPath);
+
+		g_LoadedModelData.insert({ pstrFileName, pModelData });
+	}
+	else
+		pModelData = g_LoadedModelData[pstrFileName];
+
+	switch (objectData.objectType)
+	{
+	case Object_Player:
+	{
+		std::shared_ptr<Object> pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+
+		g_vpCuttedSkinnedObjs.emplace_back(pObject);
+		m_vObjectLayer[RenderLayer::Render_CuttedSkinned].emplace_back(pObject);
+	}
+	break;
+
+	case Object_Monster:
+	{
+		std::shared_ptr<Monster> pMonster = std::make_shared<Monster>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+		pObject = std::static_pointer_cast<Object>(pMonster);
+
+		g_vpAllObjs.emplace_back(pObject);
+		g_vpCuttedSkinnedObjs.emplace_back(pObject);
+		m_vObjectLayer[RenderLayer::Render_CuttedSkinned].emplace_back(pObject);
+	}
+	break;
+
+	case Object_Movable:
+	{
+		std::shared_ptr<CuttedStaticObject> pCuttedObject = std::make_shared<CuttedStaticObject>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+		pObject = std::static_pointer_cast<Object>(pCuttedObject);
+
+		g_vpAllObjs.emplace_back(pObject);
+		g_vpCuttedStaticObjs.emplace_back(pObject);
+		if(g_DefaultObjectData[pstrFileName].renderLayer == RenderLayer::Render_TextureMesh)
+			m_vObjectLayer[RenderLayer::Render_CuttedTexture].emplace_back(pObject);
+		else if (g_DefaultObjectData[pstrFileName].renderLayer == RenderLayer::Render_Static)
+			m_vObjectLayer[RenderLayer::Render_CuttedStatic].emplace_back(pObject);
+	}
+	break;
+	}
+
+	return pObject;
+}
+
 void Scene::GenerateContact()
 {
 	unsigned int nContactCnt = MAX_CONTACT_CNT * 8;
@@ -727,6 +833,21 @@ void Scene::GenerateContact()
 			CollisionDetector::BoxAndBox(*colliderBox, *g_ppColliderBoxs[i], m_CollisionData, nullptr);
 		}
 	}
+
+	// 잘린 물체 검사
+	// 평면과의 검사
+	for (int i = 0; i < g_ppColliderPlanes.size(); ++i)
+	{
+		for (int k = 0; k < g_vpCuttedStaticObjs.size(); ++k)
+		{
+			std::shared_ptr<ColliderBox> colliderBox = std::static_pointer_cast<ColliderBox>(g_vpCuttedStaticObjs[k]->GetCollider());
+			if (!colliderBox) continue;
+
+			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+			CollisionDetector::BoxAndHalfSpace(*colliderBox, *g_ppColliderPlanes[i], m_CollisionData);
+		}
+	}
+
 }
 
 void Scene::ProcessPhysics(float elapsedTime)

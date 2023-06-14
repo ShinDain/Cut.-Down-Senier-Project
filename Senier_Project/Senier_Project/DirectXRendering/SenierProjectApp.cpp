@@ -27,6 +27,9 @@ bool SenierProjectApp::Initialize()
 	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_Image, std::make_shared<ImageObjectShader>()));
 	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_WireFrame, std::make_shared<WireFrameShader>()));
 	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_DepthMap, std::make_shared<DepthMapShader>()));
+	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_CuttedStatic, std::make_shared<CuttedStaticMeshShader>()));
+	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_CuttedTextureMesh, std::make_shared<CuttedTextureMeshShader>()));
+	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_CuttedSkinned, std::make_shared<CuttedSkinnedMeshShader>()));
 
 	for (auto iter = g_Shaders.begin(); iter != g_Shaders.end(); ++iter)
 	{

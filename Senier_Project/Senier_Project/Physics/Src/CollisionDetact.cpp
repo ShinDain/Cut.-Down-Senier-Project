@@ -344,7 +344,6 @@ int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box
 		return 0;
 
 	XMVECTOR toCentre = box2.GetAxis(3) - box1.GetAxis(3);
-
 	if (XMVectorGetX(XMVectorIsNaN(toCentre)))
 		return 0;
 

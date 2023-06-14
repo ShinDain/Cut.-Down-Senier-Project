@@ -72,6 +72,7 @@ protected:
 	std::shared_ptr<Object> m_pSibling = NULL;
 
 	std::unique_ptr<UploadBuffer<ObjConstant>> m_pObjectCB = nullptr;
+	UINT m_ObjCBByteSize = 0;
 
 	std::shared_ptr<Mesh> m_pMesh = nullptr;
 	int m_nMaterial = 0;
@@ -91,7 +92,7 @@ public:
 
 protected:
 	// 좌표 관련
-	UINT m_ObjCBByteSize = 0;
+
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 	XMFLOAT4X4 m_xmf4x4ParentWorld = MathHelper::identity4x4();
 	XMFLOAT4X4 m_xmf4x4LocalTransform = MathHelper::identity4x4();	// 부모로부터 상대 좌표
