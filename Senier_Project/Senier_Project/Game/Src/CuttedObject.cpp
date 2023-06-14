@@ -5,9 +5,18 @@ CuttedStaticObject::CuttedStaticObject()
 {
 }
 
-CuttedStaticObject::CuttedStaticObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+CuttedStaticObject::CuttedStaticObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, UINT nPlaneCnt, float direction[], XMFLOAT3 planeNormal[], void* pContext)
 {
-	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, 0, pContext);
+
+	for (int i = 0; i < nPlaneCnt; ++i)
+	{
+		m_PlaneDirection[i] = direction[i];
+		m_PlaneNormal[i] = planeNormal[i];
+	}
+
+	m_nPlaneCnt = nPlaneCnt;
 }
 
 CuttedStaticObject::~CuttedStaticObject()
@@ -15,7 +24,8 @@ CuttedStaticObject::~CuttedStaticObject()
 	Object::Destroy();
 }
 
-bool CuttedStaticObject::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+bool CuttedStaticObject::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
 	Object::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 
@@ -36,7 +46,7 @@ void CuttedStaticObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 
 void CuttedStaticObject::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	pd3dCommandList->SetGraphicsRootConstantBufferView(5, m_pCuttedCB->Resource()->GetGPUVirtualAddress());
+	pd3dCommandList->SetGraphicsRootConstantBufferView(m_CuttedCBIdx, m_pCuttedCB->Resource()->GetGPUVirtualAddress());
 
 	Object::Render(elapsedTime, pd3dCommandList);
 }

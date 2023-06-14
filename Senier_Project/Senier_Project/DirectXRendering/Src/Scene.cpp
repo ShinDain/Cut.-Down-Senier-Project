@@ -39,8 +39,16 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
-	CreateCuttedObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	// 절단된 오브젝트 테스트
+	//std::shared_ptr<Object> tmp = CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	//CreateCuttedObject(pd3dDevice, pd3dCommandList, tmp.get(), 1, XMFLOAT3(1, 1, 0), false);
+	//std::shared_ptr<Object> tmp2 = CreateCuttedObject(pd3dDevice, pd3dCommandList, tmp.get(), -1, XMFLOAT3(1, 1, 0), false);
+	//std::shared_ptr<Object> tmp3 = CreateCuttedObject(pd3dDevice, pd3dCommandList, tmp2.get(), 1, XMFLOAT3(1, 0, 0), true);
+
+	std::shared_ptr<Object> tmp = CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
+	CreateCuttedObject(pd3dDevice, pd3dCommandList, tmp.get(), 1, XMFLOAT3(1, 1, 0), false);
+	std::shared_ptr<Object> tmp2 = CreateCuttedObject(pd3dDevice, pd3dCommandList, tmp.get(), -1, XMFLOAT3(1, 1, 0), false);
+	std::shared_ptr<Object> tmp3 = CreateCuttedObject(pd3dDevice, pd3dCommandList, tmp2.get(), 1, XMFLOAT3(1, 0, 0), true);
 
 	// 몬스터 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
@@ -322,7 +330,7 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 	{
 		if (!m_vObjectLayer[RenderLayer::Render_Static][i]->GetIsAlive())
 			continue;
-
+	
 		m_vObjectLayer[RenderLayer::Render_Static][i]->UpdateTransform(NULL);
 		m_vObjectLayer[RenderLayer::Render_Static][i]->Render(elapsedTime, pd3dCommandList);
 	}
@@ -539,8 +547,8 @@ void Scene::LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 			for (int i = 0; i < g_DefaultObjectNames.size(); ++i)
 			{
-				if (!strcmp(pstrObjectName, g_DefaultObjectNames[i]))
-					pstrObjectName = g_DefaultObjectNames[i];
+				if (pstrObjectName == g_DefaultObjectNames[i])
+					pstrObjectName = g_DefaultObjectNames[i].c_str();
 			}
 		}
 		else if (!strcmp(pstrToken, "<Transform>:"))
@@ -603,28 +611,36 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	
 	std::shared_ptr<ModelDataInfo> pModelData;
 	std::shared_ptr<Object> pObject;
+	std::string strFileName;
 
-	if (g_LoadedModelData.find(pstrFileName) == g_LoadedModelData.end() && pstrFileName != nullptr)
+	if (pstrFileName != nullptr)
 	{
-		// 모델 로드
-		pModelData = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, pstrFileName, g_DefaultObjectData[pstrFileName].pstrTexPath);
+		strFileName = pstrFileName;
 
-		g_LoadedModelData.insert({ pstrFileName, pModelData });
+		if (g_LoadedModelData.find(pstrFileName) == g_LoadedModelData.end())
+		{
+			// 모델 로드
+			pModelData = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, pstrFileName, g_DefaultObjectData[pstrFileName].pstrTexPath);
+
+			g_LoadedModelData.insert({ pstrFileName, pModelData });
+		}
+		else	// 이미 로드한 모델인 경우
+		{
+			pModelData = g_LoadedModelData[pstrFileName];
+		}
 	}
 	else if (pstrFileName == nullptr)
 	{
 		pModelData = nullptr;
+		strFileName = "";
 	}
-	else	// 이미 로드한 모델인 경우
-	{
-		pModelData = g_LoadedModelData[pstrFileName];
-	}
-
+	
 	switch (objectData.objectType)
 	{
 	case Object_Player:
 	{
 		std::shared_ptr<Player> pPlayer = std::make_shared<Player>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+		strcpy_s(pPlayer->m_pstrFileName, strFileName.c_str());
 		m_pPlayer = pPlayer;
 
 		g_vpCharacters.emplace_back(pPlayer);
@@ -640,7 +656,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		g_vpAllObjs.emplace_back(pObject);
 		g_vpMovableObjs.emplace_back(pObject);
 		g_vpCharacters.emplace_back(pObject);
-		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
+		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
 	}
 		break;
 
@@ -653,7 +669,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		m_pPlayer->SetWeapon(pWeapon);
 
 		g_vpAllObjs.emplace_back(pObject);
-		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
+		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
 	}
 	break;	
 
@@ -664,7 +680,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		g_vpAllObjs.emplace_back(pObject);
 		g_vpMovableObjs.emplace_back(pObject);
 		g_vpWorldObjs.emplace_back(pObject);
-		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
+		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
 	}
 	break;
 
@@ -675,7 +691,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 
 		g_vpAllObjs.emplace_back(pObject);
 		g_vpWorldObjs.emplace_back(pObject);
-		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
+		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
 	}
 	break;
 
@@ -685,27 +701,60 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 
 		g_vpAllObjs.emplace_back(pObject);
 		g_vpWorldObjs.emplace_back(pObject);
-		m_vObjectLayer[g_DefaultObjectData[pstrFileName].renderLayer].emplace_back(pObject);
+		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
 	}
 		break;
 	}
 
+	if (pObject && strFileName.c_str() != nullptr) strcpy_s(pObject->m_pstrFileName, strFileName.c_str());
+
 	return pObject;
 }
 
-std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotation, XMFLOAT3 xmf3Scale, const char* pstrFileName, int nAnimationTracks)
+std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	Object* pObject, float direction, XMFLOAT3 xmf3PlaneNormal, bool bIsCutted)
 {
-	ObjectInitData objectData;
-	if (pstrFileName == nullptr)
-		return nullptr;
+	float directions[3] = {0,0,0};
+	XMFLOAT3 xmf3PlaneNormals[3] = { XMFLOAT3(0,0,0), XMFLOAT3(0,0,0), XMFLOAT3(0,0,0) };
+	UINT planeCnt = 0;
 
-	objectData.xmf3Position = xmf3Position;
-	objectData.xmf3Rotation = xmf3Rotation;
-	objectData.xmf4Orientation = xmf4Orientation;
-	objectData.xmf3Scale = g_DefaultObjectData[pstrFileName].xmf3OffsetScale;
-	objectData.xmf3Scale.x *= xmf3Scale.x;
-	objectData.xmf3Scale.y *= xmf3Scale.y;
-	objectData.xmf3Scale.z *= xmf3Scale.z;
+	if (bIsCutted)
+	{
+		CuttedStaticObject* pCuttedObj = (CuttedStaticObject*)(pObject);
+
+		UINT lastPlaneCnt = pCuttedObj->GetPlaneCnt();
+		if (lastPlaneCnt >= 3)
+			return nullptr;
+		for (int i = 0; i < lastPlaneCnt; ++i)
+		{
+			directions[i] = pCuttedObj->GetPlaneDirection(i);
+			xmf3PlaneNormals[i] = pCuttedObj->GetPlaneNormal(i);
+		}
+		directions[lastPlaneCnt] = direction * -1;
+		xmf3PlaneNormals[lastPlaneCnt] = xmf3PlaneNormal;
+		planeCnt = lastPlaneCnt + 1;
+		pCuttedObj->AddPlane(direction, xmf3PlaneNormal);
+	}
+	else
+	{
+		directions[0] = direction;
+		xmf3PlaneNormals[0] = xmf3PlaneNormal;
+		planeCnt += 1;
+	}
+
+	std::string pstrFileName;
+	pstrFileName = pObject->m_pstrFileName;
+
+	ObjectInitData objectData;
+
+	objectData.xmf3Position = pObject->GetPosition();
+	objectData.xmf3Position.x -= 20;
+	//if (bIsCutted)
+	//	objectData.xmf3Position.x += 20;
+
+	objectData.xmf3Rotation = pObject->GetRotation();
+	objectData.xmf4Orientation = pObject->GetOrientation();
+	objectData.xmf3Scale = pObject->GetScale();
 	objectData.nMass = g_DefaultObjectData[pstrFileName].nMass;
 	objectData.objectType = g_DefaultObjectData[pstrFileName].objectType;
 	objectData.colliderType = g_DefaultObjectData[pstrFileName].colliderType;
@@ -714,56 +763,86 @@ std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D
 	objectData.xmf3MeshOffsetRotation = g_DefaultObjectData[pstrFileName].xmf3MeshOffsetRotation;
 
 	std::shared_ptr<ModelDataInfo> pModelData;
-	std::shared_ptr<Object> pObject;
+	std::shared_ptr<Object> tmpObject;
 
-	if (g_LoadedModelData.find(pstrFileName) == g_LoadedModelData.end())
-	{
-		// 모델 로드
-		pModelData = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, pstrFileName, g_DefaultObjectData[pstrFileName].pstrTexPath);
-
-		g_LoadedModelData.insert({ pstrFileName, pModelData });
-	}
-	else
-		pModelData = g_LoadedModelData[pstrFileName];
+	//if (g_LoadedModelData.find(pstrFileName) == g_LoadedModelData.end())
+	//	return nullptr;
+	//else
+	pModelData = g_LoadedModelData[pstrFileName];
 
 	switch (objectData.objectType)
 	{
-	case Object_Player:
+	/*case Object_Player:
 	{
-		std::shared_ptr<Object> pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+		std::shared_ptr<Object> tmpObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 
-		g_vpCuttedSkinnedObjs.emplace_back(pObject);
-		m_vObjectLayer[RenderLayer::Render_CuttedSkinned].emplace_back(pObject);
+		g_vpCuttedSkinnedObjs.emplace_back(tmpObject);
+		m_vObjectLayer[RenderLayer::Render_CuttedSkinned].emplace_back(tmpObject);
 	}
 	break;
 
 	case Object_Monster:
 	{
 		std::shared_ptr<Monster> pMonster = std::make_shared<Monster>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
-		pObject = std::static_pointer_cast<Object>(pMonster);
+		tmpObject = std::static_pointer_cast<Object>(pMonster);
 
-		g_vpAllObjs.emplace_back(pObject);
-		g_vpCuttedSkinnedObjs.emplace_back(pObject);
-		m_vObjectLayer[RenderLayer::Render_CuttedSkinned].emplace_back(pObject);
+		g_vpAllObjs.emplace_back(tmpObject);
+		g_vpCuttedSkinnedObjs.emplace_back(tmpObject);
+		m_vObjectLayer[RenderLayer::Render_CuttedSkinned].emplace_back(tmpObject);
 	}
-	break;
+	break;*/
 
 	case Object_Movable:
 	{
-		std::shared_ptr<CuttedStaticObject> pCuttedObject = std::make_shared<CuttedStaticObject>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
-		pObject = std::static_pointer_cast<Object>(pCuttedObject);
+		std::shared_ptr<CuttedStaticObject> pCuttedObject = std::make_shared<CuttedStaticObject>(pd3dDevice, pd3dCommandList,
+			objectData, pModelData, planeCnt, directions, xmf3PlaneNormals, nullptr);
+		tmpObject = std::static_pointer_cast<Object>(pCuttedObject);
 
-		g_vpAllObjs.emplace_back(pObject);
-		g_vpCuttedStaticObjs.emplace_back(pObject);
-		if(g_DefaultObjectData[pstrFileName].renderLayer == RenderLayer::Render_TextureMesh)
-			m_vObjectLayer[RenderLayer::Render_CuttedTexture].emplace_back(pObject);
+		strcpy_s(pCuttedObject->m_pstrFileName, pstrFileName.c_str());
+		
+
+		g_vpAllObjs.emplace_back(tmpObject);
+		g_vpCuttedStaticObjs.emplace_back(tmpObject);
+		if (g_DefaultObjectData[pstrFileName].renderLayer == RenderLayer::Render_TextureMesh)
+		{
+			m_vObjectLayer[RenderLayer::Render_CuttedTexture].emplace_back(tmpObject);
+			pCuttedObject->SetCuttedCBIdx(CUTTED_CB_TEXTURE_IDX);
+		}
 		else if (g_DefaultObjectData[pstrFileName].renderLayer == RenderLayer::Render_Static)
-			m_vObjectLayer[RenderLayer::Render_CuttedStatic].emplace_back(pObject);
+		{
+			m_vObjectLayer[RenderLayer::Render_CuttedStatic].emplace_back(tmpObject);
+			pCuttedObject->SetCuttedCBIdx(CUTTED_CB_STATIC_IDX);
+		}
 	}
 	break;
+
+	default:
+	{
+		std::shared_ptr<CuttedStaticObject> pCuttedObject = std::make_shared<CuttedStaticObject>(pd3dDevice, pd3dCommandList,
+			objectData, pModelData, planeCnt, directions, xmf3PlaneNormals, nullptr);
+		tmpObject = std::static_pointer_cast<Object>(pCuttedObject);
+
+		strcpy_s(pCuttedObject->m_pstrFileName, pstrFileName.c_str());
+
+		g_vpAllObjs.emplace_back(tmpObject);
+		g_vpCuttedStaticObjs.emplace_back(tmpObject);
+		if (g_DefaultObjectData[pstrFileName].renderLayer == RenderLayer::Render_TextureMesh)
+		{
+			m_vObjectLayer[RenderLayer::Render_CuttedTexture].emplace_back(tmpObject);
+			pCuttedObject->SetCuttedCBIdx(CUTTED_CB_TEXTURE_IDX);
+		}
+		else if (g_DefaultObjectData[pstrFileName].renderLayer == RenderLayer::Render_Static)
+		{
+			m_vObjectLayer[RenderLayer::Render_CuttedStatic].emplace_back(tmpObject);
+			pCuttedObject->SetCuttedCBIdx(CUTTED_CB_STATIC_IDX);
+		}
+	}
+	break;
+
+
 	}
 
-	return pObject;
+	return tmpObject;
 }
 
 void Scene::GenerateContact()
@@ -910,6 +989,22 @@ void Scene::ClearObjectLayer()
 		{
 			g_vpWorldObjs[i]->DestroyRunTime();
 			g_vpWorldObjs.erase(g_vpWorldObjs.begin() + i);
+		}
+	}
+	for (int i = 0; i < g_vpCuttedStaticObjs.size(); ++i)
+	{
+		if (!g_vpCuttedStaticObjs[i]->GetIsAlive())
+		{
+			g_vpCuttedStaticObjs[i]->DestroyRunTime();
+			g_vpCuttedStaticObjs.erase(g_vpCuttedStaticObjs.begin() + i);
+		}
+	}
+	for (int i = 0; i < g_vpCuttedSkinnedObjs.size(); ++i)
+	{
+		if (!g_vpCuttedSkinnedObjs[i]->GetIsAlive())
+		{
+			g_vpCuttedSkinnedObjs[i]->DestroyRunTime();
+			g_vpCuttedSkinnedObjs.erase(g_vpCuttedSkinnedObjs.begin() + i);
 		}
 	}
 

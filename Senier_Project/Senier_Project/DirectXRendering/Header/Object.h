@@ -66,6 +66,7 @@ protected:
 	virtual void BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice);
 
 protected:
+	
 	char m_FrameName[64];
 
 	std::shared_ptr<Object> m_pChild = NULL;
@@ -79,8 +80,8 @@ protected:
 	std::vector<std::shared_ptr<Material>> m_vpMaterials;
 
 public:
+	char m_pstrFileName[64];
 	std::unique_ptr<AnimationController> m_pAnimationController = nullptr;
-
 public:
 	void SetChild(std::shared_ptr<Object> pChild);
 	void SetMesh(std::shared_ptr<Mesh> pMesh);

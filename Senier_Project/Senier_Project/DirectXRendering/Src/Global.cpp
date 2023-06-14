@@ -16,12 +16,12 @@ std::vector<std::shared_ptr<Object>> g_vpWorldObjs;
 std::vector<std::shared_ptr<Object>> g_vpCuttedStaticObjs;
 std::vector<std::shared_ptr<Object>> g_vpCuttedSkinnedObjs;
 
-std::map<const char*, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;
+std::map<std::string, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;
 
 UINT g_curShader = ShaderType::Shader_Count;
 
-std::map<const char*, ObjectDefaultData> g_DefaultObjectData;
-std::vector<const char*> g_DefaultObjectNames;
+std::map<std::string, ObjectDefaultData> g_DefaultObjectData;
+std::vector<std::string> g_DefaultObjectNames;
 
 void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName)
 {

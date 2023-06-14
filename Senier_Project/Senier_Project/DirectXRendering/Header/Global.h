@@ -3,6 +3,7 @@
 #define GLOBAL_H
 
 #include <tchar.h>
+#include <string>
 #include "../../Common/Header/MathHelper.h"
 #include "../../Common/Header/D3DUtil.h"
 #include "../../Common/Header/UploadBuffer.h"
@@ -31,15 +32,15 @@ extern std::vector<std::shared_ptr<Object>> g_vpWorldObjs;
 extern std::vector<std::shared_ptr<Object>> g_vpCuttedStaticObjs;
 extern std::vector<std::shared_ptr<Object>> g_vpCuttedSkinnedObjs;
 
-extern std::map<const char*, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;
+extern std::map<std::string, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;
 
 extern std::vector<std::shared_ptr<Texture>> g_CachingTexture;
 extern std::map<ShaderType, std::shared_ptr<Shader>> g_Shaders;
 
 extern UINT g_curShader;
 
-extern std::map<const char*, ObjectDefaultData> g_DefaultObjectData;
-extern std::vector<const char*> g_DefaultObjectNames;
+extern std::map<std::string, ObjectDefaultData> g_DefaultObjectData;
+extern std::vector<std::string> g_DefaultObjectNames;
 
 void LoadTexture(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const wchar_t* texFileName);
 std::shared_ptr<Texture> FindReplicatedTexture(const wchar_t* pstrTextureName);
