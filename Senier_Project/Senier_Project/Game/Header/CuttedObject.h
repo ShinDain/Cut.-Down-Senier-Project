@@ -11,17 +11,22 @@
 
 #define CUTTED_CB_STATIC_IDX 4
 #define CUTTED_CB_TEXTURE_IDX 5
+#define CUTTED_CB_SKINNED_IDX 7
 
-class CuttedStaticObject : public Object
+class CuttedObject : public Object
 {
 public:
-	CuttedStaticObject();
-	CuttedStaticObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
-		ObjectInitData objData,	std::shared_ptr<ModelDataInfo> pModel, UINT nPlaneCnt, float direction[], XMFLOAT3 planeNormal[], void* pContext);
+	CuttedObject();
+	CuttedObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,	std::shared_ptr<ModelDataInfo> pModel, UINT nPlaneCnt,
+		float direction[], XMFLOAT3 planeNormal[], void* pContext);
+	CuttedObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, UINT nPlaneCnt,
+		float direction[], XMFLOAT3 planeNormal[], UINT nAnimationSet, float trackPosition, void* pContext);
 
-	CuttedStaticObject(const CuttedStaticObject& rhs) = delete;
-	CuttedStaticObject& operator=(const CuttedStaticObject& rhs) = delete;
-	virtual ~CuttedStaticObject();
+	CuttedObject(const CuttedObject& rhs) = delete;
+	CuttedObject& operator=(const CuttedObject& rhs) = delete;
+	virtual ~CuttedObject();
 
 	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 		ObjectInitData objData,

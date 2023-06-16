@@ -13,8 +13,7 @@ std::vector<std::shared_ptr<Object>> g_vpMovableObjs;
 std::vector<std::shared_ptr<Object>> g_vpCharacters;
 std::vector<std::shared_ptr<Object>> g_vpWorldObjs;
 
-std::vector<std::shared_ptr<Object>> g_vpCuttedStaticObjs;
-std::vector<std::shared_ptr<Object>> g_vpCuttedSkinnedObjs;
+std::vector<std::shared_ptr<Object>> g_vpCuttedObjects;
 
 std::map<std::string, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;
 

@@ -29,8 +29,7 @@ extern std::vector<std::shared_ptr<Object>> g_vpMovableObjs;
 extern std::vector<std::shared_ptr<Object>> g_vpCharacters;
 extern std::vector<std::shared_ptr<Object>> g_vpWorldObjs;
 
-extern std::vector<std::shared_ptr<Object>> g_vpCuttedStaticObjs;
-extern std::vector<std::shared_ptr<Object>> g_vpCuttedSkinnedObjs;
+extern std::vector<std::shared_ptr<Object>> g_vpCuttedObjects;
 
 extern std::map<std::string, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;
 

@@ -115,9 +115,12 @@ public:
 	void SetCallbackKey(int nKeyIndex, float KeyTime, void* pData);
 	void SetAnimationCallbackHandler(std::shared_ptr<AnimationCallbackHandler> pCallbackHandler);
 
+
 	bool GetAnimationOver() { return m_bAnimationOver; }
 	float GetAnimationRate() { return m_AnimationRate; }
 
+	float GetPosition() { return m_Position; }
+	int GetAnimaitionSet() { return m_nAnimationSet; }
 };
 
 class ModelDataInfo
@@ -218,15 +221,22 @@ public:
 		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->SetAnimationCallbackHandler(pCallbackHandler);
 	}
 
-	bool GetTrackEnable(int nAnimationTrack)
-	{
-		if (nAnimationTrack < m_vpAnimationTracks.size()) return m_vpAnimationTracks[nAnimationTrack]->m_bEnable;
-	}
 
 	void SetTrackOver(int nAnimationTrack, bool bAnimationOver)
 	{
 		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->m_bAnimationOver = bAnimationOver;
 	}
+	void SetTrackRate(int nAnimationTrack, float animationRate)
+	{
+		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->m_AnimationRate = animationRate;
+	}
+
+
+	bool GetTrackEnable(int nAnimationTrack)
+	{
+		if (nAnimationTrack < m_vpAnimationTracks.size()) return m_vpAnimationTracks[nAnimationTrack]->m_bEnable;
+	}
+
 	bool GetTrackOver(int nAnimationTrack)
 	{
 		if (nAnimationTrack < m_vpAnimationTracks.size()) return m_vpAnimationTracks[nAnimationTrack]->GetAnimationOver();
@@ -236,9 +246,14 @@ public:
 	{
 		if (nAnimationTrack < m_vpAnimationTracks.size()) return m_vpAnimationTracks[nAnimationTrack]->GetAnimationRate();
 	}
-	void SetTrackRate(int nAnimationTrack, float animationRate)
+
+	int GetTrackAnimationSet(int nAnimationTrack)
 	{
-		if (nAnimationTrack <= m_vpAnimationTracks.size()) m_vpAnimationTracks[nAnimationTrack]->m_AnimationRate = animationRate;
+		if (nAnimationTrack < m_vpAnimationTracks.size()) return m_vpAnimationTracks[nAnimationTrack]->GetAnimaitionSet();
+	}
+	float GetTrackPosition(int nAnimationTrack)
+	{
+		if (nAnimationTrack < m_vpAnimationTracks.size()) return m_vpAnimationTracks[nAnimationTrack]->GetPosition();
 	}
 };
 

@@ -1,11 +1,11 @@
 #include "../Header/CuttedObject.h"
 
 
-CuttedStaticObject::CuttedStaticObject()
+CuttedObject::CuttedObject()
 {
 }
 
-CuttedStaticObject::CuttedStaticObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+CuttedObject::CuttedObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 	ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, UINT nPlaneCnt, float direction[], XMFLOAT3 planeNormal[], void* pContext)
 {
 	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, 0, pContext);
@@ -19,39 +19,69 @@ CuttedStaticObject::CuttedStaticObject(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	m_nPlaneCnt = nPlaneCnt;
 }
 
-CuttedStaticObject::~CuttedStaticObject()
+CuttedObject::CuttedObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, UINT nPlaneCnt, float direction[], XMFLOAT3 planeNormal[],
+	UINT nAnimationSet, float trackPosition, void* pContext)
+{
+	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, 0, pContext);
+
+	for (int i = 0; i < nPlaneCnt; ++i)
+	{
+		m_PlaneDirection[i] = direction[i];
+		m_PlaneNormal[i] = planeNormal[i];
+	}
+
+	m_nPlaneCnt = nPlaneCnt;
+
+	m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, 1, pModel);
+	m_pAnimationController->SetTrackAnimationSet(0, nAnimationSet);
+	m_pAnimationController->SetTrackPosition(0, trackPosition);
+}
+
+CuttedObject::~CuttedObject()
 {
 	Object::Destroy();
 }
 
-bool CuttedStaticObject::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+bool CuttedObject::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 	ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
 	Object::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 
+	// 생성 후 삭제까지
+	m_DestroyTime = 3.0f;
+
 	return true;
 }
 
-void CuttedStaticObject::Update(float elapsedTime)
+void CuttedObject::Update(float elapsedTime)
 {
 	Object::Update(elapsedTime);
 
 	UpdateCuttedCB();
+
+	// 경과 후 삭제
+	m_ElapsedDestroyTime += elapsedTime;
+	if (m_ElapsedDestroyTime >= m_DestroyTime)
+	{
+		m_bIsAlive = false;
+	}
+
 }
 
-void CuttedStaticObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
+void CuttedObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 {
 	Object::UpdateTransform(NULL);
 }
 
-void CuttedStaticObject::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
+void CuttedObject::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	pd3dCommandList->SetGraphicsRootConstantBufferView(m_CuttedCBIdx, m_pCuttedCB->Resource()->GetGPUVirtualAddress());
 
 	Object::Render(elapsedTime, pd3dCommandList);
 }
 
-void CuttedStaticObject::UpdateCuttedCB()
+void CuttedObject::UpdateCuttedCB()
 {
 	CuttedConstant cuttedConstant;
 	cuttedConstant.PlaneCnt = m_nPlaneCnt;
@@ -99,7 +129,7 @@ void CuttedStaticObject::UpdateCuttedCB()
 	m_pCuttedCB->CopyData(0, cuttedConstant);
 }
 
-void CuttedStaticObject::BuildConstantBuffers(ID3D12Device* pd3dDevice)
+void CuttedObject::BuildConstantBuffers(ID3D12Device* pd3dDevice)
 {
 	m_pObjectCB = std::make_unique<UploadBuffer<ObjConstant>>(pd3dDevice, 1, true);
 	m_ObjCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjConstant));

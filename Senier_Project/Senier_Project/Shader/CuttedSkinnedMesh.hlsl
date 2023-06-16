@@ -13,6 +13,22 @@ cbuffer cbBoneTransforms : register(b2)
 	float4x4 gmtxBoneTransforms[SKINNED_ANIMATION_BONES];
 };
 
+
+cbuffer cbPerCut : register(b5)
+{
+	int PlaneCnt;
+	float PlaneDirection_1;
+	float PlaneDirection_2;
+	float PlaneDirection_3;
+
+	float3 PlaneNormal_1;
+	float PlaneDistance_1;
+	float3 PlaneNormal_2;
+	float PlaneDistance_2;
+	float3 PlaneNormal_3;
+	float PlaneDistance_3;
+};
+
 struct SkinnedMeshVertexIn
 {
 	float3 PosL : POSITION;
@@ -60,7 +76,33 @@ SkinnedMeshVertexOut VSSkinnedMesh(SkinnedMeshVertexIn vin)
 
 float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 {
-	float4 diffuseAlbedo = gDiffuseMap.Sample(gSamLinear, pin.TexC);
+	float4 diffuseAlbedo = float4(0,0,0,1);
+
+	if (dot(pin.PosW, PlaneNormal_1 * (PlaneDirection_1)) < PlaneDistance_1 * (PlaneDirection_1))
+	{
+		diffuseAlbedo = float4(0, 0, 0, 0);
+		// Alpha Test
+		clip(diffuseAlbedo.a - 0.1f);
+
+		return diffuseAlbedo;
+	}
+	if (dot(pin.PosW, PlaneNormal_2 * (PlaneDirection_2)) < PlaneDistance_2 * (PlaneDirection_2))
+	{
+		diffuseAlbedo = float4(0, 0, 0, 0);
+		// Alpha Test
+		clip(diffuseAlbedo.a - 0.1f);
+	}
+	if (dot(pin.PosW, PlaneNormal_3 * (PlaneDirection_3)) < PlaneDistance_3 * (PlaneDirection_3))
+	{
+		diffuseAlbedo = float4(0, 0, 0, 0);
+		// Alpha Test
+		clip(diffuseAlbedo.a - 0.1f);
+	}
+
+	// Alpha Test
+	clip(diffuseAlbedo.a - 0.1f);
+
+	diffuseAlbedo = gDiffuseMap.Sample(gSamLinear, pin.TexC);
 
 	pin.NormalW = normalize(pin.NormalW);
 	float4 normalMapSample = gNormalMap.Sample(gSamLinear, pin.TexC);
