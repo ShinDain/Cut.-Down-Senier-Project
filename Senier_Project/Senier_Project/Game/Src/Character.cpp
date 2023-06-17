@@ -1,4 +1,5 @@
 #include "../Header/Character.h"
+#include "../../DirectXRendering/Header/Scene.h"
 
 Character::Character()
 {
@@ -225,12 +226,12 @@ void Character::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
 	if (m_bInvincible)
 		return;
+	// 피격 무적
+	m_bInvincible = true;
 
 	// 체력 감소
 	m_HP -= power;
 
-	// 피격 무적
-	m_bInvincible = true;
 
 	XMVECTOR damageDirection = XMLoadFloat3(&xmf3DamageDirection);
 	damageDirection = XMVector3Normalize(damageDirection);
@@ -240,6 +241,16 @@ void Character::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 
 	m_pBody->AddVelocity(xmf3DeltaVelocity);
+}
+
+void Character::Cutting(XMFLOAT3 xmf3PlaneNormal)
+{
+	XMVECTOR orientation = XMQuaternionRotationRollPitchYaw(m_xmf3Rotation.x, m_xmf3Rotation.y, m_xmf3Rotation.z);
+	XMStoreFloat4(&m_xmf4Orientation, orientation);
+
+	m_bIsAlive = false;
+	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, 1, xmf3PlaneNormal, false);
+	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, -1, xmf3PlaneNormal, false);
 }
 
 void Character::BlendWithIdleMovement(float maxWeight)

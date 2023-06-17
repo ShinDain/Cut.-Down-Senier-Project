@@ -152,6 +152,7 @@ struct ObjectDefaultData
 	RenderLayer renderLayer;
 	XMFLOAT3 xmf3MeshOffsetPosition;
 	XMFLOAT3 xmf3MeshOffsetRotation;
+	bool bShadowed;
 };
 
 // 오브젝트 초기화 데이터 구조체
@@ -167,6 +168,7 @@ struct ObjectInitData
 	XMFLOAT3 xmf3Extents = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	bool bShadow = true;
 };
 
 // 메시의 하위 범위 인덱스를 정의

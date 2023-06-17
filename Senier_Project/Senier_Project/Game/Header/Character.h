@@ -51,6 +51,7 @@ public:
 	virtual	void RotateToTargetLook(float elapsedTime, XMFLOAT3 xmf3TargetLook, float divideConst);
 
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+	virtual void Cutting(XMFLOAT3 xmf3PlaneNormal);
 
 	virtual void BlendWithIdleMovement(float maxWeight);
 

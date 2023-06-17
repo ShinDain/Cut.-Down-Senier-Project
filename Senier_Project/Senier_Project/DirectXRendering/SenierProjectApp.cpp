@@ -38,6 +38,15 @@ bool SenierProjectApp::Initialize()
 	// 오브젝트 기본 정보 생성
 	CreateObjectDefaultData();
 
+	for (int i = 0; i < g_DefaultObjectNames.size(); ++i)
+	{
+		const char* pstrFileName = g_DefaultObjectNames[i].c_str();
+		std::shared_ptr<ModelDataInfo> pModelData =
+			Object::LoadModelDataFromFile(m_d3d12Device.Get(), m_CommandList.Get(), pstrFileName, g_DefaultObjectData[pstrFileName].pstrTexPath);
+
+		g_LoadedModelData.insert({ pstrFileName, pModelData });
+	}
+
 	m_Scene = std::make_unique<Scene>();
 	if (!m_Scene->Initialize(m_d3d12Device.Get(), m_CommandList.Get()))
 		return false;

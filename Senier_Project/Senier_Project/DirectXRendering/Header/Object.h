@@ -70,7 +70,6 @@ protected:
 	virtual void BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice);
 
 protected:
-	
 	char m_FrameName[64];
 
 	std::shared_ptr<Object> m_pChild = NULL;
@@ -82,6 +81,8 @@ protected:
 	std::shared_ptr<Mesh> m_pMesh = nullptr;
 	int m_nMaterial = 0;
 	std::vector<std::shared_ptr<Material>> m_vpMaterials;
+
+	bool m_bShadow = true;
 
 public:
 	char m_pstrFileName[64];
@@ -97,7 +98,6 @@ public:
 
 protected:
 	// 좌표 관련
-
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 	XMFLOAT4X4 m_xmf4x4ParentWorld = MathHelper::identity4x4();
 	XMFLOAT4X4 m_xmf4x4LocalTransform = MathHelper::identity4x4();	// 부모로부터 상대 좌표
@@ -240,6 +240,7 @@ public:
 
 	const float& GetHP() { return m_HP; }
 	bool GetInvincible() { return m_bInvincible; }
+	bool GetShadowed() { return m_bShadow; }
 };
 
 

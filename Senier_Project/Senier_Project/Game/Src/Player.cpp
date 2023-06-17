@@ -257,7 +257,7 @@ void Player::Attack()
 	{
 		// 선입력 방지
 		float trackRate = m_pAnimationController->GetTrackRate(PLAYER_ONCE_TRACK_1 + m_nCurAttackTrack);
-		if (trackRate < 0.3f || m_nAttackCombo - m_nCurAttackTrack > 1)
+		if (trackRate < 0.4f || m_nAttackCombo - m_nCurAttackTrack > 1)
 			return;
 
 		// 콤보 최대치 도달

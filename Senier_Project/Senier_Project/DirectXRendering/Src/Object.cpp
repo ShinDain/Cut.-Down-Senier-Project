@@ -90,13 +90,13 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_xmf3ColliderExtents = objData.xmf3Extents;
 	m_xmf3RenderOffsetPosition = objData.xmf3MeshOffsetPosition;
 	m_xmf3RenderOffsetRotation = objData.xmf3MeshOffsetRotation;
+	m_bShadow = objData.bShadow;
 
 #if defined(_DEBUG)
 	if (m_pCollider) m_pCollider->BuildMesh(pd3dDevice, pd3dCommandList);
 #endif
 
 	BuildConstantBuffers(pd3dDevice);
-
 	UpdateToRigidBody(0.0f);
 
 	return true;
@@ -196,12 +196,12 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 		XMMATRIX world = XMMatrixIdentity();
 		XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
 		XMMATRIX xmmatOrientation = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
-		XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotation.x), XMConvertToRadians(m_xmf3Rotation.y), XMConvertToRadians(m_xmf3Rotation.z));
+		//XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotation.x), XMConvertToRadians(m_xmf3Rotation.y), XMConvertToRadians(m_xmf3Rotation.z));
 		XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
 		// S * R * T
-		xmmatRotate = XMMatrixMultiply(xmmatRotate, xmmatOrientation);
-		//world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate));
-		world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate));
+		//xmmatRotate = XMMatrixMultiply(xmmatRotate, xmmatOrientation);
+		world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate));
+		//world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate));
 
 		XMMATRIX offset = XMMatrixTranslation(-m_xmf3RenderOffsetPosition.x, -m_xmf3RenderOffsetPosition.y, -m_xmf3RenderOffsetPosition.z);
 		XMMATRIX offsetRotate = XMMatrixRotationRollPitchYaw(m_xmf3RenderOffsetRotation.x, m_xmf3RenderOffsetRotation.y, m_xmf3RenderOffsetRotation.z);
@@ -792,16 +792,18 @@ void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
 	if (m_bInvincible)
 		return;
+	// 피격 무적
+	m_bInvincible = true;
 
 	// 체력 감소
 	m_HP -= power;
 	if (m_HP <= 0)
 	{
 		m_bDestroying = true;
+		// 파괴된 위치에 아이템 생성
+		Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position, 
+			XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
 	}
-
-	// 피격 무적
-	m_bInvincible = true;
 
 	XMVECTOR damageDirection = XMLoadFloat3(&xmf3DamageDirection);
 	damageDirection = XMVector3Normalize(damageDirection);

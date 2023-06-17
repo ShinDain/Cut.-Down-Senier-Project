@@ -43,6 +43,8 @@ bool Item::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 	m_TraceCollider.Center = m_xmf3Position;
 	m_TraceCollider.Radius = m_TraceColliderRadius;
 
+	m_bShadow = objData.bShadow;
+
 	return true;
 }
 

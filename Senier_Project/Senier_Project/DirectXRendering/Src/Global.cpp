@@ -12,6 +12,7 @@ std::vector<std::shared_ptr<Object>> g_vpAllObjs;
 std::vector<std::shared_ptr<Object>> g_vpMovableObjs;
 std::vector<std::shared_ptr<Object>> g_vpCharacters;
 std::vector<std::shared_ptr<Object>> g_vpWorldObjs;
+std::vector<std::shared_ptr<Object>> g_vpShadowedObjs;
 
 std::vector<std::shared_ptr<Object>> g_vpCuttedObjects;
 

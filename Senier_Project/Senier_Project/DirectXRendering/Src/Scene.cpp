@@ -47,12 +47,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
-	// 절단된 오브젝트 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 30, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
-
 	// 몬스터 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.25, 1.25, 1.25),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(50, 0, 150), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(40, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
@@ -69,11 +65,12 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
-	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
+	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 
-	std::shared_ptr<ImgObject> imgobj = std::make_shared<ImgObject>();
-	imgobj->Initialize(pd3dDevice, pd3dCommandList, 1900, 1024, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 500, 500);
-	m_pImage = imgobj;
+	// 이미지 오브젝트 테스트
+	//std::shared_ptr<ImgObject> imgobj = std::make_shared<ImgObject>();
+	//imgobj->Initialize(pd3dDevice, pd3dCommandList, 1900, 1024, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 500, 500);
+	//m_pImage = imgobj;
 
 	// 카메라 초기화
 	if (g_pPlayer)
@@ -302,7 +299,13 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 {
 	g_Shaders[ShaderType::Shader_Skinned]->ChangeShader(pd3dCommandList);
 	pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
-	//pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pShadowPassCB->Resource()->GetGPUVirtualAddress());
+	
+	// Scene 그림자맵 
+	ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
+	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
+
+	D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	pd3dCommandList->SetGraphicsRootDescriptorTable(3, texHandle);
 
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
 	{
@@ -379,18 +382,18 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 	}
 
 	// img 오브젝트
-	/*{
-		g_Shaders[ShaderType::Shader_Image]->ChangeShader(pd3dCommandList);
-
-		ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
-		pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
-
-		D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		pd3dCommandList->SetGraphicsRootDescriptorTable(1, texHandle);
-
-		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &m_xmf4x4ImgObjMat, 0);
-		m_pImage->Render(elapsedTime, pd3dCommandList);
-	}*/
+	//{
+	//	g_Shaders[ShaderType::Shader_Image]->ChangeShader(pd3dCommandList);
+	//
+	//	ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
+	//	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
+	//
+	//	D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	//	pd3dCommandList->SetGraphicsRootDescriptorTable(1, texHandle);
+	//
+	//	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &m_xmf4x4ImgObjMat, 0);
+	//	m_pImage->Render(elapsedTime, pd3dCommandList);
+	//}
 }
 
 void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
@@ -419,15 +422,43 @@ void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 	pd3dCommandList->OMSetRenderTargets(0, nullptr, false, &dsv);
 	pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pShadowPassCB->Resource()->GetGPUVirtualAddress());
 
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
+	{
+		if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
+		{
+			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->GetIsAlive())
+				continue;
+			// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
+			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(0.0f);
+			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
+				m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
+			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(0.0f, pd3dCommandList);
+		}
+	}
+
+	// 플레이어 렌더링
+	{
+		g_pPlayer->Animate(0.0f);
+		if (!g_pPlayer->m_pAnimationController)
+			g_pPlayer->UpdateTransform(NULL);
+		g_pPlayer->Render(0.0f, pd3dCommandList);
+	}
+
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
 	{
-		m_vObjectLayer[RenderLayer::Render_Static][i]->UpdateTransform(NULL);
-		m_vObjectLayer[RenderLayer::Render_Static][i]->Render(0.0f, pd3dCommandList);
+		if (m_vObjectLayer[RenderLayer::Render_Static][i]->GetShadowed())
+		{
+			m_vObjectLayer[RenderLayer::Render_Static][i]->UpdateTransform(NULL);
+			m_vObjectLayer[RenderLayer::Render_Static][i]->Render(0.0f, pd3dCommandList);
+		}
 	}
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_TextureMesh].size(); ++i)
 	{
-		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->UpdateTransform(NULL);
-		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(0.0f, pd3dCommandList);
+		if (m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->GetShadowed())
+		{
+			m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->UpdateTransform(NULL);
+			m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(0.0f, pd3dCommandList);
+		}
 	}
 
 	transition = CD3DX12_RESOURCE_BARRIER::Transition(m_ShadowMap->Resource(),
@@ -617,6 +648,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		objectData.xmf3Extents = g_DefaultObjectData[pstrFileName].xmf3Extents;
 		objectData.xmf3MeshOffsetPosition = g_DefaultObjectData[pstrFileName].xmf3MeshOffsetPosition;
 		objectData.xmf3MeshOffsetRotation = g_DefaultObjectData[pstrFileName].xmf3MeshOffsetRotation;
+		objectData.bShadow = g_DefaultObjectData[pstrFileName].bShadowed;
 	}
 	
 	std::shared_ptr<ModelDataInfo> pModelData;
@@ -629,10 +661,8 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 
 		if (g_LoadedModelData.find(pstrFileName) == g_LoadedModelData.end())
 		{
-			// 모델 로드
-			pModelData = Object::LoadModelDataFromFile(pd3dDevice, pd3dCommandList, pstrFileName, g_DefaultObjectData[pstrFileName].pstrTexPath);
-
-			g_LoadedModelData.insert({ pstrFileName, pModelData });
+			// 로드되지 않은 모델인 경우
+			assert(false);
 		}
 		else	// 이미 로드한 모델인 경우
 		{

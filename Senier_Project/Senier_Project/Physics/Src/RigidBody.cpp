@@ -34,6 +34,10 @@ RigidBody::RigidBody(XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 x
 		m_bPhysics = true;
 		m_bInGravity = true;
 	}
+	else if (m_Mass == 9999)
+	{
+		m_bIsPlatform = true;
+	}
 
 }
 

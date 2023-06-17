@@ -76,6 +76,7 @@ bool Weapon::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_xmf3Scale = objData.xmf3Scale;
 	m_xmf4Orientation = objData.xmf4Orientation;
 	m_Mass = objData.nMass;
+	m_bShadow = objData.bShadow;
 
 #if defined(_DEBUG)
 	if (m_pCollider) m_pCollider->BuildMesh(pd3dDevice, pd3dCommandList);

@@ -28,6 +28,7 @@ extern std::vector<std::shared_ptr<Object>> g_vpAllObjs;
 extern std::vector<std::shared_ptr<Object>> g_vpMovableObjs;
 extern std::vector<std::shared_ptr<Object>> g_vpCharacters;
 extern std::vector<std::shared_ptr<Object>> g_vpWorldObjs;
+extern std::vector<std::shared_ptr<Object>> g_vpShadowedObjs;
 
 extern std::vector<std::shared_ptr<Object>> g_vpCuttedObjects;
 
