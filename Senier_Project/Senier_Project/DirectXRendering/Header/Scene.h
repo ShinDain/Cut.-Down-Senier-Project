@@ -1,7 +1,9 @@
-#pragma once
+#ifndef SCENE_H
 
+#define SCENE_H
 // 장면에 삽입될 오브젝트 초기화 및 관리
 
+#include "../../Common/Header/D3DUtil.h"
 #include <algorithm>
 #include "Camera.h"
 #include "../../Common/Header/MathHelper.h"
@@ -55,10 +57,10 @@ public:
 
 	void LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName);
 
-	std::shared_ptr<Object> CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	static std::shared_ptr<Object> CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 		XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotation, XMFLOAT3 xmf3Scale, const char* pstrFileName, int nAnimationTracks);
 
-	std::shared_ptr<Object> CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	static std::shared_ptr<Object> CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 		Object* pObject, float direction, XMFLOAT3 planeNormal, bool bIsCutted);
 
 	void GenerateContact();
@@ -67,7 +69,6 @@ public:
 	void ClearObjectLayer();
 
 private:
-
 	XMFLOAT4X4 m_xmf4x4ViewProj = MathHelper::identity4x4();
 	XMFLOAT4X4 m_xmf4x4ImgObjMat = MathHelper::identity4x4();
 
@@ -75,16 +76,15 @@ private:
 	std::unique_ptr<UploadBuffer<PassConstant>> m_pPassCB = nullptr;
 	std::unique_ptr<UploadBuffer<PassConstant>> m_pShadowPassCB = nullptr;
 
-	// 오브젝트 객체들
-	std::vector<std::shared_ptr<Object>> m_vObjectLayer[(int)RenderLayer::Render_Count];
-
-	std::shared_ptr<Player> m_pPlayer = nullptr;
+	//std::shared_ptr<Player> m_pPlayer = nullptr;
 
 	std::shared_ptr<ImgObject> m_pImage = nullptr;
 
 	// 씬을 렌더링할 메인 카메라
 	std::unique_ptr<Camera> m_pCamera = nullptr;
-	//std::shared_ptr<Character> m_pCharacter = nullptr;
+
+	// 오브젝트 객체들
+	static std::vector<std::shared_ptr<Object>> m_vObjectLayer[(int)RenderLayer::Render_Count];
 
 	static std::unique_ptr<CollisionResolver> m_pCollisionResolver;
 	static CollisionData m_CollisionData;
@@ -115,6 +115,8 @@ private:
 public:
 	void SetViewProjMatrix(XMFLOAT4X4 viewProj) { m_xmf4x4ViewProj = viewProj; }
 
+	static ID3D12Device* m_pd3dDevice;
+	static ID3D12GraphicsCommandList* m_pd3dCommandList;
 
 #if defined(_DEBUG) | defined(DEBUG)
 public:
@@ -129,5 +131,5 @@ public:
 
 
 
-
+#endif
 

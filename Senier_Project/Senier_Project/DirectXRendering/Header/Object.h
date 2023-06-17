@@ -1,4 +1,6 @@
-#pragma once
+#ifndef OBJECT_H
+
+#define OBJECT_H
 
 // 메쉬, 재질 등 오브젝트를 렌더링하는데 필요한
 // 데이터들을 가진다.
@@ -6,7 +8,6 @@
 
 #include "../../Common/Header/D3DUtil.h"
 #include "../../Common/Header/UploadBuffer.h"
-
 #include "../../Physics/Header/Collider.h"
 #include "../../Physics/Header/RigidBody.h"
 #include "Global.h"
@@ -22,6 +23,8 @@
 #define DIR_RIGHT					0x08
 
 using namespace DirectX;
+
+class Scene;
 
 class Object : public std::enable_shared_from_this<Object>
 {
@@ -57,6 +60,7 @@ public:
 	static void LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData);
 	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject, const char* pstrFileName, const char* pstrTexPath);
 
+	virtual void Cutting(XMFLOAT3 xmf3PlaneNormal);
 	virtual void Destroy();
 	virtual void DestroyRunTime();
 
@@ -131,6 +135,7 @@ protected:
 
 	float m_DestroyTime = 0.0f;
 	float m_ElapsedDestroyTime = 0.0f;
+	bool m_bDestroying = false;
 
 	float m_InvincibleTime = 0.5f;
 	float m_ElapsedInvincibleTime = 0.0f;
@@ -240,4 +245,4 @@ public:
 
 
 
-
+#endif // !OBJECT_H

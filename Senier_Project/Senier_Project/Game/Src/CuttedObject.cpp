@@ -1,4 +1,5 @@
 #include "../Header/CuttedObject.h"
+#include "../../DirectXRendering/Header/Scene.h"
 
 
 CuttedObject::CuttedObject()
@@ -50,23 +51,51 @@ bool CuttedObject::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 
 	// 생성 후 삭제까지
 	m_DestroyTime = 3.0f;
+	m_bDestroying = true;
 
 	return true;
 }
 
 void CuttedObject::Update(float elapsedTime)
 {
-	Object::Update(elapsedTime);
-
-	UpdateCuttedCB();
-
-	// 경과 후 삭제
-	m_ElapsedDestroyTime += elapsedTime;
-	if (m_ElapsedDestroyTime >= m_DestroyTime)
+	// 오브젝트 파괴 타이머
+	if (m_bDestroying)
 	{
-		m_bIsAlive = false;
+		m_ElapsedDestroyTime += elapsedTime;
+		if (m_ElapsedDestroyTime >= m_DestroyTime)
+		{
+			m_bIsAlive = false;
+		}
 	}
 
+	// 무적 시간 경과 누적
+	if (m_bInvincible)
+	{
+		m_ElapsedInvincibleTime += elapsedTime;
+		if (m_InvincibleTime <= m_ElapsedInvincibleTime)
+		{
+			m_ElapsedInvincibleTime = 0.0f;
+			m_bInvincible = false;
+		}
+	}
+
+	if (m_nObjectType != ObjectType::Object_World)
+		UpdateToRigidBody(elapsedTime);
+
+	ObjConstant objConstant;
+	XMMATRIX world = XMLoadFloat4x4(&m_xmf4x4World);
+	XMMATRIX inverseTransWorld = XMMatrixInverse(nullptr, XMMatrixTranspose(world));
+	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(world));
+	XMStoreFloat4x4(&objConstant.InverseTransWorld, XMMatrixTranspose(inverseTransWorld));
+	if (m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
+
+	if (m_pSibling) {
+		m_pSibling->Update(elapsedTime);
+	}
+	if (m_pChild) {
+		m_pChild->Update(elapsedTime);
+	}
+	UpdateCuttedCB();
 }
 
 void CuttedObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
@@ -79,6 +108,12 @@ void CuttedObject::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dComm
 	pd3dCommandList->SetGraphicsRootConstantBufferView(m_CuttedCBIdx, m_pCuttedCB->Resource()->GetGPUVirtualAddress());
 
 	Object::Render(elapsedTime, pd3dCommandList);
+}
+
+void CuttedObject::Cutting()
+{
+	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, 1, XMFLOAT3(1, 1, 0), true);
+//	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, -1, XMFLOAT3(1, 1, 0), true);
 }
 
 void CuttedObject::UpdateCuttedCB()

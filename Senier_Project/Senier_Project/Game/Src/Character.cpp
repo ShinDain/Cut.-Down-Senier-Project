@@ -30,6 +30,16 @@ bool Character::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 void Character::Update(float elapsedTime)
 {
+	// 오브젝트 파괴 타이머
+	if (m_bDestroying)
+	{
+		m_ElapsedDestroyTime += elapsedTime;
+		if (m_ElapsedDestroyTime >= m_DestroyTime)
+		{
+			m_bIsAlive = false;
+		}
+	}
+
 	// 무적 시간 경과 누적
 	if (m_bInvincible)
 	{
@@ -209,6 +219,27 @@ void Character::RotateToTargetLook(float elapsedTime, XMFLOAT3 xmf3TargetLook, f
 
 		SetRotate(XMFLOAT3(m_xmf3Rotation.x, tmp, m_xmf3Rotation.z));
 	}
+}
+
+void Character::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+{
+	if (m_bInvincible)
+		return;
+
+	// 체력 감소
+	m_HP -= power;
+
+	// 피격 무적
+	m_bInvincible = true;
+
+	XMVECTOR damageDirection = XMLoadFloat3(&xmf3DamageDirection);
+	damageDirection = XMVector3Normalize(damageDirection);
+	XMVECTOR deltaVelocity = damageDirection * power * 5;
+
+	XMFLOAT3 xmf3DeltaVelocity;
+	XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+
+	m_pBody->AddVelocity(xmf3DeltaVelocity);
 }
 
 void Character::BlendWithIdleMovement(float maxWeight)

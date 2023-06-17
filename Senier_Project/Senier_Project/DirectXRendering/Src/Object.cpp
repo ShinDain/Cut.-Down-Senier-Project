@@ -1,4 +1,5 @@
 #include "../Header/Shader.h"
+#include "../Header/Scene.h"
 #include "../Header/Object.h"
 
 Object::Object()
@@ -112,8 +113,16 @@ void Object::Animate(float elapsedTime)
 
 void Object::Update(float elapsedTime)
 {
-	if (m_HP <= 0)
-		m_bIsAlive = false;
+	// 오브젝트 파괴 타이머
+	if (m_bDestroying)
+	{
+		m_ElapsedDestroyTime += elapsedTime;
+		if (m_ElapsedDestroyTime >= m_DestroyTime)
+		{
+			m_bIsAlive = false;
+			Cutting(XMFLOAT3(1,0,0));
+		}
+	}
 
 	// 무적 시간 경과 누적
 	if (m_bInvincible)
@@ -187,12 +196,12 @@ void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 		XMMATRIX world = XMMatrixIdentity();
 		XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
 		XMMATRIX xmmatOrientation = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
-		//XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotation.x), XMConvertToRadians(m_xmf3Rotation.y), XMConvertToRadians(m_xmf3Rotation.z));
+		XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotation.x), XMConvertToRadians(m_xmf3Rotation.y), XMConvertToRadians(m_xmf3Rotation.z));
 		XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
 		// S * R * T
-		//xmmatRotate = XMMatrixMultiply(xmmatRotate, xmmatOrientation);
-		world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate));
-		//world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate));
+		xmmatRotate = XMMatrixMultiply(xmmatRotate, xmmatOrientation);
+		//world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate));
+		world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate));
 
 		XMMATRIX offset = XMMatrixTranslation(-m_xmf3RenderOffsetPosition.x, -m_xmf3RenderOffsetPosition.y, -m_xmf3RenderOffsetPosition.z);
 		XMMATRIX offsetRotate = XMMatrixRotationRollPitchYaw(m_xmf3RenderOffsetRotation.x, m_xmf3RenderOffsetRotation.y, m_xmf3RenderOffsetRotation.z);
@@ -551,6 +560,13 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	SetMaterials(vpMat);
 }
 
+void Object::Cutting(XMFLOAT3 xmf3PlaneNormal)
+{
+	m_bIsAlive = false;
+	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, 1, xmf3PlaneNormal, false);
+	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, -1, xmf3PlaneNormal, false);
+}
+
 void Object::Destroy()
 {
 	m_bIsAlive = false;
@@ -779,6 +795,11 @@ void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 
 	// 체력 감소
 	m_HP -= power;
+	if (m_HP <= 0)
+	{
+		m_bDestroying = true;
+	}
+
 	// 피격 무적
 	m_bInvincible = true;
 

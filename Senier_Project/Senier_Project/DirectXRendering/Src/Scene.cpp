@@ -1,6 +1,9 @@
 #include "../Header/Scene.h"
 
-static float pEtime = 0;
+ID3D12Device* Scene::m_pd3dDevice;
+ID3D12GraphicsCommandList* Scene::m_pd3dCommandList;
+
+std::vector<std::shared_ptr<Object>> Scene::m_vObjectLayer[(int)RenderLayer::Render_Count];
 CollisionData Scene::m_CollisionData;
 std::unique_ptr<CollisionResolver> Scene::m_pCollisionResolver;
 
@@ -9,6 +12,8 @@ Scene::Scene()
 	m_CollisionData.Reset(MAX_CONTACT_CNT);
 	m_pCollisionResolver = std::make_unique<CollisionResolver>(MAX_CONTACT_CNT * 8);
 
+	m_pd3dDevice = nullptr;
+	m_pd3dCommandList = nullptr;
 }
 
 Scene::~Scene()
@@ -17,6 +22,9 @@ Scene::~Scene()
 
 bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_pd3dDevice = pd3dDevice;
+	m_pd3dCommandList = pd3dCommandList;
+
 	// 패스 버퍼 생성
 	m_pPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
 	m_pShadowPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
@@ -40,16 +48,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
 	// 절단된 오브젝트 테스트
-	//std::shared_ptr<Object> tmp = CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
-	//CreateCuttedObject(pd3dDevice, pd3dCommandList, tmp.get(), 1, XMFLOAT3(1, 1, 0), false);
-	//std::shared_ptr<Object> tmp2 = CreateCuttedObject(pd3dDevice, pd3dCommandList, tmp.get(), -1, XMFLOAT3(1, 1, 0), false);
-	//std::shared_ptr<Object> tmp3 = CreateCuttedObject(pd3dDevice, pd3dCommandList, tmp2.get(), 1, XMFLOAT3(1, 0, 0), true);
-	
-	std::shared_ptr<Object> tmp = CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 30, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
-	std::shared_ptr<Object> tmp2 = CreateCuttedObject(pd3dDevice, pd3dCommandList, tmp.get(), 1, XMFLOAT3(1, 1, 0), false);
-	CreateCuttedObject(pd3dDevice, pd3dCommandList, tmp.get(), -1, XMFLOAT3(1, 1, 0), false);
-	CreateCuttedObject(pd3dDevice, pd3dCommandList, tmp2.get(), 1, XMFLOAT3(1, 0, 0), true);
-	CreateCuttedObject(pd3dDevice, pd3dCommandList, tmp2.get(), -1, XMFLOAT3(1, 0, 0), true);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 30, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 
 	// 몬스터 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
@@ -76,9 +76,9 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_pImage = imgobj;
 
 	// 카메라 초기화
-	if (m_pPlayer)
+	if (g_pPlayer)
 	{
-		m_pCamera = std::make_unique<Third_Person_Camera>(m_pPlayer);
+		m_pCamera = std::make_unique<Third_Person_Camera>(g_pPlayer);
 		m_pCamera->Pitch(15);
 	}
 #if defined(_DEBUG)
@@ -158,7 +158,7 @@ void Scene::Update(float totalTime ,float elapsedTime)
 	{
 		if (g_vpAllObjs[i]) g_vpAllObjs[i]->Update(elapsedTime);
 	}
-	m_pPlayer->Update(elapsedTime);
+	//g_pPlayer->Update(elapsedTime);
 
 	// 충돌 검사
 	GenerateContact();
@@ -320,10 +320,10 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 
 	// 플레이어 렌더링
 	{
-		m_pPlayer->Animate(elapsedTime);
-		if (!m_pPlayer->m_pAnimationController)
-			m_pPlayer->UpdateTransform(NULL);
-		m_pPlayer->Render(elapsedTime, pd3dCommandList);
+		g_pPlayer->Animate(elapsedTime);
+		if (!g_pPlayer->m_pAnimationController)
+			g_pPlayer->UpdateTransform(NULL);
+		g_pPlayer->Render(elapsedTime, pd3dCommandList);
 	}
 
 	g_Shaders[ShaderType::Shader_Static]->ChangeShader(pd3dCommandList);
@@ -461,10 +461,11 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 	}
 	
 	// 임시
-	if (m_pPlayer)
+	if (g_pPlayer)
 	{
-		m_pPlayer->ProcessInput(pKeybuffer);
-		m_pPlayer->SetCameraRotation(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
+		g_pPlayer->ProcessInput(pKeybuffer);
+		Player* tmpPlayer = (Player*)(g_pPlayer.get());
+		tmpPlayer->SetCameraRotation(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
 	}
 	
 #if defined(_DEBUG)
@@ -474,22 +475,30 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 
 void Scene::KeyDownEvent(WPARAM wParam)
 {
-	if(m_pPlayer) m_pPlayer->KeyDownEvent(wParam);	
+	if(g_pPlayer) g_pPlayer->KeyDownEvent(wParam);
 }
 
 void Scene::KeyUpEvent(WPARAM wParam)
 {
-	if (m_pPlayer) m_pPlayer->KeyUpEvent(wParam);
+	if (g_pPlayer) g_pPlayer->KeyUpEvent(wParam);
 }
 
 void Scene::LeftButtonDownEvent()
 {
-	if(m_pPlayer) m_pPlayer->LeftButtonDownEvent();
+	if (g_pPlayer)
+	{
+		Player* tmpPlayer = (Player*)(g_pPlayer.get());
+		tmpPlayer->LeftButtonDownEvent();
+	}
 }
 
 void Scene::RightButtonDownEvent()
 {
-	if (m_pPlayer) m_pPlayer->RightButtonDownEvent();
+	if (g_pPlayer) 
+	{
+		Player* tmpPlayer = (Player*)(g_pPlayer.get());
+		tmpPlayer->RightButtonDownEvent();
+	}
 }
 
 void Scene::LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName)
@@ -642,8 +651,10 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	{
 		std::shared_ptr<Player> pPlayer = std::make_shared<Player>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 		strcpy_s(pPlayer->m_pstrFileName, strFileName.c_str());
-		m_pPlayer = pPlayer;
+		//m_pPlayer = pPlayer;
+		pObject = std::static_pointer_cast<Object>(pPlayer);
 
+		g_vpAllObjs.emplace_back(pObject);
 		g_vpCharacters.emplace_back(pPlayer);
 		g_pPlayer = pPlayer;
 	}
@@ -665,9 +676,10 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	case Object_Weapon:
 	{
 		char tmp[64] = "mixamorig:RightHand";
-		std::shared_ptr<Weapon> pWeapon = std::make_shared<Weapon>(pd3dDevice, pd3dCommandList, objectData, tmp, m_pPlayer, pModelData, nAnimationTracks, nullptr);
+		std::shared_ptr<Weapon> pWeapon = std::make_shared<Weapon>(pd3dDevice, pd3dCommandList, objectData, tmp, g_pPlayer, pModelData, nAnimationTracks, nullptr);
 		pObject = std::static_pointer_cast<Object>(pWeapon);
-		m_pPlayer->SetWeapon(pWeapon);
+		Player* tmpPlayer = (Player*)(g_pPlayer.get());
+		tmpPlayer->SetWeapon(pWeapon);
 
 		g_vpAllObjs.emplace_back(pObject);
 		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
@@ -715,6 +727,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 	Object* pObject, float direction, XMFLOAT3 xmf3PlaneNormal, bool bIsCutted)
 {
+	float cuttingPower = 50;
 	float directions[3] = {0,0,0};
 	XMFLOAT3 xmf3PlaneNormals[3] = { XMFLOAT3(0,0,0), XMFLOAT3(0,0,0), XMFLOAT3(0,0,0) };
 	UINT planeCnt = 0;
@@ -735,6 +748,13 @@ std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D
 		xmf3PlaneNormals[lastPlaneCnt] = xmf3PlaneNormal;
 		planeCnt = lastPlaneCnt + 1;
 		pCuttedObj->AddPlane(direction, xmf3PlaneNormal);
+
+
+		XMFLOAT3 xmf3CuttingVel = xmf3PlaneNormal;
+		xmf3CuttingVel.x *= cuttingPower * direction * -1;
+		xmf3CuttingVel.y *= cuttingPower * direction * -1;
+		xmf3CuttingVel.z *= cuttingPower * direction * -1;
+		pCuttedObj->GetBody()->AddVelocity(xmf3CuttingVel);
 	}
 	else
 	{
@@ -763,9 +783,6 @@ std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D
 	std::shared_ptr<ModelDataInfo> pModelData;
 	std::shared_ptr<Object> tmpObject;
 
-	//if (g_LoadedModelData.find(pstrFileName) == g_LoadedModelData.end())
-	//	return nullptr;
-	//else
 	pModelData = g_LoadedModelData[pstrFileName];
 
 	switch (objectData.objectType)
@@ -781,8 +798,6 @@ std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D
 
 	case Object_Monster:
 	{
-		objectData.xmf3Position.x -= 20;
-
 		int trackAnimationSet = pObject->m_pAnimationController->GetTrackAnimationSet(3);
 	 	float trackPosition = pObject->m_pAnimationController->GetTrackPosition(3);
 
@@ -846,6 +861,12 @@ std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D
 	break;
 	}
 
+	XMFLOAT3 xmf3CuttingVel = xmf3PlaneNormal;
+	xmf3CuttingVel.x *= cuttingPower * direction * -1;
+	xmf3CuttingVel.y *= cuttingPower * direction * -1;
+	xmf3CuttingVel.z *= cuttingPower * direction * -1;
+	tmpObject->GetBody()->AddVelocity(xmf3CuttingVel);
+
 	return tmpObject;
 }
 
@@ -858,7 +879,7 @@ void Scene::GenerateContact()
 		if(g_vpAllObjs[i]->GetBody())
 			g_vpAllObjs[i]->GetBody()->ClearContact();
 	}
-	m_pPlayer->GetBody()->ClearContact();
+	g_pPlayer->GetBody()->ClearContact();
 
 	m_CollisionData.Reset(nContactCnt);
 	m_CollisionData.friction = 0;

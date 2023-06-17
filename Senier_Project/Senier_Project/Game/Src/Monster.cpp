@@ -2,7 +2,6 @@
 
 #define ZOMBIE_MAXSPEED 50.0f
 
-
 #define ZOMBIE_IDLE_TRACK 0
 #define ZOMBIE_MOVE_TRACK 1
 #define ZOMBIE_LOOP_TRACK 2
@@ -25,6 +24,8 @@ Monster::Monster(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 	m_pAnimationController->m_vpAnimationTracks[ZOMBIE_ONCE_TRACK_1]->SetType(ANIMATION_TYPE_ONCE);
 	m_pAnimationController->SetTrackAnimationSet(ZOMBIE_IDLE_TRACK, Monster_Anim_Index_Idle);
 	m_pAnimationController->SetTrackAnimationSet(ZOMBIE_MOVE_TRACK, Monster_Anim_Index_Run);
+
+	m_DestroyTime = 1.0f;
 }
 
 Monster::~Monster()
@@ -168,9 +169,7 @@ void Monster::UpdateAnimationTrack(float elapsedTime)
 
 		if (m_pAnimationController->GetTrackOver(ZOMBIE_ONCE_TRACK_1))
 		{
-			m_ElapsedDestroyTime += elapsedTime;
-			if (m_ElapsedDestroyTime > m_DestroyTime)
-				m_bIsAlive = false;
+			m_bDestroying = true;
 		}
 	}
 		break;
@@ -211,10 +210,6 @@ void Monster::DoLanding()
 void Monster::Patrol()
 {
 	// 패트롤, 왔다 갔다
-
-	/// <summary>
-	/// ///
-	/// </summary>
 	BoundingSphere boundSphere;
 	boundSphere.Center = m_xmf3Position;
 	boundSphere.Radius = 20.0f;
@@ -334,7 +329,7 @@ void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	if (m_AnimationState == MonsterAnimationState::Monster_State_Death || m_bInvincible)
 		return;
 
-	Object::ApplyDamage(power, xmf3DamageDirection);
+	Character::ApplyDamage(power, xmf3DamageDirection);
 
 	if (m_bSuperArmor)
 		return;
@@ -349,6 +344,7 @@ void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	}
 	else
 	{
+		Cutting(XMFLOAT3(1, 0, 0));
 		m_AnimationState = MonsterAnimationState::Monster_State_Death;
 		m_pAnimationController->SetTrackEnable(ZOMBIE_ONCE_TRACK_1, true);
 		m_pAnimationController->SetTrackAnimationSet(ZOMBIE_ONCE_TRACK_1, MonsterAnimationIndex::Monster_Anim_Index_FallingBack);

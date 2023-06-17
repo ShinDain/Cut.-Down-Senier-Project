@@ -2,7 +2,6 @@
 
 SenierProjectApp::SenierProjectApp(HINSTANCE hInstance) : DirectXApp(hInstance)
 {
-	
 }
 
 SenierProjectApp::~SenierProjectApp()

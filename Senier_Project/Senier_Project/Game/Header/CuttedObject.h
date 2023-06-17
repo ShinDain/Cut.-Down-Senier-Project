@@ -35,6 +35,8 @@ public:
 	virtual void Update(float elapsedTime);
 	virtual void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
+	
+	virtual void Cutting();
 
 	void UpdateCuttedCB();
 
