@@ -15,7 +15,7 @@ cbuffer cbPerCollider : register(b4)
 }
 
 Texture2D gDiffuseMap : register(t0);
-SamplerState gSamLinear : register(s0);
+SamplerState gsamAnisotropicWrap : register(s0);
 
 struct VertexIn
 {

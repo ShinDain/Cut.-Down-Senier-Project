@@ -14,6 +14,8 @@ using Microsoft::WRL::ComPtr;
 
 // Ω∫≈¬∆Ω ∏ﬁΩ√ ºŒ¿Ã¥ı
 
+#define SAMPLER_CNT 3
+
 class Shader
 {
 public:
@@ -34,7 +36,7 @@ protected:
 	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
 	virtual bool BuildPSO(ID3D12Device* pd3dDevice);
 
-	std::array<const CD3DX12_STATIC_SAMPLER_DESC, 2> GetStaticSampler();
+	std::array<const CD3DX12_STATIC_SAMPLER_DESC, SAMPLER_CNT> GetStaticSampler();
 
 protected:
 	ComPtr<ID3DBlob> m_vsByteCode = nullptr;

@@ -111,7 +111,7 @@ protected:
 	//DirectX::XMFLOAT3 m_xmf3Offset = { 0.0f, 30.0f, -100.0f };
 
 	float m_MaxPitch = 45;
-	float m_MinPitch = -45;
+	float m_MinPitch = -10;
 
 	// 추적할 대상 오브젝트
 	std::shared_ptr<Object> m_pObject = nullptr;

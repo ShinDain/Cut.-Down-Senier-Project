@@ -23,17 +23,27 @@ VertexOut VS(VertexIn vin)
 {
     VertexOut vout = (VertexOut)0.0f;
 
+   // MaterialData matData = gMaterialData[gMaterialIndex];
+
+    // Transform to world space.
+    float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
+
     // Transform to homogeneous clip space.
-    vout.PosH = float4(vin.PosL, 1.0f);
+    vout.PosH = mul(posW, gViewProj);
+
+    // Output vertex attributes for interpolation across triangle.
+    // float4 texC = mul(float4(vin.TexC, 0.0f, 1.0f), gTexTransform);
 
     vout.TexC = vin.TexC;
 
     return vout;
 }
 
-float4 PS(VertexOut pin) : SV_Target
+void PS(VertexOut pin)
 {
-    return float4(gSsaoMap.Sample(gsamAnisotropicWrapWrap, pin.TexC).rrr, 1.0f);
+#ifdef ALPHA_TEST
+    clip(diffuseAlbedo.a - 0.1f);
+#endif
 }
 
 

@@ -54,12 +54,12 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(40, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 
 	// 월드 오브젝트 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 0, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 70, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 5, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	
 	// 아이템 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
@@ -68,9 +68,10 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 
 	// 이미지 오브젝트 테스트
-	//std::shared_ptr<ImgObject> imgobj = std::make_shared<ImgObject>();
-	//imgobj->Initialize(pd3dDevice, pd3dCommandList, 1900, 1024, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 500, 500);
-	//m_pImage = imgobj;
+	std::shared_ptr<ImgObject> imgobj = std::make_shared<ImgObject>();
+	imgobj->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 128, 128);
+	m_pImage = imgobj;
+	m_pImage->ChangePosition(10, 10);
 
 	// 카메라 초기화
 	if (g_pPlayer)
@@ -137,8 +138,8 @@ void Scene::Update(float totalTime ,float elapsedTime)
 
 	m_pCamera->Update(elapsedTime);
 	// 패스버퍼 업데이트
-	UpdatePassCB(totalTime, elapsedTime);
 	UpdateShadowPassCB(totalTime, elapsedTime);
+	UpdatePassCB(totalTime, elapsedTime);
 
 	// ImageObject 렌더를 위한  직교 투영행렬 업데이트
 	m_xmf4x4ImgObjMat = m_pCamera->GetOrtho4x4f();
@@ -149,7 +150,6 @@ void Scene::Update(float totalTime ,float elapsedTime)
 	//m_DebugValue = m_pCamera->GetPosition3f().x;
 
 	m_tTime += elapsedTime;
-
 #endif
 	for (int i = 0; i < g_vpAllObjs.size(); ++i)
 	{
@@ -189,7 +189,7 @@ void Scene::UpdatePassCB(float totalTime, float elapsedTime)
 	passConstant.FarZ = 100.0f;
 	passConstant.TotalTime = totalTime;
 	passConstant.DeltaTime = elapsedTime;
-	passConstant.AmbientLight = { 0.5f, 0.5f, 0.5f, 1.0f };
+	passConstant.AmbientLight = { 0.3f, 0.3f, 0.3f, 1.0f };
 	passConstant.Lights[0].Direction = m_BaseLightDirections[0];
 	passConstant.Lights[0].Strength = { 0.5f, 0.5f, 0.5f };
 	passConstant.Lights[0].Position = { 0, 30.0f, 20 };
@@ -239,12 +239,15 @@ void Scene::UpdatePassCB(float totalTime, float elapsedTime)
 
 void Scene::UpdateShadowPassCB(float totalTime, float elapsedTime)
 {
-	float sceneBoundRadius = 100;
+	float sceneBoundRadius = 200;
 
 	// Only the first "main" light casts a shadow.
 	XMVECTOR lightDir = XMLoadFloat3(&m_BaseLightDirections[0]);
-	XMVECTOR lightPos = -2.0f * sceneBoundRadius * lightDir;
-	XMVECTOR targetPos = XMVectorSet(0, 0, 0, 1);
+	lightDir = XMVector3Normalize(lightDir);
+	XMFLOAT3 xmf3PlayerPos = g_pPlayer->GetPosition();
+	XMVECTOR targetPos = XMLoadFloat3(&xmf3PlayerPos);
+	//XMVECTOR targetPos = XMVectorSet(0, 0, 0, 1);
+	XMVECTOR lightPos = targetPos + -2.0f * sceneBoundRadius * lightDir;
 	XMVECTOR lightUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	XMMATRIX lightView = XMMatrixLookAtLH(lightPos, targetPos, lightUp);
 
@@ -272,6 +275,11 @@ void Scene::UpdateShadowPassCB(float totalTime, float elapsedTime)
 	XMMATRIX shadowTransform = lightView * lightProj * T;
 	XMStoreFloat4x4(&m_xmf4x4ShadowTransform, shadowTransform);
 
+	XMVECTOR tmpPosition = XMVectorSet(0, 0, 0, 1);
+	tmpPosition = XMVector3TransformCoord(tmpPosition, shadowTransform);
+
+
+
 	float shadowMapWidth = m_ShadowMap->Width();
 	float shadowMapHeight = m_ShadowMap->Height();
 
@@ -297,16 +305,7 @@ void Scene::UpdateShadowPassCB(float totalTime, float elapsedTime)
 
 void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	g_Shaders[ShaderType::Shader_Skinned]->ChangeShader(pd3dCommandList);
-	pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
-	
-	// Scene 그림자맵 
-	ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
-	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
-
-	D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	pd3dCommandList->SetGraphicsRootDescriptorTable(3, texHandle);
-
+	ChangeShader(ShaderType::Shader_Skinned, pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
 	{
 		if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
@@ -329,7 +328,7 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		g_pPlayer->Render(elapsedTime, pd3dCommandList);
 	}
 
-	g_Shaders[ShaderType::Shader_Static]->ChangeShader(pd3dCommandList);
+	ChangeShader(ShaderType::Shader_Static, pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
 	{
 		if (!m_vObjectLayer[RenderLayer::Render_Static][i]->GetIsAlive())
@@ -339,7 +338,7 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		m_vObjectLayer[RenderLayer::Render_Static][i]->Render(elapsedTime, pd3dCommandList);
 	}
 
-	g_Shaders[ShaderType::Shader_TextureMesh]->ChangeShader(pd3dCommandList);
+	ChangeShader(ShaderType::Shader_TextureMesh, pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_TextureMesh].size(); ++i)
 	{
 		if (!m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->GetIsAlive())
@@ -349,7 +348,7 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(elapsedTime, pd3dCommandList);
 	}
 
-	g_Shaders[ShaderType::Shader_CuttedStatic]->ChangeShader(pd3dCommandList);
+	ChangeShader(ShaderType::Shader_CuttedStatic, pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedStatic].size(); ++i)
 	{
 		if (!m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->GetIsAlive())
@@ -359,7 +358,7 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->Render(elapsedTime, pd3dCommandList);
 	}
 
-	g_Shaders[ShaderType::Shader_CuttedTextureMesh]->ChangeShader(pd3dCommandList);
+	ChangeShader(ShaderType::Shader_CuttedTextureMesh, pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedTexture].size(); ++i)
 	{
 		if (!m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->GetIsAlive())
@@ -369,7 +368,7 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->Render(elapsedTime, pd3dCommandList);
 	}
 
-	g_Shaders[ShaderType::Shader_CuttedSkinned]->ChangeShader(pd3dCommandList);
+	ChangeShader(ShaderType::Shader_CuttedSkinned, pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedSkinned].size(); ++i)
 	{
 		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->GetIsAlive())
@@ -382,23 +381,23 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 	}
 
 	// img 오브젝트
-	//{
-	//	g_Shaders[ShaderType::Shader_Image]->ChangeShader(pd3dCommandList);
-	//
-	//	ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
-	//	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
-	//
-	//	D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	//	pd3dCommandList->SetGraphicsRootDescriptorTable(1, texHandle);
-	//
-	//	pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &m_xmf4x4ImgObjMat, 0);
-	//	m_pImage->Render(elapsedTime, pd3dCommandList);
-	//}
+	{
+		g_Shaders[ShaderType::Shader_Image]->ChangeShader(pd3dCommandList);
+	
+		ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
+		pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
+	
+		D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		pd3dCommandList->SetGraphicsRootDescriptorTable(1, texHandle);
+	
+		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &m_xmf4x4ImgObjMat, 0);
+		m_pImage->Render(elapsedTime, pd3dCommandList);
+	}
 }
 
 void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	return;
+	//return;
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = { m_SrvDescriptorHeap.Get() };
 	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
@@ -422,6 +421,11 @@ void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 	pd3dCommandList->OMSetRenderTargets(0, nullptr, false, &dsv);
 	pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pShadowPassCB->Resource()->GetGPUVirtualAddress());
 
+	// 스킨메시 셰이더 추가 필요
+	//
+	// 현재 t포즈 상태로 깊이맵 렌더링
+	//
+	//
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
 	{
 		if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
@@ -435,8 +439,6 @@ void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(0.0f, pd3dCommandList);
 		}
 	}
-
-	// 플레이어 렌더링
 	{
 		g_pPlayer->Animate(0.0f);
 		if (!g_pPlayer->m_pAnimationController)
@@ -461,9 +463,54 @@ void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 		}
 	}
 
+	// 잘린 면의 배제 없이 통째로 깊이가 그려지는 중
+
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedStatic].size(); ++i)
+	{
+		if (!m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->GetIsAlive())
+			continue;
+
+		m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->UpdateTransform(NULL);
+		m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->Render(0.0f, pd3dCommandList);
+	}
+
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedTexture].size(); ++i)
+	{
+		if (!m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->GetIsAlive())
+			continue;
+
+		m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->UpdateTransform(NULL);
+		m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->Render(0.0f, pd3dCommandList);
+	}
+
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedSkinned].size(); ++i)
+	{
+		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->GetIsAlive())
+			continue;
+		// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
+		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Animate(0.0f);
+		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->m_pAnimationController)
+			m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->UpdateTransform(NULL);
+		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Render(0.0f, pd3dCommandList);
+	}
+
 	transition = CD3DX12_RESOURCE_BARRIER::Transition(m_ShadowMap->Resource(),
 		D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_GENERIC_READ);
 	pd3dCommandList->ResourceBarrier(1, &transition);
+}
+
+void Scene::ChangeShader(ShaderType nShaderType, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	g_Shaders[nShaderType]->ChangeShader(pd3dCommandList);
+
+	pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
+
+	// Scene 그림자맵 
+	ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
+	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
+
+	D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	pd3dCommandList->SetGraphicsRootDescriptorTable(3, texHandle);
 }
 
 void Scene::ProcessInput(UCHAR* pKeybuffer)

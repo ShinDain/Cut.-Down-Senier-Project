@@ -51,7 +51,6 @@ SkinnedMeshVertexOut VSSkinnedMesh(SkinnedMeshVertexIn vin)
 	vout.BiTangent = mul(vin.BiTangent, (float3x3)mtxVertexToBoneWorld).xyz;
 
 	vout.PosH = mul(float4(vout.PosW, 1.0f), gViewProj);
-
 	vout.TexC = vin.TexC;
 
 	return(vout);
@@ -60,10 +59,10 @@ SkinnedMeshVertexOut VSSkinnedMesh(SkinnedMeshVertexIn vin)
 
 float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 {
-	float4 diffuseAlbedo = gDiffuseMap.Sample(gSamLinear, pin.TexC);
+	float4 diffuseAlbedo = gDiffuseMap.Sample(gsamAnisotropicWrap, pin.TexC);
 
 	pin.NormalW = normalize(pin.NormalW);
-	float4 normalMapSample = gNormalMap.Sample(gSamLinear, pin.TexC);
+	float4 normalMapSample = gNormalMap.Sample(gsamAnisotropicWrap, pin.TexC);
 	float3 bumpedNormalW = NormalSampleToWorldSpace(normalMapSample.rgb, pin.NormalW, pin.TangentW);
 
 	float3 toEyeW = normalize(gEyePosW - pin.PosW);
@@ -74,7 +73,7 @@ float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 	// 직접 조명
 	const float shininess = 1.0f - gRoughness;
 	Material mat = { gAlbedoColor, gFresnelR0, shininess };
-	float3 shadowFactor = { 1.0f, 1.0f, 1.0f } ;
+	float3 shadowFactor = { 1.0f, 1.0f, 1.0f };
 	float4 directLight = ComputeLighting(gLights, mat, pin.PosW, bumpedNormalW, toEyeW, shadowFactor);
 
 	float4 litColor = ambient + directLight;

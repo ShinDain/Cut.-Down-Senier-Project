@@ -46,6 +46,8 @@ public:
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 	void RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList);
 
+	void ChangeShader(ShaderType nShaderType, ID3D12GraphicsCommandList* pd3dCommandList);
+
 	void UpdatePassCB(float totalTime, float elapsedTime);
 	void UpdateShadowPassCB(float totalTime, float elapsedTime);
 
@@ -97,7 +99,7 @@ private:
 
 	XMFLOAT3 m_BaseLightDirections[3] = {
 	//XMFLOAT3(-0.57735f, -0.57735f, -0.57735f),
-	XMFLOAT3(0.0f, -1.0f, 0.0f),
+	XMFLOAT3(0.0f, -1.0f, 0.01f),
 	XMFLOAT3(-0.57735f, -0.57735f, 0.57735f),
 	XMFLOAT3(0.0f, -0.707f, -0.707f)
 	};

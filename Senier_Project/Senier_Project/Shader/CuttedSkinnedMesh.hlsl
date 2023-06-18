@@ -102,10 +102,10 @@ float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 	// Alpha Test
 	clip(diffuseAlbedo.a - 0.1f);
 
-	diffuseAlbedo = gDiffuseMap.Sample(gSamLinear, pin.TexC);
+	diffuseAlbedo = gDiffuseMap.Sample(gsamAnisotropicWrap, pin.TexC);
 
 	pin.NormalW = normalize(pin.NormalW);
-	float4 normalMapSample = gNormalMap.Sample(gSamLinear, pin.TexC);
+	float4 normalMapSample = gNormalMap.Sample(gsamAnisotropicWrap, pin.TexC);
 	float3 bumpedNormalW = NormalSampleToWorldSpace(normalMapSample.rgb, pin.NormalW, pin.TangentW);
 
 	float3 toEyeW = normalize(gEyePosW - pin.PosW);

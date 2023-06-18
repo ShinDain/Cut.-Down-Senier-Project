@@ -12,7 +12,8 @@ struct VertexIn
 struct VertexOut
 {
 	float4 PosH : SV_POSITION;
-	float3 PosW : POSITION;
+	float3 PosW : POSITION0;
+	float4 ShadowPosH : POSITION1;
 	float3 NormalW : NORMAL;
 	float3 TangentW : TANGENT;
 	float3 BiTangent : BITANGENT;
@@ -31,7 +32,7 @@ VertexOut defaultVS(VertexIn vin)
 	vout.TangentW = mul(vin.Tangent, (float3x3)gWorld).xyz;
 	vout.BiTangent = mul(vin.BiTangent, (float3x3)gWorld).xyz;
 
-
+	vout.ShadowPosH = mul(posW, gShadowTransform);
 	vout.TexC = vin.TexC;
 
 	return vout;
@@ -50,7 +51,8 @@ float4 defaultPS(VertexOut pin) : SV_Target
 	// 직접 조명
 	const float shininess = 1.0f - gRoughness;
 	Material mat = { gAlbedoColor, gFresnelR0, shininess };
-	float3 shadowFactor = 1.0f;
+	float3 shadowFactor = { 1.0f, 1.0f, 1.0f };
+	shadowFactor[0] = CalcShadowFactor(pin.ShadowPosH);
 	float4 directLight = ComputeLighting(gLights, mat, pin.PosW, pin.NormalW, toEyeW, shadowFactor);
 
 	float4 litColor = ambient + directLight;
@@ -79,6 +81,7 @@ VertexOut TextureVS(VertexIn vin)
 	vout.TangentW = mul(vin.Tangent, (float3x3)gWorld).xyz;
 	vout.BiTangent = mul(vin.BiTangent, (float3x3)gWorld).xyz;
 
+	vout.ShadowPosH = mul(posW, gShadowTransform);
 	vout.TexC = vin.TexC;
 
 	return vout;
@@ -86,10 +89,10 @@ VertexOut TextureVS(VertexIn vin)
 
 float4 TexturePS(VertexOut pin) : SV_Target
 {
-	float4 diffuseAlbedo = gDiffuseMap.Sample(gSamLinear, pin.TexC);
+	float4 diffuseAlbedo = gDiffuseMap.Sample(gsamAnisotropicWrap, pin.TexC);
 
 	pin.NormalW = normalize(pin.NormalW);
-	float4 normalMapSample = gNormalMap.Sample(gSamLinear, pin.TexC);
+	float4 normalMapSample = gNormalMap.Sample(gsamAnisotropicWrap, pin.TexC);
 	float3 bumpedNormalW = NormalSampleToWorldSpace(normalMapSample.rgb, pin.NormalW, pin.TangentW);
 
 	float3 toEyeW = normalize(gEyePosW - pin.PosW);
@@ -101,7 +104,9 @@ float4 TexturePS(VertexOut pin) : SV_Target
 	//const float shininess = 1.0f - gRoughness;
 	const float shininess = 0.0f;
 	Material mat = { gAlbedoColor, gFresnelR0, shininess };
-	float3 shadowFactor = 1.0f;
+	float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
+	shadowFactor[0] = CalcShadowFactor(pin.ShadowPosH);
+
 	float4 directLight = ComputeLighting(gLights, mat, pin.PosW, bumpedNormalW, toEyeW, shadowFactor);
 
 	float4 litColor = ambient + directLight;
@@ -111,7 +116,7 @@ float4 TexturePS(VertexOut pin) : SV_Target
 
 	return litColor;
 
-	//diffuseAlbedo = gShadowMap.Sample(gSamLinear, pin.TexC);
+	//diffuseAlbedo = gShadowMap.Sample(gsamAnisotropicWrap, pin.TexC);
 
 	//return diffuseAlbedo;
 }

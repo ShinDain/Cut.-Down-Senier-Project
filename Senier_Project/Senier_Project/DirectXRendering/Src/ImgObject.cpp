@@ -136,6 +136,7 @@ bool ImgObject::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 	return true;
 }
 
+
 bool ImgObject::ChangePosition(int nPosX, int nPosY)
 {
 	float left, right, top, bottom;
