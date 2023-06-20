@@ -55,6 +55,9 @@ void Item::Animate(float elapsedTime)
 
 void Item::Update(float elapsedTime)
 {
+	if (!m_bIsAlive)
+		return;
+
 	if (m_bIsActive)
 		Intersect(elapsedTime);
 	else
@@ -67,12 +70,7 @@ void Item::Update(float elapsedTime)
 	Animate(elapsedTime);
 	UpdateTransform(NULL);
 
-	ObjConstant objConstant;
-	XMMATRIX world = XMLoadFloat4x4(&m_xmf4x4World);
-	XMMATRIX inverseTransWorld = XMMatrixInverse(nullptr, XMMatrixTranspose(world));
-	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(world));
-	XMStoreFloat4x4(&objConstant.InverseTransWorld, XMMatrixTranspose(inverseTransWorld));
-	if (m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
+	if (m_pObjectCB) UpdateObjectCB();
 
 	if (m_pSibling) {
 		m_pSibling->Update(elapsedTime);

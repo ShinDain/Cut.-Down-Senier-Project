@@ -41,9 +41,7 @@ VertexOut VS(VertexIn vin)
 
 void PS(VertexOut pin)
 {
-#ifdef ALPHA_TEST
-    clip(diffuseAlbedo.a - 0.1f);
-#endif
+   // clip(diffuseAlbedo.a - 0.1f);
 }
 
 

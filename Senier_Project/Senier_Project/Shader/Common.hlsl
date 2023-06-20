@@ -13,9 +13,10 @@
 #include "LightingUtil.hlsl"
 
 Texture2D gShadowMap : register(t0);
-Texture2D gDiffuseMap : register(t1);
-Texture2D gMaskMap : register(t2);
-Texture2D gNormalMap : register(t3);
+Texture2D gDissolveMap : register(t1);
+Texture2D gDiffuseMap : register(t2);
+Texture2D gMaskMap : register(t3);
+Texture2D gNormalMap : register(t4);
 
 SamplerState gsamAnisotropicWrap  : register(s0);
 SamplerState gsamAnisotropicClamp : register(s1);
@@ -48,6 +49,9 @@ cbuffer cbPerPass : register(b3)
 	// [NUM_DIR_LIGHTS + NUM_POINT_LIGHTS, NUM_DIR_LIGHTS + NUM_POINT_LIGHTS + NUM_SPOT_LIGHTS) 점적광
 
 	Light gLights[MaxLights];
+
+    float gFadeInValue;
+    float3 gPadding;
 };
 
 cbuffer cbPerMaterial : register(b4)
@@ -56,6 +60,12 @@ cbuffer cbPerMaterial : register(b4)
 	float3 gFresnelR0;
 	float gRoughness;
 	float4x4 gMatTransform;
+}
+
+cbuffer cbPerObject : register(b5)
+{
+    float gDissolveValue;
+
 }
 
 // 법선 맵 표본을 세계 공간으로 변환한다.

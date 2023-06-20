@@ -14,7 +14,7 @@ cbuffer cbBoneTransforms : register(b2)
 };
 
 
-cbuffer cbPerCut : register(b5)
+cbuffer cbPerCut : register(b6)
 {
 	int PlaneCnt;
 	float PlaneDirection_1;
@@ -76,6 +76,10 @@ SkinnedMeshVertexOut VSSkinnedMesh(SkinnedMeshVertexIn vin)
 
 float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 {
+	// Dissolve 효과 적용
+	float dissolveValue = gDissolveMap.Sample(gsamAnisotropicWrap, pin.TexC).r - gDissolveValue;
+	clip(dissolveValue);
+	
 	float4 diffuseAlbedo = float4(0,0,0,1);
 
 	if (dot(pin.PosW, PlaneNormal_1 * (PlaneDirection_1)) < PlaneDistance_1 * (PlaneDirection_1))

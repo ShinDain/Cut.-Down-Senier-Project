@@ -448,7 +448,7 @@ void Player::DoLanding()
 
 void Player::UpdateAnimationTrack(float elapsedTime)
 {
-	m_pWeapon->SetActive(false);
+	if(m_pWeapon) m_pWeapon->SetActive(false);
 
 	switch (m_nAnimationState)
 	{
@@ -489,18 +489,18 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 		m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_1, true);
 
 		float trackRate = m_pAnimationController->GetTrackRate(PLAYER_ONCE_TRACK_1);
-		if (trackRate > 0.2f)
+		if (trackRate > 0.5f)
 		{
 			m_pAnimationController->SetTrackEnable(PLAYER_LOOP_TRACK, false);
 
-			float weight = (trackRate - 0.2f) * 1.25f;
+			float weight = (trackRate - 0.5f) * 2.f;
 			m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1 - weight);
 
 			BlendWithIdleMovement(weight);
 		}
 		else
 		{
-			float weight = trackRate * 5;
+			float weight = trackRate * 2;
 			m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, weight);
 			m_pAnimationController->SetTrackWeight(PLAYER_LOOP_TRACK, 1 - weight);
 		}

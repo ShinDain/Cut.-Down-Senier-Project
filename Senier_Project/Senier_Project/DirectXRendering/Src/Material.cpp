@@ -47,14 +47,14 @@ bool Material::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 	CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 	UINT CbvSrvUavDescriptorSize = pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
 	for (size_t i = 0; i < m_vpTextures.size(); ++i)
 	{
-		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MostDetailedMip = 0;
-		srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-
 		if (m_vpTextures[i])
 		{
 			auto tex = m_vpTextures[i]->Resource;
@@ -83,7 +83,7 @@ void Material::MaterialSet(ID3D12GraphicsCommandList* pd3dCommandList)
 	if (m_pShader && g_curShader != m_nShaderType && g_curShader < ShaderType::Shader_DepthMap)
 		m_pShader->ChangeShader(pd3dCommandList);
 
-	if(m_pMatCB) pd3dCommandList->SetGraphicsRootConstantBufferView(2, m_pMatCB->Resource()->GetGPUVirtualAddress());
+	if(m_pMatCB) pd3dCommandList->SetGraphicsRootConstantBufferView(m_nMatCBParameterIdx, m_pMatCB->Resource()->GetGPUVirtualAddress());
 
 	if (g_curShader == ShaderType::Shader_DepthMap)
 		return;
@@ -98,9 +98,9 @@ void Material::MaterialSet(ID3D12GraphicsCommandList* pd3dCommandList)
 		pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
 
 		D3D12_GPU_DESCRIPTOR_HANDLE matHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		pd3dCommandList->SetGraphicsRootDescriptorTable(4, matHandle);
-	}
 
+		pd3dCommandList->SetGraphicsRootDescriptorTable(m_nDescTableParameterIdx, matHandle);
+	}
 }
 
 bool Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
@@ -135,7 +135,6 @@ bool Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		if (!bDuplicated)
 		{
 			LoadTexture(pd3dDevice, pd3dCommandList, conStr);
-			
 		}
 		return true;
 	}

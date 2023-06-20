@@ -9,9 +9,9 @@
 #include "../../DirectXRendering//Header/Global.h"
 #include "../../DirectXRendering/Header/Shader.h"
 
-#define CUTTED_CB_STATIC_IDX 4
-#define CUTTED_CB_TEXTURE_IDX 5
-#define CUTTED_CB_SKINNED_IDX 7
+#define CUTTED_CB_STATIC_IDX 5
+#define CUTTED_CB_TEXTURE_IDX 6
+#define CUTTED_CB_SKINNED_IDX 8
 
 class CuttedObject : public Object
 {
@@ -36,7 +36,7 @@ public:
 	virtual void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 	
-	virtual void Cutting();
+	virtual void Cutting(XMFLOAT3 xmf3PlaneNormal);
 
 	void UpdateCuttedCB();
 

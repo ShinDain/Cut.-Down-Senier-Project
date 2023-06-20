@@ -48,7 +48,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
 	std::wstring m_strTextureName;
 	std::shared_ptr<Texture> m_pTexture = nullptr;
-
+	UINT m_nDescTableParameterIdx = 1;
 
 
 	D3D12_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;

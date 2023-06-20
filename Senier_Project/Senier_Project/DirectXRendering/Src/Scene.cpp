@@ -31,24 +31,24 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	// 그림자 맵 생성
 	m_ShadowMap = std::make_unique<DepthMap>(pd3dDevice, 2048, 2048);
-	BuildDescriptorHeap(pd3dDevice);
+	BuildDescriptorHeap(pd3dDevice, pd3dCommandList);
 
 	// 캐릭터 테스트
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,15, -20), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), CHARACTER_MODEL_NAME, PLAYER_TRACK_CNT);
 
 	// 무기
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-0.59f, 0.135f, 0.063f), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90), XMFLOAT3(1, 1, 1), WEAPON_MODEL_NAME, 0);
-
+	
 	// 바닥
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, 0);
-
+	
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
 	// 몬스터 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.25, 1.25, 1.25),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.25, 1.25, 1.25),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(50, 0, 150), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(40, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
@@ -56,7 +56,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// 월드 오브젝트 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 5, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
@@ -65,7 +65,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
-	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
+	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 
 	// 이미지 오브젝트 테스트
 	std::shared_ptr<ImgObject> imgobj = std::make_shared<ImgObject>();
@@ -89,7 +89,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	return true;
 }
 
-void Scene::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
+void Scene::BuildDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
 	dsvHeapDesc.NumDescriptors = 1;
@@ -99,7 +99,7 @@ void Scene::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 	ThrowIfFailed(pd3dDevice->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_DsvDescriptorHeap)));
 
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = 1;
+	srvHeapDesc.NumDescriptors = 2;			// ShdowMap, Dissolve Texture
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	ThrowIfFailed(pd3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_SrvDescriptorHeap)));
@@ -123,6 +123,21 @@ void Scene::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 		CD3DX12_CPU_DESCRIPTOR_HANDLE(srvCpuStart, m_ShadowMapHeapIndex, cbvSrvUavDescriptorSize),
 		CD3DX12_GPU_DESCRIPTOR_HANDLE(srvGpuStart, m_ShadowMapHeapIndex, cbvSrvUavDescriptorSize),
 		CD3DX12_CPU_DESCRIPTOR_HANDLE(dsvCpuStart, 0, dsvDescriptorSize));
+
+	// Dissolve Texture
+	hDescriptor.Offset(1, cbvSrvUavDescriptorSize);
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+	const wchar_t* pstrFilePath = L"Textures/Noise.dds";
+	LoadTexture(pd3dDevice, pd3dCommandList, pstrFilePath);
+	auto dissolveTexture = FindReplicatedTexture(pstrFilePath);
+	srvDesc.Format = dissolveTexture->Resource->GetDesc().Format;
+	srvDesc.Texture2D.MipLevels = dissolveTexture->Resource->GetDesc().MipLevels;
+
+	pd3dDevice->CreateShaderResourceView(dissolveTexture->Resource.Get(), &srvDesc, hDescriptor);
 }
 
 void Scene::OnResize(float aspectRatio, float newWidth, float newHeight)
@@ -191,48 +206,10 @@ void Scene::UpdatePassCB(float totalTime, float elapsedTime)
 	passConstant.DeltaTime = elapsedTime;
 	passConstant.AmbientLight = { 0.3f, 0.3f, 0.3f, 1.0f };
 	passConstant.Lights[0].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[0].Strength = { 0.5f, 0.5f, 0.5f };
+	passConstant.Lights[0].Strength = { 0.3f, 0.3f, 0.3f };
 	passConstant.Lights[0].Position = { 0, 30.0f, 20 };
 
-	passConstant.Lights[1].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[1].Strength = { 0.5f, 0.5f, 0.5f };
-	passConstant.Lights[1].Position = { 20, 20.0f, 120 };
-
-	passConstant.Lights[2].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[2].Strength = { 0.5f, 0.5f, 0.5f };
-	passConstant.Lights[2].Position = { -50, 20.0f, 240 };
-
-	passConstant.Lights[3].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[3].Strength = { 0.5f, 0.5f, 0.5f };
-	passConstant.Lights[3].Position = { 220, 20.0f, 0 };
-
-	passConstant.Lights[4].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[4].Strength = { 0.5f, 0.5f, 0.5f };
-	passConstant.Lights[4].Position = { 220, 20.0f, 120 };
-
-	passConstant.Lights[5].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[5].Strength = { 0.5f, 0.5f, 0.5f };
-	passConstant.Lights[5].Position = { 220, 20.0f, 240 };
-
-	passConstant.Lights[6].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[6].Strength = { 0.5f, 0.5f, 0.5f };
-	passConstant.Lights[6].Position = { 150, 20.0f, 0 };
-
-	passConstant.Lights[7].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[7].Strength = { 0.5f, 0.5f, 0.5f };
-	passConstant.Lights[7].Position = { 150, 20.0f, 120 };
-
-	passConstant.Lights[8].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[8].Strength = { 0.5f, 0.5f, 0.5f };
-	passConstant.Lights[8].Position = { 150, 20.0f, 240 };
-
-	passConstant.Lights[9].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[9].Strength = { 0.5f, 0.5f, 0.5f };
-	passConstant.Lights[9].Position = { 20, 20.0f, 240 };
-
-	passConstant.Lights[10].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[10].Strength = { 0.5f, 0.5f, 0.5f };
-	passConstant.Lights[10].Position = { -50, 20.0f, 150 };
+	passConstant.FadeInValue = m_FadeInValue;
 
 	m_pPassCB->CopyData(0, passConstant);
 }
@@ -320,13 +297,13 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		}
 	}
 
-	// 플레이어 렌더링
-	{
-		g_pPlayer->Animate(elapsedTime);
-		if (!g_pPlayer->m_pAnimationController)
-			g_pPlayer->UpdateTransform(NULL);
-		g_pPlayer->Render(elapsedTime, pd3dCommandList);
-	}
+	//// 플레이어 렌더링
+	//{
+	//	g_pPlayer->Animate(elapsedTime);
+	//	if (!g_pPlayer->m_pAnimationController)
+	//		g_pPlayer->UpdateTransform(NULL);
+	//	g_pPlayer->Render(elapsedTime, pd3dCommandList);
+	//}
 
 	ChangeShader(ShaderType::Shader_Static, pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
@@ -384,12 +361,6 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 	{
 		g_Shaders[ShaderType::Shader_Image]->ChangeShader(pd3dCommandList);
 	
-		ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
-		pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
-	
-		D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		pd3dCommandList->SetGraphicsRootDescriptorTable(1, texHandle);
-	
 		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &m_xmf4x4ImgObjMat, 0);
 		m_pImage->Render(elapsedTime, pd3dCommandList);
 	}
@@ -414,18 +385,13 @@ void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 	pd3dCommandList->ClearDepthStencilView(m_ShadowMap->Dsv(),
 		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
-	// 셰이더 변경 여기
-	g_Shaders[ShaderType::Shader_DepthMap]->ChangeShader(pd3dCommandList);
+
+	g_Shaders[ShaderType::Shader_Skinned]->ChangeShader(pd3dCommandList);
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE dsv = m_ShadowMap->Dsv();
 	pd3dCommandList->OMSetRenderTargets(0, nullptr, false, &dsv);
-	pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pShadowPassCB->Resource()->GetGPUVirtualAddress());
+	pd3dCommandList->SetGraphicsRootConstantBufferView(m_nPassCBParameterIdx, m_pShadowPassCB->Resource()->GetGPUVirtualAddress());
 
-	// 스킨메시 셰이더 추가 필요
-	//
-	// 현재 t포즈 상태로 깊이맵 렌더링
-	//
-	//
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
 	{
 		if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
@@ -436,53 +402,51 @@ void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(0.0f);
 			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
 				m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
-			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(0.0f, pd3dCommandList);
+			m_vObjectLayer[RenderLayer::Render_Skinned][i]->DepthRender(0.0f, pd3dCommandList);
 		}
 	}
-	{
-		g_pPlayer->Animate(0.0f);
-		if (!g_pPlayer->m_pAnimationController)
-			g_pPlayer->UpdateTransform(NULL);
-		g_pPlayer->Render(0.0f, pd3dCommandList);
-	}
 
+	// 셰이더 변경 여기
+	g_Shaders[ShaderType::Shader_DepthMap]->ChangeShader(pd3dCommandList);
+	//g_Shaders[ShaderType::Shader_Static]->ChangeShader(pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
 	{
 		if (m_vObjectLayer[RenderLayer::Render_Static][i]->GetShadowed())
 		{
 			m_vObjectLayer[RenderLayer::Render_Static][i]->UpdateTransform(NULL);
-			m_vObjectLayer[RenderLayer::Render_Static][i]->Render(0.0f, pd3dCommandList);
+			m_vObjectLayer[RenderLayer::Render_Static][i]->DepthRender(0.0f, pd3dCommandList);
 		}
 	}
+	//g_Shaders[ShaderType::Shader_TextureMesh]->ChangeShader(pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_TextureMesh].size(); ++i)
 	{
 		if (m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->GetShadowed())
 		{
 			m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->UpdateTransform(NULL);
-			m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(0.0f, pd3dCommandList);
+			m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->DepthRender(0.0f, pd3dCommandList);
 		}
 	}
 
 	// 잘린 면의 배제 없이 통째로 깊이가 그려지는 중
-
+	//g_Shaders[ShaderType::Shader_CuttedStatic]->ChangeShader(pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedStatic].size(); ++i)
 	{
 		if (!m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->GetIsAlive())
 			continue;
 
 		m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->UpdateTransform(NULL);
-		m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->Render(0.0f, pd3dCommandList);
+		m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->DepthRender(0.0f, pd3dCommandList);
 	}
-
+	//g_Shaders[ShaderType::Shader_CuttedTextureMesh]->ChangeShader(pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedTexture].size(); ++i)
 	{
 		if (!m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->GetIsAlive())
 			continue;
 
 		m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->UpdateTransform(NULL);
-		m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->Render(0.0f, pd3dCommandList);
+		m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->DepthRender(0.0f, pd3dCommandList);
 	}
-
+	//g_Shaders[ShaderType::Shader_CuttedSkinned]->ChangeShader(pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedSkinned].size(); ++i)
 	{
 		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->GetIsAlive())
@@ -491,7 +455,7 @@ void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Animate(0.0f);
 		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->m_pAnimationController)
 			m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->UpdateTransform(NULL);
-		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Render(0.0f, pd3dCommandList);
+		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->DepthRender(0.0f, pd3dCommandList);
 	}
 
 	transition = CD3DX12_RESOURCE_BARRIER::Transition(m_ShadowMap->Resource(),
@@ -502,15 +466,15 @@ void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 void Scene::ChangeShader(ShaderType nShaderType, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	g_Shaders[nShaderType]->ChangeShader(pd3dCommandList);
-
-	pd3dCommandList->SetGraphicsRootConstantBufferView(1, m_pPassCB->Resource()->GetGPUVirtualAddress());
+	
+	pd3dCommandList->SetGraphicsRootConstantBufferView(m_nPassCBParameterIdx, m_pPassCB->Resource()->GetGPUVirtualAddress());
 
 	// Scene 그림자맵 
 	ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
 	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
 
 	D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	pd3dCommandList->SetGraphicsRootDescriptorTable(3, texHandle);
+	pd3dCommandList->SetGraphicsRootDescriptorTable(m_nDescTableParameterIdx, texHandle);
 }
 
 void Scene::ProcessInput(UCHAR* pKeybuffer)
@@ -553,6 +517,20 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 
 void Scene::KeyDownEvent(WPARAM wParam)
 {
+	switch (wParam)
+	{
+	case 'U':
+		m_FadeInValue += 0.1f;
+		if (m_FadeInValue > 1.0f)
+			m_FadeInValue = 1.0f;
+		break;
+	case 'I':
+		m_FadeInValue -= 0.1f;
+		if(m_FadeInValue < 0.0f)
+			m_FadeInValue = 0.0f;
+		break;
+	}
+
 	if(g_pPlayer) g_pPlayer->KeyDownEvent(wParam);
 }
 
@@ -734,6 +712,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		g_vpAllObjs.emplace_back(pObject);
 		g_vpCharacters.emplace_back(pPlayer);
 		g_pPlayer = pPlayer;
+		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
 	}
 		break;
 

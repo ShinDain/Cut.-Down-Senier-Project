@@ -19,7 +19,7 @@ struct VertexOut
 	float2 TexC : TEXCOORD;
 };
 
-cbuffer cbPerCut : register(b5)
+cbuffer cbPerCut : register(b6)
 {
 	int PlaneCnt;
 	float PlaneDirection_1;
@@ -56,6 +56,10 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
+	// Dissolve 효과 적용
+	float dissolveValue = gDissolveMap.Sample(gsamAnisotropicWrap, pin.TexC).r - gDissolveValue;
+	clip(dissolveValue);
+
 	float4 diffuseAlbedo = gAlbedoColor;
 
 	if (dot(pin.PosW, PlaneNormal_1 * (PlaneDirection_1)) < PlaneDistance_1 * (PlaneDirection_1))
@@ -126,6 +130,10 @@ VertexOut TextureVS(VertexIn vin)
 
 float4 TexturePS(VertexOut pin) : SV_Target
 {
+	// Dissolve 효과 적용
+	float dissolveValue = gDissolveMap.Sample(gsamAnisotropicWrap, pin.TexC).r - gDissolveValue;
+	clip(dissolveValue);
+
 	float4 diffuseAlbedo = float4(0, 0, 0, 1);
 
 	if (dot(pin.PosW, PlaneNormal_1 * (PlaneDirection_1)) < PlaneDistance_1 * (PlaneDirection_1))

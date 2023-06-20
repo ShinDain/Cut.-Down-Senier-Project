@@ -59,6 +59,10 @@ SkinnedMeshVertexOut VSSkinnedMesh(SkinnedMeshVertexIn vin)
 
 float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 {
+	// Dissolve 효과 적용
+	float dissolveValue = gDissolveMap.Sample(gsamAnisotropicWrap, pin.TexC).r - gDissolveValue;
+	clip(dissolveValue);
+
 	float4 diffuseAlbedo = gDiffuseMap.Sample(gsamAnisotropicWrap, pin.TexC);
 
 	pin.NormalW = normalize(pin.NormalW);
@@ -81,9 +85,7 @@ float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 	// 흔히 하는 방식대로, 분산 재질에서 알파를 가져온다.
 	litColor.a = diffuseAlbedo.a;
 
-	float4 tmp = float4(pin.NormalW, 1.0f);
-
-	return litColor;
+	return litColor * gFadeInValue;
 	//return tmp;
 }
 

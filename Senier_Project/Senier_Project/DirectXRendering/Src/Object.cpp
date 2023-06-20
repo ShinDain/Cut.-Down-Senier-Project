@@ -11,6 +11,7 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 				std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
 	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+	m_nObjectCBParameterIdx = 3;
 }
 
 Object::~Object()
@@ -92,7 +93,7 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_xmf3RenderOffsetRotation = objData.xmf3MeshOffsetRotation;
 	m_bShadow = objData.bShadow;
 
-#if defined(_DEBUG)
+#if defined(_DEBUG) && defined(COLLIDER_RENDER)
 	if (m_pCollider) m_pCollider->BuildMesh(pd3dDevice, pd3dCommandList);
 #endif
 
@@ -113,14 +114,30 @@ void Object::Animate(float elapsedTime)
 
 void Object::Update(float elapsedTime)
 {
+	if (!m_bIsAlive)
+		return;
+
 	// 오브젝트 파괴 타이머
 	if (m_bDestroying)
 	{
-		m_ElapsedDestroyTime += elapsedTime;
-		if (m_ElapsedDestroyTime >= m_DestroyTime)
+		if (m_bDissolveStart)
 		{
-			m_bIsAlive = false;
-			Cutting(XMFLOAT3(1,0,0));
+			m_ElapsedDestroyTime += elapsedTime;
+			m_DissolveValue = m_ElapsedDestroyTime / (m_DestroyTime);
+			if (m_ElapsedDestroyTime >= m_DestroyTime)
+			{
+				Cutting(XMFLOAT3(1, 0, 0));
+				m_bIsAlive = false;
+				return;
+			}
+		}
+		else
+		{
+			m_ElapsedDissolveTime += elapsedTime;
+			if (m_ElapsedDissolveTime >= m_DissolveTime)
+			{
+				m_bDissolveStart = true;
+			}
 		}
 	}
 
@@ -138,12 +155,7 @@ void Object::Update(float elapsedTime)
 	if(m_nObjectType != ObjectType::Object_World)
 		UpdateToRigidBody(elapsedTime);
 
-	ObjConstant objConstant;
-	XMMATRIX world = XMLoadFloat4x4(&m_xmf4x4World);
-	XMMATRIX inverseTransWorld = XMMatrixInverse(nullptr, XMMatrixTranspose(world));
-	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(world));
-	XMStoreFloat4x4(&objConstant.InverseTransWorld, XMMatrixTranspose(inverseTransWorld));
-	if(m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
+	if (m_pObjectCB) UpdateObjectCB();
 
 	if (m_pSibling) {
 		m_pSibling->Update(elapsedTime);
@@ -178,7 +190,13 @@ void Object::UpdateToRigidBody(float elapsedTime)
 			m_pCollider->UpdateWorldTransform();
 		}
 	}
+}
 
+void Object::UpdateObjectCB()
+{
+	ObjConstant objConstant;
+	objConstant.DissolveValue = m_DissolveValue;
+	if (m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
 }
 
 void Object::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
@@ -230,7 +248,7 @@ void Object::OnPrepareRender(float elapsedTime, ID3D12GraphicsCommandList* pd3dC
 {
 	// 셰이더로 전달될 Bone 행렬 버퍼를 변경한다.
 	if (m_pAnimationController) m_pAnimationController->ChangeBoneTransformCB(pd3dCommandList);
-	
+	if (m_pObjectCB) pd3dCommandList->SetGraphicsRootConstantBufferView(m_nObjectCBParameterIdx, m_pObjectCB->Resource()->GetGPUVirtualAddress());
 }
 
 void Object::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
@@ -241,10 +259,10 @@ void Object::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandLis
 	{
 		XMFLOAT4X4 xmf4x4World;
 		XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
-		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4World, 0);
+		pd3dCommandList->SetGraphicsRoot32BitConstants(m_nObjectConstantsParameterIdx, 16, &xmf4x4World, 0);
 		XMFLOAT4X4 xmf4x4InverseTransWorld;
 		XMStoreFloat4x4(&xmf4x4InverseTransWorld, XMMatrixTranspose(XMMatrixTranspose(XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_xmf4x4World)))));
-		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &xmf4x4InverseTransWorld, 16);
+		pd3dCommandList->SetGraphicsRoot32BitConstants(m_nObjectConstantsParameterIdx, 16, &xmf4x4InverseTransWorld, 16);
 
 		for (int i = 0; i < m_vpMaterials.size(); ++i)
 		{
@@ -264,6 +282,29 @@ void Object::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandLis
 
 	if (m_pSibling) m_pSibling->Render(elapsedTime, pd3dCommandList);
 	if (m_pChild) m_pChild->Render(elapsedTime, pd3dCommandList);
+}
+
+void Object::DepthRender(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	OnPrepareRender(elapsedTime, pd3dCommandList);
+
+	if (m_pMesh)
+	{
+		XMFLOAT4X4 xmf4x4World;
+		XMStoreFloat4x4(&xmf4x4World, XMMatrixTranspose(XMLoadFloat4x4(&m_xmf4x4World)));
+		pd3dCommandList->SetGraphicsRoot32BitConstants(m_nObjectConstantsParameterIdx, 16, &xmf4x4World, 0);
+		XMFLOAT4X4 xmf4x4InverseTransWorld;
+		XMStoreFloat4x4(&xmf4x4InverseTransWorld, XMMatrixTranspose(XMMatrixTranspose(XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_xmf4x4World)))));
+		pd3dCommandList->SetGraphicsRoot32BitConstants(m_nObjectConstantsParameterIdx, 16, &xmf4x4InverseTransWorld, 16);
+
+		for (int i = 0; i < m_vpMaterials.size(); ++i)
+		{
+			m_pMesh->Render(elapsedTime, pd3dCommandList);
+		}
+	}
+
+	if (m_pSibling) m_pSibling->DepthRender(elapsedTime, pd3dCommandList);
+	if (m_pChild) m_pChild->DepthRender(elapsedTime, pd3dCommandList);
 }
 
 void Object::BuildConstantBuffers(ID3D12Device* pd3dDevice)
@@ -612,7 +653,7 @@ void Object::DestroyRunTime()
 	{
 		m_pAnimationController.reset();
 	}
-	if (m_pObjectCB) m_pObjectCB.reset();
+	//if (m_pObjectCB) m_pObjectCB.reset();
 
 	if (m_pCollider) m_pCollider.reset();
 	if (m_pBody)

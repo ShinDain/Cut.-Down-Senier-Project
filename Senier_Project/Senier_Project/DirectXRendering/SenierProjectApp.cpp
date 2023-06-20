@@ -15,7 +15,6 @@ bool SenierProjectApp::Initialize()
 	if (!DirectXApp::Initialize())
 		return false;
 
-
 	// 명령목록 초기화
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
@@ -80,6 +79,7 @@ void SenierProjectApp::Update(float elapsedTime)
 {
 	ProcessInput();
 
+	FlushCommandQueue();
 	// 업데이트
 	if (m_Scene)
 	{

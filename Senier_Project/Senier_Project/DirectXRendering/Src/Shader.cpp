@@ -44,15 +44,16 @@ bool Shader::BuildShadersAndInputLayout()
 
 bool Shader::BuildRootSignature(ID3D12Device* pd3dDevice)
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[4];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[5];
 
 	CD3DX12_DESCRIPTOR_RANGE texTable1;
-	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0);
 
 	slotRootParameter[0].InitAsConstants(32, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
 	slotRootParameter[2].InitAsConstantBufferView(4);	// 재질 버퍼
-	slotRootParameter[3].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_ALL);
+	slotRootParameter[3].InitAsConstantBufferView(5);	// 오브젝트 버퍼
+	slotRootParameter[4].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_ALL);
 
 
 	// 샘플러
@@ -175,19 +176,20 @@ bool TextureMeshShader::BuildShadersAndInputLayout()
 
 bool TextureMeshShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[5];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[6];
 
 	CD3DX12_DESCRIPTOR_RANGE texTable1;
-	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0);
 
 	CD3DX12_DESCRIPTOR_RANGE texTable2;
-	texTable2.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 1, 0);
+	texTable2.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 2, 0);
 
 	slotRootParameter[0].InitAsConstants(32, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
 	slotRootParameter[2].InitAsConstantBufferView(4);	// 재질 버퍼
-	slotRootParameter[3].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_ALL);
-	slotRootParameter[4].InitAsDescriptorTable(1, &texTable2, D3D12_SHADER_VISIBILITY_ALL);
+	slotRootParameter[3].InitAsConstantBufferView(5);	// 오브젝트 버퍼
+	slotRootParameter[4].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_ALL);
+	slotRootParameter[5].InitAsDescriptorTable(1, &texTable2, D3D12_SHADER_VISIBILITY_ALL);
 
 	// 샘플러
 	auto staticSamplers = GetStaticSampler();
@@ -249,21 +251,22 @@ bool SkinnedMeshShader::BuildShadersAndInputLayout()
 
 bool SkinnedMeshShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[7];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[8];
 
 	CD3DX12_DESCRIPTOR_RANGE texTable1;
-	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0);
 
 	CD3DX12_DESCRIPTOR_RANGE texTable2;
-	texTable2.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 1, 0);
+	texTable2.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 2, 0);
 
 	slotRootParameter[0].InitAsConstants(32, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
 	slotRootParameter[2].InitAsConstantBufferView(4);	// 재질 버퍼
-	slotRootParameter[3].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_ALL);
-	slotRootParameter[4].InitAsDescriptorTable(1, &texTable2, D3D12_SHADER_VISIBILITY_ALL);
-	slotRootParameter[5].InitAsConstantBufferView(1);	// BoneOffsets 상수 버퍼 
-	slotRootParameter[6].InitAsConstantBufferView(2);	// BoneTransforms 상수 버퍼 
+	slotRootParameter[3].InitAsConstantBufferView(5);	// 오브젝트 버퍼
+	slotRootParameter[4].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_ALL);
+	slotRootParameter[5].InitAsDescriptorTable(1, &texTable2, D3D12_SHADER_VISIBILITY_ALL);
+	slotRootParameter[6].InitAsConstantBufferView(1);	// BoneOffsets 상수 버퍼 
+	slotRootParameter[7].InitAsConstantBufferView(2);	// BoneTransforms 상수 버퍼 
 
 	// 샘플러
 	auto staticSamplers = GetStaticSampler();
@@ -459,12 +462,13 @@ bool WireFrameShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 {
 	CD3DX12_ROOT_PARAMETER slotRootParameter[3];
 
-	CD3DX12_DESCRIPTOR_RANGE texTable;
-	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+	//CD3DX12_DESCRIPTOR_RANGE texTable;
+	//texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 
 	slotRootParameter[0].InitAsConstants(32, 0);		// 월드 변환 행렬
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
 	slotRootParameter[2].InitAsConstants(1,4);	// 재질 버퍼
+
 
 	// 샘플러
 	auto staticSamplers = GetStaticSampler();
@@ -555,7 +559,7 @@ bool DepthMapShader::BuildShadersAndInputLayout()
 
 bool DepthMapShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[3];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[4];
 
 	//CD3DX12_DESCRIPTOR_RANGE texTable;
 	//texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0, 0);
@@ -563,6 +567,7 @@ bool DepthMapShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 	slotRootParameter[0].InitAsConstants(32, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
 	slotRootParameter[2].InitAsConstantBufferView(4);	// 재질 버퍼
+	slotRootParameter[3].InitAsConstantBufferView(5);	// 오브젝트 버퍼
 	//slotRootParameter[3].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_ALL);
 
 	// 샘플러
@@ -659,16 +664,17 @@ bool CuttedStaticMeshShader::BuildShadersAndInputLayout()
 
 bool CuttedStaticMeshShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[5];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[6];
 
 	CD3DX12_DESCRIPTOR_RANGE texTable1;
-	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0);
 
 	slotRootParameter[0].InitAsConstants(32, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
 	slotRootParameter[2].InitAsConstantBufferView(4);	// 재질 버퍼
-	slotRootParameter[3].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_ALL); // 그림자 맵
-	slotRootParameter[4].InitAsConstantBufferView(5);	// 절단 버퍼
+	slotRootParameter[3].InitAsConstantBufferView(5);	// 오브젝트 버퍼
+	slotRootParameter[4].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_ALL); // 그림자 맵, Dissolve 텍스쳐
+	slotRootParameter[5].InitAsConstantBufferView(6);	// 절단 버퍼
 
 	// 샘플러
 	auto staticSamplers = GetStaticSampler();
@@ -770,20 +776,21 @@ bool CuttedTextureMeshShader::BuildShadersAndInputLayout()
 
 bool CuttedTextureMeshShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[6];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[7];
 
 	CD3DX12_DESCRIPTOR_RANGE texTable1;
-	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0);
 
 	CD3DX12_DESCRIPTOR_RANGE texTable2;
-	texTable2.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 1, 0);
+	texTable2.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 2, 0);
 
 	slotRootParameter[0].InitAsConstants(32, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
 	slotRootParameter[2].InitAsConstantBufferView(4);	// 재질 버퍼
-	slotRootParameter[3].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_ALL);	// 그림자 맵
-	slotRootParameter[4].InitAsDescriptorTable(1, &texTable2, D3D12_SHADER_VISIBILITY_ALL); // 메시 텍스쳐
-	slotRootParameter[5].InitAsConstantBufferView(5);	// 절단 버퍼
+	slotRootParameter[3].InitAsConstantBufferView(5);	// 오브젝트 버퍼
+	slotRootParameter[4].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_ALL);	// 그림자 맵
+	slotRootParameter[5].InitAsDescriptorTable(1, &texTable2, D3D12_SHADER_VISIBILITY_ALL); // 메시 텍스쳐
+	slotRootParameter[6].InitAsConstantBufferView(6);	// 절단 버퍼
 
 	// 샘플러
 	auto staticSamplers = GetStaticSampler();
@@ -844,22 +851,23 @@ bool CuttedSkinnedMeshShader::BuildShadersAndInputLayout()
 
 bool CuttedSkinnedMeshShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 {
-	CD3DX12_ROOT_PARAMETER slotRootParameter[8];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[9];
 
 	CD3DX12_DESCRIPTOR_RANGE texTable1;
-	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0);
 
 	CD3DX12_DESCRIPTOR_RANGE texTable2;
-	texTable2.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 1, 0);
+	texTable2.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 2, 0);
 
 	slotRootParameter[0].InitAsConstants(32, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
 	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
 	slotRootParameter[2].InitAsConstantBufferView(4);	// 재질 버퍼
-	slotRootParameter[3].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_ALL);
-	slotRootParameter[4].InitAsDescriptorTable(1, &texTable2, D3D12_SHADER_VISIBILITY_ALL);
-	slotRootParameter[5].InitAsConstantBufferView(1);	// BoneOffsets 상수 버퍼 
-	slotRootParameter[6].InitAsConstantBufferView(2);	// BoneTransforms 상수 버퍼 
-	slotRootParameter[7].InitAsConstantBufferView(5);	// 절단 버퍼
+	slotRootParameter[3].InitAsConstantBufferView(5);	// 오브젝트 버퍼
+	slotRootParameter[4].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_ALL);
+	slotRootParameter[5].InitAsDescriptorTable(1, &texTable2, D3D12_SHADER_VISIBILITY_ALL);
+	slotRootParameter[6].InitAsConstantBufferView(1);	// BoneOffsets 상수 버퍼 
+	slotRootParameter[7].InitAsConstantBufferView(2);	// BoneTransforms 상수 버퍼 
+	slotRootParameter[8].InitAsConstantBufferView(6);	// 절단 버퍼
 
 	// 샘플러
 	auto staticSamplers = GetStaticSampler();

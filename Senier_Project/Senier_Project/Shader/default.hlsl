@@ -41,16 +41,24 @@ VertexOut defaultVS(VertexIn vin)
 
 float4 defaultPS(VertexOut pin) : SV_Target
 {
+	// Dissolve 효과 적용
+	float dissolveValue = gDissolveMap.Sample(gsamAnisotropicWrap, pin.TexC).r - gDissolveValue;
+	clip(dissolveValue);
+
+	float4 diffuseAlbedo = gAlbedoColor;
+	// Alpha Test
+	clip(diffuseAlbedo.a - 0.1f);
+
 	pin.NormalW = normalize(pin.NormalW);
 
 	float3 toEyeW = normalize(gEyePosW - pin.PosW);
 
 	// 간접 조명을 흉내 내는 주변광 항.
-	float4 ambient = gAmbientLight * gAlbedoColor;
+	float4 ambient = gAmbientLight * diffuseAlbedo;
 
 	// 직접 조명
 	const float shininess = 1.0f - gRoughness;
-	Material mat = { gAlbedoColor, gFresnelR0, shininess };
+	Material mat = { diffuseAlbedo, gFresnelR0, shininess };
 	float3 shadowFactor = { 1.0f, 1.0f, 1.0f };
 	shadowFactor[0] = CalcShadowFactor(pin.ShadowPosH);
 	float4 directLight = ComputeLighting(gLights, mat, pin.PosW, pin.NormalW, toEyeW, shadowFactor);
@@ -58,9 +66,9 @@ float4 defaultPS(VertexOut pin) : SV_Target
 	float4 litColor = ambient + directLight;
 
 	// 흔히 하는 방식대로, 분산 재질에서 알파를 가져온다.
-	litColor.a = gAlbedoColor.a;
+	litColor.a = diffuseAlbedo.a;
 
-	return litColor;
+	return litColor * gFadeInValue;
 
 	//float4 diffuseAlbedo = gAlbedoColor;
 
@@ -89,7 +97,13 @@ VertexOut TextureVS(VertexIn vin)
 
 float4 TexturePS(VertexOut pin) : SV_Target
 {
+	// Dissolve 효과 적용
+	float dissolveValue = gDissolveMap.Sample(gsamAnisotropicWrap, pin.TexC).r - gDissolveValue;
+	clip(dissolveValue);
+
 	float4 diffuseAlbedo = gDiffuseMap.Sample(gsamAnisotropicWrap, pin.TexC);
+	// Alpha Test
+	clip(diffuseAlbedo.a - 0.1f);
 
 	pin.NormalW = normalize(pin.NormalW);
 	float4 normalMapSample = gNormalMap.Sample(gsamAnisotropicWrap, pin.TexC);
@@ -114,7 +128,7 @@ float4 TexturePS(VertexOut pin) : SV_Target
 	// 흔히 하는 방식대로, 분산 재질에서 알파를 가져온다.
 	litColor.a = diffuseAlbedo.a;
 
-	return litColor;
+	return litColor * gFadeInValue;
 
 	//diffuseAlbedo = gShadowMap.Sample(gsamAnisotropicWrap, pin.TexC);
 

@@ -32,6 +32,8 @@ protected:
 	std::unique_ptr<UploadBuffer<MatConstant>> m_pMatCB = nullptr;
 	std::shared_ptr<Shader> m_pShader = nullptr;
 	ShaderType m_nShaderType = ShaderType::Shader_Count;
+	UINT m_nMatCBParameterIdx = 2;
+	UINT m_nDescTableParameterIdx = 5;
 
 	XMFLOAT4 m_xmf4AlbedoColor = {0.0f, 0.0f, 0.0f, 0.0f};
 	XMFLOAT4 m_xmf4EmissiveColor = { 0.0f, 0.0f, 0.0f, 0.0f };

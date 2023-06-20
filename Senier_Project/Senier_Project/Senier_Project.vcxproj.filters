@@ -270,8 +270,5 @@
     <FxCompile Include="Shader\LightingUtil.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shader\Shadow_Skinned.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
   </ItemGroup>
 </Project>

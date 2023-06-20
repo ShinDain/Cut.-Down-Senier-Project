@@ -81,8 +81,8 @@ enum ObjectType : UINT
 
 struct ObjConstant
 {
-	DirectX::XMFLOAT4X4 World = MathHelper::identity4x4();
-	DirectX::XMFLOAT4X4 InverseTransWorld = MathHelper::identity4x4();
+	float DissolveValue = 1.0f;
+
 };
 
 struct PassConstant
@@ -101,6 +101,9 @@ struct PassConstant
 	DirectX::XMFLOAT4 AmbientLight;
 
 	Light Lights[MaxLights];
+
+	float FadeInValue = 1.0f;
+	XMFLOAT3 xmf3Pad;
 };
 
 struct MatConstant

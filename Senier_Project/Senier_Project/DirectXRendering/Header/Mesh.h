@@ -149,11 +149,13 @@ protected:
 
 	std::vector<XMFLOAT4X4> m_vxmf4x4BindPoseBoneOffsets;	
 	std::unique_ptr<UploadBuffer<BoneBindPoseOffsetConstant>> m_BindPoseBoneOffsetCB = nullptr;
+	UINT m_nBoneOffsetParameterIdx = 6;
 
 	//---------------
 
 	std::vector<XMFLOAT4X4> m_vxmf4x4SkinningBoneTransforms;
 	std::shared_ptr<UploadBuffer<SkinningBoneTransformConstant>> m_SkinningBoneTransformCB = nullptr;
+	UINT m_nBoneTransformParameterIdx = 7;
 
 	//------------------
 

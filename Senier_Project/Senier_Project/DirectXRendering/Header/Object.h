@@ -46,6 +46,7 @@ public:
 	virtual void Animate(float elapsedTime);
 	virtual void Update(float elapsedTime);
 	virtual void UpdateToRigidBody(float elapsedTime);
+	virtual void UpdateObjectCB();
 
 	virtual void ProcessInput(UCHAR* pKeybuffer) {}
 	virtual void KeyDownEvent(WPARAM wParam) {}
@@ -53,6 +54,7 @@ public:
 
 	virtual void UpdateTransform(XMFLOAT4X4 *pxmf4x4Parent = NULL);
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void DepthRender(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 
 	static std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, const char* pstrFileName, const char* pstrTexPath);
 	static std::shared_ptr<Object> LoadFrameHierarchyFromFile
@@ -87,6 +89,9 @@ protected:
 public:
 	char m_pstrFileName[64];
 	std::unique_ptr<AnimationController> m_pAnimationController = nullptr;
+	UINT m_nObjectConstantsParameterIdx = 0;
+	UINT m_nObjectCBParameterIdx = 3;
+
 public:
 	void SetChild(std::shared_ptr<Object> pChild);
 	void SetMesh(std::shared_ptr<Mesh> pMesh);
@@ -136,6 +141,11 @@ protected:
 	float m_DestroyTime = 0.0f;
 	float m_ElapsedDestroyTime = 0.0f;
 	bool m_bDestroying = false;
+
+	float m_DissolveTime = 0.0f;
+	float m_ElapsedDissolveTime = 0.0f;
+	float m_DissolveValue = 0.0f;
+	bool m_bDissolveStart = false;
 
 	float m_InvincibleTime = 0.5f;
 	float m_ElapsedInvincibleTime = 0.0f;

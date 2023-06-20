@@ -41,9 +41,8 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
-	// shadow map 테스트 중
-	//float4 diffuseAlbedo = gTexMap.Sample(gsamAnisotropicWrap, pin.TexC);
-	float4 diffuseAlbedo = float4(gTexMap.Sample(gsamAnisotropicWrap, pin.TexC).rrr, 1.0f);
+	float4 diffuseAlbedo = gTexMap.Sample(gsamAnisotropicWrap, pin.TexC);
+	//float4 diffuseAlbedo = float4(gTexMap.Sample(gsamAnisotropicWrap, pin.TexC).rrr, 1.0f);
 	//float4 diffuseAlbedo = float4(1.0f,1.0f,1.0f,1.0f);
 
 	return diffuseAlbedo;

@@ -38,7 +38,7 @@ public:
 	virtual ~Scene();
 
 	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-	void BuildDescriptorHeap(ID3D12Device* pd3dDevice);
+	void BuildDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 
 	virtual void OnResize(float aspectRatio, float newWidth, float newHeight);
@@ -77,6 +77,7 @@ private:
 	// 프레임마다 넘겨줄 상수 버퍼
 	std::unique_ptr<UploadBuffer<PassConstant>> m_pPassCB = nullptr;
 	std::unique_ptr<UploadBuffer<PassConstant>> m_pShadowPassCB = nullptr;
+	UINT m_nPassCBParameterIdx = 1;
 
 	//std::shared_ptr<Player> m_pPlayer = nullptr;
 
@@ -109,10 +110,10 @@ private:
 	std::unique_ptr<DepthMap> m_ShadowMap = nullptr;
 	ComPtr<ID3D12DescriptorHeap> m_SrvDescriptorHeap = nullptr;
 	ComPtr<ID3D12DescriptorHeap> m_DsvDescriptorHeap = nullptr;
-
 	UINT m_ShadowMapHeapIndex = 0;
+	UINT m_nDescTableParameterIdx = 4;
 
-
+	float m_FadeInValue = 1.0f;
 
 public:
 	void SetViewProjMatrix(XMFLOAT4X4 viewProj) { m_xmf4x4ViewProj = viewProj; }

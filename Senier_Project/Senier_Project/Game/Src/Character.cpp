@@ -31,13 +31,30 @@ bool Character::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 void Character::Update(float elapsedTime)
 {
+	if (!m_bIsAlive)
+		return;
+
 	// 오브젝트 파괴 타이머
 	if (m_bDestroying)
 	{
-		m_ElapsedDestroyTime += elapsedTime;
-		if (m_ElapsedDestroyTime >= m_DestroyTime)
+		if (m_bDissolveStart)
 		{
-			m_bIsAlive = false;
+			m_ElapsedDestroyTime += elapsedTime;
+			m_DissolveValue = m_ElapsedDestroyTime / (m_DestroyTime);
+			if (m_ElapsedDestroyTime >= m_DestroyTime)
+			{
+				Cutting(XMFLOAT3(1, 0, 0));
+				m_bIsAlive = false;
+				return;
+			}
+		}
+		else
+		{
+			m_ElapsedDissolveTime += elapsedTime;
+			if (m_ElapsedDissolveTime >= m_DissolveTime)
+			{
+				m_bDissolveStart = true;
+			}
 		}
 	}
 
@@ -54,12 +71,7 @@ void Character::Update(float elapsedTime)
 
 	UpdateToRigidBody(elapsedTime);
 
-	ObjConstant objConstant;
-	XMMATRIX world = XMLoadFloat4x4(&m_xmf4x4World);
-	XMMATRIX inverseTransWorld = XMMatrixInverse(nullptr, XMMatrixTranspose(world));
-	XMStoreFloat4x4(&objConstant.World, XMMatrixTranspose(world));
-	XMStoreFloat4x4(&objConstant.InverseTransWorld, XMMatrixTranspose(inverseTransWorld));
-	if (m_pObjectCB) m_pObjectCB->CopyData(0, objConstant);
+	if (m_pObjectCB) UpdateObjectCB();
 
 	if (m_pSibling) {
 		m_pSibling->Update(elapsedTime);
