@@ -48,7 +48,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
 	// 몬스터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.25, 1.25, 1.25),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.25, 1.25, 1.25),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(50, 0, 150), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(40, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
@@ -56,7 +56,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// 월드 오브젝트 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 5, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
@@ -65,11 +65,11 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
-	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
+	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 
 	// 이미지 오브젝트 테스트
 	std::shared_ptr<ImgObject> imgobj = std::make_shared<ImgObject>();
-	imgobj->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 128, 128);
+	imgobj->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 512, 512);
 	m_pImage = imgobj;
 	m_pImage->ChangePosition(10, 10);
 
@@ -361,6 +361,13 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 	{
 		g_Shaders[ShaderType::Shader_Image]->ChangeShader(pd3dCommandList);
 	
+		// Scene 그림자맵 
+		ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
+		pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
+
+		D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		pd3dCommandList->SetGraphicsRootDescriptorTable(1, texHandle);
+
 		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &m_xmf4x4ImgObjMat, 0);
 		m_pImage->Render(elapsedTime, pd3dCommandList);
 	}
@@ -446,7 +453,8 @@ void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 		m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->UpdateTransform(NULL);
 		m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->DepthRender(0.0f, pd3dCommandList);
 	}
-	//g_Shaders[ShaderType::Shader_CuttedSkinned]->ChangeShader(pd3dCommandList);
+	g_Shaders[ShaderType::Shader_CuttedSkinned]->ChangeShader(pd3dCommandList);
+	//g_Shaders[ShaderType::Shader_Skinned]->ChangeShader(pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedSkinned].size(); ++i)
 	{
 		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->GetIsAlive())
@@ -783,7 +791,12 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 	Object* pObject, float direction, XMFLOAT3 xmf3PlaneNormal, bool bIsCutted)
 {
-	float cuttingPower = 50;
+	float cuttingPower = rand() % 20 + 5; 
+	XMFLOAT3 noiseDir;
+	noiseDir.x = (float)(rand() % 30) / 100 * (1 - xmf3PlaneNormal.x);
+	noiseDir.y = (float)(rand() % 30) / 100 * (1 - xmf3PlaneNormal.y);
+	noiseDir.z = (float)(rand() % 30) / 100 * (1 - xmf3PlaneNormal.z);
+	
 	float directions[3] = {0,0,0};
 	XMFLOAT3 xmf3PlaneNormals[3] = { XMFLOAT3(0,0,0), XMFLOAT3(0,0,0), XMFLOAT3(0,0,0) };
 	UINT planeCnt = 0;
@@ -807,9 +820,9 @@ std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D
 
 
 		XMFLOAT3 xmf3CuttingVel = xmf3PlaneNormal;
-		xmf3CuttingVel.x *= cuttingPower * direction * -1;
-		xmf3CuttingVel.y *= cuttingPower * direction * -1;
-		xmf3CuttingVel.z *= cuttingPower * direction * -1;
+		xmf3CuttingVel.x *= cuttingPower * direction * -1 + noiseDir.x;
+		xmf3CuttingVel.y *= cuttingPower * direction * -1 + noiseDir.y;
+		xmf3CuttingVel.z *= cuttingPower * direction * -1 + noiseDir.z;
 		pCuttedObj->GetBody()->AddVelocity(xmf3CuttingVel);
 	}
 	else
@@ -828,8 +841,8 @@ std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D
 	objectData.xmf3Rotation = pObject->GetRotation();
 	objectData.xmf4Orientation = pObject->GetOrientation();
 	objectData.xmf3Scale = pObject->GetScale();
-	//objectData.nMass = g_DefaultObjectData[pstrFileName].nMass;
-	objectData.nMass = g_DefaultObjectData[pstrFileName].nMass * 0.3f;
+	objectData.nMass = g_DefaultObjectData[pstrFileName].nMass;
+	//objectData.nMass = g_DefaultObjectData[pstrFileName].nMass * 0.3f;
 	objectData.objectType = g_DefaultObjectData[pstrFileName].objectType;
 	objectData.colliderType = g_DefaultObjectData[pstrFileName].colliderType;
 	objectData.xmf3Extents = g_DefaultObjectData[pstrFileName].xmf3Extents;
@@ -918,9 +931,9 @@ std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D
 	}
 
 	XMFLOAT3 xmf3CuttingVel = xmf3PlaneNormal;
-	xmf3CuttingVel.x *= cuttingPower * direction * -1;
-	xmf3CuttingVel.y *= cuttingPower * direction * -1;
-	xmf3CuttingVel.z *= cuttingPower * direction * -1;
+	xmf3CuttingVel.x *= cuttingPower * direction + noiseDir.x;
+	xmf3CuttingVel.y *= cuttingPower * direction + noiseDir.y;
+	xmf3CuttingVel.z *= cuttingPower * direction + noiseDir.z;
 	tmpObject->GetBody()->AddVelocity(xmf3CuttingVel);
 
 	return tmpObject;

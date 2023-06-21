@@ -159,6 +159,27 @@ protected:
 	virtual bool BuildPSO(ID3D12Device* pd3dDevice);
 };
 
+// CuttedDepthMap ∑ª¥ı∏µ ºŒ¿Ã¥ı
+class CuttedDepthMapShader : public Shader
+{
+public:
+	CuttedDepthMapShader();
+	CuttedDepthMapShader(const CuttedDepthMapShader& rhs) = delete;
+	CuttedDepthMapShader& operator=(const CuttedDepthMapShader& rhs) = delete;
+	virtual ~CuttedDepthMapShader();
+
+	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList)
+	{
+		Shader::ChangeShader(pd3dCommandList);
+		g_curShader = m_Type;
+	}
+
+protected:
+	virtual bool BuildShadersAndInputLayout();
+	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
+	virtual bool BuildPSO(ID3D12Device* pd3dDevice);
+};
+
 // ¿ﬂ∏∞ ø¿∫Í¡ß∆Æ
 // 
 // Ω∫≈¬∆Ω ∏ﬁΩ√ ºŒ¿Ã¥ı

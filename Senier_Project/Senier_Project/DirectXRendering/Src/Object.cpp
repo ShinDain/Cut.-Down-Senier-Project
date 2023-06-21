@@ -12,6 +12,9 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 {
 	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 	m_nObjectCBParameterIdx = 3;
+
+	m_DestroyTime = 0.0f;
+	m_DissolveTime = 0.0f;
 }
 
 Object::~Object()
@@ -126,7 +129,7 @@ void Object::Update(float elapsedTime)
 			m_DissolveValue = m_ElapsedDestroyTime / (m_DestroyTime);
 			if (m_ElapsedDestroyTime >= m_DestroyTime)
 			{
-				Cutting(XMFLOAT3(1, 0, 0));
+				Cutting(XMFLOAT3(0, 1, 0));
 				m_bIsAlive = false;
 				return;
 			}

@@ -56,13 +56,13 @@ void ImgObject::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	pd3dCommandList->IASetIndexBuffer(&m_IndexBufferView);
 
-	ID3D12DescriptorHeap* descriptorHeap[] = { m_DescriptorHeap.Get() };
-	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
-
-	// shadow ¸Ê Å×½ºÆ® Áß
-	D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	
-	pd3dCommandList->SetGraphicsRootDescriptorTable(m_nDescTableParameterIdx, texHandle);
+	//ID3D12DescriptorHeap* descriptorHeap[] = { m_DescriptorHeap.Get() };
+	//pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
+	//
+	//// shadow ¸Ê Å×½ºÆ® Áß
+	//D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	//
+	//pd3dCommandList->SetGraphicsRootDescriptorTable(m_nDescTableParameterIdx, texHandle);
 }
 
 void ImgObject::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)

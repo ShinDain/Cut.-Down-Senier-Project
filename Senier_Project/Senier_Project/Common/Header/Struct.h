@@ -38,6 +38,7 @@ enum ShaderType : UINT
 	Shader_Image,
 	Shader_WireFrame,
 	Shader_DepthMap,
+	Shader_CuttedDepthMap,
 	Shader_CuttedStatic,
 	Shader_CuttedTextureMesh,
 	Shader_CuttedSkinned,

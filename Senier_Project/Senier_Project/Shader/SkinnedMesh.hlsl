@@ -27,7 +27,8 @@ struct SkinnedMeshVertexIn
 struct SkinnedMeshVertexOut
 {
 	float4 PosH : SV_POSITION;
-	float3 PosW : POSITION;
+	float3 PosW : POSITION0;
+	float4 ShadowPosH : POSITION1;
 	float3 NormalW : NORMAL;
 	float3 TangentW : TANGENT;
 	float3 BiTangent : BITANGENT;
@@ -51,6 +52,7 @@ SkinnedMeshVertexOut VSSkinnedMesh(SkinnedMeshVertexIn vin)
 	vout.BiTangent = mul(vin.BiTangent, (float3x3)mtxVertexToBoneWorld).xyz;
 
 	vout.PosH = mul(float4(vout.PosW, 1.0f), gViewProj);
+	vout.ShadowPosH = mul(vout.PosW, gShadowTransform);
 	vout.TexC = vin.TexC;
 
 	return(vout);
@@ -60,10 +62,11 @@ SkinnedMeshVertexOut VSSkinnedMesh(SkinnedMeshVertexIn vin)
 float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 {
 	// Dissolve 효과 적용
-	float dissolveValue = gDissolveMap.Sample(gsamAnisotropicWrap, pin.TexC).r - gDissolveValue;
-	clip(dissolveValue);
-
+	//float dissolveValue = gDissolveMap.Sample(gsamAnisotropicWrap, pin.TexC).r - gDissolveValue;
+	//clip(dissolveValue);
+   
 	float4 diffuseAlbedo = gDiffuseMap.Sample(gsamAnisotropicWrap, pin.TexC);
+	//clip(diffuseAlbedo.a - 0.01f);
 
 	pin.NormalW = normalize(pin.NormalW);
 	float4 normalMapSample = gNormalMap.Sample(gsamAnisotropicWrap, pin.TexC);
@@ -78,6 +81,7 @@ float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 	const float shininess = 1.0f - gRoughness;
 	Material mat = { gAlbedoColor, gFresnelR0, shininess };
 	float3 shadowFactor = { 1.0f, 1.0f, 1.0f };
+	//shadowFactor[0] = CalcShadowFactor(pin.ShadowPosH);
 	float4 directLight = ComputeLighting(gLights, mat, pin.PosW, bumpedNormalW, toEyeW, shadowFactor);
 
 	float4 litColor = ambient + directLight;
@@ -86,7 +90,6 @@ float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 	litColor.a = diffuseAlbedo.a;
 
 	return litColor * gFadeInValue;
-	//return tmp;
 }
 
 

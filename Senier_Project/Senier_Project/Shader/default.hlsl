@@ -25,7 +25,7 @@ VertexOut defaultVS(VertexIn vin)
 	VertexOut vout;
 
 	float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
-	vout.PosW = posW;
+	vout.PosW = posW.xyz;
 	vout.PosH = mul(posW, gViewProj);
 
 	vout.NormalW = mul(float4(vin.NormalL, 1.0f), gInverseTransWorld);
@@ -82,7 +82,7 @@ VertexOut TextureVS(VertexIn vin)
 	VertexOut vout;
 
 	float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
-	vout.PosW = posW;
+	vout.PosW = posW.xyz;
 	vout.PosH = mul(posW, gViewProj);
 
 	vout.NormalW = mul(float4(vin.NormalL, 1.0f), gInverseTransWorld);
@@ -103,7 +103,7 @@ float4 TexturePS(VertexOut pin) : SV_Target
 
 	float4 diffuseAlbedo = gDiffuseMap.Sample(gsamAnisotropicWrap, pin.TexC);
 	// Alpha Test
-	clip(diffuseAlbedo.a - 0.1f);
+	//clip(diffuseAlbedo.a - 0.1f);
 
 	pin.NormalW = normalize(pin.NormalW);
 	float4 normalMapSample = gNormalMap.Sample(gsamAnisotropicWrap, pin.TexC);

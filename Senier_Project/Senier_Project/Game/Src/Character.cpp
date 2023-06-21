@@ -40,10 +40,14 @@ void Character::Update(float elapsedTime)
 		if (m_bDissolveStart)
 		{
 			m_ElapsedDestroyTime += elapsedTime;
-			m_DissolveValue = m_ElapsedDestroyTime / (m_DestroyTime);
+			m_DissolveValue = m_ElapsedDestroyTime / m_DestroyTime;
+			if (m_DissolveValue > 0.9f)
+			{
+				float a = 100;
+			}
 			if (m_ElapsedDestroyTime >= m_DestroyTime)
 			{
-				Cutting(XMFLOAT3(1, 0, 0));
+				//Cutting(XMFLOAT3(1, 0, 0));
 				m_bIsAlive = false;
 				return;
 			}

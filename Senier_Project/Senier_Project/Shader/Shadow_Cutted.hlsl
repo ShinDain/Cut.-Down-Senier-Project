@@ -20,6 +20,21 @@ struct VertexOut
     float2 TexC    : TEXCOORD;
 };
 
+cbuffer cbPerCut : register(b6)
+{
+    int PlaneCnt;
+    float PlaneDirection_1;
+    float PlaneDirection_2;
+    float PlaneDirection_3;
+
+    float3 PlaneNormal_1;
+    float PlaneDistance_1;
+    float3 PlaneNormal_2;
+    float PlaneDistance_2;
+    float3 PlaneNormal_3;
+    float PlaneDistance_3;
+};
+
 VertexOut VS(VertexIn vin)
 {
     VertexOut vout = (VertexOut)0.0f;
@@ -42,9 +57,21 @@ VertexOut VS(VertexIn vin)
 
 void PS(VertexOut pin)
 {
-    //clip(pin.PosW.z);
-    //clip(-1);
-    //clip(diffuseAlbedo.a - 0.1f);
+    if (dot(pin.PosW, PlaneNormal_1 * (PlaneDirection_1)) < PlaneDistance_1 * (PlaneDirection_1))
+    {
+        // Alpha Test
+        //clip(-1);
+    }
+    if (dot(pin.PosW, PlaneNormal_2 * (PlaneDirection_2)) < PlaneDistance_2 * (PlaneDirection_2))
+    {
+        // Alpha Test
+       // clip(-1);
+    }
+    if (dot(pin.PosW, PlaneNormal_3 * (PlaneDirection_3)) < PlaneDistance_3 * (PlaneDirection_3))
+    {
+        // Alpha Test
+       // clip(-1);
+    }
 }
 
 

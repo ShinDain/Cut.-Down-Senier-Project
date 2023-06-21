@@ -25,7 +25,8 @@ Monster::Monster(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 	m_pAnimationController->SetTrackAnimationSet(ZOMBIE_IDLE_TRACK, Monster_Anim_Index_Idle);
 	m_pAnimationController->SetTrackAnimationSet(ZOMBIE_MOVE_TRACK, Monster_Anim_Index_Run);
 
-	m_DestroyTime = 1.0f;
+	m_DestroyTime = 3.0f;
+	m_DissolveTime = 0.0f;
 }
 
 Monster::~Monster()
