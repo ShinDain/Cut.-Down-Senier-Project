@@ -94,10 +94,11 @@ protected:
 	XMFLOAT3 m_xmf3CameraRotation = XMFLOAT3(0, 0, 0);
 	bool m_bCanDoubleJump = true;
 
-	float m_DefaultSpeed = 80.0f;
-	bool m_bSprint = false;
-	float m_SprintSpeed = 120.0f;
-	bool m_bDecreaseMaxSpeed = false;
+	float m_AimmingSpeed = 10.0f;
+	float m_DefaultSpeed = 100.0f;
+	//bool m_bSprint = false;
+	//float m_SprintSpeed = 120.0f;
+	//bool m_bDecreaseMaxSpeed = false;
 
 	bool m_bDashToIdle = false;
 	float m_TransitionTime = 0.5f;

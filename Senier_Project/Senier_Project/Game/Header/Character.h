@@ -68,6 +68,8 @@ protected:
 	float m_CrashPower = 0;
 	XMFLOAT3 m_xmf3CrashDirection = { 0,0,0 };
 
+	bool m_bIsShoulderView = false;
+
 	void ApplyCharacterFriction(float elapsedTime);
 	void CalcVelocityAndPosition(float elapsedTime);
 
@@ -77,4 +79,5 @@ public:
 	void SetCrashWithObject(bool bCrashWithObject) { m_bCrashWithObject = bCrashWithObject; }
 	void SetCrashPower(float crashPower) { m_CrashPower = crashPower; }
 	void SetCrashDirection(XMFLOAT3 xmf3CrashDirection) { m_xmf3CrashDirection = xmf3CrashDirection; }
+	void SetIsShoulderView(bool bIsShoulderView) { m_bIsShoulderView = bIsShoulderView; }
 };

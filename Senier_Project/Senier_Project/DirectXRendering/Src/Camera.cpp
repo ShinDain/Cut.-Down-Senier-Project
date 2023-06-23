@@ -309,47 +309,85 @@ void Third_Person_Camera::Update(float Etime)
 	Right = XMVector3TransformNormal(Right, R);
 	Up = XMVector3TransformNormal(Up, R);
 
-	R = XMMatrixRotationAxis(Right, XMConvertToRadians(m_Pitch));
-
-	Look = XMVector3TransformNormal(Look, R);
-	Up = XMVector3TransformNormal(Up, R);
-
-	XMFLOAT3 xmf3ObjectPos = m_pObject->GetPosition();
-	xmf3ObjectPos.y += m_OffsetHeight;
-	XMVECTOR objectPos = XMLoadFloat3(&xmf3ObjectPos);
-	XMVECTOR newPos = XMLoadFloat3(&xmf3ObjectPos);
-	newPos = -Look * cameraOffsetLength + newPos;
-
-	// 카메라와 플레이어 사이에 오브젝트 있는지 확인
-	XMVECTOR camDir = newPos - objectPos;
-	camDir = XMVector3Normalize(camDir);
-	float distance = 9999;
-	float best = 9999;
-	for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
+	if (m_bShoulderView)
 	{
-		BoundingOrientedBox tmpBB = g_ppColliderBoxs[i]->GetOBB();
-		if (!tmpBB.Intersects(objectPos, camDir, distance))
-			continue;
-		if (distance < best && distance != 0)
+		// Pitch 적용
+		R = XMMatrixRotationAxis(Right, XMConvertToRadians(m_ShoulderCameraPitch));
+
+		Look = XMVector3TransformNormal(Look, R);
+		Up = XMVector3TransformNormal(Up, R);
+
+		float cameraOffsetHeight = m_ShoulderOffsetHeight;// -(m_ShoulderCameraPitch) / 10;
+
+		XMFLOAT3 xmf3ObjectPos = m_pObject->GetPosition();
+		//xmf3ObjectPos.y += cameraOffsetHeight;
+		XMVECTOR objectPos = XMLoadFloat3(&xmf3ObjectPos);
+
+		float cameraOffsetLength = m_ShoulderOffsetLength;// - (m_ShoulderCameraPitch) / 2;
+
+		objectPos = Up * cameraOffsetHeight + objectPos;
+		objectPos = Right * 4 + objectPos;
+		objectPos = -Look * cameraOffsetLength + objectPos;
+		XMStoreFloat3(&xmf3ObjectPos, objectPos);
+
+
+		XMVECTOR newPos = XMLoadFloat3(&xmf3ObjectPos);
+		float targetLength = 100.0f;
+		newPos = Look * targetLength + newPos;
+
+		XMFLOAT3 xmf3NewPos;
+		XMStoreFloat3(&xmf3NewPos, newPos);
+		SetPosition(xmf3NewPos);
+
+		LookAt(xmf3ObjectPos, xmf3NewPos, XMFLOAT3(0, 1, 0));
+	}
+	else
+	{
+		// Pitch 적용
+		R = XMMatrixRotationAxis(Right, XMConvertToRadians(m_Pitch));
+
+		Look = XMVector3TransformNormal(Look, R);
+		Up = XMVector3TransformNormal(Up, R);
+
+		XMFLOAT3 xmf3ObjectPos = m_pObject->GetPosition();
+		xmf3ObjectPos.y += m_OffsetHeight;
+		XMVECTOR objectPos = XMLoadFloat3(&xmf3ObjectPos);
+
+		XMVECTOR newPos = XMLoadFloat3(&xmf3ObjectPos);
+		newPos = -Look * cameraOffsetLength + newPos;
+
+		// 카메라와 플레이어 사이에 오브젝트 있는지 확인
+		XMVECTOR camDir = newPos - objectPos;
+		camDir = XMVector3Normalize(camDir);
+		float distance = 9999;
+		float best = 9999;
+		for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
 		{
-			best = distance;
+			BoundingOrientedBox tmpBB = g_ppColliderBoxs[i]->GetOBB();
+			if (!tmpBB.Intersects(objectPos, camDir, distance))
+				continue;
+			if (distance < best && distance != 0)
+			{
+				best = distance;
+			}
 		}
+		if (best > m_OffsetLength)
+		{
+			best = m_OffsetLength;
+		}
+		cameraOffsetLength = best;
+
+		newPos = XMLoadFloat3(&xmf3ObjectPos);
+
+		newPos = -Look * cameraOffsetLength + newPos;
+
+
+		XMFLOAT3 xmf3NewPos;
+		XMStoreFloat3(&xmf3NewPos, newPos);
+		SetPosition(xmf3NewPos);
+
+		LookAt(xmf3NewPos, xmf3ObjectPos, XMFLOAT3(0, 1, 0));
 	}
-	if (best > m_OffsetLength)
-	{
-		best = m_OffsetLength;
-	}
-	cameraOffsetLength = best;
-
-	newPos = XMLoadFloat3(&xmf3ObjectPos);
-	newPos = -Look * cameraOffsetLength + newPos;
-
-
-	XMFLOAT3 xmf3NewPos;
-	XMStoreFloat3(&xmf3NewPos, newPos);
-	SetPosition(xmf3NewPos);
-
-	LookAt(xmf3NewPos, xmf3ObjectPos, XMFLOAT3(0, 1, 0));
 
 	UpdateViewMatrix();
 }
@@ -357,10 +395,21 @@ void Third_Person_Camera::Update(float Etime)
 void Third_Person_Camera::Pitch(float angle)
 {
 	m_Pitch += angle;
+
 	if (m_Pitch > m_MaxPitch)
 	{ m_Pitch = m_MaxPitch; }
 	if (m_Pitch < m_MinPitch) 
 	{ m_Pitch = m_MinPitch; }
+
+	m_ShoulderCameraPitch += angle;
+	if (m_ShoulderCameraPitch > m_MaxShoulderPitch)
+	{
+		m_ShoulderCameraPitch = m_MaxShoulderPitch;
+	}
+	if (m_ShoulderCameraPitch < m_MinShoulderPitch)
+	{
+		m_ShoulderCameraPitch = m_MinShoulderPitch;
+	}
 }
 
 void Third_Person_Camera::RotateY(float angle)

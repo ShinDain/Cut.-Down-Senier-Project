@@ -258,6 +258,10 @@ LRESULT DirectXApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
+	case WM_SETCURSOR:
+		// 커서 미표시
+		SetCursor(NULL);
+		return 0;
 	// WM_ACTIVATE는 창이 (비)활성화 시점에 보내진다. 
 	// 창이 비활성화시 시간이 가지 않도록 정지시킨다.
 	case WM_ACTIVATE:

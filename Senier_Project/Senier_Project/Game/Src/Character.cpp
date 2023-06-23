@@ -85,7 +85,8 @@ void Character::Update(float elapsedTime)
 	}
 
 	ApplyCharacterFriction(elapsedTime);
-	RotateToMove(elapsedTime);
+	if(!m_bIsShoulderView)
+		RotateToMove(elapsedTime);
 	IsFalling();
 	UpdateAnimationTrack(elapsedTime);
 
@@ -162,12 +163,16 @@ void Character::IsFalling()
 		m_xmf3RenderPosition.y = 0;
 		DoLanding();
 	}
-	else if (m_xmf3RenderPosition.y > 0)
+	else if (m_xmf3RenderPosition.y > 3)
 	{
-		for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
+		ColliderBox* thisColliderBox = (ColliderBox*)m_pCollider.get();
+		for (int i = 0; i < g_ppColliderBoxs.size(); ++i)
 		{
+			if (thisColliderBox == g_ppColliderBoxs[i].get())
+				continue;
+
 			BoundingOrientedBox obb = g_ppColliderBoxs[i]->GetOBB();
-			
+		
 			XMVECTOR position = XMLoadFloat3(&m_xmf3RenderPosition);
 			XMVECTOR direction = XMVectorSet(0, -1, 0, 0);
 			float distance = 100;
@@ -180,8 +185,12 @@ void Character::IsFalling()
 		}
 
 		m_bIsFalling = true;
-		m_CharacterFriction = 30.f;
+		if(m_bIsShoulderView)
+			m_CharacterFriction = 350.0f;
+		else
+			m_CharacterFriction = 30.0f;
 		m_Acceleration = 100.f;
+		m_pBody->SetInGravity(true);
 	}
 }
 
@@ -191,6 +200,12 @@ void Character::DoLanding()
 	m_MaxSpeedXZ = 100.f;
 	m_CharacterFriction = 350.0f;
 	m_Acceleration = 500.0f;
+	m_pBody->SetInGravity(false);
+
+	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+	if(xmf3Velocity.y < 50 && xmf3Velocity.y > 0)
+		xmf3Velocity.y = 0;
+	m_pBody->SetVelocity(xmf3Velocity);
 }
 
 void Character::RotateToMove(float elapsedTime)
@@ -271,6 +286,13 @@ void Character::Cutting(XMFLOAT3 xmf3PlaneNormal)
 
 void Character::BlendWithIdleMovement(float maxWeight)
 {
+	if (m_bIsShoulderView)
+	{
+		m_pAnimationController->SetTrackWeight(CHARACTER_IDLE_TRACK, 1);
+		m_pAnimationController->SetTrackWeight(CHARACTER_MOVE_TRACK, 0);
+		return;
+	}
+
 	m_pAnimationController->SetTrackEnable(CHARACTER_IDLE_TRACK, true);
 	m_pAnimationController->SetTrackEnable(CHARACTER_MOVE_TRACK, true);
 

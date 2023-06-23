@@ -60,7 +60,7 @@ void RigidBody::Update(float elapsedTime)
 	{
 		m_xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
 		m_xmf3AngularVelocity = XMFLOAT3(0, 0, 0);
-		m_xmf3Rotate = XMFLOAT3(0, m_xmf3Rotate.y, 0);
+		m_xmf3Rotate = XMFLOAT3(m_CharacterPitch, m_xmf3Rotate.y, 0);
 		if (!XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_xmf3Acceleration))))
 		{
 			if (XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_xmf3Velocity))) < 0.8f)

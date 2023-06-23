@@ -104,9 +104,6 @@
     <ClCompile Include="Game\Src\Character.cpp">
       <Filter>Game\Src</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Src\Player.cpp">
-      <Filter>Game\Src</Filter>
-    </ClCompile>
     <ClCompile Include="Game\Src\Monster.cpp">
       <Filter>Game\Src</Filter>
     </ClCompile>
@@ -133,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="Game\Src\CuttedObject.cpp">
       <Filter>Game\Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Src\Player.cpp">
+      <Filter>Game\Header</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

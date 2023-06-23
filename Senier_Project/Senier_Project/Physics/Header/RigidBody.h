@@ -28,6 +28,8 @@ protected:
 	XMFLOAT4 m_xmf4Orientation = XMFLOAT4(0, 0, 0, 1);
 	XMFLOAT3 m_xmf3Rotate = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 m_xmf3Scale = XMFLOAT3(1,1,1);
+
+	float m_CharacterPitch = 0;
 	//XMFLOAT3 m_xmf3Scale = XMFLOAT3(0, 0, 0);
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 
@@ -93,6 +95,8 @@ public:
 													XMStoreFloat4(&m_xmf4Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmf4Orientation))); }
 	void SetRotate(XMFLOAT3 xmf3Rotate) { m_xmf3Rotate = xmf3Rotate; }
 	void SetScale(XMFLOAT3 xmf3Scale) { m_xmf3Scale = xmf3Scale; }
+	void SetCharacterPitch(float characterPitch) { m_CharacterPitch = characterPitch; }
+
 	void SetWorld(XMFLOAT4X4 xmf4x4World) { m_xmf4x4World = xmf4x4World; }
 
 	void SetMass(float Mass) { m_Mass = Mass; }

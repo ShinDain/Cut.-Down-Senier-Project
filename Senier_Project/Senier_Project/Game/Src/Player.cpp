@@ -56,21 +56,26 @@ void Player::Update(float elapsedTime)
 	m_ObjectSearchSphere.Center = m_xmf3Position;
 	if(m_pWeapon) m_pWeapon->Intersect(m_xmf3Look);
 
-	if (m_bDecreaseMaxSpeed)
-	{
-		XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
-		xmf3Velocity.y = 0;
-		XMVECTOR velocity = XMLoadFloat3(&xmf3Velocity);
-		float length = XMVectorGetX(XMVector3Length(velocity));
+	if (m_bIsShoulderView)
+		m_MaxSpeedXZ = m_AimmingSpeed;
+	else
+		m_MaxSpeedXZ = m_DefaultSpeed;
 
-		m_MaxSpeedXZ -= 1;
-		if (m_MaxSpeedXZ < m_DefaultSpeed || length < m_DefaultSpeed)
-		{
-			m_bSprint = false;
-			m_MaxSpeedXZ = m_DefaultSpeed;
-			m_bDecreaseMaxSpeed = false;
-		}
-	}
+	//if (m_bDecreaseMaxSpeed)
+	//{
+	//	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+	//	xmf3Velocity.y = 0;
+	//	XMVECTOR velocity = XMLoadFloat3(&xmf3Velocity);
+	//	float length = XMVectorGetX(XMVector3Length(velocity));
+	//
+	//	m_MaxSpeedXZ -= 1;
+	//	if (m_MaxSpeedXZ < m_DefaultSpeed || length < m_DefaultSpeed)
+	//	{
+	//		m_bSprint = false;
+	//		m_MaxSpeedXZ = m_DefaultSpeed;
+	//		m_bDecreaseMaxSpeed = false;
+	//	}
+	//}
 }
 
 void Player::Destroy()
@@ -116,10 +121,10 @@ void Player::KeyDownEvent(WPARAM wParam)
 	case VK_SPACE:
 		Jump();
 		break;
-	case VK_SHIFT:
-		m_bSprint = true;
-		m_MaxSpeedXZ = m_SprintSpeed;
-		break;
+	//case VK_SHIFT:
+	//	m_bSprint = true;
+	//	m_MaxSpeedXZ = m_SprintSpeed;
+	//	break;
 	default:
 		break;
 	}
@@ -129,9 +134,9 @@ void Player::KeyUpEvent(WPARAM wParam)
 {
 	switch (wParam)
 	{
-	case VK_SHIFT:
-		m_bDecreaseMaxSpeed = true;
-		break;
+	//case VK_SHIFT:
+	//	m_bDecreaseMaxSpeed = true;
+	//	break;
 	default:
 		break;
 	}
@@ -204,6 +209,9 @@ void Player::Move(DWORD dwDirection)
 
 void Player::Jump()
 {
+	if (m_bIsShoulderView)
+		return;
+
 	if (!m_bIsFalling || m_bCanDoubleJump)
 	{
 		if (m_bIsFalling)
@@ -239,6 +247,9 @@ void Player::ChangeToJumpState()
 
 void Player::Attack()
 {
+	if (m_bIsShoulderView)
+		return;
+
 	m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, false);
 	m_pAnimationController->SetTrackEnable(PLAYER_MOVE_TRACK, false);
 	m_pAnimationController->SetTrackEnable(PLAYER_SPRINT_TRACK, false);
@@ -418,10 +429,14 @@ void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 
 void Player::DoLanding()
 {
-	m_bIsFalling = false;
+	Character::DoLanding();
+
+	//m_bIsFalling = false;
+	//m_MaxSpeedXZ = 100.f;
+	//m_CharacterFriction = 350.0f;
+	//m_Acceleration = 500.0f;
+	//m_pBody->SetInGravity(false);
 	m_bCanDoubleJump = true;
-	m_CharacterFriction = 350.0f;
-	m_Acceleration = 500.0f;
 	m_TurnSpeed = 1;
 
 	switch (m_nAnimationState)
@@ -614,46 +629,49 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 
 void Player::BlendWithIdleMovement(float maxWeight)
 {
-	m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, true);
-	m_pAnimationController->SetTrackEnable(PLAYER_MOVE_TRACK, true);
-	if (m_bSprint)
-		m_pAnimationController->SetTrackEnable(PLAYER_SPRINT_TRACK, true);
-	else
-		m_pAnimationController->SetTrackEnable(PLAYER_SPRINT_TRACK, false);
+	Character::BlendWithIdleMovement(maxWeight);
+	return;
 
-	float weight = maxWeight;
-	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
-	xmf3Velocity.y = 0;
-	XMVECTOR velocity = XMLoadFloat3(&xmf3Velocity);
-	float length = XMVectorGetX(XMVector3Length(velocity));
-
-	if (m_bSprint)
-		weight = length / m_SprintSpeed;
-	else
-		weight = length / m_DefaultSpeed;
-
-	if (weight < FLT_EPSILON)
-		weight = 0;
-	else if (weight > maxWeight)
-		weight = maxWeight;
-	if (m_bSprint)
-	{
-		if (weight <= 0.66f)
-		{
-			m_pAnimationController->SetTrackWeight(PLAYER_IDLE_TRACK, maxWeight - (weight / 2 * 3));
-			m_pAnimationController->SetTrackWeight(PLAYER_MOVE_TRACK, weight / 2 * 3);
-			m_pAnimationController->SetTrackWeight(PLAYER_SPRINT_TRACK, 0);
-		}
-		else
-		{
-			m_pAnimationController->SetTrackWeight(PLAYER_IDLE_TRACK, 0);
-			m_pAnimationController->SetTrackWeight(PLAYER_MOVE_TRACK, maxWeight - (weight - 0.66f) * 3);
-			m_pAnimationController->SetTrackWeight(PLAYER_SPRINT_TRACK, (weight - 0.66f) * 3);
-		}
-	}
-	else
-	{
-		m_pAnimationController->SetTrackWeight(PLAYER_IDLE_TRACK, maxWeight - weight);
-		m_pAnimationController->SetTrackWeight(PLAYER_MOVE_TRACK, weight);
-	}
+	//m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, true);
+	//m_pAnimationController->SetTrackEnable(PLAYER_MOVE_TRACK, true);
+	//if (m_bSprint)
+	//	m_pAnimationController->SetTrackEnable(PLAYER_SPRINT_TRACK, true);
+	//else
+	//	m_pAnimationController->SetTrackEnable(PLAYER_SPRINT_TRACK, false);
+	//
+	//float weight = maxWeight;
+	//XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+	//xmf3Velocity.y = 0;
+	//XMVECTOR velocity = XMLoadFloat3(&xmf3Velocity);
+	//float length = XMVectorGetX(XMVector3Length(velocity));
+	//
+	//if (m_bSprint)
+	//	weight = length / m_SprintSpeed;
+	//else
+	//	weight = length / m_DefaultSpeed;
+	//
+	//if (weight < FLT_EPSILON)
+	//	weight = 0;
+	//else if (weight > maxWeight)
+	//	weight = maxWeight;
+	//if (m_bSprint)
+	//{
+	//	if (weight <= 0.66f)
+	//	{
+	//		m_pAnimationController->SetTrackWeight(PLAYER_IDLE_TRACK, maxWeight - (weight / 2 * 3));
+	//		m_pAnimationController->SetTrackWeight(PLAYER_MOVE_TRACK, weight / 2 * 3);
+	//		m_pAnimationController->SetTrackWeight(PLAYER_SPRINT_TRACK, 0);
+	//	}
+	//	else
+	//	{
+	//		m_pAnimationController->SetTrackWeight(PLAYER_IDLE_TRACK, 0);
+	//		m_pAnimationController->SetTrackWeight(PLAYER_MOVE_TRACK, maxWeight - (weight - 0.66f) * 3);
+	//		m_pAnimationController->SetTrackWeight(PLAYER_SPRINT_TRACK, (weight - 0.66f) * 3);
+	//	}
+	//}
+	//else
+	//{
+	//	m_pAnimationController->SetTrackWeight(PLAYER_IDLE_TRACK, maxWeight - weight);
+	//	m_pAnimationController->SetTrackWeight(PLAYER_MOVE_TRACK, weight);
+	//}
 }

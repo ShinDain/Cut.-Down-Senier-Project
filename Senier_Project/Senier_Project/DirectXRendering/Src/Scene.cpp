@@ -69,7 +69,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	// 이미지 오브젝트 테스트
 	std::shared_ptr<ImgObject> imgobj = std::make_shared<ImgObject>();
-	imgobj->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 512, 512);
+	imgobj->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 128, 128);
 	m_pImage = imgobj;
 	m_pImage->ChangePosition(10, 10);
 
@@ -151,14 +151,6 @@ void Scene::Update(float totalTime ,float elapsedTime)
 {
 	ClearObjectLayer();
 
-	m_pCamera->Update(elapsedTime);
-	// 패스버퍼 업데이트
-	UpdateShadowPassCB(totalTime, elapsedTime);
-	UpdatePassCB(totalTime, elapsedTime);
-
-	// ImageObject 렌더를 위한  직교 투영행렬 업데이트
-	m_xmf4x4ImgObjMat = m_pCamera->GetOrtho4x4f();
-
 #if defined(_DEBUG)
 	XMFLOAT3 xmf3PlayerPosition = g_pPlayer->GetPosition();
 	m_refCnt = xmf3PlayerPosition.x;
@@ -171,6 +163,14 @@ void Scene::Update(float totalTime ,float elapsedTime)
 		if (g_vpAllObjs[i]) g_vpAllObjs[i]->Update(elapsedTime);
 	}
 	//g_pPlayer->Update(elapsedTime);
+
+	m_pCamera->Update(elapsedTime);
+	// 패스버퍼 업데이트
+	UpdateShadowPassCB(totalTime, elapsedTime);
+	UpdatePassCB(totalTime, elapsedTime);
+
+	// ImageObject 렌더를 위한  직교 투영행렬 업데이트
+	m_xmf4x4ImgObjMat = m_pCamera->GetOrtho4x4f();
 
 	// 충돌 검사
 	GenerateContact();
@@ -361,12 +361,12 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 	{
 		g_Shaders[ShaderType::Shader_Image]->ChangeShader(pd3dCommandList);
 	
-		// Scene 그림자맵 
-		ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
-		pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
-
-		D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		pd3dCommandList->SetGraphicsRootDescriptorTable(1, texHandle);
+		//// Scene 그림자맵 
+		//ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
+		//pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
+		//
+		//D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_SrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		//pd3dCommandList->SetGraphicsRootDescriptorTable(1, texHandle);
 
 		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &m_xmf4x4ImgObjMat, 0);
 		m_pImage->Render(elapsedTime, pd3dCommandList);
@@ -487,35 +487,58 @@ void Scene::ChangeShader(ShaderType nShaderType, ID3D12GraphicsCommandList* pd3d
 
 void Scene::ProcessInput(UCHAR* pKeybuffer)
 {
-	float dx, dy;
-	dx = dy = 0;
-
-	POINT ptCursorPos;
-
-	if (pKeybuffer[VK_RBUTTON] & 0xF0)
+	if (m_pCamera)
 	{
-		SetCursor(NULL);
+		if (pKeybuffer[VK_RBUTTON] & 0xF0)
+		{
+			Third_Person_Camera* tmpCam = (Third_Person_Camera*)m_pCamera.get();
+			tmpCam->SetIsShoulderView(true);
+		}
+		else
+		{
+			Third_Person_Camera* tmpCam = (Third_Person_Camera*)m_pCamera.get();
+			tmpCam->SetIsShoulderView(false);
+		}
+		float dx, dy;
+		dx = dy = 0;
+
+		// 카메라 이동
+		POINT ptCursorPos;
 		GetCursorPos(&ptCursorPos);
 		SetCursorPos(CLIENT_WIDTH / 2, CLIENT_HEIGHT / 2);
-		dx = (float)(ptCursorPos.x - CLIENT_WIDTH / 2) / 30.0f;
-		dy = (float)(ptCursorPos.y - CLIENT_HEIGHT / 2) / 30.0f;
-	}
+		dx = (float)(ptCursorPos.x - CLIENT_WIDTH / 2) / 25.0f;
+		dy = (float)(ptCursorPos.y - CLIENT_HEIGHT / 2) / 25.0f;
 
-	if (dx != 0 || dy != 0)
-	{
 		if (dx != 0 || dy != 0)
 		{
-			m_pCamera->Pitch(dy);
-			m_pCamera->RotateY(dx);
+			if (dx != 0 || dy != 0)
+			{
+				m_pCamera->Pitch(dy);
+				m_pCamera->RotateY(dx);
+			}
 		}
 	}
-	
-	// 임시
+
 	if (g_pPlayer)
 	{
-		g_pPlayer->ProcessInput(pKeybuffer);
+		Third_Person_Camera* tmpCam = (Third_Person_Camera*)m_pCamera.get();
 		Player* tmpPlayer = (Player*)(g_pPlayer.get());
+
+		g_pPlayer->ProcessInput(pKeybuffer);
+
+		if (tmpCam->GetIsShoulderView())
+		{
+			tmpPlayer->SetIsShoulderView(true);
+			tmpPlayer->GetBody()->SetCharacterPitch(tmpCam->GetShoulderCameraPitch());
+			tmpPlayer->SetRotate(XMFLOAT3(tmpCam->GetShoulderCameraPitch(), m_pCamera->GetYaw(), 0));
+		}
+		else
+		{
+			tmpPlayer->SetIsShoulderView(false);
+			tmpPlayer->GetBody()->SetCharacterPitch(0);
+		}
 		tmpPlayer->SetCameraRotation(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
+		
 	}
 	
 #if defined(_DEBUG)

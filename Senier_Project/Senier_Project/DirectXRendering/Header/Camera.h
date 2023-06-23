@@ -107,11 +107,19 @@ public:
 
 protected:
 	float m_OffsetLength = 75.0f;
-	float m_OffsetHeight = 10;
+	float m_OffsetHeight = 10.0f;
 	//DirectX::XMFLOAT3 m_xmf3Offset = { 0.0f, 30.0f, -100.0f };
 
-	float m_MaxPitch = 45;
+	float m_ShoulderOffsetLength = 7.0f;
+	float m_ShoulderOffsetHeight = 12.0f;
+	float m_ShoulderCameraPitch = -15.0f;
+	bool m_bShoulderView = false;
+
+	float m_MaxPitch = 40;
 	float m_MinPitch = -10;
+
+	float m_MaxShoulderPitch = 20;
+	float m_MinShoulderPitch = -45;
 
 	// 추적할 대상 오브젝트
 	std::shared_ptr<Object> m_pObject = nullptr;
@@ -121,10 +129,14 @@ public:
 	float GetOffsetLength() const { return m_OffsetLength; }
 	//DirectX::XMFLOAT3 GetOffset() const { return m_xmf3Offset; }
 	std::shared_ptr<Object> GetTrackedObject() const { return m_pObject; }
+	bool GetIsShoulderView() { return m_bShoulderView; }
+	float GetShoulderCameraPitch() { return m_ShoulderCameraPitch; }
 
 	void SetOffsetLength(float value) { m_OffsetLength = value; }
 	//void SetOffset(DirectX::XMFLOAT3 xmf3Offset) {	m_xmf3Offset = xmf3Offset;}
 	void SetTrackedObject(const std::shared_ptr<Object> pObject) { m_pObject = pObject; }
+	void SetIsShoulderView(bool bShoulderView) { m_bShoulderView = bShoulderView; }
+	void SetShoulderCameraPitch(float shoulderPitch) { m_ShoulderCameraPitch = shoulderPitch; }
 
 };
 
