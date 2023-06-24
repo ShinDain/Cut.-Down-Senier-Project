@@ -57,15 +57,16 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 5, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 15, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	
 	// 아이템 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
-	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
+	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 
 	// 이미지 오브젝트 테스트
 	std::shared_ptr<ImgObject> imgobj = std::make_shared<ImgObject>();
@@ -489,14 +490,13 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 {
 	if (m_pCamera)
 	{
+		Third_Person_Camera* tmpCam = (Third_Person_Camera*)m_pCamera.get();
 		if (pKeybuffer[VK_RBUTTON] & 0xF0)
 		{
-			Third_Person_Camera* tmpCam = (Third_Person_Camera*)m_pCamera.get();
 			tmpCam->SetIsShoulderView(true);
 		}
 		else
 		{
-			Third_Person_Camera* tmpCam = (Third_Person_Camera*)m_pCamera.get();
 			tmpCam->SetIsShoulderView(false);
 		}
 		float dx, dy;
@@ -795,6 +795,17 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	}
 	break;
 
+	case Object_PlayerProjectile:
+	{
+		pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+	
+		g_vpAllObjs.emplace_back(pObject);
+		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
+	}
+	case Object_EnemyProjectile:
+	{
+	
+	}
 	default:
 	{
 		pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);

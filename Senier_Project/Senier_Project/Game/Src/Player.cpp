@@ -251,7 +251,31 @@ void Player::Attack()
 	// 숄더뷰 상태에선 던지기
 	if (m_bIsShoulderView)
 	{
-		//Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, m_xmf3Position, m_xmf4Orientation, XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
+		if (m_nAnimationState == Player_State_Idle)
+		{
+			// 위치는 그대로도 괜찬
+			// 카메라 위치로 시작위치
+			// 카메라 바라보는 방향으로 발사
+
+			XMFLOAT3 xmf3ProjectilePos = m_xmf3Position;
+			//xmf3ProjectilePos.y += m_xmf3ColliderExtents.y * 10 + 5;
+			xmf3ProjectilePos.y += m_xmf3ColliderExtents.y * 10;
+			XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+			XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
+			XMVECTOR projectilePos = XMLoadFloat3(&xmf3ProjectilePos);
+			projectilePos += look * 3;
+			projectilePos += right * 4;
+			XMStoreFloat3(&xmf3ProjectilePos, projectilePos);
+			std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, xmf3ProjectilePos, m_xmf4Orientation, XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
+
+			XMFLOAT3 xmf3ProjectileVelocity;
+			XMVECTOR projectileVelocity = look * 200;
+			//XMVECTOR projectileVelocity = look * 3 ;
+			XMStoreFloat3(&xmf3ProjectileVelocity, projectileVelocity);
+			tmp->GetBody()->SetVelocity(xmf3ProjectileVelocity);
+		}
+
+		return;
 	}
 
 	m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, false);
@@ -453,9 +477,11 @@ void Player::DoLanding()
 	//case Player_State_Land:
 	//	break;
 	case Player_State_Melee:
+		Character::DoLanding();
 		m_Acceleration = 30.0f;
 		m_TurnSpeed = 0;
-		break;
+		m_bCanDoubleJump = true;
+		return;
 	default:
 		break;
 	}
@@ -645,7 +671,6 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 void Player::BlendWithIdleMovement(float maxWeight)
 {
 	Character::BlendWithIdleMovement(maxWeight);
-	return;
 
 	//m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, true);
 	//m_pAnimationController->SetTrackEnable(PLAYER_MOVE_TRACK, true);

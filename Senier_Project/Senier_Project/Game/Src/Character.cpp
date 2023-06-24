@@ -287,17 +287,17 @@ void Character::Cutting(XMFLOAT3 xmf3PlaneNormal)
 
 void Character::BlendWithIdleMovement(float maxWeight)
 {
+	float weight = maxWeight;
+	m_pAnimationController->SetTrackEnable(CHARACTER_IDLE_TRACK, true);
+	m_pAnimationController->SetTrackEnable(CHARACTER_MOVE_TRACK, true);
+
 	if (m_bIsShoulderView)
 	{
-		m_pAnimationController->SetTrackWeight(CHARACTER_IDLE_TRACK, 1);
+		m_pAnimationController->SetTrackWeight(CHARACTER_IDLE_TRACK, weight);
 		m_pAnimationController->SetTrackWeight(CHARACTER_MOVE_TRACK, 0);
 		return;
 	}
 
-	m_pAnimationController->SetTrackEnable(CHARACTER_IDLE_TRACK, true);
-	m_pAnimationController->SetTrackEnable(CHARACTER_MOVE_TRACK, true);
-
-	float weight = maxWeight;
 	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
 	xmf3Velocity.y = 0;
 	XMVECTOR velocity = XMLoadFloat3(&xmf3Velocity);
