@@ -280,11 +280,13 @@ int CollisionDetector::SphereAndSphere(const ColliderSphere& sphere1, const Coll
 
 int CollisionDetector::BoxAndHalfSpace(const ColliderBox& box, const ColliderPlane& plane, CollisionData& pData)
 {
+	std::shared_ptr<RigidBody> pBoxBody = box.GetBody();
+
 	// 박스가 물리 연산을 하지 않는 경우 return;
-	if (!box.GetPhysics() || box.GetBody()->GetInvalid())
+	if (!box.GetPhysics() || pBoxBody->GetInvalid())
 		return 0;
 
-	if (!box.GetBody()->GetIsAwake())
+	if (!pBoxBody->GetIsAwake())
 		return 0;
 
 	if (pData.ContactCnt() > pData.maxContacts) return 0;
@@ -320,7 +322,7 @@ int CollisionDetector::BoxAndHalfSpace(const ColliderBox& box, const ColliderPla
 			XMFLOAT3 xmf3ContactNormal = plane.GetDirection();
 			float depth = plane.GetDistance() - distance;
 
-			pData.addContact(box.GetBody(), nullptr, pData.friction, pData.restitution, xmf3ContactPoint, xmf3ContactNormal, depth);
+			pData.addContact(pBoxBody, nullptr, pData.friction, pData.restitution, xmf3ContactPoint, xmf3ContactNormal, depth);
 
 			++contactCnt;
 
@@ -333,10 +335,13 @@ int CollisionDetector::BoxAndHalfSpace(const ColliderBox& box, const ColliderPla
 
 int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box2, CollisionData& pData, Character* pCharacter)
 {
-	if (box1.GetBody()->GetInvalid() || box2.GetBody()->GetInvalid())
+	std::shared_ptr<RigidBody> pBody1 = box1.GetBody();
+	std::shared_ptr<RigidBody> pBody2 = box2.GetBody();
+
+	if (pBody1->GetInvalid() || pBody2->GetInvalid())
 		return 0;
 
-	if (!box1.GetBody()->GetIsAwake() && !box2.GetBody()->GetIsAwake())
+	if (!pBody1->GetIsAwake() && !pBody2->GetIsAwake())
 		return 0;
 
 	// 두 물체 모두 물리 연산을 하지 않는 경우 return;
@@ -346,6 +351,7 @@ int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box
 	XMVECTOR toCentre = box2.GetAxis(3) - box1.GetAxis(3);
 	if (XMVectorGetX(XMVectorIsNaN(toCentre)))
 		return 0;
+
 
 	float pen = FLT_MAX;
 	int best = 0xffffff;
@@ -444,8 +450,8 @@ int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box
 		XMStoreFloat3(&xmf3ContactNormal, axis);
 
 		// 물리 연산을 하지 않는 경우 NULL로 전달
-		std::shared_ptr<RigidBody> pBody1 = box1.GetBody();
-		std::shared_ptr<RigidBody> pBody2 = box2.GetBody();
+		//std::shared_ptr<RigidBody> pBody1 = box1.GetBody();
+		//std::shared_ptr<RigidBody> pBody2 = box2.GetBody();
 		if (!pBody1->GetPhysics())
 			pBody1 = nullptr;
 		if (!pBody2->GetPhysics())

@@ -39,9 +39,9 @@ public:
 
 	const XMVECTOR GetAxis(int index) const;
 	const XMFLOAT4X4& GetWorld() const { return m_xmf4x4World; }
-	std::shared_ptr<RigidBody> GetBody() const { return m_pRigidBody; }
-	BoundingSphere GetBoundingSphere() { return m_BoundingSphere; }
+	BoundingSphere GetBoundingSphere() const { return m_BoundingSphere; }
 
+	std::shared_ptr<RigidBody> GetBody() const { return m_pRigidBody; }
 
 	void SetIsActive(bool bIsActive) { m_bIsActive = bIsActive; }
 	const bool GetIsActive() { return m_bIsActive; }

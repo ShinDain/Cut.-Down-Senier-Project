@@ -133,12 +133,13 @@ ColliderBox::ColliderBox(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3Extents)
 		xmf3Scale = m_pRigidBody->GetScale();
 
 	float bestLen = m_xmf3Extents.x * xmf3Scale.x;
-	if (bestLen < m_xmf3Extents.y)
+	if (bestLen < m_xmf3Extents.y * xmf3Scale.y)
 		bestLen = m_xmf3Extents.y * xmf3Scale.y;
-	if (bestLen < m_xmf3Extents.z)
+	if (bestLen < m_xmf3Extents.z * xmf3Scale.z)
 		bestLen = m_xmf3Extents.z * xmf3Scale.z;
 
 	m_BoundingSphere.Radius = bestLen;
+	m_BoundingSphere.Center = m_xmf3Position;
 
 	CalculateRotateInertiaMatrix();
 	UpdateWorldTransform();

@@ -1,4 +1,5 @@
 #include "../Header/Player.h"
+#include "../../DirectXRendering/Header/Scene.h"
 
 #define PLAYER_IDLE_TRACK 0
 #define PLAYER_MOVE_TRACK 1
@@ -247,8 +248,11 @@ void Player::ChangeToJumpState()
 
 void Player::Attack()
 {
+	// 숄더뷰 상태에선 던지기
 	if (m_bIsShoulderView)
-		return;
+	{
+		//Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, m_xmf3Position, m_xmf4Orientation, XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
+	}
 
 	m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, false);
 	m_pAnimationController->SetTrackEnable(PLAYER_MOVE_TRACK, false);
@@ -429,22 +433,19 @@ void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 
 void Player::DoLanding()
 {
-	Character::DoLanding();
-
-	//m_bIsFalling = false;
-	//m_MaxSpeedXZ = 100.f;
-	//m_CharacterFriction = 350.0f;
-	//m_Acceleration = 500.0f;
-	//m_pBody->SetInGravity(false);
-	m_bCanDoubleJump = true;
-	m_TurnSpeed = 1;
-
 	switch (m_nAnimationState)
 	{
 	//case Player_State_Idle:
 	//	break;
-	//case Player_State_Jump:
-	//	break;
+	case Player_State_Jump:
+		m_pAnimationController->SetTrackEnable(PLAYER_LOOP_TRACK, true);
+		m_pAnimationController->SetTrackAnimationSet(PLAYER_LOOP_TRACK, Player_Anim_Index_Falling);
+
+		UnableAnimationTrack(PLAYER_ONCE_TRACK_1);
+
+		m_pAnimationController->SetTrackWeight(PLAYER_LOOP_TRACK, 1);
+		m_nAnimationState = PlayerAnimationState::Player_State_Falling;
+		return;
 	case Player_State_Falling:
 		m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_JumpDown);
 		m_nAnimationState = PlayerAnimationState::Player_State_Land;
@@ -458,6 +459,17 @@ void Player::DoLanding()
 	default:
 		break;
 	}
+
+	Character::DoLanding();
+
+	//m_bIsFalling = false;
+	//m_MaxSpeedXZ = 100.f;
+	//m_CharacterFriction = 350.0f;
+	//m_Acceleration = 500.0f;
+	//m_pBody->SetInGravity(false);
+	m_bCanDoubleJump = true;
+	m_TurnSpeed = 1;
+
 
 }
 
@@ -584,6 +596,9 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 
 			m_nAnimationState = PlayerAnimationState::Player_State_Idle;
 			m_nAttackCombo = 0;
+			// 가속도 정상화
+			m_Acceleration = 500.0f;
+			m_TurnSpeed = 1;
 		}
 	}
 		break;

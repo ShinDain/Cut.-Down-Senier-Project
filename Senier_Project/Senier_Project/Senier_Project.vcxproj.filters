@@ -132,7 +132,7 @@
       <Filter>Game\Src</Filter>
     </ClCompile>
     <ClCompile Include="Game\Src\Player.cpp">
-      <Filter>Game\Header</Filter>
+      <Filter>Game\Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

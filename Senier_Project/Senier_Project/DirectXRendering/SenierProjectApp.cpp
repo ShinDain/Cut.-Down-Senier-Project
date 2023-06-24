@@ -51,6 +51,10 @@ bool SenierProjectApp::Initialize()
 	if (!m_Scene->Initialize(m_d3d12Device.Get(), m_CommandList.Get()))
 		return false;
 
+	// device, commandlist 저장
+	g_pd3dDevice = m_d3d12Device.Get();
+	g_pd3dCommandList = m_CommandList.Get();
+
 	// 디버그 텍스트 객체 초기화
 #if defined(_DEBUG) | defined(DEBUG)
 	m_DebugText = std::make_unique<DWriteText>();

@@ -19,6 +19,9 @@ class ModelDataInfo;
 class Object;
 class Player;
 
+extern ID3D12Device* g_pd3dDevice;
+extern ID3D12GraphicsCommandList* g_pd3dCommandList;
+
 extern std::vector<std::shared_ptr<ColliderPlane>> g_ppColliderPlanes;
 extern std::vector<std::shared_ptr<ColliderBox>> g_ppColliderBoxs;
 extern std::vector<std::shared_ptr<ColliderSphere>> g_ppColliderSpheres;

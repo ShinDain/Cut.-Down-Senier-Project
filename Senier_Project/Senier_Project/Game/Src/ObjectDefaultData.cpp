@@ -16,6 +16,19 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ CHARACTER_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(CHARACTER_MODEL_NAME);
 
+	//tmpData.pstrTexPath = PLAYER_PROJECTILE_MODEL_TEXPATH;
+	//tmpData.xmf3Extents = PLAYER_PROJECTILE_MODEL_EXTENTS;
+	//tmpData.objectType = PLAYER_PROJECTILE_MODEL_TYPE;
+	//tmpData.colliderType = PLAYER_PROJECTILE_MODEL_COLLIDERTYPE;
+	//tmpData.nMass = PLAYER_PROJECTILE_MODEL_MASS;
+	//tmpData.xmf3OffsetScale = PLAYER_PROJECTILE_MODEL_SCALE;
+	//tmpData.renderLayer = PLAYER_PROJECTILE_MODEL_RENDERLAYER;
+	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	//tmpData.bShadowed = PLAYER_PROJECTILE_MODEL_SHADOW;
+	//g_DefaultObjectData.insert({ PLAYER_PROJECTILE_MODEL_NAME, tmpData });
+	//g_DefaultObjectNames.emplace_back(PLAYER_PROJECTILE_MODEL_NAME);
+
 	tmpData.pstrTexPath = ZOMBIE_MODEL_TEXPATH;
 	tmpData.xmf3Extents = ZOMBIE_MODEL_EXTENTS;
 	tmpData.objectType = ZOMBIE_MODEL_TYPE;

@@ -995,9 +995,14 @@ void Scene::GenerateContact()
 
 		for (int i = 0; i < g_ppColliderBoxs.size(); ++i)
 		{
-			if (characterBox == g_ppColliderBoxs[i]) continue;
-
 			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+
+			if (characterBox == g_ppColliderBoxs[i]) continue;
+			// 박스 검사 이전 가능 여부 선행 검사 
+			// BoxAndBox 내부보다 먼저 하는 것이 더 빠름
+			if (!characterBox->GetBoundingSphere().Intersects(g_ppColliderBoxs[i]->GetBoundingSphere()))
+				continue;
+
 			CollisionDetector::BoxAndBox(*characterBox, *g_ppColliderBoxs[i], m_CollisionData, pCharacter.get());
 		}
 	}
@@ -1006,12 +1011,15 @@ void Scene::GenerateContact()
 	// 평면과의 검사
 	for (int i = 0; i < g_ppColliderPlanes.size(); ++i)
 	{
+		XMVECTOR planeNormal = XMLoadFloat3(&g_ppColliderPlanes[i]->GetDirection());
 		for (int k = 0; k < g_vpWorldObjs.size(); ++k)
 		{
+			if (m_CollisionData.ContactCnt() > nContactCnt) return;
 			std::shared_ptr<ColliderBox> colliderBox = std::static_pointer_cast<ColliderBox>(g_vpWorldObjs[k]->GetCollider());
 			if (!colliderBox) continue;
+			//if (!colliderBox->GetBoundingSphere().Intersects(planeNormal))
+			//	continue;
 
-			if (m_CollisionData.ContactCnt() > nContactCnt) return;
 			CollisionDetector::BoxAndHalfSpace(*colliderBox, *g_ppColliderPlanes[i], m_CollisionData);
 		}
 	}
@@ -1020,12 +1028,18 @@ void Scene::GenerateContact()
 	{
 		for (int k = 0; k < g_vpWorldObjs.size(); ++k)
 		{
+			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+
 			if (g_vpWorldObjs[k]->GetColliderType() != ColliderType::Collider_Box)
 				continue;
 			std::shared_ptr<ColliderBox> colliderBox = std::static_pointer_cast<ColliderBox>(g_vpWorldObjs[k]->GetCollider());
 			if (!colliderBox || colliderBox == g_ppColliderBoxs[i]) continue;
 
-			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+			// 박스 검사 이전 가능 여부 선행 검사 
+			// BoxAndBox 내부보다 먼저 하는 것이 더 빠름
+			if(!colliderBox->GetBoundingSphere().Intersects(g_ppColliderBoxs[i]->GetBoundingSphere()))
+				continue;
+			
 			CollisionDetector::BoxAndBox(*colliderBox, *g_ppColliderBoxs[i], m_CollisionData, nullptr);
 		}
 	}

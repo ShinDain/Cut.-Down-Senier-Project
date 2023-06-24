@@ -175,9 +175,10 @@ void Character::IsFalling()
 		
 			XMVECTOR position = XMLoadFloat3(&m_xmf3RenderPosition);
 			XMVECTOR direction = XMVectorSet(0, -1, 0, 0);
-			float distance = 100;
+			float distance = 0;
 			bool bIntersect = obb.Intersects(position, direction, distance);
-			if (distance < m_xmf3ColliderExtents.y * 10 && bIntersect)
+			//if (distance < m_xmf3ColliderExtents.y * 10 && bIntersect)
+			if (distance < 1 && bIntersect)
 			{
 				DoLanding();
 				return;

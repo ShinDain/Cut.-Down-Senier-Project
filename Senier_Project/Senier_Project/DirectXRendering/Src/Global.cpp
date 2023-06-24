@@ -1,5 +1,8 @@
 #include "../Header/Global.h"
 
+ID3D12Device* g_pd3dDevice = nullptr;
+ID3D12GraphicsCommandList* g_pd3dCommandList = nullptr;
+
 std::vector<std::shared_ptr<Texture>> g_CachingTexture;
 std::map<ShaderType, std::shared_ptr<Shader>> g_Shaders;
 
