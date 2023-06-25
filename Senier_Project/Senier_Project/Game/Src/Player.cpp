@@ -253,24 +253,41 @@ void Player::Attack()
 	{
 		if (m_nAnimationState == Player_State_Idle)
 		{
-			// 위치는 그대로도 괜찬
-			// 카메라 위치로 시작위치
-			// 카메라 바라보는 방향으로 발사
-
 			XMFLOAT3 xmf3ProjectilePos = m_xmf3Position;
-			//xmf3ProjectilePos.y += m_xmf3ColliderExtents.y * 10 + 5;
-			xmf3ProjectilePos.y += m_xmf3ColliderExtents.y * 10;
+
+			XMVECTOR cameraLook = XMVectorSet(0, 0, 1, 0);
+			XMVECTOR cameraRight = XMVectorSet(1, 0, 0, 0);
+			XMVECTOR cameraUp = XMVectorSet(0, 1, 0, 0);
+			XMVECTOR cameraRotation = XMLoadFloat3(&m_xmf3CameraRotation);
+			XMMATRIX R = XMMatrixRotationY(XMConvertToRadians(m_xmf3CameraRotation.y));
+			cameraLook = XMVector3TransformNormal(cameraLook, R);
+			cameraRight = XMVector3TransformNormal(cameraRight, R);
+			R = XMMatrixRotationAxis(cameraRight, XMConvertToRadians(m_xmf3CameraRotation.x));
+			cameraLook = XMVector3TransformNormal(cameraLook, R);
+			cameraUp = XMVector3TransformNormal(cameraUp, R);
+
 			XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
 			XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
 			XMVECTOR projectilePos = XMLoadFloat3(&xmf3ProjectilePos);
+			
 			projectilePos += look * 3;
 			projectilePos += right * 4;
+			projectilePos += cameraUp * m_xmf3ColliderExtents.y * 12;
 			XMStoreFloat3(&xmf3ProjectilePos, projectilePos);
-			std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, xmf3ProjectilePos, m_xmf4Orientation, XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
+			XMVECTOR projectileTarget = projectilePos;
+			projectileTarget += cameraLook * 1000;
+			XMVECTOR projectileVelocity = projectileTarget - projectilePos;
+			projectileVelocity = XMVector3Normalize(projectileVelocity);
 
 			XMFLOAT3 xmf3ProjectileVelocity;
-			XMVECTOR projectileVelocity = look * 200;
-			//XMVECTOR projectileVelocity = look * 3 ;
+			projectileVelocity = projectileVelocity * 200;
+
+			XMVECTOR projectileOrientation = XMLoadFloat4(&m_xmf4Orientation);
+			projectileOrientation = XMQuaternionRotationRollPitchYaw(0, 0, 90);
+			XMFLOAT4 xmf4projectileOrientation;
+			XMStoreFloat4(&xmf4projectileOrientation, projectileOrientation);
+			std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, xmf3ProjectilePos, xmf4projectileOrientation,
+				XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
 			XMStoreFloat3(&xmf3ProjectileVelocity, projectileVelocity);
 			tmp->GetBody()->SetVelocity(xmf3ProjectileVelocity);
 		}

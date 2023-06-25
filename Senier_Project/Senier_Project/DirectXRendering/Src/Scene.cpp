@@ -73,6 +73,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	imgobj->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 128, 128);
 	m_pImage = imgobj;
 	m_pImage->ChangePosition(10, 10);
+	//m_pImage->ChangePosition(CLIENT_WIDTH / 2 - 64, CLIENT_HEIGHT / 2 - 64);
 
 	// 카메라 초기화
 	if (g_pPlayer)
@@ -531,14 +532,14 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 			tmpPlayer->SetIsShoulderView(true);
 			tmpPlayer->GetBody()->SetCharacterPitch(tmpCam->GetShoulderCameraPitch());
 			tmpPlayer->SetRotate(XMFLOAT3(tmpCam->GetShoulderCameraPitch(), m_pCamera->GetYaw(), 0));
+			tmpPlayer->SetCameraRotation(XMFLOAT3(tmpCam->GetShoulderCameraPitch(), m_pCamera->GetYaw(), 0));
 		}
 		else
 		{
 			tmpPlayer->SetIsShoulderView(false);
 			tmpPlayer->GetBody()->SetCharacterPitch(0);
+			tmpPlayer->SetCameraRotation(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
 		}
-		tmpPlayer->SetCameraRotation(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
-		
 	}
 	
 #if defined(_DEBUG)

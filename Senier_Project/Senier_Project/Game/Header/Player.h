@@ -92,9 +92,10 @@ protected:
 	std::shared_ptr<Weapon> m_pWeapon = nullptr;
 	
 	XMFLOAT3 m_xmf3CameraRotation = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 m_xmf3CameraLook = XMFLOAT3(0, 0, 0);
 	bool m_bCanDoubleJump = true;
 
-	float m_AimmingSpeed = 10.0f;
+	float m_AimmingSpeed = 20.f;
 	float m_DefaultSpeed = 100.0f;
 	//bool m_bSprint = false;
 	//float m_SprintSpeed = 120.0f;
