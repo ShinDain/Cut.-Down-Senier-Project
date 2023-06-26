@@ -129,7 +129,7 @@ void Object::Update(float elapsedTime)
 			m_DissolveValue = m_ElapsedDestroyTime / (m_DestroyTime);
 			if (m_ElapsedDestroyTime >= m_DestroyTime)
 			{
-				Cutting(XMFLOAT3(0, 1, 0));
+				//Cutting(XMFLOAT3(0, 1, 0));
 				m_bIsAlive = false;
 				return;
 			}
@@ -179,7 +179,8 @@ void Object::UpdateToRigidBody(float elapsedTime)
 			Destroy();
 			return;
 		}
-		m_pCollider->UpdateWorldTransform();
+		if (m_pCollider)
+			m_pCollider->UpdateWorldTransform();
 		m_xmf3Position = m_pBody->GetPosition();
 		m_xmf4Orientation = m_pBody->GetOrientation();
 		m_xmf3Rotation = m_pBody->GetRotate();

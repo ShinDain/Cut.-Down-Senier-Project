@@ -272,15 +272,16 @@ void Player::Attack()
 			
 			projectilePos += look * 3;
 			projectilePos += right * 4;
-			projectilePos += cameraUp * m_xmf3ColliderExtents.y * 12;
+			projectilePos += cameraUp * m_xmf3ColliderExtents.y * 13;
 			XMStoreFloat3(&xmf3ProjectilePos, projectilePos);
 			XMVECTOR projectileTarget = projectilePos;
-			projectileTarget += cameraLook * 1000;
+			projectileTarget += cameraLook * 1;
+			//projectileTarget += cameraUp;
 			XMVECTOR projectileVelocity = projectileTarget - projectilePos;
 			projectileVelocity = XMVector3Normalize(projectileVelocity);
 
 			XMFLOAT3 xmf3ProjectileVelocity;
-			projectileVelocity = projectileVelocity * 200;
+			projectileVelocity = projectileVelocity * 300;
 
 			XMVECTOR projectileOrientation = XMLoadFloat4(&m_xmf4Orientation);
 			projectileOrientation = XMQuaternionRotationRollPitchYaw(0, 0, 90);
@@ -313,7 +314,7 @@ void Player::Attack()
 	{
 		// 선입력 방지
 		float trackRate = m_pAnimationController->GetTrackRate(PLAYER_ONCE_TRACK_1 + m_nCurAttackTrack);
-		if (trackRate < 0.4f || m_nAttackCombo - m_nCurAttackTrack > 1)
+		if (trackRate < 0.25f || trackRate > 0.8f || m_nAttackCombo - m_nCurAttackTrack > 1)
 			return;
 
 		// 콤보 최대치 도달
@@ -597,11 +598,11 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 				m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_1 + m_nCurAttackTrack + 1, true);
 				m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1 + m_nCurAttackTrack + 1, Player_Anim_Index_MeleeTwoHand);
 				m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1 + m_nCurAttackTrack + 1, weight);
-				m_pAnimationController->SetTrackSpeed(PLAYER_ONCE_TRACK_1 + m_nCurAttackTrack + 1, 1.5f);
+				m_pAnimationController->SetTrackSpeed(PLAYER_ONCE_TRACK_1 + m_nCurAttackTrack + 1, 1.8f);
 
 				m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_1 + m_nCurAttackTrack, true);
 				m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1 + m_nCurAttackTrack, 1 - weight);
-				m_pAnimationController->SetTrackSpeed(PLAYER_ONCE_TRACK_1 + m_nCurAttackTrack, 1.5f);
+				m_pAnimationController->SetTrackSpeed(PLAYER_ONCE_TRACK_1 + m_nCurAttackTrack, 1.8f);
 			}
 			// 추가 입력 없는 경우 마무리 동작으로 블랜딩
 			else

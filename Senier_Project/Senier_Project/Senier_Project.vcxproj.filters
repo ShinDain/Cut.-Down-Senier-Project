@@ -134,6 +134,9 @@
     <ClCompile Include="Game\Src\Player.cpp">
       <Filter>Game\Src</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Src\Projectile.cpp">
+      <Filter>Game\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Physics\Header\Collider.h">
@@ -236,6 +239,9 @@
       <Filter>Game\Header</Filter>
     </ClInclude>
     <ClInclude Include="Game\Header\CuttedObject.h">
+      <Filter>Game\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Header\Projectile.h">
       <Filter>Game\Header</Filter>
     </ClInclude>
   </ItemGroup>

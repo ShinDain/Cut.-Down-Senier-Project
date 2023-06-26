@@ -48,7 +48,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
 	// 몬스터 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.25, 1.25, 1.25),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.25, 1.25, 1.25),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(50, 0, 150), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(40, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
@@ -57,9 +57,9 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 15, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 15, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	
 	// 아이템 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
@@ -75,11 +75,11 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	m_pPlayerHPBar->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 128, 128);
 	m_pEnemyHPBar->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 128, 128);
-	m_pPlayerAim->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 128, 128);
+	m_pPlayerAim->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 32, 32);
 	m_pPlayerHPBar->ChangePosition(10, 10);
 	m_pEnemyHPBar->ChangePosition(50, 10);
 	m_pPlayerAim->ChangePosition((CLIENT_WIDTH / 2) - (m_pPlayerAim->GetBitmapWidth() / 2), (CLIENT_HEIGHT / 2) - (m_pPlayerAim->GetBitmapHeight() / 2));
-
+	m_pPlayerAim->SetVisible(false);
 	// TextUI 초기화
 	m_pTextUIs = pDWriteText;
 
@@ -507,10 +507,12 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 		if (pKeybuffer[VK_RBUTTON] & 0xF0)
 		{
 			tmpCam->SetIsShoulderView(true);
+			m_pPlayerAim->SetVisible(true);
 		}
 		else
 		{
 			tmpCam->SetIsShoulderView(false);
+			m_pPlayerAim->SetVisible(false);
 		}
 		float dx, dy;
 		dx = dy = 0;
@@ -810,15 +812,36 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 
 	case Object_PlayerProjectile:
 	{
-		pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
-	
-		g_vpAllObjs.emplace_back(pObject);
+		std::shared_ptr<Projectile> pProjectile = std::make_shared<Projectile>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+		pProjectile->SetProjectileProperty(ProjectileProperty::Projectile_Player);
+		pObject = std::static_pointer_cast<Object>(pProjectile);
+		
+		g_vpAllObjs.emplace_back(pObject); 
+		if (objectData.colliderType != Collider_None)
+		{
+			g_vpMovableObjs.emplace_back(pObject);
+			g_vpWorldObjs.emplace_back(pObject);
+		}
 		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
 	}
+	break;
+
 	case Object_EnemyProjectile:
 	{
-	
+		std::shared_ptr<Projectile> pProjectile = std::make_shared<Projectile>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+		pProjectile->SetProjectileProperty(ProjectileProperty::Projectile_Enemy);
+		pObject = std::static_pointer_cast<Object>(pProjectile);
+
+		g_vpAllObjs.emplace_back(pObject);
+		if (objectData.colliderType != Collider_None)
+		{
+			g_vpMovableObjs.emplace_back(pObject);
+			g_vpWorldObjs.emplace_back(pObject);
+		}
+		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
 	}
+	break;
+
 	default:
 	{
 		pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);

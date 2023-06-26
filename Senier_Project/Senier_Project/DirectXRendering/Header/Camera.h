@@ -118,7 +118,7 @@ protected:
 	float m_MaxPitch = 40;
 	float m_MinPitch = -10;
 
-	float m_MaxShoulderPitch = 20;
+	float m_MaxShoulderPitch = 40;
 	float m_MinShoulderPitch = -45;
 
 	// 추적할 대상 오브젝트

@@ -148,6 +148,9 @@ void Weapon::UpdateToRigidBody(float elapsedTime)
 
 void Weapon::Intersect(XMFLOAT3 xmf3PlayerLook)
 {
+	if(!m_bActive)
+		return;
+
 #if defined(_DEBUG) || defined(DEBUG)
 	m_pCollider->SetIntersect(0);
 

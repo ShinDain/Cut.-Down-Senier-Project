@@ -26,26 +26,23 @@ public:
 	virtual void Animate(float elapsedTime);
 	virtual void Update(float elapsedTime);
 	virtual void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
-	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 
-	void Intersect(float elapsedTime);
+	virtual void Intersect(float elapsedTime);
 	void TracePlayer(float elapsedTime);
 
-	virtual void Destroy();
-
 protected:
-	BoundingSphere m_ItemCollider;
+	BoundingSphere m_IntersectCollider;
 	BoundingSphere m_TraceCollider;
-	float m_ItemColliderRadius = 1.0f;
+	float m_IntersectColliderRadius = 1.0f;
 	float m_TraceColliderRadius = 30.0f;
 
 	bool m_bIsActive = false;
 	bool m_bTrace = false;
 
-	float m_ActiveTime = 0.5f;
+	float m_ActiveTime = 1.0f;
 	float m_ElapsedActiveTime = 0.0f;
 
-	float m_PlayerTraceSpeed = 100.0f;
+	float m_Speed = 100.0f;
 
 	UINT m_nItemType = 0;
 

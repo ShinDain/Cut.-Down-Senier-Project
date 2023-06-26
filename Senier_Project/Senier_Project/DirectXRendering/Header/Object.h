@@ -251,6 +251,8 @@ public:
 	const float& GetHP() { return m_HP; }
 	bool GetInvincible() { return m_bInvincible; }
 	bool GetShadowed() { return m_bShadow; }
+
+	UINT GetObjectType() {return m_nObjectType;}
 };
 
 

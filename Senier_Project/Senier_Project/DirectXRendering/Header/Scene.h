@@ -21,6 +21,7 @@
 #include "../../Game/Header/Monster.h"
 #include "../../Game/Header/Item.h"
 #include "../../Game/header/CuttedObject.h"
+#include "../../Game/Header/Projectile.h"
 
 #include "../../Physics/Header/Contact.h"
 #include "../../Physics/Header/Collider.h"

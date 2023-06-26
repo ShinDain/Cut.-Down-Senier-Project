@@ -37,8 +37,8 @@ bool Item::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 	if (m_pCollider) m_pCollider->BuildMesh(pd3dDevice, pd3dCommandList);
 #endif
 	BuildConstantBuffers(pd3dDevice);
-	m_ItemCollider.Center = m_xmf3Position;
-	m_ItemCollider.Radius = m_ItemColliderRadius;
+	m_IntersectCollider.Center = m_xmf3Position;
+	m_IntersectCollider.Radius = m_IntersectColliderRadius;
 
 	m_TraceCollider.Center = m_xmf3Position;
 	m_TraceCollider.Radius = m_TraceColliderRadius;
@@ -118,11 +118,6 @@ void Item::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 	}
 }
 
-void Item::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	Object::Render(elapsedTime, pd3dCommandList);
-}
-
 void Item::Intersect(float elapsedTime)
 {
 	BoundingOrientedBox playerCollider = std::static_pointer_cast<ColliderBox>(g_pPlayer->GetCollider())->GetOBB();
@@ -131,7 +126,7 @@ void Item::Intersect(float elapsedTime)
 	{
 		TracePlayer(elapsedTime);
 
-		if (m_ItemCollider.Intersects(playerCollider))
+		if (m_IntersectCollider.Intersects(playerCollider))
 		{
 			std::shared_ptr<Player> pPlayer = std::static_pointer_cast<Player>(g_pPlayer);
 			pPlayer->AcquireItem(m_nItemType);
@@ -157,13 +152,8 @@ void Item::TracePlayer(float elapsedTime)
 
 	XMVECTOR direction = playerPos - thisPos;
 	direction = XMVector3Normalize(direction);
-	XMVECTOR newPosition = thisPos + direction * m_PlayerTraceSpeed * elapsedTime;
+	XMVECTOR newPosition = thisPos + direction * m_Speed * elapsedTime;
 	XMStoreFloat3(&m_xmf3Position, newPosition);
 
-	m_ItemCollider.Center = m_xmf3Position;
-}
-
-void Item::Destroy()
-{
-	Object::Destroy();
+	m_IntersectCollider.Center = m_xmf3Position;
 }
