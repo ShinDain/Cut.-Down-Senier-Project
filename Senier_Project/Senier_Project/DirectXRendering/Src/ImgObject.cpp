@@ -56,17 +56,19 @@ void ImgObject::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
 
 	pd3dCommandList->IASetIndexBuffer(&m_IndexBufferView);
 
-	//ID3D12DescriptorHeap* descriptorHeap[] = { m_DescriptorHeap.Get() };
-	//pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
-	//
-	//// shadow 맵 테스트 중
-	//D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	//
-	//pd3dCommandList->SetGraphicsRootDescriptorTable(m_nDescTableParameterIdx, texHandle);
+	// shadow 맵 테스트 시 주석 처리
+	ID3D12DescriptorHeap* descriptorHeap[] = { m_DescriptorHeap.Get() };
+	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
+	
+	D3D12_GPU_DESCRIPTOR_HANDLE texHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	
+	pd3dCommandList->SetGraphicsRootDescriptorTable(m_nDescTableParameterIdx, texHandle);
 }
 
 void ImgObject::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (!m_bVisible)
+		return;
 	OnPrepareRender(pd3dCommandList);
 	pd3dCommandList->DrawIndexedInstanced(m_nIndexCnt, 1, 0, 0, 0);
 }

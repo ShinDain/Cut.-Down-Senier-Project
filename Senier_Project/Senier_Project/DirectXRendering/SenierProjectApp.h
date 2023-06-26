@@ -35,11 +35,13 @@ protected:
 
 private:
 
-	std::unique_ptr<Scene> m_Scene;
+	std::unique_ptr<Scene> m_Scene = nullptr;
+	std::shared_ptr<DWriteText> m_pSceneTextUI = nullptr;
+
 	//std::unique_ptr<Player> m_Player;
 
 #if defined(_DEBUG) | defined(DEBUG)
-	std::unique_ptr<DWriteText> m_DebugText;
+	//std::unique_ptr<DWriteText> m_DebugText;
 
 #endif
 

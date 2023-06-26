@@ -47,26 +47,20 @@ bool SenierProjectApp::Initialize()
 		g_LoadedModelData.insert({ pstrFileName, pModelData });
 	}
 
+	// Scene 초기화
+	m_pSceneTextUI = std::make_shared<DWriteText>();
+	if (!m_pSceneTextUI->Initialize(m_d2dDeviceContext.Get(), m_dWriteFactory.Get(), 25, D2D1::ColorF::Black,
+		DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING))
+		return false;
 	m_Scene = std::make_unique<Scene>();
-	if (!m_Scene->Initialize(m_d3d12Device.Get(), m_CommandList.Get()))
+	if (!m_Scene->Initialize(m_d3d12Device.Get(), m_CommandList.Get(), m_pSceneTextUI))
 		return false;
 
 	// device, commandlist 저장
 	g_pd3dDevice = m_d3d12Device.Get();
 	g_pd3dCommandList = m_CommandList.Get();
 
-	// 디버그 텍스트 객체 초기화
 #if defined(_DEBUG) | defined(DEBUG)
-	m_DebugText = std::make_unique<DWriteText>();
-	if (!m_DebugText->Initialize(m_d2dDeviceContext.Get(), m_dWriteFactory.Get(), 25, D2D1::ColorF::Black, 
-		DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING))
-		return false;
-	
-
-	m_DebugText->AddTextUI(L"Total Time : 0", 10, 0);
-	m_DebugText->AddTextUI(L"refCnt : 0", 10, 20);
-	m_DebugText->AddTextUI(L"vecCnt : 0", 10, 40);
-	m_DebugText->AddTextUI(L"vecCnt : 0", 10, 60);
 
 #endif
 
@@ -92,41 +86,9 @@ void SenierProjectApp::Update(float elapsedTime)
 		m_Scene->Update(m_Timer.TotalTime(), elapsedTime);
 	}
 
-	// 디버그를 위한 텍스트들 업데이트
+
 #if defined(_DEBUG) | defined(DEBUG)
-
-	// 전체 경과 시간 출력
-
-	float tTime = m_Timer.TotalTime();
-	int nIdx = 0;
-	wchar_t totalTimeText[64] = {};
-	// 시간 측정
-	float posX = m_DebugText->GetTextUIPosX(nIdx);
-	float posY = m_DebugText->GetTextUIPosY(nIdx);
-	wcscpy_s(totalTimeText, L"Total Time : ");
-	wcscat_s(totalTimeText, std::to_wstring(tTime).c_str());
-	m_DebugText->UpdateTextUI(totalTimeText, posX, posY, nIdx);
 	
-	posX = m_DebugText->GetTextUIPosX(1);
-	posY = m_DebugText->GetTextUIPosY(1);
-	wcscpy_s(totalTimeText, L"refCnt : ");
-	float refCnt = m_Scene->m_refCnt;
-	wcscat_s(totalTimeText, std::to_wstring(refCnt).c_str());
-	m_DebugText->UpdateTextUI(totalTimeText, posX, posY, 1);
-
-	posX = m_DebugText->GetTextUIPosX(2);
-	posY = m_DebugText->GetTextUIPosY(2);
-	wcscpy_s(totalTimeText, L"refCnt : ");
-	float debugValue = m_Scene->m_DebugValue;
-	wcscat_s(totalTimeText, std::to_wstring(debugValue).c_str());
-	m_DebugText->UpdateTextUI(totalTimeText, posX, posY, 2);
-
-	posX = m_DebugText->GetTextUIPosX(3);
-	posY = m_DebugText->GetTextUIPosY(3);
-	wcscpy_s(totalTimeText, L"vecCnt : ");
-	int vecCnt = g_vpAllObjs.size();
-	wcscat_s(totalTimeText, std::to_wstring(vecCnt).c_str());
-	m_DebugText->UpdateTextUI(totalTimeText, posX, posY, 3);
 #endif
 }
 
@@ -172,13 +134,14 @@ void SenierProjectApp::Render(float elapsedTime)
 
 	// D3D12 Render를 모두 종료한 후 
 	// D2D Render를 진행한다. D3D12 CommandList를 Execute한 후 진행해야 한다.
-
-#if defined(_DEBUG) | defined(DEBUG)
-	if (m_DebugText)
+	if (m_pSceneTextUI)
 	{
-		m_DebugText->Render(m_d3d11On12Device.Get(), m_d2dRenderTargets[m_CurrBackBuffer].Get(), m_d2dDeviceContext.Get(),
+		m_pSceneTextUI->Render(m_d3d11On12Device.Get(), m_d2dRenderTargets[m_CurrBackBuffer].Get(), m_d2dDeviceContext.Get(),
 			m_d3d11DeviceContext.Get(), m_d3d11On12WrappedResoruces[m_CurrBackBuffer].Get());
 	}
+	
+#if defined(_DEBUG) | defined(DEBUG)
+
 #endif
 
 	// Resource State 변경

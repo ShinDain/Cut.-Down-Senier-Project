@@ -64,4 +64,12 @@ protected:
 	int m_nVertexCnt = -1;
 	int m_nIndexCnt = -1;
 
+	bool m_bVisible = true;
+
+public:
+	bool GetVisible() { return m_bVisible; }
+	int GetBitmapWidth() { return m_nBitmapWidth; }
+	int GetBitmapHeight() { return m_nBitmapHeight; }
+
+	void SetVisible(bool bVisible) { m_bVisible = bVisible; }
 };

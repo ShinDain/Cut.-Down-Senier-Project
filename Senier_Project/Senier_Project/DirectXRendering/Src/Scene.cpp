@@ -20,7 +20,7 @@ Scene::~Scene()
 {
 }
 
-bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText)
 {
 	m_pd3dDevice = pd3dDevice;
 	m_pd3dCommandList = pd3dCommandList;
@@ -68,12 +68,23 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// 맵 데이터 로드
 	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 
-	// 이미지 오브젝트 테스트
-	std::shared_ptr<ImgObject> imgobj = std::make_shared<ImgObject>();
-	imgobj->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 128, 128);
-	m_pImage = imgobj;
-	m_pImage->ChangePosition(10, 10);
-	//m_pImage->ChangePosition(CLIENT_WIDTH / 2 - 64, CLIENT_HEIGHT / 2 - 64);
+	// 각종 UI들 초기화  함수로 분리 예정
+	m_pPlayerHPBar = std::make_unique<ImgObject>();
+	m_pEnemyHPBar = std::make_unique<ImgObject>();
+	m_pPlayerAim = std::make_unique<ImgObject>();
+
+	m_pPlayerHPBar->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 128, 128);
+	m_pEnemyHPBar->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 128, 128);
+	m_pPlayerAim->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 128, 128);
+	m_pPlayerHPBar->ChangePosition(10, 10);
+	m_pEnemyHPBar->ChangePosition(50, 10);
+	m_pPlayerAim->ChangePosition((CLIENT_WIDTH / 2) - (m_pPlayerAim->GetBitmapWidth() / 2), (CLIENT_HEIGHT / 2) - (m_pPlayerAim->GetBitmapHeight() / 2));
+
+	// TextUI 초기화
+	m_pTextUIs = pDWriteText;
+
+	m_pTextUIs->AddTextUI(L"Scene Text Test1", CLIENT_WIDTH / 3, 0);
+	m_pTextUIs->AddTextUI(L"Scene Text Test2", CLIENT_WIDTH / 3, 20);
 
 	// 카메라 초기화
 	if (g_pPlayer)
@@ -182,8 +193,6 @@ void Scene::Update(float totalTime ,float elapsedTime)
 	xmf3PlayerPosition = g_pPlayer->GetPosition();
 	m_DebugValue = xmf3PlayerPosition.x;
 #endif
-
-
 }
 
 void Scene::UpdatePassCB(float totalTime, float elapsedTime)
@@ -363,7 +372,7 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 	{
 		g_Shaders[ShaderType::Shader_Image]->ChangeShader(pd3dCommandList);
 	
-		//// Scene 그림자맵 
+		//// Scene 그림자맵 테스트 시 주석 해제
 		//ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
 		//pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeap), descriptorHeap);
 		//
@@ -371,7 +380,10 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		//pd3dCommandList->SetGraphicsRootDescriptorTable(1, texHandle);
 
 		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &m_xmf4x4ImgObjMat, 0);
-		m_pImage->Render(elapsedTime, pd3dCommandList);
+
+		m_pPlayerHPBar->Render(elapsedTime, pd3dCommandList);
+		m_pEnemyHPBar->Render(elapsedTime, pd3dCommandList);
+		m_pPlayerAim->Render(elapsedTime, pd3dCommandList);
 	}
 }
 

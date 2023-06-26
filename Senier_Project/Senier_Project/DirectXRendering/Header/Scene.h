@@ -3,15 +3,16 @@
 #define SCENE_H
 // 장면에 삽입될 오브젝트 초기화 및 관리
 
-#include "../../Common/Header/D3DUtil.h"
 #include <algorithm>
-#include "Camera.h"
+#include "../../Common/Header/D3DUtil.h"
 #include "../../Common/Header/MathHelper.h"
+#include "../../Common/Header/GameTimer.h"
+#include "Camera.h"
 #include "Global.h"
 #include "Shader.h"
 #include "Object.h"
 #include "DepthMap.h"
-#include "../../Common/Header/GameTimer.h"
+#include "DWriteText.h"
 
 #include "../../Game/Header/ObjectDefaultData.h"
 #include "../../Game/Header/Character.h"
@@ -37,7 +38,7 @@ public:
 	Scene& operator=(const Scene& rhs) = delete;
 	virtual ~Scene();
 
-	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText);
 	void BuildDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 
@@ -81,13 +82,21 @@ private:
 
 	//std::shared_ptr<Player> m_pPlayer = nullptr;
 
-	std::shared_ptr<ImgObject> m_pImage = nullptr;
-
 	// 씬을 렌더링할 메인 카메라
 	std::unique_ptr<Camera> m_pCamera = nullptr;
 
 	// 오브젝트 객체들
 	static std::vector<std::shared_ptr<Object>> m_vObjectLayer[(int)RenderLayer::Render_Count];
+	
+	// UI 표시에 사용될 ImageObject들
+	std::unique_ptr<ImgObject> m_pPlayerHPBar = nullptr;
+	std::unique_ptr<ImgObject> m_pEnemyHPBar = nullptr;
+	std::unique_ptr<ImgObject> m_pPlayerAim = nullptr;
+
+	float m_tmptmp = 100;
+
+	// Text로 표시될 UI의 전체 총괄 객체
+	std::shared_ptr<DWriteText> m_pTextUIs = nullptr;
 
 	static std::unique_ptr<CollisionResolver> m_pCollisionResolver;
 	static CollisionData m_CollisionData;
