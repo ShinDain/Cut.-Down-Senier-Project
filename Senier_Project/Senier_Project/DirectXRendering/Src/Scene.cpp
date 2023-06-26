@@ -66,7 +66,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
-	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
+	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 
 	// 각종 UI들 초기화  함수로 분리 예정
 	m_pPlayerHPBar = std::make_unique<ImgObject>();
@@ -83,8 +83,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// TextUI 초기화
 	m_pTextUIs = pDWriteText;
 
-	m_pTextUIs->AddTextUI(L"Scene Text Test1", CLIENT_WIDTH / 3, 0);
-	m_pTextUIs->AddTextUI(L"Scene Text Test2", CLIENT_WIDTH / 3, 20);
+	m_pTextUIs->AddTextUI(L"HP ", CLIENT_WIDTH / 3, 0);
+	m_pTextUIs->AddTextUI(L"Score ", CLIENT_WIDTH / 3, 20);
 
 	// 카메라 초기화
 	if (g_pPlayer)

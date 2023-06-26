@@ -118,11 +118,17 @@
 			<Frame>: Server_Rack (1)
 				<Transform>: -7.873403 1 18.73622 0 180 0 1 1 1 0 -1 0 0  
 			</Frame>
+			<Frame>: Zombie1
+				<Transform>: 21.11 1.46 -3.1 0 0 0 1 1 1 0 0 0 1  
+			</Frame>
+			<Frame>: Zombie1 (1)
+				<Transform>: 17.78 1.46 -3.1 0 0 0 1 1 1 0 0 0 1  
+			</Frame>
+			<Frame>: Zombie1 (2)
+				<Transform>: 15.08 1.46 -3.1 0 0 0 1 1 1 0 0 0 1  
+			</Frame>
 			<Frame>: Wall_2 (14)
 				<Transform>: -2.114913 6.381 -1.396627 90 0 0 4.267455 4.251686 1 0.7071068 0 0 0.7071068  
-			</Frame>
-			<Frame>: Wall_2 (15)
-				<Transform>: 5.103515 2.735001 9.830564 90 0 0 0.6432421 1.411782 1 0.7071068 0 0 0.7071068  
 			</Frame>
 			<Frame>: Vase (11)
 				<Transform>: 5.815 3.315357 9.174999 0 5.414873E-20 0 1 1 1 0 4.725368E-22 0 1  
@@ -160,20 +166,11 @@
 			<Frame>: Table_1 (1)
 				<Transform>: -5.52 0.493389 24.897 0 180 0 1 1 1 0 1 0 0  
 			</Frame>
-			<Frame>: Zombie1
-				<Transform>: 21.11 1.46 -3.1 0 0 0 1 1 1 0 0 0 1  
-			</Frame>
 			<Frame>: Stool (2)
 				<Transform>: -5.084 0.4854167 25.824 9.334667E-06 0 0 1 1 1 8.146034E-08 0 0 1  
 			</Frame>
-			<Frame>: Zombie1 (1)
-				<Transform>: 17.78 1.46 -3.1 0 0 0 1 1 1 0 0 0 1  
-			</Frame>
 			<Frame>: Stool (3)
 				<Transform>: -5.976 0.4854167 25.837 9.334667E-06 0 0 1 1 1 8.146034E-08 0 0 1  
-			</Frame>
-			<Frame>: Zombie1 (2)
-				<Transform>: 15.08 1.46 -3.1 0 0 0 1 1 1 0 0 0 1  
 			</Frame>
 			<Frame>: Stool (4)
 				<Transform>: -6.935 0.4854167 24.89 9.334667E-06 0 0 1 1 1 8.146034E-08 0 0 1  
@@ -240,5 +237,8 @@
 			</Frame>
 			<Frame>: Carpet_5
 				<Transform>: 18.76001 0.01920498 10.13 0 0 0 27.01096 1 29.18691 0 0 0 1  
+			</Frame>
+			<Frame>: TmpPlatform
+				<Transform>: 4.97 2.565 8.92 0 0 0 3 0.2 3 0 0 0 1  
 			</Frame>
 </Hierarchy>

@@ -242,6 +242,16 @@ using namespace DirectX;
 #define WALL_PILLAR_3_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
 #define WALL_PILLAR_3_MODEL_SHADOW false
 
+#define PLATFORM_MODEL_NAME "TmpPlatform"
+#define PLATFORM_MODEL_TEXPATH ""
+#define PLATFORM_MODEL_EXTENTS XMFLOAT3(0.5f, 0.5f, 0.5f)
+#define PLATFORM_MODEL_TYPE Object_World
+#define PLATFORM_MODEL_COLLIDERTYPE Collider_Box
+#define PLATFORM_MODEL_MASS 9999
+#define PLATFORM_MODEL_SCALE XMFLOAT3(10,10,10)
+#define PLATFORM_MODEL_RENDERLAYER RenderLayer::Render_Static
+#define PLATFORM_MODEL_SHADOW true
+
 #define ITEM_MODEL_NAME "TmpItem"
 #define ITEM_MODEL_TEXPATH ""
 #define ITEM_MODEL_EXTENTS XMFLOAT3(0.3f, 0.8f, 0.2f)

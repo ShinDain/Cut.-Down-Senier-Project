@@ -301,6 +301,19 @@ void CreateObjectDefaultData()
 	tmpData.bShadowed = WALL_PILLAR_3_MODEL_SHADOW;
 	g_DefaultObjectData.insert({ WALL_PILLAR_3_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WALL_PILLAR_3_MODEL_NAME);
+
+	tmpData.pstrTexPath = PLATFORM_MODEL_TEXPATH;
+	tmpData.xmf3Extents = PLATFORM_MODEL_EXTENTS;
+	tmpData.objectType = PLATFORM_MODEL_TYPE;
+	tmpData.colliderType = PLATFORM_MODEL_COLLIDERTYPE;
+	tmpData.nMass = PLATFORM_MODEL_MASS;
+	tmpData.xmf3OffsetScale = PLATFORM_MODEL_SCALE;
+	tmpData.renderLayer = PLATFORM_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0.0f, tmpData.xmf3Extents.y, 0.0f);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = PLATFORM_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ PLATFORM_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(PLATFORM_MODEL_NAME);
 	
 	tmpData.pstrTexPath = ITEM_MODEL_TEXPATH;
 	tmpData.xmf3Extents = ITEM_MODEL_EXTENTS;
