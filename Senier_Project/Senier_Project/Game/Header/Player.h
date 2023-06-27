@@ -25,7 +25,9 @@ enum PlayerAnimationIndex
 	Player_Anim_Index_MeleeOneHand,
 	Player_Anim_Index_MeleeTwoHand,
 	Player_Anim_Index_GetHit,
-	Player_Anim_Index_Death
+	Player_Anim_Index_Death,
+	Player_Anim_Index_ThrowIdle,
+	Player_Anim_Index_Throw
 };
 
 enum PlayerAnimationState
@@ -36,7 +38,8 @@ enum PlayerAnimationState
 	Player_State_Land,
 	Player_State_Melee,
 	Player_State_Hit,
-	Player_State_Death
+	Player_State_Death,
+	Player_State_Throw
 };
 
 class Player : public Character
@@ -71,6 +74,7 @@ public:
 	void ChangeToJumpState();
 
 	virtual void Attack();
+	virtual void ThrowProjectile();
 	void RotateToObj();
 	void AcquireItem(UINT itemType);
 
@@ -83,7 +87,6 @@ public:
 	virtual void UpdateAnimationTrack(float elapsedTime);
 	virtual void BlendWithIdleMovement(float maxWeight);
 
-
 protected:
 	UINT m_nScore = 0;
 
@@ -94,6 +97,7 @@ protected:
 	XMFLOAT3 m_xmf3CameraRotation = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 m_xmf3CameraLook = XMFLOAT3(0, 0, 0);
 	bool m_bCanDoubleJump = true;
+	bool m_bCanThrow = true;
 
 	float m_AimmingSpeed = 20.f;
 	float m_DefaultSpeed = 100.0f;
@@ -116,11 +120,15 @@ protected:
 	PlayerAnimationState m_nAnimationState = PlayerAnimationState::Player_State_Idle;
 	BoundingSphere m_ObjectSearchSphere;
 
+	std::shared_ptr<Object> m_pTargetObject = nullptr;
+
 public:
 
 	std::shared_ptr<Weapon> GetWeapon() { return m_pWeapon; }
 	XMFLOAT3 GetCameraRotation() {	return m_xmf3CameraRotation;}
 	UINT GetScore() { return m_nScore; }
+	Object* GetPlayerTargetObject() { return m_pTargetObject.get(); }
+
 
 	void SetWeapon(std::shared_ptr<Weapon> pWeapon) { m_pWeapon = pWeapon; }
 	void SetCameraRotation(XMFLOAT3 xmf3CameraRotation) { m_xmf3CameraRotation = xmf3CameraRotation; }

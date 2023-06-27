@@ -361,10 +361,21 @@ bool ImageObjectShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 
 bool ImageObjectShader::BuildPSO(ID3D12Device* pd3dDevice)
 {
-	// 깊이 검사 하지 않는 것 이외는 동일
+	D3D12_RENDER_TARGET_BLEND_DESC transparancyblendDesc;
+	transparancyblendDesc.BlendEnable = true;
+	transparancyblendDesc.LogicOpEnable = false;
+	transparancyblendDesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	transparancyblendDesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	transparancyblendDesc.BlendOp = D3D12_BLEND_OP_ADD;
+	transparancyblendDesc.SrcBlendAlpha = D3D12_BLEND_ZERO;
+	transparancyblendDesc.DestBlendAlpha = D3D12_BLEND_ZERO;
+	transparancyblendDesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	transparancyblendDesc.LogicOp = D3D12_LOGIC_OP_NOOP;
+	transparancyblendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
 
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-	depthStencilDesc.DepthEnable = false;
+	//depthStencilDesc.DepthEnable = true;
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 	ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
@@ -379,6 +390,7 @@ bool ImageObjectShader::BuildPSO(ID3D12Device* pd3dDevice)
 
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	psoDesc.BlendState.RenderTarget[0] = transparancyblendDesc;
 	psoDesc.DepthStencilState = depthStencilDesc;
 	psoDesc.SampleMask = UINT_MAX;
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;

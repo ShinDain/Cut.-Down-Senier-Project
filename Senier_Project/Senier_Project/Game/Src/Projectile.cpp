@@ -188,8 +188,11 @@ void Projectile::Intersect(float elapsedTime)
 
 			if (m_IntersectCollider.Intersects(objCollider->GetOBB()))
 			{
-				g_vpWorldObjs[i]->ApplyDamage(projectilePower, xmf3Direction);
-				g_vpWorldObjs[i]->GetBody()->SetIsAwake(true);
+				if (g_vpWorldObjs[i]->GetObjectType() == Object_Movable)
+				{
+					g_vpWorldObjs[i]->ApplyDamage(projectilePower, xmf3Direction);
+					g_vpWorldObjs[i]->GetBody()->SetIsAwake(true);
+				}
 
 				m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
 				m_DissolveTime = 0;

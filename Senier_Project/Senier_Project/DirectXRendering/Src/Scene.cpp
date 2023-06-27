@@ -66,25 +66,9 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
-	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
-
-	// 각종 UI들 초기화  함수로 분리 예정
-	m_pPlayerHPBar = std::make_unique<ImgObject>();
-	m_pEnemyHPBar = std::make_unique<ImgObject>();
-	m_pPlayerAim = std::make_unique<ImgObject>();
-
-	m_pPlayerHPBar->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 128, 128);
-	m_pEnemyHPBar->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 128, 128);
-	m_pPlayerAim->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Model/Textures/Carpet/Carpet_2_Diffuse.dds", 32, 32);
-	m_pPlayerHPBar->ChangePosition(10, 10);
-	m_pEnemyHPBar->ChangePosition(50, 10);
-	m_pPlayerAim->ChangePosition((CLIENT_WIDTH / 2) - (m_pPlayerAim->GetBitmapWidth() / 2), (CLIENT_HEIGHT / 2) - (m_pPlayerAim->GetBitmapHeight() / 2));
-	m_pPlayerAim->SetVisible(false);
-	// TextUI 초기화
-	m_pTextUIs = pDWriteText;
-
-	m_pTextUIs->AddTextUI(L"HP ", CLIENT_WIDTH / 3, 0);
-	m_pTextUIs->AddTextUI(L"Score ", CLIENT_WIDTH / 3, 20);
+	InitMapData(pd3dDevice, pd3dCommandList);
+	// UI 초기화
+	InitUI(pd3dDevice, pd3dCommandList, pDWriteText);
 
 	// 카메라 초기화
 	if (g_pPlayer)
@@ -92,12 +76,43 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 		m_pCamera = std::make_unique<Third_Person_Camera>(g_pPlayer);
 		m_pCamera->Pitch(15);
 	}
+
+
 #if defined(_DEBUG)
 	//m_pCamera = std::make_unique<Camera>();
 	//m_pCamera->SetPosition(0, 30, -100);
 	//m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
 
 #endif
+
+	return true;
+}
+
+bool Scene::InitMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
+
+	return true;
+}
+
+bool Scene::InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText)
+{
+	// 각종 UI들 초기화  함수로 분리 예정
+	m_pPlayerHPBar = std::make_unique<ImgObject>();
+	m_pEnemyHPBar = std::make_unique<ImgObject>();
+	m_pPlayerAim = std::make_unique<ImgObject>();
+
+	m_pPlayerHPBar->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Textures/RedBack.dds", PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT);
+	m_pEnemyHPBar->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Textures/RedBack.dds", ENEMY_HP_BAR_WIDTH, ENEMY_HP_BAR_HEIGHT);
+	m_pPlayerAim->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Textures/Aim.dds", PLAYER_AIM_WIDTH, PLAYER_AIM_HEIGHT);
+	m_pPlayerHPBar->ChangePosition(80, 35);
+	m_pEnemyHPBar->ChangePosition((CLIENT_WIDTH / 2) - (m_pEnemyHPBar->GetBitmapWidth() / 2), 35);
+	m_pPlayerAim->ChangePosition((CLIENT_WIDTH / 2) - (m_pPlayerAim->GetBitmapWidth() / 2), (CLIENT_HEIGHT / 2) - (m_pPlayerAim->GetBitmapHeight() / 2));
+	m_pPlayerAim->SetVisible(false);
+	// TextUI 초기화
+	m_pTextUIs = pDWriteText;
+	m_pTextUIs->AddTextUI(L"HP ", 35, -CLIENT_HEIGHT / 2 + 40);
+	m_pTextUIs->AddTextUI(L"Score ", 35, -CLIENT_HEIGHT / 2 + 80);
 
 	return true;
 }
@@ -189,10 +204,50 @@ void Scene::Update(float totalTime ,float elapsedTime)
 	GenerateContact();
 	ProcessPhysics(elapsedTime);
 
+	// UI 이미지 업데이트
+	UpdateUI(elapsedTime);
+
+	m_pPlayerHPBar->Update(elapsedTime);
+	m_pEnemyHPBar->Update(elapsedTime);
+	m_pPlayerAim->Update(elapsedTime);
+
+
 #if defined(_DEBUG)
 	xmf3PlayerPosition = g_pPlayer->GetPosition();
 	m_DebugValue = xmf3PlayerPosition.x;
 #endif
+}
+
+void Scene::UpdateUI(float elapsedTime)
+{
+	Player* pPlayer = (Player*)g_pPlayer.get();
+
+	// 플레이어 HP 
+	float playerHPRate = g_pPlayer->GetHP() / g_pPlayer->GetMaxHP();
+	float playerHPBarWidth = PLAYER_HP_BAR_WIDTH * playerHPRate;
+	m_pPlayerHPBar->ChangeSize(playerHPBarWidth, PLAYER_HP_BAR_HEIGHT);
+
+	// 몬스터 HP
+	Object* pTargetObject = pPlayer->GetPlayerTargetObject();
+	if (pTargetObject && pTargetObject->GetObjectType() == Object_Monster)
+	{
+		m_pEnemyHPBar->SetVisible(true);
+
+		float targetHPRate = pTargetObject->GetHP() / pTargetObject->GetMaxHP();
+		float targetHPBarWidth = ENEMY_HP_BAR_WIDTH * targetHPRate;
+		m_pEnemyHPBar->ChangeSize(targetHPBarWidth, ENEMY_HP_BAR_HEIGHT);
+	}
+	else
+	{
+		m_pEnemyHPBar->SetVisible(false);
+	}
+
+	// 점수 Text 
+	wchar_t pstrScore[64] = L"Score : ";
+	wcscat_s(pstrScore, std::to_wstring(pPlayer->GetScore()).c_str());
+
+	m_pTextUIs->UpdateTextUI(pstrScore, m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Score), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Score), Text_UI_Idx_Score);
+
 }
 
 void Scene::UpdatePassCB(float totalTime, float elapsedTime)
@@ -1018,7 +1073,7 @@ void Scene::GenerateContact()
 		if(g_vpAllObjs[i]->GetBody())
 			g_vpAllObjs[i]->GetBody()->ClearContact();
 	}
-	g_pPlayer->GetBody()->ClearContact();
+	if(g_pPlayer) g_pPlayer->GetBody()->ClearContact();
 
 	m_CollisionData.Reset(nContactCnt);
 	m_CollisionData.friction = 0;

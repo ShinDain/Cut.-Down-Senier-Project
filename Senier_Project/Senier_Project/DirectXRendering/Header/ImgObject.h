@@ -21,7 +21,10 @@ public:
 	void OnResize();
 	void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 
-	virtual bool ChangePosition(int nPosX, int nPosY);
+	virtual void ChangePosition(int nPosX, int nPosY);
+	virtual void ChangeSize(int nBitmapWidth, int nBitmapHeight);
+
+	bool UpdateBuffer();
 
 protected:
 	void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList);
@@ -65,6 +68,7 @@ protected:
 	int m_nIndexCnt = -1;
 
 	bool m_bVisible = true;
+	bool m_bBufferDirty = false;
 
 public:
 	bool GetVisible() { return m_bVisible; }

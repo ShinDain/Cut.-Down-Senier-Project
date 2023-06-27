@@ -53,14 +53,65 @@ bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 void Player::Update(float elapsedTime)
 {
-	Character::Update(elapsedTime);
+	if (!m_bIsAlive)
+		return;
+
+	// 오브젝트 파괴 타이머
+	if (m_bDestroying)
+	{
+
+	}
+
+	// 무적 시간 경과 누적
+	if (m_bInvincible)
+	{
+		m_ElapsedInvincibleTime += elapsedTime;
+		if (m_InvincibleTime <= m_ElapsedInvincibleTime)
+		{
+			m_ElapsedInvincibleTime = 0.0f;
+			m_bInvincible = false;
+		}
+	}
+
+	UpdateToRigidBody(elapsedTime);
+
+	if (m_pObjectCB) UpdateObjectCB();
+
+	if (m_pSibling) {
+		m_pSibling->Update(elapsedTime);
+	}
+	if (m_pChild) {
+		m_pChild->Update(elapsedTime);
+	}
+
+	ApplyCharacterFriction(elapsedTime);
+	if (!m_bIsShoulderView)
+		RotateToMove(elapsedTime);
+	IsFalling();
+	UpdateAnimationTrack(elapsedTime);
+
+	if (m_bCrashWithObject)
+	{
+		ApplyDamage(m_CrashPower, m_xmf3CrashDirection);
+		m_bCrashWithObject = false;
+		m_CrashPower = 0;
+		m_xmf3CrashDirection = { 0,0,0 };
+	}
+
+
 	m_ObjectSearchSphere.Center = m_xmf3Position;
 	if(m_pWeapon) m_pWeapon->Intersect(m_xmf3Look);
 
 	if (m_bIsShoulderView)
+	{
+		m_pWeapon->SetVisible(false);
 		m_MaxSpeedXZ = m_AimmingSpeed;
+	}
 	else
+	{
+		m_pWeapon->SetVisible(true);
 		m_MaxSpeedXZ = m_DefaultSpeed;
+	}
 
 	//if (m_bDecreaseMaxSpeed)
 	//{
@@ -110,7 +161,7 @@ void Player::KeyDownEvent(WPARAM wParam)
 #if defined(_DEBUG) || defined(DEBUG)
 	if (wParam == 'K')
 	{
-		ApplyDamage(10, XMFLOAT3(0, 0, -1));
+		ApplyDamage(100, XMFLOAT3(0, 0, -1));
 	}
 #endif
 
@@ -248,67 +299,34 @@ void Player::ChangeToJumpState()
 
 void Player::Attack()
 {
+	m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, false);
+	m_pAnimationController->SetTrackEnable(PLAYER_MOVE_TRACK, false);
+	m_pAnimationController->SetTrackEnable(PLAYER_SPRINT_TRACK, false);
+
 	// 숄더뷰 상태에선 던지기
 	if (m_bIsShoulderView)
 	{
 		if (m_nAnimationState == Player_State_Idle)
 		{
-			XMFLOAT3 xmf3ProjectilePos = m_xmf3Position;
-
-			XMVECTOR cameraLook = XMVectorSet(0, 0, 1, 0);
-			XMVECTOR cameraRight = XMVectorSet(1, 0, 0, 0);
-			XMVECTOR cameraUp = XMVectorSet(0, 1, 0, 0);
-			XMVECTOR cameraRotation = XMLoadFloat3(&m_xmf3CameraRotation);
-			XMMATRIX R = XMMatrixRotationY(XMConvertToRadians(m_xmf3CameraRotation.y));
-			cameraLook = XMVector3TransformNormal(cameraLook, R);
-			cameraRight = XMVector3TransformNormal(cameraRight, R);
-			R = XMMatrixRotationAxis(cameraRight, XMConvertToRadians(m_xmf3CameraRotation.x));
-			cameraLook = XMVector3TransformNormal(cameraLook, R);
-			cameraUp = XMVector3TransformNormal(cameraUp, R);
-
-			XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
-			XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
-			XMVECTOR projectilePos = XMLoadFloat3(&xmf3ProjectilePos);
-			
-			projectilePos += look * 3;
-			projectilePos += right * 4;
-			projectilePos += cameraUp * m_xmf3ColliderExtents.y * 13;
-			XMStoreFloat3(&xmf3ProjectilePos, projectilePos);
-			XMVECTOR projectileTarget = projectilePos;
-			projectileTarget += cameraLook * 1;
-			//projectileTarget += cameraUp;
-			XMVECTOR projectileVelocity = projectileTarget - projectilePos;
-			projectileVelocity = XMVector3Normalize(projectileVelocity);
-
-			XMFLOAT3 xmf3ProjectileVelocity;
-			projectileVelocity = projectileVelocity * 300;
-
-			XMVECTOR projectileOrientation = XMLoadFloat4(&m_xmf4Orientation);
-			projectileOrientation = XMQuaternionRotationRollPitchYaw(0, 0, 90);
-			XMFLOAT4 xmf4projectileOrientation;
-			XMStoreFloat4(&xmf4projectileOrientation, projectileOrientation);
-			std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, xmf3ProjectilePos, xmf4projectileOrientation,
-				XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
-			XMStoreFloat3(&xmf3ProjectileVelocity, projectileVelocity);
-			tmp->GetBody()->SetVelocity(xmf3ProjectileVelocity);
+			UnableAnimationTrack(PLAYER_ONCE_TRACK_1);
+			m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_1, true);
+			m_nAnimationState = PlayerAnimationState::Player_State_Throw;
+			m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_Throw);
+			m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1);
+			m_pAnimationController->SetTrackSpeed(PLAYER_ONCE_TRACK_1, 2.0f);
 		}
 
 		return;
 	}
-
-	m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, false);
-	m_pAnimationController->SetTrackEnable(PLAYER_MOVE_TRACK, false);
-	m_pAnimationController->SetTrackEnable(PLAYER_SPRINT_TRACK, false);
 
 	switch (m_nAnimationState)
 	{
 	//case Player_State_Idle:
 	//	break;
 	case Player_State_Jump:
-		return;
 	case Player_State_Falling:
-		return;
 	case Player_State_Land:
+	case Player_State_Throw:
 		return;
 	case Player_State_Melee:
 	{
@@ -350,6 +368,53 @@ void Player::Attack()
 	m_pBody->AddVelocity(xmf3AddVelocity);
 }
 
+void Player::ThrowProjectile()
+{
+	if (!m_bCanThrow)
+		return;
+
+	m_bCanThrow = false;
+
+	XMFLOAT3 xmf3ProjectilePos = m_xmf3Position;
+
+	XMVECTOR cameraLook = XMVectorSet(0, 0, 1, 0);
+	XMVECTOR cameraRight = XMVectorSet(1, 0, 0, 0);
+	XMVECTOR cameraUp = XMVectorSet(0, 1, 0, 0);
+	XMVECTOR cameraRotation = XMLoadFloat3(&m_xmf3CameraRotation);
+	XMMATRIX R = XMMatrixRotationY(XMConvertToRadians(m_xmf3CameraRotation.y));
+	cameraLook = XMVector3TransformNormal(cameraLook, R);
+	cameraRight = XMVector3TransformNormal(cameraRight, R);
+	R = XMMatrixRotationAxis(cameraRight, XMConvertToRadians(m_xmf3CameraRotation.x));
+	cameraLook = XMVector3TransformNormal(cameraLook, R);
+	cameraUp = XMVector3TransformNormal(cameraUp, R);
+
+	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+	XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
+	XMVECTOR projectilePos = XMLoadFloat3(&xmf3ProjectilePos);
+
+	projectilePos += look * 3;
+	projectilePos += right * 4;
+	projectilePos += cameraUp * m_xmf3ColliderExtents.y * 13;
+	XMStoreFloat3(&xmf3ProjectilePos, projectilePos);
+	XMVECTOR projectileTarget = projectilePos;
+	projectileTarget += cameraLook * 10;
+	projectileTarget += cameraUp;
+	XMVECTOR projectileVelocity = projectileTarget - projectilePos;
+	projectileVelocity = XMVector3Normalize(projectileVelocity);
+
+	XMFLOAT3 xmf3ProjectileVelocity;
+	projectileVelocity = projectileVelocity * 300;
+
+	XMVECTOR projectileOrientation = XMLoadFloat4(&m_xmf4Orientation);
+	projectileOrientation = XMQuaternionRotationRollPitchYaw(0, 0, 90);
+	XMFLOAT4 xmf4projectileOrientation;
+	XMStoreFloat4(&xmf4projectileOrientation, projectileOrientation);
+	std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, xmf3ProjectilePos, xmf4projectileOrientation,
+		XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
+	XMStoreFloat3(&xmf3ProjectileVelocity, projectileVelocity);
+	tmp->GetBody()->SetVelocity(xmf3ProjectileVelocity);
+}
+
 void Player::RotateToObj()
 {
 	XMFLOAT3 xmf3MyPosition = m_xmf3Position;
@@ -376,6 +441,8 @@ void Player::RotateToObj()
 
 	xmf3MyPosition.y = 0;
 	myPosition = XMLoadFloat3(&xmf3MyPosition);
+
+	m_pTargetObject = g_vpMovableObjs[closestIdx];
 	XMFLOAT3 xmf3TargetPosition = g_vpMovableObjs[closestIdx]->GetPosition();
 	xmf3TargetPosition.y = 0;
 	XMVECTOR targetPosition = XMLoadFloat3(&xmf3TargetPosition);
@@ -402,6 +469,7 @@ void Player::AcquireItem(UINT itemType)
 	}
 }
 
+// 동작이 캔슬되어 초기화될 시
 void Player::InitializeState()
 {
 	UnableAnimationTrack(PLAYER_IDLE_TRACK);
@@ -419,6 +487,7 @@ void Player::InitializeState()
 
 	m_bIsFalling = false;
 	m_bCanDoubleJump = true;
+	m_bCanThrow = true;
 	m_MaxSpeedXZ = m_DefaultSpeed;
 	m_CharacterFriction = 350.0f;
 
@@ -675,11 +744,48 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 		if (m_pAnimationController->GetTrackOver(PLAYER_ONCE_TRACK_1))
 		{
 			m_ElapsedDestroyTime += elapsedTime;
-			if (m_ElapsedDestroyTime > m_DestroyTime)
-				m_bIsAlive = false;
+			//if (m_ElapsedDestroyTime > m_DestroyTime)
+			//	m_bIsAlive = false;
 		}
 	}
 		break;
+
+	case Player_State_Throw:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(PLAYER_ONCE_TRACK_1);
+
+		if (trackRate > 0.4f)
+		{
+			ThrowProjectile();
+
+			float weight = (trackRate - 0.4f) * (5.0f / 3.0f);
+			m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1 - weight);
+
+			BlendWithIdleMovement(weight);
+			
+		}
+		else if (trackRate < 0.2f)
+		{
+			float weight = trackRate * 5.0f;
+
+			m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, weight);
+			BlendWithIdleMovement(1 - weight);
+		}
+
+		// 현재 공격 동작 마무리 시
+		if (m_pAnimationController->GetTrackOver(PLAYER_ONCE_TRACK_1))
+		{
+			m_bCanThrow = true;
+
+			// 모든 동작 마무리 후 기본 상태로 전환
+			UnableAnimationTrack(PLAYER_ONCE_TRACK_1);
+			UnableAnimationTrack(PLAYER_ONCE_TRACK_2);
+			UnableAnimationTrack(PLAYER_ONCE_TRACK_3);
+
+			m_nAnimationState = PlayerAnimationState::Player_State_Idle;
+		}
+	}
+	break;
 
 	default:
 		break;
@@ -688,6 +794,11 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 
 void Player::BlendWithIdleMovement(float maxWeight)
 {
+	if(m_bIsShoulderView)
+		m_pAnimationController->SetTrackAnimationSet(PLAYER_IDLE_TRACK, Player_Anim_Index_ThrowIdle);
+	else
+		m_pAnimationController->SetTrackAnimationSet(PLAYER_IDLE_TRACK, Player_Anim_Index_Idle);
+
 	Character::BlendWithIdleMovement(maxWeight);
 
 	//m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, true);

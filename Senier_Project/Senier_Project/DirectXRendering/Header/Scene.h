@@ -31,6 +31,21 @@
 #define PLAYER_TRACK_CNT 7
 #define ZOMBIE_TRACK_CNT 4
 
+// UI 표시 사이즈 
+#define PLAYER_HP_BAR_WIDTH 256
+#define PLAYER_HP_BAR_HEIGHT 16
+#define ENEMY_HP_BAR_WIDTH 256
+#define ENEMY_HP_BAR_HEIGHT 16
+#define PLAYER_AIM_WIDTH 128
+#define PLAYER_AIM_HEIGHT 128
+
+// Text UI Index
+enum TextUIIdx
+{
+	Text_UI_Idx_HP,
+	Text_UI_Idx_Score
+};
+
 class Scene
 {
 public:
@@ -40,11 +55,16 @@ public:
 	virtual ~Scene();
 
 	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText);
+
+	bool InitMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	bool InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText);
+
 	void BuildDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
 
 	virtual void OnResize(float aspectRatio, float newWidth, float newHeight);
 	virtual void Update(float totalTime, float elapsedTime);
+	void UpdateUI(float elapsedTime);
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 	void RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList);
 

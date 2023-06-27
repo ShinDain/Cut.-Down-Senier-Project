@@ -257,6 +257,9 @@ void Object::OnPrepareRender(float elapsedTime, ID3D12GraphicsCommandList* pd3dC
 
 void Object::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (!m_bVisible)
+		return;
+
 	OnPrepareRender(elapsedTime, pd3dCommandList);
 
 	if (m_pMesh)
@@ -290,6 +293,9 @@ void Object::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandLis
 
 void Object::DepthRender(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (!m_bVisible)
+		return;
+
 	OnPrepareRender(elapsedTime, pd3dCommandList);
 
 	if (m_pMesh)

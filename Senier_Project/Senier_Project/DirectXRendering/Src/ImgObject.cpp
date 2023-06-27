@@ -37,6 +37,8 @@ bool ImgObject::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 void ImgObject::Update(float elapsedTime)
 {
+	if (m_bBufferDirty)
+		UpdateBuffer();
 }
 
 void ImgObject::OnResize()
@@ -140,19 +142,31 @@ bool ImgObject::BuildDescriptorHeap(ID3D12Device* pd3dDevice)
 }
 
 
-bool ImgObject::ChangePosition(int nPosX, int nPosY)
+void ImgObject::ChangePosition(int nPosX, int nPosY)
 {
-	float left, right, top, bottom;
-
 	if ((nPosX == m_nPreviousPosX) && (nPosY == m_nPreviousPosY))
-		return true;
+		return;
 
 	m_nPreviousPosX = nPosX;
 	m_nPreviousPosY = nPosY;
 
-	left = (float)((m_nScreenWidth / 2) * -1) + (float)nPosX;
+	m_bBufferDirty = true;
+}
+
+void ImgObject::ChangeSize(int nBitmapWidth, int nBitmapHeight)
+{
+	m_nBitmapWidth = nBitmapWidth;
+	m_nBitmapHeight = nBitmapHeight;
+
+	m_bBufferDirty = true;
+}
+
+bool ImgObject::UpdateBuffer()
+{
+	float left, right, top, bottom;
+	left = (float)((m_nScreenWidth / 2) * -1) + (float)m_nPreviousPosX;
 	right = left + m_nBitmapWidth;
-	top = (float)((m_nScreenHeight / 2)) - (float)nPosY;
+	top = (float)((m_nScreenHeight / 2)) - (float)m_nPreviousPosY;
 	bottom = top - m_nBitmapHeight;
 
 	std::vector<XMFLOAT3> vPositions;
@@ -183,6 +197,8 @@ bool ImgObject::ChangePosition(int nPosX, int nPosY)
 		m_DynamicPositionBuffer->CopyData(i, vPositions[i]);
 		m_DynamicTexC0Buffer->CopyData(i, vTexC0[i]);
 	}
+
+	m_bBufferDirty = false;
 
 	return true;
 }

@@ -136,6 +136,7 @@ protected:
 	bool m_bIsAlive = true;
 
 	// ===================================
+	float m_MaxHP = 20.f;
 	float m_HP = 20.0f;
 
 	float m_DestroyTime = 0.0f;
@@ -150,6 +151,7 @@ protected:
 	float m_InvincibleTime = 0.5f;
 	float m_ElapsedInvincibleTime = 0.0f;
 	bool m_bInvincible = false;
+	bool m_bVisible = true;
 
 	
 public:
@@ -221,8 +223,10 @@ public:
 	void SetIsFalling(bool IsFalling) { m_bIsFalling = IsFalling; }
 	void SetIsAlive(bool IsAlive) { m_bIsAlive = IsAlive; }
 
+	void SetMaxHP(float maxHp) { m_MaxHP = maxHp; }
 	void SetHP(float hp) { m_HP = hp; }
 	void SetInvincible(bool bInvincible) { m_bInvincible = bInvincible; }
+	void SetVisible(bool bVisible) { m_bVisible = bVisible; }
 
 
 	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
@@ -248,6 +252,7 @@ public:
 	bool GetIsFalling() { return m_bIsFalling; }
 	bool GetIsAlive() { return m_bIsAlive; }
 
+	const float& GetMaxHP() { return m_MaxHP; }
 	const float& GetHP() { return m_HP; }
 	bool GetInvincible() { return m_bInvincible; }
 	bool GetShadowed() { return m_bShadow; }

@@ -210,6 +210,9 @@ void Monster::DoLanding()
 
 void Monster::Patrol()
 {
+	if (!g_pPlayer->GetIsAlive())
+		return;
+
 	// 패트롤, 왔다 갔다
 	BoundingSphere boundSphere;
 	boundSphere.Center = m_xmf3Position;
@@ -292,6 +295,9 @@ void Monster::Attack()
 
 void Monster::CreateAttackSphere()
 {
+	if (!g_pPlayer->GetIsAlive())
+		return;
+
 	XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
 	XMVECTOR myPosition = XMLoadFloat3(&m_xmf3Position);
 	XMVECTOR attackPosition = myPosition + (l * m_AttackRange);

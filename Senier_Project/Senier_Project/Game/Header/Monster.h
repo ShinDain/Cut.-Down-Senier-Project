@@ -67,7 +67,7 @@ protected:
 	MonsterAnimationState m_AnimationState = MonsterAnimationState::Monster_State_Idle;
 
 	float m_AttackRange = 6.0f;
-	float m_AttackRadius = 3.0f;
+	float m_AttackRadius = 5.0f;
 
 	bool m_bFindPlayer = false;
 	bool m_bSuperArmor = false;
