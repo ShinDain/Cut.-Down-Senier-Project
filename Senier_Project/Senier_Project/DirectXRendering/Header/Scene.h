@@ -14,6 +14,7 @@
 #include "DepthMap.h"
 #include "DWriteText.h"
 
+#include "../../Game/Header/Cinematic.h"
 #include "../../Game/Header/ObjectDefaultData.h"
 #include "../../Game/Header/Character.h"
 #include "../../Game/Header/Weapon.h"
@@ -58,6 +59,7 @@ public:
 
 	bool InitMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	bool InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText);
+	bool InitCinematic();
 
 	void BuildDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
@@ -90,6 +92,8 @@ public:
 	void GenerateContact();
 	void ProcessPhysics(float elapsedTime);
 
+	void PlayCinematic(UINT nCinematicNum);
+
 	void ClearObjectLayer();
 
 private:
@@ -105,6 +109,11 @@ private:
 
 	// 씬을 렌더링할 메인 카메라
 	std::unique_ptr<Camera> m_pCamera = nullptr;
+	std::shared_ptr<Camera> m_pCinematicCamera = nullptr;
+
+	UINT m_nCurCinematicNum = 0;
+	std::vector<std::shared_ptr<Cinematic>> m_vpCinematics;
+	bool m_bInCinematic = false;
 
 	// 오브젝트 객체들
 	static std::vector<std::shared_ptr<Object>> m_vObjectLayer[(int)RenderLayer::Render_Count];

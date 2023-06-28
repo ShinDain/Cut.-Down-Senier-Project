@@ -69,6 +69,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	InitMapData(pd3dDevice, pd3dCommandList);
 	// UI 초기화
 	InitUI(pd3dDevice, pd3dCommandList, pDWriteText);
+	// 시네마틱 초기화
+	InitCinematic();
 
 	// 카메라 초기화
 	if (g_pPlayer)
@@ -76,7 +78,6 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 		m_pCamera = std::make_unique<Third_Person_Camera>(g_pPlayer);
 		m_pCamera->Pitch(15);
 	}
-
 
 #if defined(_DEBUG)
 	//m_pCamera = std::make_unique<Camera>();
@@ -113,6 +114,22 @@ bool Scene::InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComm
 	m_pTextUIs = pDWriteText;
 	m_pTextUIs->AddTextUI(L"HP ", 35, -CLIENT_HEIGHT / 2 + 40);
 	m_pTextUIs->AddTextUI(L"Score ", 35, -CLIENT_HEIGHT / 2 + 80);
+
+	return true;
+}
+
+bool Scene::InitCinematic()
+{
+	m_pCinematicCamera = std::make_shared<Camera>();
+
+	std::shared_ptr<Cinematic> pCinematic = std::make_shared<Cinematic>();
+	pCinematic->SetCamera(m_pCinematicCamera);
+	pCinematic->AddCameraKeyFrame(0.5f, XMFLOAT3(-20, -50, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0));
+	pCinematic->AddCameraKeyFrame(1.0f, XMFLOAT3(20, 50, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0));
+	pCinematic->AddCameraKeyFrame(1.5f, XMFLOAT3(20, 50, 20), XMFLOAT3(0, 90, 0), XMFLOAT3(0, 0, 0));
+	pCinematic->AddCameraKeyFrame(1.7f, XMFLOAT3(20, 50, 20), XMFLOAT3(0, 90, 0), XMFLOAT3(0, 0, 0));
+
+	m_vpCinematics.emplace_back(pCinematic);
 
 	return true;
 }
@@ -193,6 +210,11 @@ void Scene::Update(float totalTime ,float elapsedTime)
 	//g_pPlayer->Update(elapsedTime);
 
 	m_pCamera->Update(elapsedTime);
+	m_vpCinematics[m_nCurCinematicNum]->Update(elapsedTime);
+	if (m_vpCinematics[m_nCurCinematicNum]->GetCinematicEnd())
+		m_bInCinematic = false;
+	m_pCinematicCamera->Update(elapsedTime);
+
 	// 패스버퍼 업데이트
 	UpdateShadowPassCB(totalTime, elapsedTime);
 	UpdatePassCB(totalTime, elapsedTime);
@@ -255,15 +277,24 @@ void Scene::UpdatePassCB(float totalTime, float elapsedTime)
 	// 패스 버퍼 : 뷰 * 투영 변환 행렬 업데이트
 	PassConstant passConstant;
 
-	XMMATRIX view = m_pCamera->GetView();
-	XMMATRIX viewProj = XMMatrixMultiply(view, m_pCamera->GetProj());
+	if (m_bInCinematic)
+	{
+		XMMATRIX view = m_pCinematicCamera->GetView();
+		XMMATRIX viewProj = XMMatrixMultiply(view, m_pCinematicCamera->GetProj());
+		passConstant.EyePosW = m_pCinematicCamera->GetPosition3f();
+		XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
+	}
+	else
+	{
+		XMMATRIX view = m_pCamera->GetView();
+		XMMATRIX viewProj = XMMatrixMultiply(view, m_pCamera->GetProj());
+		passConstant.EyePosW = m_pCamera->GetPosition3f();
+		XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
+	}
 
 	XMMATRIX shadowTransform = XMLoadFloat4x4(&m_xmf4x4ShadowTransform);
-
-	XMStoreFloat4x4(&passConstant.ViewProj, XMMatrixTranspose(viewProj));
 	XMStoreFloat4x4(&passConstant.ShadowTransform, XMMatrixTranspose(shadowTransform));
 
-	passConstant.EyePosW = m_pCamera->GetPosition3f();
 	passConstant.RenderTargetSize = XMFLOAT2((float)CLIENT_WIDTH, (float)CLIENT_HEIGHT);
 	passConstant.InvRenderTargetSize = XMFLOAT2(1.0f / CLIENT_WIDTH, 1.0f / CLIENT_HEIGHT);
 	passConstant.NearZ = 1.0f;
@@ -556,6 +587,10 @@ void Scene::ChangeShader(ShaderType nShaderType, ID3D12GraphicsCommandList* pd3d
 
 void Scene::ProcessInput(UCHAR* pKeybuffer)
 {
+	// 시네마틱 재생중
+	if (m_bInCinematic)
+		return;
+
 	if (m_pCamera)
 	{
 		Third_Person_Camera* tmpCam = (Third_Person_Camera*)m_pCamera.get();
@@ -630,18 +665,33 @@ void Scene::KeyDownEvent(WPARAM wParam)
 		if(m_FadeInValue < 0.0f)
 			m_FadeInValue = 0.0f;
 		break;
+	case 'P':
+		PlayCinematic(0);
+		break;
 	}
+
+	// 시네마틱 재생중
+	if (m_bInCinematic)
+		return;
 
 	if(g_pPlayer) g_pPlayer->KeyDownEvent(wParam);
 }
 
 void Scene::KeyUpEvent(WPARAM wParam)
 {
+	// 시네마틱 재생중
+	if (m_bInCinematic)
+		return;
+
 	if (g_pPlayer) g_pPlayer->KeyUpEvent(wParam);
 }
 
 void Scene::LeftButtonDownEvent()
 {
+	// 시네마틱 재생중
+	if (m_bInCinematic)
+		return;
+
 	if (g_pPlayer)
 	{
 		Player* tmpPlayer = (Player*)(g_pPlayer.get());
@@ -651,6 +701,10 @@ void Scene::LeftButtonDownEvent()
 
 void Scene::RightButtonDownEvent()
 {
+	// 시네마틱 재생중
+	if (m_bInCinematic)
+		return;
+
 	if (g_pPlayer) 
 	{
 		Player* tmpPlayer = (Player*)(g_pPlayer.get());
@@ -1165,6 +1219,16 @@ void Scene::GenerateContact()
 void Scene::ProcessPhysics(float elapsedTime)
 {
 	m_pCollisionResolver->ResolveContacts(m_CollisionData.pContacts, elapsedTime);
+}
+
+void Scene::PlayCinematic(UINT nCinematicNum)
+{
+	if (m_vpCinematics.size() < nCinematicNum)
+		return;
+
+	m_bInCinematic = true;
+	m_nCurCinematicNum = nCinematicNum;
+	m_vpCinematics[m_nCurCinematicNum]->Play();
 }
 
 void Scene::ClearObjectLayer()

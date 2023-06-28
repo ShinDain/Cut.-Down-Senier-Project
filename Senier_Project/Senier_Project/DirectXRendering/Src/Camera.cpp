@@ -420,3 +420,29 @@ void Third_Person_Camera::RotateY(float angle)
 
 }
 
+CinematicCamera::CinematicCamera()
+{
+	SetLens(0.25 * MathHelper::Pi, 1.0f, 1.0f, 1000.f);
+
+}
+
+CinematicCamera::~CinematicCamera()
+{
+}
+
+void CinematicCamera::Update(float Etime)
+{
+	XMFLOAT3 xmf3Right = { 1,0,0 };
+	XMFLOAT3 xmf3Up = { 0,1,0 };
+	XMFLOAT3 xmf3Look = { 0,0,1 };
+
+	XMMATRIX R = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
+
+	XMStoreFloat3(&m_xmf3Right, XMVector3TransformNormal(XMLoadFloat3(&xmf3Right), R));
+	XMStoreFloat3(&m_xmf3Up, XMVector3TransformNormal(XMLoadFloat3(&xmf3Up), R));
+	XMStoreFloat3(&m_xmf3Look, XMVector3TransformNormal(XMLoadFloat3(&xmf3Look), R));
+
+	m_bViewDirty = true;
+
+	UpdateViewMatrix();
+}

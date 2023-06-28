@@ -70,6 +70,8 @@ public:
 
 protected:
 	DirectX::XMFLOAT3 m_xmf3Position = { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT4 m_xmf4Orientation = { 0,0,0, 1 };
+
 	DirectX::XMFLOAT3 m_xmf3Right = { 1.0f, 0.0f, 0.0f };
 	DirectX::XMFLOAT3 m_xmf3Up = { 0.0f, 1.0f, 0.0f };
 	DirectX::XMFLOAT3 m_xmf3Look = { 0.0f, 0.0f, 1.0f };
@@ -89,6 +91,10 @@ protected:
 
 	float m_Pitch = 0.0f;
 	float m_Yaw = 0.0f;
+	float m_Roll = 0.0f;
+
+public:
+	void SetOrientation(XMFLOAT4 xmf4Orientation) { m_xmf4Orientation = xmf4Orientation; }
 };
 
 class Third_Person_Camera : public Camera
@@ -140,3 +146,13 @@ public:
 
 };
 
+class CinematicCamera : public Camera
+{
+public:
+	CinematicCamera();
+	CinematicCamera(const CinematicCamera& rhs) = delete;
+	CinematicCamera& operator=(const CinematicCamera& rhs) = delete;
+	virtual ~CinematicCamera();
+
+	virtual void Update(float Etime) override;
+};
