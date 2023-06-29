@@ -42,6 +42,17 @@ using namespace DirectX;
 #define ZOMBIE_MODEL_RENDERLAYER RenderLayer::Render_Skinned
 #define ZOMBIE_MODEL_SHADOW true
 
+#define BOSS_MODEL_NAME "Cyber_Monsters_2"
+#define BOSS_MODEL_TEXPATH "Cyber_Monsters_2"
+#define BOSS_MODEL_EXTENTS XMFLOAT3(0.3f, 0.8f, 0.2f)
+#define BOSS_MODEL_TYPE Object_Monster
+//#define BOSS_MODEL_TYPE Object_Boss
+#define BOSS_MODEL_COLLIDERTYPE Collider_Box
+#define BOSS_MODEL_MASS 40
+#define BOSS_MODEL_SCALE XMFLOAT3(10,10,10)
+#define BOSS_MODEL_RENDERLAYER RenderLayer::Render_Skinned
+#define BOSS_MODEL_SHADOW true
+
 #define WEAPON_MODEL_NAME "Katana"
 #define WEAPON_MODEL_TEXPATH "Katana"
 #define WEAPON_MODEL_EXTENTS XMFLOAT3(0.3f, 3.2f, 1)

@@ -7,13 +7,11 @@
 #define ZOMBIE_LOOP_TRACK 2
 #define ZOMBIE_ONCE_TRACK_1 3
 
-Monster::Monster()
+Zombie::Zombie()
 {
 }
 
-Monster::Monster(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, 
-				 ObjectInitData objData,
-				 std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+Zombie::Zombie(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
 	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 
@@ -22,19 +20,19 @@ Monster::Monster(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComman
 	m_pAnimationController->SetTrackEnable(ZOMBIE_LOOP_TRACK, false);
 	m_pAnimationController->SetTrackEnable(ZOMBIE_ONCE_TRACK_1, false);
 	m_pAnimationController->m_vpAnimationTracks[ZOMBIE_ONCE_TRACK_1]->SetType(ANIMATION_TYPE_ONCE);
-	m_pAnimationController->SetTrackAnimationSet(ZOMBIE_IDLE_TRACK, Monster_Anim_Index_Idle);
-	m_pAnimationController->SetTrackAnimationSet(ZOMBIE_MOVE_TRACK, Monster_Anim_Index_Run);
+	m_pAnimationController->SetTrackAnimationSet(ZOMBIE_IDLE_TRACK, Zombie_Anim_Index_Idle);
+	m_pAnimationController->SetTrackAnimationSet(ZOMBIE_MOVE_TRACK, Zombie_Anim_Index_Run);
 
 	m_DestroyTime = 3.0f;
 	m_DissolveTime = 0.0f;
 }
 
-Monster::~Monster()
+Zombie::~Zombie()
 {
 	Destroy();
 }
 
-void Monster::Update(float elapsedTime)
+void Zombie::Update(float elapsedTime)
 {
 	Character::Update(elapsedTime);
 
@@ -47,34 +45,34 @@ void Monster::Update(float elapsedTime)
 	StateAction(elapsedTime);
 
 	{
-		XMFLOAT3 tmp =	m_pBody->GetVelocity();
-		XMFLOAT3 tmp2 =	m_pBody->GetAcceleration();
+		XMFLOAT3 tmp = m_pBody->GetVelocity();
+		XMFLOAT3 tmp2 = m_pBody->GetAcceleration();
 		float a = 0;
 	}
 }
 
-void Monster::Destroy()
+void Zombie::Destroy()
 {
 	Object::Destroy();
 }
 
-void Monster::UpdateAnimationTrack(float elapsedTime)
+void Zombie::UpdateAnimationTrack(float elapsedTime)
 {
 	switch (m_AnimationState)
 	{
-	case Monster_State_Idle:
-	case Monster_State_Trace:
+	case Zombie_State_Idle:
+	case Zombie_State_Trace:
 	{
 		BlendWithIdleMovement(1);
 	}
+	break;
+	case Zombie_State_Jump:
 		break;
-	case Monster_State_Jump:
+	case Zombie_State_Falling:
 		break;
-	case Monster_State_Falling:
+	case Zombie_State_Land:
 		break;
-	case Monster_State_Land:
-		break;
-	case Monster_State_Melee:
+	case Zombie_State_Melee:
 	{
 		float trackRate = m_pAnimationController->GetTrackRate(ZOMBIE_ONCE_TRACK_1);
 		// 공격 판정
@@ -112,11 +110,11 @@ void Monster::UpdateAnimationTrack(float elapsedTime)
 		if (m_pAnimationController->GetTrackOver(ZOMBIE_ONCE_TRACK_1))
 		{
 			UnableAnimationTrack(ZOMBIE_ONCE_TRACK_1);
-			m_AnimationState = MonsterAnimationState::Monster_State_Idle;
+			m_AnimationState = ZombieAnimationState::Zombie_State_Idle;
 		}
 	}
-		break;
-	case Monster_State_Hit:
+	break;
+	case Zombie_State_Hit:
 	{
 		float trackRate = m_pAnimationController->GetTrackRate(ZOMBIE_ONCE_TRACK_1);
 
@@ -145,11 +143,11 @@ void Monster::UpdateAnimationTrack(float elapsedTime)
 		if (m_pAnimationController->GetTrackOver(ZOMBIE_ONCE_TRACK_1))
 		{
 			UnableAnimationTrack(ZOMBIE_ONCE_TRACK_1);
-			m_AnimationState = MonsterAnimationState::Monster_State_Idle;
+			m_AnimationState = ZombieAnimationState::Zombie_State_Idle;
 		}
 	}
-		break;
-	case Monster_State_Death:
+	break;
+	case Zombie_State_Death:
 	{
 		float trackRate = m_pAnimationController->GetTrackRate(ZOMBIE_ONCE_TRACK_1);
 
@@ -173,22 +171,22 @@ void Monster::UpdateAnimationTrack(float elapsedTime)
 			m_bDestroying = true;
 		}
 	}
-		break;
+	break;
 	default:
 		break;
 	}
 
 }
 
-void Monster::StateAction(float elapsedTime)
+void Zombie::StateAction(float elapsedTime)
 {
 	switch (m_AnimationState)
 	{
-	case Monster_State_Idle:
-		if (m_bFindPlayer) m_AnimationState = Monster_State_Trace;
+	case Zombie_State_Idle:
+		if (m_bFindPlayer) m_AnimationState = Zombie_State_Trace;
 		Patrol();
 		break;
-	case Monster_State_Trace:
+	case Zombie_State_Trace:
 		Trace();
 		break;
 	default:
@@ -196,11 +194,11 @@ void Monster::StateAction(float elapsedTime)
 	}
 }
 
-void Monster::Move(DWORD dwDirection)
+void Zombie::Move(DWORD dwDirection)
 {
 }
 
-void Monster::DoLanding()
+void Zombie::DoLanding()
 {
 	m_bIsFalling = false;
 	m_MaxSpeedXZ = ZOMBIE_MAXSPEED;
@@ -208,7 +206,7 @@ void Monster::DoLanding()
 	m_Acceleration = 500.0f;
 }
 
-void Monster::Patrol()
+void Zombie::Patrol()
 {
 	if (!g_pPlayer->GetIsAlive())
 		return;
@@ -222,7 +220,7 @@ void Monster::Patrol()
 		m_bFindPlayer = true;
 }
 
-void Monster::Trace()
+void Zombie::Trace()
 {
 	// 맹목적으로 플레이어를 추적한다.
 	XMFLOAT3 xmf3TargetPosition = g_pPlayer->GetPosition();
@@ -232,7 +230,7 @@ void Monster::Trace()
 	XMFLOAT3 xmf3MyPosition = m_xmf3Position;
 	xmf3MyPosition.y = 0;
 	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
-	
+
 	XMVECTOR accelDir = targetPosition - myPosition;
 	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 0.8f * 3)
 	{
@@ -249,42 +247,41 @@ void Monster::Trace()
 	XMVECTOR deltaAccelXZ = accelDir * m_Acceleration;
 	XMFLOAT3 xmf3DeltaAccelXZ;
 	XMStoreFloat3(&xmf3DeltaAccelXZ, deltaAccelXZ);
-	
+
 
 	XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
 	xmf3Accel.x = xmf3DeltaAccelXZ.x;
 	xmf3Accel.z = xmf3DeltaAccelXZ.z;
 	m_pBody->SetAcceleration(xmf3Accel);
-
 }
 
-void Monster::Attack()
+void Zombie::Attack()
 {
 	XMVECTOR playerPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
 	XMVECTOR myPosition = XMLoadFloat3(&m_xmf3Position);
 	if (XMVectorGetX(XMVector3Length(myPosition - playerPosition)) > m_AttackRange * 3)
 	{
-		m_AnimationState = Monster_State_Trace;
+		m_AnimationState = Zombie_State_Trace;
 		return;
 	}
 
 	switch (m_AnimationState)
 	{
-	/*case Monster_State_Idle:
-		break;
-	case Monster_State_Jump:
-		break;
-	case Monster_State_Falling:
-		break;
-	case Monster_State_Land:
-		break;*/
-	case Monster_State_Melee:
+		/*case Zombie_State_Idle:
+			break;
+		case Zombie_State_Jump:
+			break;
+		case Zombie_State_Falling:
+			break;
+		case Zombie_State_Land:
+			break;*/
+	case Zombie_State_Melee:
 		break;
 	default:
-		m_AnimationState = MonsterAnimationState::Monster_State_Melee;
+		m_AnimationState = ZombieAnimationState::Zombie_State_Melee;
 		UnableAnimationTrack(ZOMBIE_ONCE_TRACK_1);
 		m_pAnimationController->SetTrackEnable(ZOMBIE_ONCE_TRACK_1, true);
-		m_pAnimationController->SetTrackAnimationSet(ZOMBIE_ONCE_TRACK_1, Monster_Anim_Index_Attack1);
+		m_pAnimationController->SetTrackAnimationSet(ZOMBIE_ONCE_TRACK_1, Zombie_Anim_Index_Attack1);
 		m_pAnimationController->SetTrackWeight(ZOMBIE_ONCE_TRACK_1, 0);
 		m_pAnimationController->SetTrackSpeed(ZOMBIE_ONCE_TRACK_1, 1.5f);
 
@@ -293,7 +290,7 @@ void Monster::Attack()
 
 }
 
-void Monster::CreateAttackSphere()
+void Zombie::CreateAttackSphere()
 {
 	if (!g_pPlayer->GetIsAlive())
 		return;
@@ -316,7 +313,7 @@ void Monster::CreateAttackSphere()
 		g_pPlayer->ApplyDamage(10, m_xmf3Look);
 }
 
-void Monster::RotateToPlayer()
+void Zombie::RotateToPlayer()
 {
 	XMFLOAT3 xmf3MyPosition = m_xmf3Position;
 	xmf3MyPosition.y = 0;
@@ -331,9 +328,9 @@ void Monster::RotateToPlayer()
 	RotateToTargetLook(0.0f, xmf3TargetLook, 1);
 }
 
-void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+void Zombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
-	if (m_AnimationState == MonsterAnimationState::Monster_State_Death || m_bInvincible)
+	if (m_AnimationState == ZombieAnimationState::Zombie_State_Death || m_bInvincible)
 		return;
 
 	Character::ApplyDamage(power, xmf3DamageDirection);
@@ -344,17 +341,29 @@ void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	UnableAnimationTrack(ZOMBIE_ONCE_TRACK_1);
 	if (m_HP > 0)
 	{
-		m_AnimationState = MonsterAnimationState::Monster_State_Hit;
+		m_AnimationState = ZombieAnimationState::Zombie_State_Hit;
 		m_pAnimationController->SetTrackEnable(ZOMBIE_ONCE_TRACK_1, true);
-		m_pAnimationController->SetTrackAnimationSet(ZOMBIE_ONCE_TRACK_1, MonsterAnimationIndex::Monster_Anim_Index_Hit2);
+		m_pAnimationController->SetTrackAnimationSet(ZOMBIE_ONCE_TRACK_1, ZombieAnimationIndex::Zombie_Anim_Index_Hit2);
 		m_pAnimationController->SetTrackSpeed(ZOMBIE_ONCE_TRACK_1, 1.5f);
 	}
 	else
 	{
 		Cutting(XMFLOAT3(1, 0, 0));
-		m_AnimationState = MonsterAnimationState::Monster_State_Death;
+		m_AnimationState = ZombieAnimationState::Zombie_State_Death;
 		m_pAnimationController->SetTrackEnable(ZOMBIE_ONCE_TRACK_1, true);
-		m_pAnimationController->SetTrackAnimationSet(ZOMBIE_ONCE_TRACK_1, MonsterAnimationIndex::Monster_Anim_Index_FallingBack);
+		m_pAnimationController->SetTrackAnimationSet(ZOMBIE_ONCE_TRACK_1, ZombieAnimationIndex::Zombie_Anim_Index_FallingBack);
 		m_pAnimationController->SetTrackSpeed(ZOMBIE_ONCE_TRACK_1, 1);
 	}
+}
+
+Monster::Monster()
+{
+}
+
+Monster::Monster(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+{
+}
+
+Monster::~Monster()
+{
 }

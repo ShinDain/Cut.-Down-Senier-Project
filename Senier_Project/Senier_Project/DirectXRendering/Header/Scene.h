@@ -31,6 +31,7 @@
 
 #define PLAYER_TRACK_CNT 7
 #define ZOMBIE_TRACK_CNT 4
+#define BOSS_TRACK_CNT 4
 
 // UI 표시 사이즈 
 #define PLAYER_HP_BAR_WIDTH 256
