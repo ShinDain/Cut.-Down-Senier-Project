@@ -84,6 +84,7 @@ bool Weapon::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 	BuildConstantBuffers(pd3dDevice);
 	m_pCollider->SetIsActive(false);
+	UpdateTransform(nullptr);
 
 	return true;
 }

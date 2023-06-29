@@ -45,6 +45,8 @@ bool Item::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 
 	m_bShadow = objData.bShadow;
 
+	UpdateTransform(nullptr);
+
 	return true;
 }
 

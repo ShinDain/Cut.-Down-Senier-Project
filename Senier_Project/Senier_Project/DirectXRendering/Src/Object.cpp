@@ -102,6 +102,7 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 	BuildConstantBuffers(pd3dDevice);
 	UpdateToRigidBody(0.0f);
+	UpdateTransform(nullptr);
 
 	return true;
 }

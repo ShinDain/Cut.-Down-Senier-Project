@@ -5,8 +5,11 @@
 #include <vector>
 #include <map>
 #include "../../Common/Header/D3DUtil.h"
+#include "../../Common/Header/MathHelper.h"
 #include "../../DirectXRendering/Header/Camera.h"
 #include "../../DirectXRendering/Header/Object.h"
+
+#define KEYFRAME_FUNCTION_EPSILON	0.00165f
 
 // a 키프레임에 p오브젝트가 특정 이동/회전으로 조정된다.
 // 특정 애니메이션을 재생시키려면,
@@ -15,15 +18,15 @@ struct KeyFrame // map에 시간과 함께 배치
 {
 	XMFLOAT3 xmf3Position;
 	XMFLOAT3 xmf3Rotation;
-	XMFLOAT4 xmf4Orientation;
 	XMFLOAT3 xmf3Scale;
-			 
-	void(*pFunction)();
+
+	void(Object::*pFunction)();
 };
 
 struct CinematicTrack
 {
 	std::shared_ptr<Object> pObject;
+	bool TrackEnd = false;
 
 	UINT nCurIdx = 0;
 	UINT nKeyFrameCnt = 0;
@@ -35,6 +38,7 @@ struct CinematicTrack
 struct CinematicCameraTrack
 {
 	std::shared_ptr<Camera> pCamera;
+	bool TrackEnd = false;
 
 	UINT nCurIdx = 0;
 	UINT nKeyFrameCnt = 0;
@@ -60,12 +64,13 @@ public:
 	void Play();
 	void Update(float elapsedTime);
 
-	void AddTrack(std::shared_ptr<Object> pObject);
-	void AddKeyFrame(UINT nTrackIdx, float time, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotation, XMFLOAT3 xmf3Scale, void(*pFunction)());
-	void AddCameraKeyFrame(float time, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotation, XMFLOAT3 xmf3Scale);
+	void AddCamera(std::shared_ptr<Camera> pCamera, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotation);
+	void AddTrack(std::shared_ptr<Object> pObject, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotation, XMFLOAT3 xmf3Scale);
+	void AddKeyFrame(UINT nTrackIdx, float time, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotation, XMFLOAT3 xmf3Scale, void(Object::*pFunction)());
+	void AddCameraKeyFrame(float time, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotation);
 
 	void GetCameraKeyFrameData(UINT nCurIdx);
-	void GetKeyFrameData(UINT nCurIdx);
+	void GetKeyFrameData(UINT nTrackIdx, UINT nCurIdx);
 
 protected:
 	bool m_bPlay = false;
@@ -78,7 +83,6 @@ protected:
 
 
 public:
-	void SetCamera(std::shared_ptr<Camera> pCamera);
 
 
 	bool GetCinematicEnd() { return m_bCinematicEnd; }

@@ -158,6 +158,7 @@ public:
 	virtual void Move(DWORD dwDirection) {}
 	virtual void Rotate(float x, float y, float z) {}
 	virtual void Jump() {}
+	virtual void Attack() {}
 	virtual void IsFalling();
 
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
@@ -235,6 +236,7 @@ public:
 
 	const char* GetName() { return m_FrameName; }
 	const XMFLOAT3& GetPosition() { return(m_xmf3Position); }
+	const XMFLOAT3& GetRenderPosition() { return(m_xmf3RenderPosition); }
 	const XMFLOAT3& GetScale() { return(m_xmf3Scale); }
 	const XMFLOAT3& GetLookVector() { return(m_xmf3Look); }
 	const XMFLOAT3& GetUpVector() { return(m_xmf3Up); }

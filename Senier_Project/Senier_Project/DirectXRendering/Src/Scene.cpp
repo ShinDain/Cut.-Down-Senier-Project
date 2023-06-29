@@ -48,7 +48,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
 	// 몬스터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.25, 1.25, 1.25),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.25, 1.25, 1.25),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(50, 0, 150), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(40, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
@@ -59,7 +59,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 15, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 15, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	
 	// 아이템 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
@@ -70,7 +70,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// UI 초기화
 	InitUI(pd3dDevice, pd3dCommandList, pDWriteText);
 	// 시네마틱 초기화
-	InitCinematic();
+	//InitCinematic();
 
 	// 카메라 초기화
 	if (g_pPlayer)
@@ -121,13 +121,43 @@ bool Scene::InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComm
 bool Scene::InitCinematic()
 {
 	m_pCinematicCamera = std::make_shared<Camera>();
+	//m_pCinematicCamera->SetPosition(0, 30, -100);
+	m_pCinematicCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
 
 	std::shared_ptr<Cinematic> pCinematic = std::make_shared<Cinematic>();
-	pCinematic->SetCamera(m_pCinematicCamera);
-	pCinematic->AddCameraKeyFrame(0.5f, XMFLOAT3(-20, -50, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0));
-	pCinematic->AddCameraKeyFrame(1.0f, XMFLOAT3(20, 50, 0), XMFLOAT3(0, 0, 0), XMFLOAT3(0, 0, 0));
-	pCinematic->AddCameraKeyFrame(1.5f, XMFLOAT3(20, 50, 20), XMFLOAT3(0, 90, 0), XMFLOAT3(0, 0, 0));
-	pCinematic->AddCameraKeyFrame(1.7f, XMFLOAT3(20, 50, 20), XMFLOAT3(0, 90, 0), XMFLOAT3(0, 0, 0));
+
+	std::shared_ptr<Object> pObject;
+	XMFLOAT3 position;
+	XMFLOAT3 rotation;
+	XMFLOAT3 scale;
+	auto pFunction = nullptr;
+
+	// 카메라 연결 및 조작
+	pCinematic->AddCamera(m_pCinematicCamera, XMFLOAT3(0, 20, 0), XMFLOAT3(0,0,0));
+	pCinematic->AddCameraKeyFrame(0.5f, XMFLOAT3(0, 20, 0), XMFLOAT3(0, 0, 0));
+	//pCinematic->AddCameraKeyFrame(1.0f, XMFLOAT3(0, 0, 0),   XMFLOAT3(0, 0, 0));
+	//pCinematic->AddCameraKeyFrame(1.5f, XMFLOAT3(0, 50, 0),  XMFLOAT3(0, 90, 0));
+
+	// 오브젝트 연결 및 조작
+	pObject = m_vObjectLayer[RenderLayer::Render_Skinned][1];
+	position = pObject->GetPosition();
+	rotation = pObject->GetRotation();
+	scale = pObject->GetScale();
+
+	pCinematic->AddTrack(pObject, position, rotation, scale);
+	pCinematic->AddKeyFrame(0, 0.5f, position, XMFLOAT3(0, 30, 0), scale, pFunction);
+	pCinematic->AddKeyFrame(0, 1.0f, position,  XMFLOAT3(0, 30, 0), scale, pFunction);
+	pCinematic->AddKeyFrame(0, 1.5f, position,  XMFLOAT3(0, 90, 0), scale, pFunction);
+
+	pObject = m_vObjectLayer[RenderLayer::Render_TextureMesh][5];
+	position = pObject->GetPosition();
+	rotation = pObject->GetRotation();
+	scale = pObject->GetScale();
+
+	pCinematic->AddTrack(pObject, position, rotation, scale);
+	pCinematic->AddKeyFrame(1, 0.5f, position, XMFLOAT3(0, 30, 0), scale, pFunction);
+	pCinematic->AddKeyFrame(1, 1.0f, position, XMFLOAT3(0, 30, 100), scale, pFunction);
+	pCinematic->AddKeyFrame(1, 1.5f, position, XMFLOAT3(0, 90, 500), scale, pFunction);
 
 	m_vpCinematics.emplace_back(pCinematic);
 
@@ -210,11 +240,15 @@ void Scene::Update(float totalTime ,float elapsedTime)
 	//g_pPlayer->Update(elapsedTime);
 
 	m_pCamera->Update(elapsedTime);
-	m_vpCinematics[m_nCurCinematicNum]->Update(elapsedTime);
-	if (m_vpCinematics[m_nCurCinematicNum]->GetCinematicEnd())
-		m_bInCinematic = false;
-	m_pCinematicCamera->Update(elapsedTime);
+	if (m_vpCinematics.size() > m_nCurCinematicNum)
+	{
+		m_vpCinematics[m_nCurCinematicNum]->Update(elapsedTime);
+		if (m_vpCinematics[m_nCurCinematicNum]->GetCinematicEnd())
+			m_bInCinematic = false;
 
+		m_pCinematicCamera->Update(elapsedTime);
+	}
+	
 	// 패스버퍼 업데이트
 	UpdateShadowPassCB(totalTime, elapsedTime);
 	UpdatePassCB(totalTime, elapsedTime);

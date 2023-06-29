@@ -103,6 +103,7 @@ bool Projectile::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	m_TraceCollider.Radius = m_TraceColliderRadius;
 
 	m_bShadow = objData.bShadow;
+	UpdateTransform(nullptr);
 
 	return true;
 }
