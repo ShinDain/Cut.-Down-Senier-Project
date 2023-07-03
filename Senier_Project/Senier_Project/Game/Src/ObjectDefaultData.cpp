@@ -3,6 +3,7 @@
 void CreateObjectDefaultData()
 {
 	ObjectDefaultData tmpData;
+	tmpData.pstrObjectPath = CHARACTER_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = CHARACTER_MODEL_TEXPATH;
 	tmpData.xmf3Extents = CHARACTER_MODEL_EXTENTS;
 	tmpData.objectType = CHARACTER_MODEL_TYPE;
@@ -16,6 +17,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ CHARACTER_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(CHARACTER_MODEL_NAME);
 
+	tmpData.pstrObjectPath = PLAYER_PROJECTILE_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = PLAYER_PROJECTILE_MODEL_TEXPATH;
 	tmpData.xmf3Extents = PLAYER_PROJECTILE_MODEL_EXTENTS;
 	tmpData.objectType = PLAYER_PROJECTILE_MODEL_TYPE;
@@ -29,6 +31,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ PLAYER_PROJECTILE_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(PLAYER_PROJECTILE_MODEL_NAME);
 
+	tmpData.pstrObjectPath = ZOMBIE_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = ZOMBIE_MODEL_TEXPATH;
 	tmpData.xmf3Extents = ZOMBIE_MODEL_EXTENTS;
 	tmpData.objectType = ZOMBIE_MODEL_TYPE;
@@ -42,6 +45,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ ZOMBIE_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(ZOMBIE_MODEL_NAME);	
 	
+	tmpData.pstrObjectPath = BOSS_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = BOSS_MODEL_TEXPATH;
 	tmpData.xmf3Extents = BOSS_MODEL_EXTENTS;
 	tmpData.objectType = BOSS_MODEL_TYPE;
@@ -55,6 +59,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ BOSS_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(BOSS_MODEL_NAME);
 
+	tmpData.pstrObjectPath = WEAPON_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = WEAPON_MODEL_TEXPATH;
 	tmpData.xmf3Extents = WEAPON_MODEL_EXTENTS;
 	tmpData.objectType = WEAPON_MODEL_TYPE;
@@ -68,6 +73,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ WEAPON_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WEAPON_MODEL_NAME);
 
+	tmpData.pstrObjectPath = CUBE_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = CUBE_MODEL_TEXPATH;
 	tmpData.xmf3Extents = CUBE_MODEL_EXTENTS;
 	tmpData.objectType = CUBE_MODEL_TYPE;
@@ -81,6 +87,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ CUBE_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(CUBE_MODEL_NAME);
 
+	tmpData.pstrObjectPath = GROUND_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = GROUND_MODEL_TEXPATH;
 	tmpData.xmf3Extents = GROUND_MODEL_EXTENTS;
 	tmpData.objectType = GROUND_MODEL_TYPE;
@@ -94,6 +101,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ GROUND_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(GROUND_MODEL_NAME);
 
+	tmpData.pstrObjectPath = CARPET_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = CARPET_MODEL_TEXPATH;
 	tmpData.xmf3Extents = CARPET_MODEL_EXTENTS;
 	tmpData.objectType = CARPET_MODEL_TYPE;
@@ -107,6 +115,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ CARPET_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(CARPET_MODEL_NAME);
 
+	tmpData.pstrObjectPath = DRAWER_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = DRAWER_MODEL_TEXPATH;
 	tmpData.xmf3Extents = DRAWER_MODEL_EXTENTS;
 	tmpData.objectType = DRAWER_MODEL_TYPE;
@@ -120,6 +129,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ DRAWER_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(DRAWER_MODEL_NAME);
 
+	tmpData.pstrObjectPath = MECHANICAL_ARM_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = MECHANICAL_ARM_MODEL_TEXPATH;
 	tmpData.xmf3Extents = MECHANICAL_ARM_MODEL_EXTENTS;
 	tmpData.objectType = MECHANICAL_ARM_MODEL_TYPE;
@@ -133,6 +143,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ MECHANICAL_ARM_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(MECHANICAL_ARM_MODEL_NAME);
 
+	tmpData.pstrObjectPath = OFFICE_CHAIR_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = OFFICE_CHAIR_MODEL_TEXPATH;
 	tmpData.xmf3Extents = OFFICE_CHAIR_MODEL_EXTENTS;
 	tmpData.objectType = OFFICE_CHAIR_MODEL_TYPE;
@@ -146,6 +157,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ OFFICE_CHAIR_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(OFFICE_CHAIR_MODEL_NAME);
 
+	tmpData.pstrObjectPath = DOOR_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = DOOR_MODEL_TEXPATH;
 	tmpData.xmf3Extents = DOOR_MODEL_EXTENTS;
 	tmpData.objectType = DOOR_MODEL_TYPE;
@@ -159,6 +171,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ DOOR_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(DOOR_MODEL_NAME);
 
+	tmpData.pstrObjectPath = SERVER_RACK_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = SERVER_RACK_MODEL_TEXPATH;
 	tmpData.xmf3Extents = SERVER_RACK_MODEL_EXTENTS;
 	tmpData.objectType = SERVER_RACK_MODEL_TYPE;
@@ -172,6 +185,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ SERVER_RACK_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(SERVER_RACK_MODEL_NAME);
 
+	tmpData.pstrObjectPath = SHELF_CRATE_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = SHELF_CRATE_MODEL_TEXPATH;
 	tmpData.xmf3Extents = SHELF_CRATE_MODEL_EXTENTS;
 	tmpData.objectType = SHELF_CRATE_MODEL_TYPE;
@@ -185,6 +199,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ SHELF_CRATE_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(SHELF_CRATE_MODEL_NAME);
 
+	tmpData.pstrObjectPath = SHELF_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = SHELF_MODEL_TEXPATH;
 	tmpData.xmf3Extents = SHELF_MODEL_EXTENTS;
 	tmpData.objectType = SHELF_MODEL_TYPE;
@@ -198,6 +213,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ SHELF_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(SHELF_MODEL_NAME);
 
+	tmpData.pstrObjectPath = STOOL_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = STOOL_MODEL_TEXPATH;
 	tmpData.xmf3Extents = STOOL_MODEL_EXTENTS;
 	tmpData.objectType = STOOL_MODEL_TYPE;
@@ -211,6 +227,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ STOOL_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(STOOL_MODEL_NAME);
 
+	tmpData.pstrObjectPath = TABLE_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = TABLE_MODEL_TEXPATH;
 	tmpData.xmf3Extents = TABLE_MODEL_EXTENTS;
 	tmpData.objectType = TABLE_MODEL_TYPE;
@@ -224,6 +241,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ TABLE_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(TABLE_MODEL_NAME);
 
+	tmpData.pstrObjectPath = TABLE_GLASS_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = TABLE_GLASS_MODEL_TEXPATH;
 	tmpData.xmf3Extents = TABLE_GLASS_MODEL_EXTENTS;
 	tmpData.objectType = TABLE_GLASS_MODEL_TYPE;
@@ -237,6 +255,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ TABLE_GLASS_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(TABLE_GLASS_MODEL_NAME);
 
+	tmpData.pstrObjectPath = TABLE_SET_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = TABLE_SET_MODEL_TEXPATH;
 	tmpData.xmf3Extents = TABLE_SET_MODEL_EXTENTS;
 	tmpData.objectType = TABLE_SET_MODEL_TYPE;
@@ -250,6 +269,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ TABLE_SET_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(TABLE_SET_MODEL_NAME);
 
+	tmpData.pstrObjectPath = VASE_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = VASE_MODEL_TEXPATH;
 	tmpData.xmf3Extents = VASE_MODEL_EXTENTS;
 	tmpData.objectType = VASE_MODEL_TYPE;
@@ -263,6 +283,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ VASE_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(VASE_MODEL_NAME);
 
+	tmpData.pstrObjectPath = WALL_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = WALL_MODEL_TEXPATH;
 	tmpData.xmf3Extents = WALL_MODEL_EXTENTS;
 	tmpData.objectType = WALL_MODEL_TYPE;
@@ -276,6 +297,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ WALL_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WALL_MODEL_NAME);
 
+	tmpData.pstrObjectPath = WALL_WITH_WINDOWS_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = WALL_WITH_WINDOWS_MODEL_TEXPATH;
 	tmpData.xmf3Extents = WALL_WITH_WINDOWS_MODEL_EXTENTS;
 	tmpData.objectType = WALL_WITH_WINDOWS_MODEL_TYPE;
@@ -289,6 +311,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ WALL_WITH_WINDOWS_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WALL_WITH_WINDOWS_MODEL_NAME);
 
+	tmpData.pstrObjectPath = WALL_PILLAR_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = WALL_PILLAR_MODEL_TEXPATH;
 	tmpData.xmf3Extents = WALL_PILLAR_MODEL_EXTENTS;
 	tmpData.objectType = WALL_PILLAR_MODEL_TYPE;
@@ -302,6 +325,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ WALL_PILLAR_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WALL_PILLAR_MODEL_NAME);
 
+	tmpData.pstrObjectPath = WALL_PILLAR_3_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = WALL_PILLAR_3_MODEL_TEXPATH;
 	tmpData.xmf3Extents = WALL_PILLAR_3_MODEL_EXTENTS;
 	tmpData.objectType = WALL_PILLAR_3_MODEL_TYPE;
@@ -315,6 +339,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ WALL_PILLAR_3_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WALL_PILLAR_3_MODEL_NAME);
 
+	tmpData.pstrObjectPath = PLATFORM_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = PLATFORM_MODEL_TEXPATH;
 	tmpData.xmf3Extents = PLATFORM_MODEL_EXTENTS;
 	tmpData.objectType = PLATFORM_MODEL_TYPE;
@@ -328,6 +353,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ PLATFORM_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(PLATFORM_MODEL_NAME);
 	
+	tmpData.pstrObjectPath = ITEM_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = ITEM_MODEL_TEXPATH;
 	tmpData.xmf3Extents = ITEM_MODEL_EXTENTS;
 	tmpData.objectType = ITEM_MODEL_TYPE;

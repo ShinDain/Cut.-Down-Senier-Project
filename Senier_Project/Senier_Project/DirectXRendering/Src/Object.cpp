@@ -335,12 +335,18 @@ void Object::BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice)
 	if (m_pChild) m_pChild->BuildTextureDescriptorHeap(pd3dDevice);
 }
 
-std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName, const char* pstrTexPath)
+std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	const char* pstrFileName, const char* pstrObjectPath, const char* pstrTexPath)
 {
 	FILE* pInFile = NULL;
 
 	char pstrFilePath[64] = { '\0' };
 	strcpy_s(pstrFilePath, 64, "Model/");
+	if (strlen(pstrObjectPath))
+	{
+		strcat_s(pstrFilePath, pstrObjectPath);
+		strcat_s(pstrFilePath, "/");
+	}
 	strcat_s(pstrFilePath, pstrFileName);
 	strcat_s(pstrFilePath, ".bin");
 	::fopen_s(&pInFile, pstrFilePath, "rb");
@@ -711,10 +717,7 @@ void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo>
 			for (int i = 0; i < nBoneFrames; ++i)
 			{
 				ReadStringFromFile(pInFile, pstrToken);
-				if (!strcmp(pstrToken, "Vampire"))
-				{
-					float a = 100;
-				}
+
 				pModelData->m_pAnimationSets->m_vpAnimatedBoneFrameCaches.emplace_back(pModelData->m_pRootObject->FindFrame(pstrToken));
 			}
 
@@ -778,6 +781,7 @@ void Object::LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo>
 		}
 		else if (!strcmp(pstrToken, "</AnimationSets>"))
 		{
+			pModelData->m_pAnimationSets->m_nAnimationSets = nAnimationSets;
 			break;
 		}
 	}

@@ -686,9 +686,12 @@ void DirectXApp::CalculateFrameStats()
 		wstring fpsStr = to_wstring(fps);
 		wstring mspfStr = to_wstring(mspf);
 
+		wstring tmpCaptionStr = to_wstring(g_tmpCaptionNum);
+
 		wstring windowText = m_MainWndCaption +
 			L"    fps: " + fpsStr +
-			L"   mspf: " + mspfStr;
+			L"   mspf: " + mspfStr +
+			L"   animateTime : " + tmpCaptionStr;
 
 		SetWindowText(m_hMainWnd, windowText.c_str());
 

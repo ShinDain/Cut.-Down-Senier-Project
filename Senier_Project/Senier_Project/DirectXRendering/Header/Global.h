@@ -19,6 +19,8 @@ class ModelDataInfo;
 class Object;
 class Player;
 
+extern float g_tmpCaptionNum;
+
 extern ID3D12Device* g_pd3dDevice;
 extern ID3D12GraphicsCommandList* g_pd3dCommandList;
 

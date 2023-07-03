@@ -48,11 +48,17 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
 	// 몬스터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1), BOSS_MODEL_NAME, BOSS_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), BOSS_MODEL_NAME, BOSS_TRACK_CNT);		
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.25, 1.25, 1.25),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(50, 0, 150), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(40, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
+	//
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), BOSS_MODEL_NAME, BOSS_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.25, 1.25, 1.25), ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(50, 0, 150), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(40, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 
 	// 월드 오브젝트 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
@@ -236,6 +242,18 @@ void Scene::Update(float totalTime ,float elapsedTime)
 #endif
 	for (int i = 0; i < g_vpAllObjs.size(); ++i)
 	{
+		BoundingFrustum tmpFus = BoundingFrustum(XMFLOAT3(0,0,0), XMFLOAT4(0,0,0,1), 0.375f, -0.375f, 0.25f, -0.25f, 1, 1000);
+		//bool res = tmpFus.Intersects(g_vpAllObjs[i]->GetCollider()->GetBoundingSphere());
+		//if (g_vpAllObjs[i]->GetColliderType() == Collider_Box)
+		//{
+		//	bool res = m_pCamera->m_CameraFrustum.Intersects(g_vpAllObjs[i]->GetCollider()->GetBoundingSphere());
+		//
+		//	if (res)
+		//		g_vpAllObjs[i]->SetVisible(false);
+		//	else
+		//		g_vpAllObjs[i]->SetVisible(true);
+		//}
+
 		if (g_vpAllObjs[i]) g_vpAllObjs[i]->Update(elapsedTime);
 	}
 	//g_pPlayer->Update(elapsedTime);
@@ -429,14 +447,6 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		}
 	}
 
-	//// 플레이어 렌더링
-	//{
-	//	g_pPlayer->Animate(elapsedTime);
-	//	if (!g_pPlayer->m_pAnimationController)
-	//		g_pPlayer->UpdateTransform(NULL);
-	//	g_pPlayer->Render(elapsedTime, pd3dCommandList);
-	//}
-
 	ChangeShader(ShaderType::Shader_Static, pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
 	{
@@ -541,7 +551,7 @@ void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->GetIsAlive())
 				continue;
 			// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
-			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(0.0f);
+			//m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(0.0f);
 			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
 				m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
 			m_vObjectLayer[RenderLayer::Render_Skinned][i]->DepthRender(0.0f, pd3dCommandList);
@@ -595,7 +605,7 @@ void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->GetIsAlive())
 			continue;
 		// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
-		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Animate(0.0f);
+		//m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Animate(0.0f);
 		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->m_pAnimationController)
 			m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->UpdateTransform(NULL);
 		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->DepthRender(0.0f, pd3dCommandList);
@@ -703,11 +713,22 @@ void Scene::KeyDownEvent(WPARAM wParam)
 	case 'P':
 		PlayCinematic(0);
 		break;
+	case 'Y':
+		if(m_vObjectLayer[RenderLayer::Render_Skinned][1]->GetVisible())
+			m_vObjectLayer[RenderLayer::Render_Skinned][1]->SetVisible(false);
+		else
+			m_vObjectLayer[RenderLayer::Render_Skinned][1]->SetVisible(true);
+		break;
 	}
-
+	
 	// 시네마틱 재생중
 	if (m_bInCinematic)
 		return;
+
+	for (int i = 0; i < g_vpCharacters.size(); ++i)
+	{
+		g_vpCharacters[i]->KeyDownEvent(wParam);
+	}
 
 	if(g_pPlayer) g_pPlayer->KeyDownEvent(wParam);
 }
@@ -908,7 +929,9 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 
 	case Object_Monster:
 	{
-		std::shared_ptr<Zombie> pMonster = std::make_shared<Zombie>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+		// 현재 zombie 클래스로 임시
+		std::shared_ptr<Monster> pMonster = std::make_shared<Monster>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+		//std::shared_ptr<Zombie> pMonster = std::make_shared<Zombie>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 		pObject = std::static_pointer_cast<Object>(pMonster);
 
 		g_vpAllObjs.emplace_back(pObject);

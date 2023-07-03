@@ -37,12 +37,13 @@ bool SenierProjectApp::Initialize()
 
 	// 오브젝트 기본 정보 생성
 	CreateObjectDefaultData();
-
+	 
 	for (int i = 0; i < g_DefaultObjectNames.size(); ++i)
 	{
 		const char* pstrFileName = g_DefaultObjectNames[i].c_str();
 		std::shared_ptr<ModelDataInfo> pModelData =
-			Object::LoadModelDataFromFile(m_d3d12Device.Get(), m_CommandList.Get(), pstrFileName, g_DefaultObjectData[pstrFileName].pstrTexPath);
+			Object::LoadModelDataFromFile(m_d3d12Device.Get(), m_CommandList.Get(), pstrFileName,
+				g_DefaultObjectData[pstrFileName].pstrObjectPath, g_DefaultObjectData[pstrFileName].pstrTexPath);
 
 		g_LoadedModelData.insert({ pstrFileName, pModelData });
 	}
@@ -79,6 +80,9 @@ void SenierProjectApp::Update(float elapsedTime)
 	ProcessInput();
 
 	FlushCommandQueue();
+
+	g_tmpCaptionNum = 0;
+
 	// 업데이트
 	if (m_Scene)
 	{

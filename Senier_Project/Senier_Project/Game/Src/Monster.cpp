@@ -51,11 +51,6 @@ void Zombie::Update(float elapsedTime)
 	}
 }
 
-void Zombie::Destroy()
-{
-	Object::Destroy();
-}
-
 void Zombie::UpdateAnimationTrack(float elapsedTime)
 {
 	switch (m_AnimationState)
@@ -356,14 +351,65 @@ void Zombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	}
 }
 
+// =========================================
+// 애니메이션 테스트용 몬스터
+
 Monster::Monster()
 {
 }
 
 Monster::Monster(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
+	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	m_pAnimationController->SetTrackEnable(ZOMBIE_IDLE_TRACK, true);
+	m_pAnimationController->SetTrackEnable(ZOMBIE_MOVE_TRACK, true);
+	m_pAnimationController->SetTrackEnable(2, false);
+	m_pAnimationController->SetTrackEnable(3, false);
+	m_pAnimationController->SetTrackAnimationSet(ZOMBIE_IDLE_TRACK, m_tmpAnimationIdx);
+	m_pAnimationController->SetTrackAnimationSet(ZOMBIE_MOVE_TRACK, m_tmpAnimationIdx);
+
+	m_DestroyTime = 3.0f;
+	m_DissolveTime = 0.0f;
 }
 
 Monster::~Monster()
 {
+	Destroy();
+}
+
+void Monster::Update(float elapsedTime)
+{
+	Character::Update(elapsedTime);
+
+	XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+	xmf3Accel.x = 0;
+	xmf3Accel.z = 0;
+	m_pBody->SetAcceleration(xmf3Accel);
+
+	// state에 따른 행동
+	StateAction(elapsedTime);
+
+	{
+		XMFLOAT3 tmp = m_pBody->GetVelocity();
+		XMFLOAT3 tmp2 = m_pBody->GetAcceleration();
+		float a = 0;
+	}
+}
+
+void Monster::UpdateAnimationTrack(float elapsedTime)
+{
+	BlendWithIdleMovement(1);
+}
+
+void Monster::KeyDownEvent(WPARAM wParam)
+{
+	if (wParam == 'L')
+	{
+		m_tmpAnimationIdx += 1;
+		m_tmpAnimationIdx = m_tmpAnimationIdx % m_pAnimationController->m_pAnimationSets->m_nAnimationSets;
+		
+		m_pAnimationController->SetTrackAnimationSet(ZOMBIE_IDLE_TRACK, m_tmpAnimationIdx);
+	}
+
 }

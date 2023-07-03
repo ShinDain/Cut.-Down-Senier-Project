@@ -24,6 +24,7 @@ XMFLOAT4X4 AnimationSet::GetSRT(int nBone, float Position)
 		if ((m_vKeyFrameTimes[i] <= Position) && (Position < m_vKeyFrameTimes[i + 1]))
 		{
 			float t = (Position - m_vKeyFrameTimes[i]) / (m_vKeyFrameTimes[i + 1] - m_vKeyFrameTimes[i]);
+			g_tmpCaptionNum += 1;
 			xmf4x4Transform = MathHelper::XMFloat4x4Interpolate(m_vvxmf4x4KeyFrameTransforms[i][nBone], m_vvxmf4x4KeyFrameTransforms[i + 1][nBone], t);
 			break;
 		}
@@ -214,9 +215,14 @@ void AnimationController::AdvanceTime(float ElapsedTime, Object* pRootGameObject
 				AnimationSet* pAnimationSet = m_pAnimationSets->m_vpAnimationSets[m_vpAnimationTracks[k]->m_nAnimationSet].get();
 				float fPosition = m_vpAnimationTracks[k]->UpdatePosition(m_vpAnimationTracks[k]->m_Position, ElapsedTime, pAnimationSet->m_Length);
 
+				if (!pRootGameObject->GetVisible())
+					continue;
+
 				for (int j = 0; j < m_pAnimationSets->m_nAnimatedBoneFrames; ++j)
 				{
 					XMFLOAT4X4 xmf4x4Transform = m_pAnimationSets->m_vpAnimatedBoneFrameCaches[j]->GetLocalTransform();
+					if (m_pAnimationSets->m_vpAnimatedBoneFrameCaches[j]->GetIsMesh())
+						continue;
 					XMFLOAT4X4 xmf4x4TrackTransform = pAnimationSet->GetSRT(j, fPosition);
 					XMStoreFloat4x4(&xmf4x4TrackTransform, XMLoadFloat4x4(&xmf4x4TrackTransform) * m_vpAnimationTracks[k]->m_Weight);
 					XMStoreFloat4x4(&xmf4x4Transform, XMLoadFloat4x4(&xmf4x4Transform) + XMLoadFloat4x4(&xmf4x4TrackTransform));
@@ -226,9 +232,10 @@ void AnimationController::AdvanceTime(float ElapsedTime, Object* pRootGameObject
 				m_vpAnimationTracks[k]->HandleCallback();
 			}
 		}
+
 		pRootGameObject->UpdateTransform(NULL);
 
-		OnRootMotion(pRootGameObject);
+		//OnRootMotion(pRootGameObject);
 	}
 }
 

@@ -106,7 +106,13 @@ public:
 	void SetEnable(bool bEnable) { m_bEnable = bEnable;	}
 	void SetSpeed(float Speed) { m_Speed = Speed; }
 	void SetPosition(float Position) { m_Position = Position; }
-	void SetWeight(float Weight) { m_Weight = Weight; }
+	void SetWeight(float Weight) { 
+		m_Weight = Weight;
+		if (m_Weight > 0)
+			m_bEnable = true;
+		else
+			m_bEnable = false;
+	}
 
 	void SetAnimationSet(int nAnimationSet) { m_nAnimationSet = nAnimationSet; }
 	void SetType(int Type) { m_Type = Type; }

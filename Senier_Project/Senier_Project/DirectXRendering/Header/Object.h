@@ -56,7 +56,8 @@ public:
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 	virtual void DepthRender(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 
-	static std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList, const char* pstrFileName, const char* pstrTexPath);
+	static std::shared_ptr<ModelDataInfo> LoadModelDataFromFile(ID3D12Device * pd3dDevice, ID3D12GraphicsCommandList * pd3dCommandList,
+		const char* pstrFileName, const char* pstrObjectPath, const char* pstrTexPath);
 	static std::shared_ptr<Object> LoadFrameHierarchyFromFile
 	(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, int* pnSkinnedMeshes, Object* pRootObject, const char* pstrFileName, const char* pstrTexPath);
 	static void LoadAnimationFromFile(FILE* pInFile, std::shared_ptr<ModelDataInfo> pModelData);
@@ -229,6 +230,7 @@ public:
 	void SetInvincible(bool bInvincible) { m_bInvincible = bInvincible; }
 	void SetVisible(bool bVisible) { m_bVisible = bVisible; }
 
+	bool GetIsMesh() { return m_pMesh ? true : false; }
 
 	const XMFLOAT4X4& GetWorld() { return m_xmf4x4World; }
 	const XMFLOAT4X4& GetParentWorld() { return m_xmf4x4ParentWorld; }
@@ -260,6 +262,9 @@ public:
 	bool GetShadowed() { return m_bShadow; }
 
 	UINT GetObjectType() {return m_nObjectType;}
+
+	bool GetVisible() { return m_bVisible; }
+
 };
 
 

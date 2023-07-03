@@ -93,7 +93,9 @@ protected:
 	float m_Yaw = 0.0f;
 	float m_Roll = 0.0f;
 
+
 public:
+	BoundingFrustum m_CameraFrustum;
 	void SetOrientation(XMFLOAT4 xmf4Orientation) { m_xmf4Orientation = xmf4Orientation; }
 };
 

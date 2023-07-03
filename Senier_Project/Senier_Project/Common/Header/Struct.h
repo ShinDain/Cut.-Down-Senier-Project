@@ -24,7 +24,7 @@ struct Light
 //////////////// Texture ±¸Á¶Ã¼ //////////////////////
 struct Texture
 {
-	__wchar_t FileName[64];
+	__wchar_t FileName[128];
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> Resource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap = nullptr;
@@ -150,6 +150,7 @@ struct SkinningBoneTransformConstant
 
 struct ObjectDefaultData
 {
+	const char* pstrObjectPath;
 	const char* pstrTexPath;
 	XMFLOAT3 xmf3Extents;
 	ObjectType objectType;

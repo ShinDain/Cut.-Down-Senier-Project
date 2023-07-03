@@ -108,7 +108,7 @@ bool Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 {
 	char pstrTextureName[64] = { '\0' };
 
-	BYTE nStrLength = 64;
+	BYTE nStrLength = 128;
 	UINT nReads = (UINT)::fread(&nStrLength, sizeof(BYTE), 1, pInFile);
 	nReads = (UINT)::fread(pstrTextureName, sizeof(char), nStrLength, pInFile);
 	pstrTextureName[nStrLength] = '\0';
@@ -116,8 +116,8 @@ bool Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	bool bDuplicated = false;
 	if (strcmp(pstrTextureName, "null"))
 	{
-		char pstrFilePath[64] = { '\0' };
-		strcpy_s(pstrFilePath, 64, "Model/Textures/");
+		char pstrFilePath[128] = { '\0' };
+		strcpy_s(pstrFilePath, 128, "Model/Textures/");
 
 		strcat_s(pstrFilePath, pstrTexPath);
 		strcat_s(pstrFilePath, "/");
@@ -127,8 +127,8 @@ bool Material::LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		strcat_s(pstrFilePath, ".dds");
 
 		size_t nConverted = 0;
-		wchar_t conStr[64];
-		mbstowcs_s(&nConverted, conStr, 64, pstrFilePath, _TRUNCATE);
+		wchar_t conStr[128];
+		mbstowcs_s(&nConverted, conStr, 128, pstrFilePath, _TRUNCATE);
 
 		m_strTextureName.push_back(conStr);
 

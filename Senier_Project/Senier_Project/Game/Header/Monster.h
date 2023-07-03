@@ -52,14 +52,14 @@ public:
 	Monster& operator=(const Monster& rhs) = delete;
 	virtual ~Monster();
 
-	virtual void Update(float elapsedTime) {}
-	virtual void Destroy() {}
-	virtual void UpdateAnimationTrack(float elapsedTime) {}
+	virtual void Update(float elapsedTime);
+	virtual void UpdateAnimationTrack(float elapsedTime);
 
 public:
 	virtual void StateAction(float elapsedTime) {}
 
 	virtual void Move(DWORD dwDirection) {}
+	virtual void KeyDownEvent(WPARAM wParam);
 	virtual void DoLanding() {}
 	virtual void Patrol() {}
 	virtual void Trace() {}
@@ -76,6 +76,9 @@ protected:
 
 	bool m_bFindPlayer = false;
 	bool m_bSuperArmor = false;
+
+
+	UINT m_tmpAnimationIdx = 0;
 };
 
 class Zombie : public Monster
@@ -91,7 +94,6 @@ public:
 	virtual ~Zombie();
 
 	virtual void Update(float elapsedTime);
-	virtual void Destroy();
 	virtual void UpdateAnimationTrack(float elapsedTime);
 
 public:

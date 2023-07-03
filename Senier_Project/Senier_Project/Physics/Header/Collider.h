@@ -39,7 +39,6 @@ public:
 
 	const XMVECTOR GetAxis(int index) const;
 	const XMFLOAT4X4& GetWorld() const { return m_xmf4x4World; }
-	BoundingSphere GetBoundingSphere() const { return m_BoundingSphere; }
 
 	std::shared_ptr<RigidBody> GetBody() const { return m_pRigidBody; }
 
@@ -51,6 +50,7 @@ public:
 	void SetPhysics(bool bPhysics) const { m_pRigidBody->SetPhysics(bPhysics); }
 	bool GetPhysics() const { return m_pRigidBody->GetPhysics(); }
 
+	BoundingSphere GetBoundingSphere() const { return m_BoundingSphere; }
 
 #if defined(_DEBUG) | defined(DEBUG)
 protected:
@@ -132,7 +132,6 @@ public:
 
 	virtual void CalculateRotateInertiaMatrix();
 	virtual void UpdateWorldTransform();
-
 
 private:
 	XMFLOAT3 m_xmf3Extents = XMFLOAT3(0, 0, 0);

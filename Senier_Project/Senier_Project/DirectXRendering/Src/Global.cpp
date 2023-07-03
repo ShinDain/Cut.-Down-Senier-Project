@@ -1,5 +1,7 @@
 #include "../Header/Global.h"
 
+float g_tmpCaptionNum = 0;
+
 ID3D12Device* g_pd3dDevice = nullptr;
 ID3D12GraphicsCommandList* g_pd3dCommandList = nullptr;
 
