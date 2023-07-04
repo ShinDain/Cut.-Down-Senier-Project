@@ -549,6 +549,9 @@ void Player::DoLanding()
 	//case Player_State_Idle:
 	//	break;
 	case Player_State_Jump:
+		if (m_pBody->GetVelocity().y > 0)
+			return;
+
 		m_pAnimationController->SetTrackEnable(PLAYER_LOOP_TRACK, true);
 		m_pAnimationController->SetTrackAnimationSet(PLAYER_LOOP_TRACK, Player_Anim_Index_Falling);
 
@@ -561,8 +564,8 @@ void Player::DoLanding()
 		m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_JumpDown);
 		m_nAnimationState = PlayerAnimationState::Player_State_Land;
 		break;
-	//case Player_State_Land:
-	//	break;
+	case Player_State_Land:
+		break;
 	case Player_State_Melee:
 		Character::DoLanding();
 		m_Acceleration = 30.0f;

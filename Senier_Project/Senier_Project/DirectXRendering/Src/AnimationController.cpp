@@ -217,6 +217,8 @@ void AnimationController::AdvanceTime(float ElapsedTime, Object* pRootGameObject
 
 				if (!pRootGameObject->GetVisible())
 					continue;
+				if (m_vpAnimationTracks[k]->m_Weight <= 0)
+					continue;
 
 				for (int j = 0; j < m_pAnimationSets->m_nAnimatedBoneFrames; ++j)
 				{

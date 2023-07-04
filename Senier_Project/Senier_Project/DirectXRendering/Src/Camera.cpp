@@ -11,7 +11,8 @@ Camera::Camera()
 {
 	SetLens(0.25 * MathHelper::Pi, 1.0f, 1.0f, 1000.f);
 
-	m_CameraFrustum = BoundingFrustum(m_xmf3Position, m_xmf4Orientation, 0.375f, 0.375f, 0.25f, 0.25f, 1, 1000);
+	//m_CameraFrustum = BoundingFrustum(m_xmf3Position, m_xmf4Orientation, 0.001f, -0.001f, 0.001f, -0.001f, 1, 10000);
+	m_CameraFrustum = BoundingFrustum(XMFLOAT3(0,0,0), XMFLOAT4(0,0,0,1), 0.6375f, -0.6375f, 0.425f, -0.425f, 1, 10000);
 }
 
 Camera::~Camera()
@@ -278,11 +279,13 @@ void Camera::UpdateViewMatrix()
 		m_xmf4x4View(3, 3) = 1.f;
 
 		XMVECTOR tmp = XMVectorSet(0, 0, 0, 1);
-		//XMVECTOR orientation = XMQuaternionRotationRollPitchYaw(m_Pitch, m_Yaw, 0);
+		XMVECTOR orientation = XMQuaternionRotationRollPitchYaw(XMConvertToRadians(m_Pitch), XMConvertToRadians(m_Yaw), 0);
+		orientation = XMQuaternionNormalize(orientation);
 		//tmp = XMVector3Rotate(tmp, orientation);
-		XMStoreFloat4(&m_xmf4Orientation, tmp);
+		XMStoreFloat4(&m_xmf4Orientation, orientation);
 
 		m_CameraFrustum.Origin = m_xmf3Position;
+		//m_CameraFrustum.Origin = XMFLOAT3(0,0,0);
 		m_CameraFrustum.Orientation = m_xmf4Orientation;
 
 		m_bViewDirty = false;

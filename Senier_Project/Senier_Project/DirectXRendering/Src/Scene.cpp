@@ -48,7 +48,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
 	// 몬스터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), BOSS_MODEL_NAME, BOSS_TRACK_CNT);		
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), BOSS_MODEL_NAME, BOSS_TRACK_CNT);		
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.25, 1.25, 1.25),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(50, 0, 150), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1,1,1),ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
@@ -73,7 +73,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
-	//InitMapData(pd3dDevice, pd3dCommandList);
+	InitMapData(pd3dDevice, pd3dCommandList);
 	// UI 초기화
 	InitUI(pd3dDevice, pd3dCommandList, pDWriteText);
 	// 시네마틱 초기화
@@ -240,19 +240,20 @@ void Scene::Update(float totalTime ,float elapsedTime)
 
 	m_tTime += elapsedTime;
 #endif
+
+	BoundingFrustum camFus = m_pCamera->m_CameraFrustum;
 	for (int i = 0; i < g_vpAllObjs.size(); ++i)
 	{
-		BoundingFrustum tmpFus = BoundingFrustum(XMFLOAT3(0,0,0), XMFLOAT4(0,0,0,1), 0.375f, -0.375f, 0.25f, -0.25f, 1, 1000);
-		//bool res = tmpFus.Intersects(g_vpAllObjs[i]->GetCollider()->GetBoundingSphere());
-		//if (g_vpAllObjs[i]->GetColliderType() == Collider_Box)
-		//{
-		//	bool res = m_pCamera->m_CameraFrustum.Intersects(g_vpAllObjs[i]->GetCollider()->GetBoundingSphere());
-		//
-		//	if (res)
-		//		g_vpAllObjs[i]->SetVisible(false);
-		//	else
-		//		g_vpAllObjs[i]->SetVisible(true);
-		//}
+		if (g_vpAllObjs[i]->GetColliderType() == Collider_Box)
+		{
+			BoundingSphere objBS = g_vpAllObjs[i]->GetCollider()->GetBoundingSphere();
+
+			bool res = camFus.Intersects(objBS);
+			if (res)
+				g_vpAllObjs[i]->SetVisible(true);
+			else
+				g_vpAllObjs[i]->SetVisible(false);
+		}
 
 		if (g_vpAllObjs[i]) g_vpAllObjs[i]->Update(elapsedTime);
 	}

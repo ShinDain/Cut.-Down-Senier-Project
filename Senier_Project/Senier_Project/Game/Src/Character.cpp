@@ -162,10 +162,10 @@ void Character::IsFalling()
 {
 	if (m_xmf3RenderPosition.y < 0)
 	{
-		m_xmf3RenderPosition.y = 0;
 		DoLanding();
+		m_xmf3RenderPosition.y = 0;
 	}
-	else if (m_xmf3RenderPosition.y > 3)
+	else if (m_xmf3RenderPosition.y > 0)
 	{
 		ColliderBox* thisColliderBox = (ColliderBox*)m_pCollider.get();
 		for (int i = 0; i < g_ppColliderBoxs.size(); ++i)
@@ -199,16 +199,19 @@ void Character::IsFalling()
 
 void Character::DoLanding()
 {
-	m_bIsFalling = false;
-	m_MaxSpeedXZ = 100.f;
-	m_CharacterFriction = 350.0f;
-	m_Acceleration = 500.0f;
-	m_pBody->SetInGravity(false);
+	if (true)
+	{
+		m_bIsFalling = false; 
+		m_MaxSpeedXZ = 100.f;
+		m_CharacterFriction = 350.0f;
+		m_Acceleration = 500.0f;
+		m_pBody->SetInGravity(false);
 
-	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
-	if(xmf3Velocity.y < 50 && xmf3Velocity.y > 0)
-		xmf3Velocity.y = 0;
-	m_pBody->SetVelocity(xmf3Velocity);
+		XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+		if(xmf3Velocity.y < 50 && xmf3Velocity.y > 0)
+			xmf3Velocity.y = 0;
+		m_pBody->SetVelocity(xmf3Velocity);
+	}
 }
 
 void Character::RotateToMove(float elapsedTime)
