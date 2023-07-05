@@ -335,6 +335,9 @@ int CollisionDetector::BoxAndHalfSpace(const ColliderBox& box, const ColliderPla
 
 int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box2, CollisionData& pData, Character* pCharacter)
 {
+	if (!box1.GetIsActive() || !box2.GetIsActive())
+		return 0;
+
 	std::shared_ptr<RigidBody> pBody1 = box1.GetBody();
 	std::shared_ptr<RigidBody> pBody2 = box2.GetBody();
 

@@ -545,6 +545,8 @@ void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	}
 	else
 	{
+		m_pCollider->SetIsActive(false);
+
 		m_nAnimationState = PlayerAnimationState::Player_State_Death;
 		UnableAnimationTrack(PLAYER_LOOP_TRACK);
 		UnableAnimationTrack(PLAYER_ONCE_TRACK_1);
@@ -577,6 +579,7 @@ void Player::DoLanding()
 		return;
 	case Player_State_Falling:
 		m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_JumpDown);
+		m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_1, true);
 		m_nAnimationState = PlayerAnimationState::Player_State_Land;
 		break;
 	case Player_State_Land:
@@ -601,7 +604,6 @@ void Player::DoLanding()
 	m_bCanDoubleJump = true;
 	m_TurnSpeed = 1;
 
-
 }
 
 void Player::UpdateAnimationTrack(float elapsedTime)
@@ -618,17 +620,12 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 		break;
 	case Player_State_Jump:
 	{
+		float trackRate = m_pAnimationController->GetTrackRate(PLAYER_ONCE_TRACK_1);
+
 		m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_JumpUp);
 		// 낙하 애니메이션과 블랜딩
-		if (m_pAnimationController->GetTrackRate(PLAYER_ONCE_TRACK_1) > 0.8f)
-		{
-			m_pAnimationController->SetTrackEnable(PLAYER_LOOP_TRACK, true);
-			m_pAnimationController->SetTrackAnimationSet(PLAYER_LOOP_TRACK, Player_Anim_Index_Falling);
+		BlendAnimationToAnimation(trackRate, 0.6f, 2.5f, PLAYER_ONCE_TRACK_1, PLAYER_LOOP_TRACK);
 
-			float weight = (m_pAnimationController->GetTrackRate(PLAYER_ONCE_TRACK_1) - 0.8f) * 5;
-			m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1 - weight);
-			m_pAnimationController->SetTrackWeight(PLAYER_LOOP_TRACK, weight);
-		}
 		// jump_up 애니메이션 종료
 		if (m_pAnimationController->GetTrackOver(PLAYER_ONCE_TRACK_1))
 		{
@@ -644,25 +641,18 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 		break;
 	case Player_State_Land:
 	{
-		m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_1, true);
-
 		float trackRate = m_pAnimationController->GetTrackRate(PLAYER_ONCE_TRACK_1);
+
+		// 낙하에서 착지로 블랜딩
+		BlendAnimationToAnimation(trackRate, 0.0f, 2.0f, PLAYER_LOOP_TRACK, PLAYER_ONCE_TRACK_1);
 		if (trackRate > 0.5f)
 		{
 			m_pAnimationController->SetTrackEnable(PLAYER_LOOP_TRACK, false);
-
-			float weight = (trackRate - 0.5f) * 2.f;
-			m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1 - weight);
-
-			BlendWithIdleMovement(weight);
 		}
-		else
-		{
-			float weight = trackRate * 2;
-			m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, weight);
-			m_pAnimationController->SetTrackWeight(PLAYER_LOOP_TRACK, 1 - weight);
-		}
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.5f, 2.0f, PLAYER_ONCE_TRACK_1);
 
+		// 종료
 		if (m_pAnimationController->GetTrackOver(PLAYER_ONCE_TRACK_1))
 		{
 			UnableAnimationTrack(PLAYER_ONCE_TRACK_1);
@@ -739,12 +729,12 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 		float trackRate = m_pAnimationController->GetTrackRate(PLAYER_ONCE_TRACK_1);
 		if (trackRate > 0.6f)
 		{
-			float weight = (trackRate - 0.6f) * 2.5f;
-			m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1 - weight);
-
-			BlendWithIdleMovement(weight);
 			m_bIgnoreInput = false;
 		}
+
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.6f, 2.5f, PLAYER_ONCE_TRACK_1);
+
 		if (m_pAnimationController->GetTrackOver(PLAYER_ONCE_TRACK_1))
 		{
 			UnableAnimationTrack(PLAYER_ONCE_TRACK_1);
@@ -775,30 +765,19 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 		if (trackRate > 0.4f)
 		{
 			ThrowProjectile();
-
-			float weight = (trackRate - 0.4f) * (5.0f / 3.0f);
-			m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1 - weight);
-
-			BlendWithIdleMovement(weight);
-			
-		}
-		else if (trackRate < 0.2f)
-		{
-			float weight = trackRate * 5.0f;
-
-			m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, weight);
-			BlendWithIdleMovement(1 - weight);
 		}
 
-		// 현재 공격 동작 마무리 시
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, PLAYER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.4f, (5.0f / 3.0f), PLAYER_ONCE_TRACK_1);
+
+		// 현재 동작 마무리 시
 		if (m_pAnimationController->GetTrackOver(PLAYER_ONCE_TRACK_1))
 		{
 			m_bCanThrow = true;
 
-			// 모든 동작 마무리 후 기본 상태로 전환
 			UnableAnimationTrack(PLAYER_ONCE_TRACK_1);
-			UnableAnimationTrack(PLAYER_ONCE_TRACK_2);
-			UnableAnimationTrack(PLAYER_ONCE_TRACK_3);
 
 			m_nAnimationState = PlayerAnimationState::Player_State_Idle;
 		}

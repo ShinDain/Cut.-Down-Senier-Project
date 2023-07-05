@@ -54,12 +54,6 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GHOUL_MODEL_NAME, MONSTER_TRACK_CNT);	
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(60, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
 	
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), BOSS_MODEL_NAME, BOSS_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.25, 1.25, 1.25), ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(50, 0, 150), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(40, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, ZOMBIE_TRACK_CNT);
-
 	// 월드 오브젝트 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
@@ -433,21 +427,6 @@ void Scene::UpdateShadowPassCB(float totalTime, float elapsedTime)
 
 void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	ChangeShader(ShaderType::Shader_Skinned, pd3dCommandList);
-	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
-	{
-		if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
-		{
-			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->GetIsAlive())
-				continue;
-			// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
-			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(elapsedTime);
-			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
-				m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
-			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(elapsedTime, pd3dCommandList);
-		}
-	}
-
 	ChangeShader(ShaderType::Shader_Static, pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
 	{
@@ -466,6 +445,21 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 
 		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->UpdateTransform(NULL);
 		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(elapsedTime, pd3dCommandList);
+	}
+
+	ChangeShader(ShaderType::Shader_Skinned, pd3dCommandList);
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
+	{
+		if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
+		{
+			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->GetIsAlive())
+				continue;
+			// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
+			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(elapsedTime);
+			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
+				m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
+			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(elapsedTime, pd3dCommandList);
+		}
 	}
 
 	ChangeShader(ShaderType::Shader_CuttedStatic, pd3dCommandList);

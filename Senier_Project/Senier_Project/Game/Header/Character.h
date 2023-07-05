@@ -6,13 +6,6 @@
 #define CHARACTER_IDLE_TRACK 0
 #define CHARACTER_MOVE_TRACK 1
 
-struct Ray
-{
-	XMFLOAT3 xmf3Start = XMFLOAT3(0, 0, 0);
-	XMFLOAT3 xmf3Direction = XMFLOAT3(0, -1, 0);
-	float length = 10.f;
-};
-
 // Object를 상속, 애니메이션
 class Character : public Object
 {
@@ -53,6 +46,9 @@ public:
 	virtual void Cutting(XMFLOAT3 xmf3PlaneNormal);
 
 	virtual void BlendWithIdleMovement(float maxWeight);
+	virtual void BlendIdleToAnimaiton(float curTrackRate, float goalRate, float mul, UINT nTrackIdx);
+	virtual void BlendAnimationToIdle(float curTrackRate, float startRate, float mul, UINT nTrackIdx);
+	virtual void BlendAnimationToAnimation(float curTrackRate, float startRate, float mul, UINT nTrackIdx1, UINT nTrackIdx2);
 
 protected:
 	float m_DefaultAccel = 500.f;
@@ -73,7 +69,6 @@ protected:
 	bool m_bIsShoulderView = false;
 
 	void ApplyCharacterFriction(float elapsedTime);
-	void CalcVelocityAndPosition(float elapsedTime);
 
 public:
 	void CrashWithObject(float crashPower, XMFLOAT3 xmf3CrashDirection);

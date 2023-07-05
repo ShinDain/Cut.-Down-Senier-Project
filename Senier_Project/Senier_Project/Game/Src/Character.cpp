@@ -287,6 +287,13 @@ void Character::Cutting(XMFLOAT3 xmf3PlaneNormal)
 
 void Character::BlendWithIdleMovement(float maxWeight)
 {
+	if (maxWeight <= 0)
+	{
+		m_pAnimationController->SetTrackEnable(CHARACTER_IDLE_TRACK, false);
+		m_pAnimationController->SetTrackEnable(CHARACTER_MOVE_TRACK, false);
+		return;
+	}
+
 	float weight = maxWeight;
 	m_pAnimationController->SetTrackEnable(CHARACTER_IDLE_TRACK, true);
 	m_pAnimationController->SetTrackEnable(CHARACTER_MOVE_TRACK, true);
@@ -309,6 +316,50 @@ void Character::BlendWithIdleMovement(float maxWeight)
 		weight = maxWeight;
 	m_pAnimationController->SetTrackWeight(CHARACTER_IDLE_TRACK, maxWeight - weight);
 	m_pAnimationController->SetTrackWeight(CHARACTER_MOVE_TRACK, weight);
+}
+
+void Character::BlendIdleToAnimaiton(float curTrackRate, float goalRate, float mul, UINT nTrackIdx)
+{
+	// 시작 블랜드
+	if (curTrackRate < goalRate)
+	{
+		float weight = curTrackRate * mul;
+
+		m_pAnimationController->SetTrackWeight(nTrackIdx, weight);
+		BlendWithIdleMovement(1 - weight);
+	}
+	else
+	{
+		m_pAnimationController->SetTrackWeight(nTrackIdx, 1);
+		BlendWithIdleMovement(0);
+	}
+}
+
+void Character::BlendAnimationToIdle(float curTrackRate, float startRate, float mul, UINT nTrackIdx)
+{
+	// 종료 블랜드
+	if (curTrackRate > startRate)
+	{
+		float weight = (curTrackRate - startRate) * mul;
+		
+		m_pAnimationController->SetTrackWeight(nTrackIdx, 1 - weight);
+		BlendWithIdleMovement(weight);
+	}
+}
+
+void Character::BlendAnimationToAnimation(float curTrackRate, float startRate, float mul, UINT nTrackIdx1, UINT nTrackIdx2)
+{
+	// 시작 블랜드
+	if (curTrackRate > startRate)
+	{
+		float weight = (curTrackRate - startRate) * mul;
+
+		m_pAnimationController->SetTrackEnable(nTrackIdx1, true);
+		m_pAnimationController->SetTrackEnable(nTrackIdx2, true);
+
+		m_pAnimationController->SetTrackWeight(nTrackIdx1, 1 - weight);
+		m_pAnimationController->SetTrackWeight(nTrackIdx2, weight);
+	}
 }
 
 void Character::ApplyCharacterFriction(float elapsedTime)
@@ -340,27 +391,6 @@ void Character::ApplyCharacterFriction(float elapsedTime)
 		newVelocity.y = xmf3Velocity.y;
 		m_pBody->SetVelocity(newVelocity);
 	}
-}
-
-void Character::CalcVelocityAndPosition(float elapsedTime)
-{
-	//XMVECTOR velocity = XMLoadFloat3(&m_xmf3Velocity);
-
-	//// 중력 적용
-	//ApplyGravity(elapsedTime);
-	//
-	//// 가속도에 따른 속도 변화
-	//XMVECTOR deltaVel = XMLoadFloat3(&m_xmf3Acceleration) * elapsedTime;
-	//velocity += deltaVel;
-	//XMStoreFloat3(&m_xmf3Velocity, velocity);
-
-	//// 위치 변화 계산 후 적용
-	//XMVECTOR resultPosition = velocity * elapsedTime + XMLoadFloat3(&m_xmf3Position);
-	//XMStoreFloat3(&m_xmf3Position, resultPosition);
-	//	
-
-	//// 최대 속도 제한 및 마찰력 
-	//ApplyCharacterFriction(elapsedTime);
 }
 
 void Character::CrashWithObject(float crashPower, XMFLOAT3 xmf3CrashDirection)
