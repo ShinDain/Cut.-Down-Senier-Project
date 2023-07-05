@@ -71,7 +71,6 @@ enum ObjectType : UINT
 	Object_World,
 	Object_Player,
 	Object_Monster,
-	Object_Boss,
 	Object_Weapon,
 	Object_Movable,
 	Object_PlayerProjectile,

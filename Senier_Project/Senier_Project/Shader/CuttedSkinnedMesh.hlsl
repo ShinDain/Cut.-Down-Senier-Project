@@ -119,7 +119,7 @@ float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 	// 직접 조명
 	const float shininess = 1.0f - gRoughness;
 	Material mat = { gAlbedoColor, gFresnelR0, shininess };
-	float3 shadowFactor = { 1.0f, 1.0f, 1.0f } ;
+	float3 shadowFactor = { 1.0f, 1.0f, 1.0f };
 	float4 directLight = ComputeLighting(gLights, mat, pin.PosW, bumpedNormalW, toEyeW, shadowFactor);
 
 	float4 litColor = ambient + directLight;
