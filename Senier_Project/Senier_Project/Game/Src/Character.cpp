@@ -289,8 +289,8 @@ void Character::BlendWithIdleMovement(float maxWeight)
 {
 	if (maxWeight <= 0)
 	{
-		m_pAnimationController->SetTrackEnable(CHARACTER_IDLE_TRACK, false);
-		m_pAnimationController->SetTrackEnable(CHARACTER_MOVE_TRACK, false);
+		UnableAnimationTrack(CHARACTER_IDLE_TRACK);
+		UnableAnimationTrack(CHARACTER_MOVE_TRACK);
 		return;
 	}
 

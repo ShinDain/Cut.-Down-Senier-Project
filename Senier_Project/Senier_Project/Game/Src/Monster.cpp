@@ -11,6 +11,19 @@
 // =========================================
 // 몬스터 클래스
 // =========================================
+void Monster::InitAnimationTrack(float animationSpeed)
+{
+	// 애니메이션 기본 재생 속도
+	m_AnimationSpeed = animationSpeed;
+	for (int i = 0; i < MONSTER_TRACK_CNT; ++i)
+	{
+		m_pAnimationController->SetTrackEnable(i, false);
+		m_pAnimationController->SetTrackSpeed(i, m_AnimationSpeed);
+	}
+	m_pAnimationController->m_vpAnimationTracks[MONSTER_ONCE_TRACK_1]->SetType(ANIMATION_TYPE_ONCE);
+	m_pAnimationController->m_vpAnimationTracks[MONSTER_ONCE_TRACK_2]->SetType(ANIMATION_TYPE_ONCE);
+}
+
 void Monster::Update(float elapsedTime)
 {
 	Character::Update(elapsedTime);
@@ -160,13 +173,9 @@ bool Zombie::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 
 	// 애니메이션 트랙 초기화
-	m_pAnimationController->SetTrackEnable(MONSTER_IDLE_TRACK, true);
-	m_pAnimationController->SetTrackEnable(MONSTER_MOVE_TRACK, true);
-	m_pAnimationController->SetTrackEnable(MONSTER_LOOP_TRACK, false);
-	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, false);
-	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_2, false);
-	m_pAnimationController->m_vpAnimationTracks[MONSTER_ONCE_TRACK_1]->SetType(ANIMATION_TYPE_ONCE);
-	m_pAnimationController->m_vpAnimationTracks[MONSTER_ONCE_TRACK_2]->SetType(ANIMATION_TYPE_ONCE);
+	InitAnimationTrack(1.5f);
+
+	// 애니메이션 트랙 초기화
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_IDLE_TRACK, Zombie_Anim_Index_Idle);
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_MOVE_TRACK, Zombie_Anim_Index_Run);
 
@@ -178,9 +187,6 @@ bool Zombie::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_AttackDamage = 10.0f;
 	m_AttackRange = 6.0f;
 	m_AttackRadius = 5.0f;
-
-	// 애니메이션 기본 재생 속도
-	m_AnimationSpeed = 1.5f;
 
 	// 체력 초기화
 	m_MaxHP = 100.0f;
@@ -224,7 +230,7 @@ void Zombie::UpdateAnimationTrack(float elapsedTime)
 		}
 
 		// 시작 블랜딩
-		BlendIdleToAnimaiton(trackRate, 0.3f, (10 / 3), MONSTER_ONCE_TRACK_1);
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
 		// 종료 블랜딩
 		BlendAnimationToIdle(trackRate, 0.6f, 2.5f, MONSTER_ONCE_TRACK_1);
 
@@ -285,7 +291,12 @@ void Zombie::UpdateAnimationTrack(float elapsedTime)
 
 void Zombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
-	Monster::ApplyDamage(power, xmf3DamageDirection, Zombie_Anim_Index_Hit1, Zombie_Anim_Index_FallingBack);
+	int nAttackAnim = rand() % 2;
+
+	UINT hitAnimIdx = Zombie_Anim_Index_Hit1 + nAttackAnim;
+	UINT deathAnimIdx = Zombie_Anim_Index_FallingBack + nAttackAnim;
+
+	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
 }
 
 void Zombie::StateAction(float elapsedTime)
@@ -354,6 +365,7 @@ void Zombie::Attack1()
 		m_State = MonsterState::Monster_State_Attack1;
 		UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 		m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+
 		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Zombie_Anim_Index_Attack1);
 		m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
 		m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
@@ -380,14 +392,12 @@ bool HighZombie::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 {
 	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 
+	InitAnimationTrack(3.0f);
+	int idleAnimIdx = rand() % 2;
+
 	// 애니메이션 트랙 초기화
-	m_pAnimationController->SetTrackEnable(MONSTER_IDLE_TRACK, true);
-	m_pAnimationController->SetTrackEnable(MONSTER_MOVE_TRACK, true);
-	m_pAnimationController->SetTrackEnable(MONSTER_LOOP_TRACK, false);
-	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, false);
-	m_pAnimationController->m_vpAnimationTracks[MONSTER_ONCE_TRACK_1]->SetType(ANIMATION_TYPE_ONCE);
-	m_pAnimationController->SetTrackAnimationSet(MONSTER_IDLE_TRACK, Zombie_Anim_Index_Idle);
-	m_pAnimationController->SetTrackAnimationSet(MONSTER_MOVE_TRACK, Zombie_Anim_Index_Run);
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_IDLE_TRACK, HighZombie_Anim_Index_Idle1 + idleAnimIdx);
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_MOVE_TRACK, HighZombie_Anim_Index_Run);
 
 	// 파괴 타이머 초기화
 	m_DestroyTime = 3.0f;
@@ -398,12 +408,9 @@ bool HighZombie::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	m_AttackRange = 6.0f;
 	m_AttackRadius = 5.0f;
 
-	// 애니메이션 기본 재생 속도
-	m_AnimationSpeed = 2.0f;
-
 	// 체력 초기화
-	m_MaxHP = 100.0f;
-	m_HP = 100.0f;
+	m_MaxHP = 200.0f;
+	m_HP = 200.0f;
 
 	return true;
 }
@@ -412,6 +419,140 @@ void HighZombie::UpdateAnimationTrack(float elapsedTime)
 {
 	switch (m_State)
 	{
+	case Monster::Monster_State_Idle:
+	case Monster::Monster_State_Trace:
+		BlendWithIdleMovement(1);
+		break;
+	case Monster::Monster_State_Attack1:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+		// 공격 판정
+		if (trackRate > 0.3f && trackRate < 0.4f)
+		{
+			m_bSuperArmor = true;
+
+			// 약간 앞으로 전진
+			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+			XMVECTOR deltaVelocity = l * 3;
+			XMFLOAT3 xmf3DeltaVelocity;
+			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+			m_pBody->AddVelocity(xmf3DeltaVelocity);
+			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
+		}
+
+		if (trackRate < 0.3f)
+		{
+			RotateToPlayer();
+		}
+		else if (trackRate > 0.6f)
+		{
+			m_bSuperArmor = false;
+		}
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.9f, 10.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+	break;
+	case Monster::Monster_State_Attack2:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+		// 공격 판정
+		if (trackRate > 0.2f && trackRate < 0.3f)
+		{
+			m_bSuperArmor = true;
+
+			// 약간 앞으로 전진
+			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+			XMVECTOR deltaVelocity = l * 3;
+			XMFLOAT3 xmf3DeltaVelocity;
+			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+			m_pBody->AddVelocity(xmf3DeltaVelocity);
+			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
+		}
+		if (trackRate > 0.5f && trackRate < 0.6f)
+		{
+			m_bSuperArmor = true;
+
+			// 약간 앞으로 전진
+			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+			XMVECTOR deltaVelocity = l * 3;
+			XMFLOAT3 xmf3DeltaVelocity;
+			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+			m_pBody->AddVelocity(xmf3DeltaVelocity);
+			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
+		}
+
+		if (trackRate < 0.3f)
+		{
+			RotateToPlayer();
+		}
+		else if (trackRate > 0.8f)
+		{
+			m_bSuperArmor = false;
+		}
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.9f, 10.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+		break;
+	case Monster::Monster_State_Attack3:
+		break;
+	case Monster::Monster_State_Hit:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.5f, 2.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+	break;
+	case Monster::Monster_State_Death:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+
+		m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			m_bDestroying = true;
+		}
+	}
+	break;
+	case Monster::Monster_State_Special1:
+		break;
+	case Monster::Monster_State_Special2:
+		break;
+	case Monster::Monster_State_Special3:
+		break;
 	default:
 		break;
 	}
@@ -419,13 +560,25 @@ void HighZombie::UpdateAnimationTrack(float elapsedTime)
 
 void HighZombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
-	Monster::ApplyDamage(power, xmf3DamageDirection, Zombie_Anim_Index_Hit1, Zombie_Anim_Index_FallingBack);
+	int nAttackAnim = rand() % 2;
+
+	UINT hitAnimIdx = HighZombie_Anim_Index_Hit;
+	UINT deathAnimIdx = HighZombie_Anim_Index_Death1 + nAttackAnim;
+
+	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
 }
 
 void HighZombie::StateAction(float elapsedTime)
 {
 	switch (m_State)
 	{
+	case Monster_State_Idle:
+		Patrol();
+		if (m_bFindPlayer) m_State = Monster_State_Trace;
+		break;
+	case Monster_State_Trace:
+		Trace();
+		break;
 	default:
 		break;
 	}
@@ -478,13 +631,27 @@ void HighZombie::Attack1()
 	case Monster_State_Attack1:
 		break;
 	default:
-		m_State = MonsterState::Monster_State_Attack1;
+	{
+		//int attackAnimIdx = rand() % 2;
+		int attackAnimIdx = 1;
+
 		UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 		m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
-		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Zombie_Anim_Index_Attack1);
 		m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
-		m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 1.5f);
 
+		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, HighZombie_Anim_Index_Attack1 + attackAnimIdx);
+
+		switch (attackAnimIdx)
+		{
+		case 0:
+			m_State = MonsterState::Monster_State_Attack1;
+			break;
+
+		case 1:
+			m_State = MonsterState::Monster_State_Attack2;
+			break;
+		}
+	}
 		break;
 	}
 }

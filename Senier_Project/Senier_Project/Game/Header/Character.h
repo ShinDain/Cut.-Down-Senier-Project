@@ -23,6 +23,8 @@ public:
 							ObjectInitData objData,
 							std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
 
+	virtual void InitAnimationTrack(float animationSpeed) {}
+
 	virtual void Update(float elapsedTime);
 	virtual void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent = NULL);
 

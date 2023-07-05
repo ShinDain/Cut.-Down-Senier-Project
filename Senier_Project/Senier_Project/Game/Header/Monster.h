@@ -23,6 +23,8 @@ public:
 		return false;
 	}
 
+	virtual void InitAnimationTrack(float animationSpeed);
+
 	virtual void Update(float elapsedTime);
 	virtual void UpdateAnimationTrack(float elapsedTime);
 	virtual void CreateAttackSphere(float range, float radius, float damage);
@@ -142,16 +144,18 @@ public:
 private:
 	enum HighZombieAnimationIndex
 	{
-		Zombie_Anim_Index_Idle,
-		Zombie_Anim_Index_Walk1,
-		Zombie_Anim_Index_Walk2,
-		Zombie_Anim_Index_Run,
-		Zombie_Anim_Index_Attack1,
-		Zombie_Anim_Index_Attack2,
-		Zombie_Anim_Index_FallingBack,
-		Zombie_Anim_Index_FallingForward,
-		Zombie_Anim_Index_Hit1,
-		Zombie_Anim_Index_Hit2
+		HighZombie_Anim_Index_Idle1,
+		HighZombie_Anim_Index_Idle2,
+		HighZombie_Anim_Index_Roar,
+		HighZombie_Anim_Index_Walk,
+		HighZombie_Anim_Index_Run,
+		HighZombie_Anim_Index_Attack1,
+		HighZombie_Anim_Index_Attack2,
+		HighZombie_Anim_Index_Attack3,
+		HighZombie_Anim_Index_Attack4,
+		HighZombie_Anim_Index_Hit,
+		HighZombie_Anim_Index_Death1,
+		HighZombie_Anim_Index_Death2
 	};
 
 public:

@@ -48,8 +48,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
 	// 몬스터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CYBER_TWINS_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GHOUL_MODEL_NAME, MONSTER_TRACK_CNT);	
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(60, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
@@ -831,7 +831,7 @@ void Scene::LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 		else if (!strcmp(pstrToken, "</Frame>"))
 		{
 			if (!strcmp(pstrObjectName, ZOMBIE_MODEL_NAME))
-				CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, xmf3Scale, pstrObjectName, ZOMBIE_TRACK_CNT);
+				CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, xmf3Scale, pstrObjectName, MONSTER_TRACK_CNT);
 			else
 				CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, xmf3Scale, pstrObjectName, 0);
 		}
@@ -923,10 +923,11 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 			std::shared_ptr<Zombie> pMonster = std::make_shared<Zombie>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 			pObject = std::static_pointer_cast<Object>(pMonster);
 		}
-		//else if (!strcmp(pstrFileName, HIGHZOMBIE_MODEL_NAME))
-		//{
-		//
-		//}
+		else if (!strcmp(pstrFileName, HIGHZOMBIE_MODEL_NAME))
+		{
+			std::shared_ptr<HighZombie> pMonster = std::make_shared<HighZombie>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+			pObject = std::static_pointer_cast<Object>(pMonster);
+		}
 		//else if (!strcmp(pstrFileName, SCAVENGER_MODEL_NAME))
 		//{
 		//

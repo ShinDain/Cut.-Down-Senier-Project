@@ -9,6 +9,9 @@
 #include "../../Common/Header/UploadBuffer.h"
 #include "../../Common/Header/Struct.h"
 
+#define PLAYER_TRACK_CNT 7
+#define MONSTER_TRACK_CNT 5
+
 #define GRAVITY_SIZE -9.81f
 
 class Shader;
