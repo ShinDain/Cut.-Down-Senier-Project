@@ -159,7 +159,6 @@ public:
 	virtual void Move(DWORD dwDirection) {}
 	virtual void Rotate(float x, float y, float z) {}
 	virtual void Jump() {}
-	virtual void Attack() {}
 	virtual void IsFalling();
 
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);

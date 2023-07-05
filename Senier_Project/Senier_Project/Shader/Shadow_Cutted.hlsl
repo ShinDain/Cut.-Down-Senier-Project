@@ -57,21 +57,21 @@ VertexOut VS(VertexIn vin)
 
 void PS(VertexOut pin)
 {
-    if (dot(pin.PosW, PlaneNormal_1 * (PlaneDirection_1)) < PlaneDistance_1 * (PlaneDirection_1))
-    {
-        // Alpha Test
-        //clip(-1);
-    }
-    if (dot(pin.PosW, PlaneNormal_2 * (PlaneDirection_2)) < PlaneDistance_2 * (PlaneDirection_2))
-    {
-        // Alpha Test
-       // clip(-1);
-    }
-    if (dot(pin.PosW, PlaneNormal_3 * (PlaneDirection_3)) < PlaneDistance_3 * (PlaneDirection_3))
-    {
-        // Alpha Test
-       // clip(-1);
-    }
+    //if (dot(pin.PosW, PlaneNormal_1 * (PlaneDirection_1)) < PlaneDistance_1 * (PlaneDirection_1))
+    //{
+    //    // Alpha Test
+    //    clip(-1);
+    //}
+    //if (dot(pin.PosW, PlaneNormal_2 * (PlaneDirection_2)) < PlaneDistance_2 * (PlaneDirection_2))
+    //{
+    //    // Alpha Test
+    //    clip(-1);
+    //}
+    //if (dot(pin.PosW, PlaneNormal_3 * (PlaneDirection_3)) < PlaneDistance_3 * (PlaneDirection_3))
+    //{
+    //    // Alpha Test
+    //    clip(-1);
+    //}
 }
 
 

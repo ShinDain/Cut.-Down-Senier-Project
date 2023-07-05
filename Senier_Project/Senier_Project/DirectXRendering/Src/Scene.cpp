@@ -951,7 +951,8 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		//}
 		else
 		{
-			std::shared_ptr<Monster> pMonster = std::make_shared<Monster>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+			// 스킨 메시 애니메이션 테스트용
+			std::shared_ptr<AnimTestCharacter> pMonster = std::make_shared<AnimTestCharacter>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 			pObject = std::static_pointer_cast<Object>(pMonster);
 		}
 

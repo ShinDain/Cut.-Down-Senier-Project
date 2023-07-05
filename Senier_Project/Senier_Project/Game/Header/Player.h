@@ -100,7 +100,6 @@ protected:
 	bool m_bCanThrow = true;
 
 	float m_AimmingSpeed = 20.f;
-	float m_DefaultSpeed = 100.0f;
 	//bool m_bSprint = false;
 	//float m_SprintSpeed = 120.0f;
 	//bool m_bDecreaseMaxSpeed = false;
@@ -113,6 +112,7 @@ protected:
 	UINT m_nAttackCombo = 0;
 	bool m_bCombeAttack = false;
 	float m_AttackRange = 30.0f;
+	float m_AttackAccel = 30.0f;
 
 	UINT m_nCurAttackTrack = 0;
 	UINT m_nNextAttackTrack = 0;

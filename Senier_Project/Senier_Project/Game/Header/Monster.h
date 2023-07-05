@@ -11,35 +11,68 @@ public:
 	Monster() {};
 	Monster(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 		ObjectInitData objData,
-		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext) {}
 
 	Monster(const Monster& rhs) = delete;
 	Monster& operator=(const Monster& rhs) = delete;
-	virtual ~Monster();
+	virtual ~Monster() { Destroy(); }
+
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext) {
+		return false;
+	}
 
 	virtual void Update(float elapsedTime);
 	virtual void UpdateAnimationTrack(float elapsedTime);
-	virtual void KeyDownEvent(WPARAM wParam);
+	virtual void CreateAttackSphere(float range, float radius, float damage);
+
+protected:
+	enum MonsterState
+	{
+		Monster_State_Idle,
+		Monster_State_Trace,
+		Monster_State_Attack1,
+		Monster_State_Attack2,
+		Monster_State_Attack3,
+		Monster_State_Hit,
+		Monster_State_Death,
+		Monster_State_Special1,
+		Monster_State_Special2,
+		Monster_State_Special3
+	};
+
+	MonsterState m_State = MonsterState::Monster_State_Idle;
 
 public:
 	virtual void MonsterMove(XMFLOAT3 xmf3Direction);
-	virtual void DoLanding();
 	virtual void RotateToPlayer();
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, UINT nHitAnimIdx, UINT nDeathAnimIdx);
 
 public:
 	virtual void StateAction(float elapsedTime) {}
-	virtual void Patrol() {}
-	virtual void Trace() {}
+	virtual void Patrol();
+	virtual void Trace();
 
-	virtual void Attack() {}
-	virtual void CreateAttackSphere() {}
+	virtual void Attack1() {}
+	virtual void Attack2() {}
+	virtual void Attack3() {}
 
-	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection) {}
+	virtual void Special1() {}
+	virtual void Special2() {}
+	virtual void Special3() {}
 
 protected:
-	UINT m_tmpAnimationIdx = 0;
+	float m_SearchRadius = 30.0f;
+
+	float m_AttackDamage = 0.0f;
+	float m_AttackRange = 0.0f;
+	float m_AttackRadius = 0.0f;
 
 	XMFLOAT3 m_xmf3MonsterMovement = XMFLOAT3(0, 0, 0);
+
+	bool m_bFindPlayer = false;
+	bool m_bSuperArmor = false;
 };
 
 class Zombie : public Monster
@@ -54,8 +87,11 @@ public:
 	Zombie& operator=(const Zombie& rhs) = delete;
 	virtual ~Zombie();
 
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
 	virtual void UpdateAnimationTrack(float elapsedTime);
-	virtual void KeyDownEvent(WPARAM wParam) {}
 
 private:
 	enum ZombieAnimationIndex
@@ -72,96 +108,61 @@ private:
 		Zombie_Anim_Index_Hit2
 	};
 
-	enum ZombieAnimationState
-	{
-		Zombie_State_Idle,
-		Zombie_State_Trace,
-		Zombie_State_Jump,
-		Zombie_State_Falling,
-		Zombie_State_Land,
-		Zombie_State_Melee,
-		Zombie_State_Hit,
-		Zombie_State_Death
-	};
-	ZombieAnimationState m_AnimationState = ZombieAnimationState::Zombie_State_Idle;
+public:
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 
 public:
 	virtual void StateAction(float elapsedTime);
-	virtual void Patrol();
 	virtual void Trace();
 
-	virtual void Attack();
-	virtual void CreateAttackSphere();
-
-	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+	virtual void Attack1();
 
 protected:
-	float m_AttackDamage = 10.0f;
-	float m_AttackRange = 6.0f;
-	float m_AttackRadius = 5.0f;
-
-	bool m_bFindPlayer = false;
-	bool m_bSuperArmor = false;
-
 
 };
 
-//class HighZombie : public Zombie
-//{
-//public:
-//	HighZombie() {};
-//	HighZombie(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
-//		ObjectInitData objData,
-//		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
-//
-//	HighZombie(const HighZombie& rhs) = delete;
-//	HighZombie& operator=(const HighZombie& rhs) = delete;
-//	virtual ~HighZombie();
-//
-//	virtual void UpdateAnimationTrack(float elapsedTime);
-//	virtual void KeyDownEvent(WPARAM wParam) {}
-//
-//private:
-//	enum HighZombieAnimationIndex
-//	{
-//		Zombie_Anim_Index_Idle,
-//		Zombie_Anim_Index_Walk1,
-//		Zombie_Anim_Index_Walk2,
-//		Zombie_Anim_Index_Run,
-//		Zombie_Anim_Index_Attack1,
-//		Zombie_Anim_Index_Attack2,
-//		Zombie_Anim_Index_FallingBack,
-//		Zombie_Anim_Index_FallingForward,
-//		Zombie_Anim_Index_Hit1,
-//		Zombie_Anim_Index_Hit2
-//	};
-//
-//	enum HighZombieAnimationState
-//	{
-//		Zombie_State_Idle,
-//		Zombie_State_Trace,
-//		Zombie_State_Jump,
-//		Zombie_State_Falling,
-//		Zombie_State_Land,
-//		Zombie_State_Melee,
-//		Zombie_State_Hit,
-//		Zombie_State_Death
-//	};
-//	HighZombieAnimationState m_AnimationState = HighZombieAnimationState::Zombie_State_Idle;
-//
-//
-//public:
-//	virtual void StateAction(float elapsedTime);
-//	virtual void Patrol();
-//	virtual void Trace();
-//
-//	virtual void Attack();
-//	virtual void CreateAttackSphere();
-//
-//	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
-//
-//protected:
-//
-//};
-//
+class HighZombie : public Zombie
+{
+public:
+	HighZombie() {};
+	HighZombie(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
+	HighZombie(const HighZombie& rhs) = delete;
+	HighZombie& operator=(const HighZombie& rhs) = delete;
+	virtual ~HighZombie();
+
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
+	virtual void UpdateAnimationTrack(float elapsedTime);
+
+private:
+	enum HighZombieAnimationIndex
+	{
+		Zombie_Anim_Index_Idle,
+		Zombie_Anim_Index_Walk1,
+		Zombie_Anim_Index_Walk2,
+		Zombie_Anim_Index_Run,
+		Zombie_Anim_Index_Attack1,
+		Zombie_Anim_Index_Attack2,
+		Zombie_Anim_Index_FallingBack,
+		Zombie_Anim_Index_FallingForward,
+		Zombie_Anim_Index_Hit1,
+		Zombie_Anim_Index_Hit2
+	};
+
+public:
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+public:
+	virtual void StateAction(float elapsedTime);
+	virtual void Trace();
+
+	virtual void Attack1();
+protected:
+
+};
+
 #endif // !MONSTER_H

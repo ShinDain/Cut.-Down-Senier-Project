@@ -23,8 +23,6 @@ bool Character::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 	m_pBody->SetIsCharacter(true);
 
-	m_MaxHP = 100.0f;
-	m_HP = 100.0f;
 	m_Acceleration = 500.0f;
 
 	return true;
@@ -152,7 +150,7 @@ void Character::UnableAnimationTrack(int nAnimationTrack)
 
 	m_pAnimationController->SetTrackOver(nAnimationTrack, false);
 	m_pAnimationController->SetTrackEnable(nAnimationTrack, false);
-	m_pAnimationController->SetTrackSpeed(nAnimationTrack, 1);
+	m_pAnimationController->SetTrackSpeed(nAnimationTrack, m_AnimationSpeed);
 	m_pAnimationController->SetTrackRate(nAnimationTrack, 0);
 	m_pAnimationController->SetTrackWeight(nAnimationTrack, 0);
 	m_pAnimationController->SetTrackPosition(nAnimationTrack, 0);
@@ -199,19 +197,16 @@ void Character::IsFalling()
 
 void Character::DoLanding()
 {
-	if (true)
-	{
-		m_bIsFalling = false; 
-		m_MaxSpeedXZ = 100.f;
-		m_CharacterFriction = 350.0f;
-		m_Acceleration = 500.0f;
-		m_pBody->SetInGravity(false);
+	m_bIsFalling = false; 
+	m_MaxSpeedXZ = m_DefaultMaxSpeedXZ;
+	m_CharacterFriction = 350.0f;
+	m_Acceleration = m_DefaultAccel;
+	m_pBody->SetInGravity(false);
 
-		XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
-		if(xmf3Velocity.y < 50 && xmf3Velocity.y > 0)
-			xmf3Velocity.y = 0;
-		m_pBody->SetVelocity(xmf3Velocity);
-	}
+	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+	if(xmf3Velocity.y < 50 && xmf3Velocity.y > 0)
+		xmf3Velocity.y = 0;
+	m_pBody->SetVelocity(xmf3Velocity);
 }
 
 void Character::RotateToMove(float elapsedTime)
@@ -376,4 +371,53 @@ void Character::CrashWithObject(float crashPower, XMFLOAT3 xmf3CrashDirection)
 	// 일단 20으로 고정
 	m_CrashPower = 20;
 	m_xmf3CrashDirection = xmf3CrashDirection;
+}
+
+///////////////////////////////////////////////////////////////
+// 애니메이션 테스트용 클래스
+///////////////////////////////////////////////////////////////
+
+AnimTestCharacter::AnimTestCharacter(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+{
+	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+}
+
+AnimTestCharacter::~AnimTestCharacter()
+{
+	Destroy();
+}
+
+bool AnimTestCharacter::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+{
+	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	m_pAnimationController->SetTrackEnable(0, true);
+	m_pAnimationController->SetTrackEnable(1, true);
+	m_pAnimationController->SetTrackEnable(2, false);
+	m_pAnimationController->SetTrackEnable(3, false);
+	m_pAnimationController->SetTrackAnimationSet(0, m_tmpAnimationIdx);
+	m_pAnimationController->SetTrackAnimationSet(1, m_tmpAnimationIdx);
+
+	m_DestroyTime = 3.0f;
+	m_DissolveTime = 0.0f;
+
+	return true;
+}
+
+void AnimTestCharacter::Update(float elapsedTime)
+{
+	Character::Update(elapsedTime);
+
+	BlendWithIdleMovement(1);
+}
+
+void AnimTestCharacter::KeyDownEvent(WPARAM wParam)
+{
+	if (wParam == 'L')
+	{
+		m_tmpAnimationIdx += 1;
+		m_tmpAnimationIdx = m_tmpAnimationIdx % m_pAnimationController->m_pAnimationSets->m_nAnimationSets;
+
+		m_pAnimationController->SetTrackAnimationSet(0, m_tmpAnimationIdx);
+	}
 }

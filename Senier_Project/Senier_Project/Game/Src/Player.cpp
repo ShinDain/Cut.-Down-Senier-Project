@@ -28,6 +28,8 @@ Player::~Player()
 bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
 	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	// 애니메이션 트랙 초기화
 	m_pAnimationController->SetTrackEnable(PLAYER_IDLE_TRACK, true);	// idle
 	m_pAnimationController->SetTrackEnable(PLAYER_MOVE_TRACK, true);	// move
 	m_pAnimationController->SetTrackEnable(PLAYER_SPRINT_TRACK, false);	// sprint
@@ -43,10 +45,23 @@ bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_pAnimationController->SetTrackAnimationSet(PLAYER_SPRINT_TRACK, Player_Anim_Index_Sprint);
 	m_pAnimationController->SetTrackAnimationSet(PLAYER_LOOP_TRACK, Player_Anim_Index_Falling);
 
+	// 아이템 획득 반경 초기화
 	m_ObjectSearchSphere.Center = m_xmf3Position;
 	m_ObjectSearchSphere.Radius = 20.0f;
 
+	// 기본 점프 스피드 초기화
 	m_JumpSpeed = 150.0f;
+
+	// 기본 이동 변수 초기화
+	m_DefaultMaxSpeedXZ = 100.f;
+	m_DefaultAccel = 500.f;
+	
+	// 애니메이션 기본 속도 초기화
+	m_AnimationSpeed = 1.5f;
+
+	// 체력 초기화
+	m_MaxHP = 100.0f;
+	m_HP = 100.0f;
 
 	return true;
 }
@@ -110,7 +125,7 @@ void Player::Update(float elapsedTime)
 	else
 	{
 		m_pWeapon->SetVisible(true);
-		m_MaxSpeedXZ = m_DefaultSpeed;
+		m_MaxSpeedXZ = m_DefaultMaxSpeedXZ;
 	}
 
 	//if (m_bDecreaseMaxSpeed)
@@ -350,12 +365,12 @@ void Player::Attack()
 		m_nAnimationState = PlayerAnimationState::Player_State_Melee;
 		m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_MeleeOneHand);
 		m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1);
-		m_pAnimationController->SetTrackSpeed(PLAYER_ONCE_TRACK_1, 1.5f);
+		m_pAnimationController->SetTrackSpeed(PLAYER_ONCE_TRACK_1, m_AnimationSpeed);
 		break;
 	}
 
 	m_TurnSpeed = 1;
-	m_Acceleration = 30.0f;
+	m_Acceleration = m_AttackAccel;
 	// 공격 시 오브젝트 방향으로 자동 회전
 	RotateToObj();
 	m_TurnSpeed = 0;
@@ -488,10 +503,10 @@ void Player::InitializeState()
 	m_bIsFalling = false;
 	m_bCanDoubleJump = true;
 	m_bCanThrow = true;
-	m_MaxSpeedXZ = m_DefaultSpeed;
+	m_MaxSpeedXZ = m_DefaultMaxSpeedXZ;
 	m_CharacterFriction = 350.0f;
 
-	m_Acceleration = 500.0f;
+	m_Acceleration = m_DefaultAccel;
 	m_TurnSpeed = 1;
 
 	// 일반 상태로 강제 초기화
@@ -568,7 +583,7 @@ void Player::DoLanding()
 		break;
 	case Player_State_Melee:
 		Character::DoLanding();
-		m_Acceleration = 30.0f;
+		m_Acceleration = m_AttackAccel;
 		m_TurnSpeed = 0;
 		m_bCanDoubleJump = true;
 		return;
@@ -579,9 +594,9 @@ void Player::DoLanding()
 	Character::DoLanding();
 
 	//m_bIsFalling = false;
-	//m_MaxSpeedXZ = 100.f;
+	//m_MaxSpeedXZ = m_DefaultMaxSpeedXZ;
 	//m_CharacterFriction = 350.0f;
-	//m_Acceleration = 500.0f;
+	//m_Acceleration = m_DefaultAccel;
 	//m_pBody->SetInGravity(false);
 	m_bCanDoubleJump = true;
 	m_TurnSpeed = 1;
@@ -713,7 +728,7 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 			m_nAnimationState = PlayerAnimationState::Player_State_Idle;
 			m_nAttackCombo = 0;
 			// 가속도 정상화
-			m_Acceleration = 500.0f;
+			m_Acceleration = m_DefaultAccel;
 			m_TurnSpeed = 1;
 		}
 	}

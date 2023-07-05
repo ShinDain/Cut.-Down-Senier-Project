@@ -42,7 +42,6 @@ public:
 public:
 	virtual void Move(DWORD dwDirection) {}
 	virtual void Jump() {}
-	virtual void Attack() {}
 
 	virtual void IsFalling();
 
@@ -56,11 +55,14 @@ public:
 	virtual void BlendWithIdleMovement(float maxWeight);
 
 protected:
+	float m_DefaultAccel = 500.f;
+	float m_DefaultMaxSpeedXZ = 100.f;
+
+	float m_AnimationSpeed = 1.0f;
+
 	float m_MaxSpeedXZ = 100.0f;
 	float m_CharacterFriction = 350.0f;
 	float m_JumpSpeed = 100.0f;
-
-	//Ray m_floorCheckRay;
 
 	float m_TurnSpeed = 1;
 
@@ -80,4 +82,29 @@ public:
 	void SetCrashPower(float crashPower) { m_CrashPower = crashPower; }
 	void SetCrashDirection(XMFLOAT3 xmf3CrashDirection) { m_xmf3CrashDirection = xmf3CrashDirection; }
 	void SetIsShoulderView(bool bIsShoulderView) { m_bIsShoulderView = bIsShoulderView; }
+};
+
+
+class AnimTestCharacter : public Character
+{
+public:
+	AnimTestCharacter() {};
+	AnimTestCharacter(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
+	AnimTestCharacter(const AnimTestCharacter& rhs) = delete;
+	AnimTestCharacter& operator=(const AnimTestCharacter& rhs) = delete;
+	virtual ~AnimTestCharacter();
+
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
+	virtual void Update(float elapsedTime);
+	virtual void KeyDownEvent(WPARAM wParam);
+
+protected:
+	UINT m_tmpAnimationIdx = 0;
+
 };

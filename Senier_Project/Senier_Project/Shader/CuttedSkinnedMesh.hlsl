@@ -77,6 +77,7 @@ SkinnedMeshVertexOut VSSkinnedMesh(SkinnedMeshVertexIn vin)
 float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 {
 	// Dissolve 효과 적용
+	// 적용이 이상하게 됨 단순 투명도 조절로 오브젝트 삭제 표현중
 	//float dissolveValue = gDissolveMap.Sample(gsamAnisotropicWrap, pin.TexC).r + gDissolveValue;
 	//clip(dissolveValue);
 	
