@@ -122,13 +122,13 @@ void Item::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 
 void Item::Intersect(float elapsedTime)
 {
-	BoundingOrientedBox playerCollider = std::static_pointer_cast<ColliderBox>(g_pPlayer->GetCollider())->GetOBB();
+	BoundingOrientedBox* playerCollider = std::static_pointer_cast<ColliderBox>(g_pPlayer->GetCollider())->GetOBB().get();
 
 	if (m_bTrace)
 	{
 		TracePlayer(elapsedTime);
 
-		if (m_IntersectCollider.Intersects(playerCollider))
+		if (m_IntersectCollider.Intersects(*playerCollider))
 		{
 			std::shared_ptr<Player> pPlayer = std::static_pointer_cast<Player>(g_pPlayer);
 			pPlayer->AcquireItem(m_nItemType);
@@ -139,7 +139,7 @@ void Item::Intersect(float elapsedTime)
 	}
 	else
 	{
-		if (m_TraceCollider.Intersects(playerCollider))
+		if (m_TraceCollider.Intersects(*playerCollider))
 		{
 			m_bTrace = true;
 			return;

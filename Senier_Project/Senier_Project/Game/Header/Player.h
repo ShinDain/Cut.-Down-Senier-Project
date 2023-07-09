@@ -7,29 +7,6 @@
 #include "Weapon.h"
 #include "../../DirectXRendering/Header/AnimationController.h"
 
-enum PlayerAnimationIndex
-{
-	Player_Anim_Index_Idle,
-	Player_Anim_Index_RunForward,
-	Player_Anim_Index_RunBackward,
-	Player_Anim_Index_RunLeft,
-	Player_Anim_Index_RunRight,
-	Player_Anim_Index_Sprint,
-	Player_Anim_Index_StrafeLeft,
-	Player_Anim_Index_StrafeRight,
-	Player_Anim_Index_JumpUp,
-	Player_Anim_Index_JumpDown,
-	Player_Anim_Index_JumpWhileRunning,
-	Player_Anim_Index_Falling,
-	Player_Anim_Index_IdleCombat,
-	Player_Anim_Index_MeleeOneHand,
-	Player_Anim_Index_MeleeTwoHand,
-	Player_Anim_Index_GetHit,
-	Player_Anim_Index_Death,
-	Player_Anim_Index_ThrowIdle,
-	Player_Anim_Index_Throw
-};
-
 enum PlayerAnimationState
 {
 	Player_State_Idle,
@@ -61,6 +38,30 @@ public:
 	virtual void Update(float elapsedTime);
 
 	virtual void Destroy();
+
+private:
+	enum PlayerAnimationIndex
+	{
+		Player_Anim_Index_Idle,
+		Player_Anim_Index_RunForward,
+		Player_Anim_Index_RunBackward,
+		Player_Anim_Index_RunLeft,
+		Player_Anim_Index_RunRight,
+		Player_Anim_Index_Sprint,
+		Player_Anim_Index_StrafeLeft,
+		Player_Anim_Index_StrafeRight,
+		Player_Anim_Index_JumpUp,
+		Player_Anim_Index_JumpDown,
+		Player_Anim_Index_JumpWhileRunning,
+		Player_Anim_Index_Falling,
+		Player_Anim_Index_IdleCombat,
+		Player_Anim_Index_MeleeOneHand,
+		Player_Anim_Index_MeleeTwoHand,
+		Player_Anim_Index_GetHit,
+		Player_Anim_Index_Death,
+		Player_Anim_Index_ThrowIdle,
+		Player_Anim_Index_Throw
+	};
 
 public:
 	virtual void ProcessInput(UCHAR* pKeybuffer);
@@ -95,7 +96,8 @@ protected:
 	std::shared_ptr<Weapon> m_pWeapon = nullptr;
 	
 	XMFLOAT3 m_xmf3CameraRotation = XMFLOAT3(0, 0, 0);
-	XMFLOAT3 m_xmf3CameraLook = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 m_xmf3CameraPosition = XMFLOAT3(0, 0, 0);
+	//XMFLOAT3 m_xmf3CameraLook = XMFLOAT3(0, 0, 0);
 	bool m_bCanDoubleJump = true;
 	bool m_bCanThrow = true;
 
@@ -122,8 +124,23 @@ protected:
 
 	std::shared_ptr<Object> m_pTargetObject = nullptr;
 
-public:
+protected:
+	enum GrabState
+	{
+		Grab_Empty,
+		Grab_Moving,
+		Grab_Complete
+	};
 
+	void ObjectGrab();
+	void UpdateGrabedObjectPosition(float elapsedTime);
+
+	std::shared_ptr<Object> m_pGrabedObject = nullptr;
+	GrabState m_GrabState = GrabState::Grab_Empty;
+
+	XMFLOAT3 m_xmf3GrabOffsetPosition = XMFLOAT3(15, 10, 3);
+	
+public:
 	std::shared_ptr<Weapon> GetWeapon() { return m_pWeapon; }
 	XMFLOAT3 GetCameraRotation() {	return m_xmf3CameraRotation;}
 	UINT GetScore() { return m_nScore; }
@@ -132,6 +149,7 @@ public:
 
 	void SetWeapon(std::shared_ptr<Weapon> pWeapon) { m_pWeapon = pWeapon; }
 	void SetCameraRotation(XMFLOAT3 xmf3CameraRotation) { m_xmf3CameraRotation = xmf3CameraRotation; }
+	void SetCameraPosition(XMFLOAT3 xmf3CameraPosition) { m_xmf3CameraPosition = xmf3CameraPosition; }
 
 };
 

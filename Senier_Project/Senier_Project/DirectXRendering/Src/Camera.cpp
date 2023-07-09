@@ -12,7 +12,7 @@ Camera::Camera()
 	SetLens(0.25 * MathHelper::Pi, 1.0f, 1.0f, 1000.f);
 
 	//m_CameraFrustum = BoundingFrustum(m_xmf3Position, m_xmf4Orientation, 0.001f, -0.001f, 0.001f, -0.001f, 1, 10000);
-	m_CameraFrustum = BoundingFrustum(XMFLOAT3(0,0,0), XMFLOAT4(0,0,0,1), 0.6375f, -0.6375f, 0.425f, -0.425f, 1, 10000);
+	m_pCameraFrustum = std::make_shared<BoundingFrustum>(XMFLOAT3(0,0,0), XMFLOAT4(0,0,0,1), 0.6375f, -0.6375f, 0.425f, -0.425f, 1.0f, 5000.0f);
 }
 
 Camera::~Camera()
@@ -278,18 +278,20 @@ void Camera::UpdateViewMatrix()
 		m_xmf4x4View(2, 3) = 0.0f;
 		m_xmf4x4View(3, 3) = 1.f;
 
-		XMVECTOR tmp = XMVectorSet(0, 0, 0, 1);
-		XMVECTOR orientation = XMQuaternionRotationRollPitchYaw(XMConvertToRadians(m_Pitch), XMConvertToRadians(m_Yaw), 0);
-		orientation = XMQuaternionNormalize(orientation);
-		//tmp = XMVector3Rotate(tmp, orientation);
-		XMStoreFloat4(&m_xmf4Orientation, orientation);
-
-		m_CameraFrustum.Origin = m_xmf3Position;
-		//m_CameraFrustum.Origin = XMFLOAT3(0,0,0);
-		m_CameraFrustum.Orientation = m_xmf4Orientation;
+		UpdateViewFrustum();
 
 		m_bViewDirty = false;
 	}
+}
+
+void Camera::UpdateViewFrustum()
+{
+	XMVECTOR orientation = XMQuaternionRotationRollPitchYaw(XMConvertToRadians(m_Pitch), XMConvertToRadians(m_Yaw), 0);
+	orientation = XMQuaternionNormalize(orientation);
+	XMStoreFloat4(&m_xmf4Orientation, orientation);
+
+	m_pCameraFrustum->Origin = m_xmf3Position;
+	m_pCameraFrustum->Orientation = m_xmf4Orientation;
 }
 
 
@@ -378,8 +380,8 @@ void Third_Person_Camera::Update(float Etime)
 			if (!g_ppColliderBoxs[i]->GetIsActive())
 				continue;
 
-			BoundingOrientedBox tmpBB = g_ppColliderBoxs[i]->GetOBB();
-			if (!tmpBB.Intersects(objectPos, camDir, distance))
+			BoundingOrientedBox* pOBB = g_ppColliderBoxs[i]->GetOBB().get();
+			if (!pOBB->Intersects(objectPos, camDir, distance))
 				continue;
 			if (distance < best && distance != 0)
 			{
@@ -405,6 +407,28 @@ void Third_Person_Camera::Update(float Etime)
 	}
 
 	UpdateViewMatrix();
+}
+
+void Third_Person_Camera::UpdateViewFrustum()
+{
+	if (m_bShoulderView)
+	{
+		XMVECTOR orientation = XMQuaternionRotationRollPitchYaw(XMConvertToRadians(m_ShoulderCameraPitch), XMConvertToRadians(m_Yaw), 0);
+		orientation = XMQuaternionNormalize(orientation);
+		XMStoreFloat4(&m_xmf4Orientation, orientation);
+
+		m_pCameraFrustum->Origin = m_xmf3Position;
+		m_pCameraFrustum->Orientation = m_xmf4Orientation;
+	}
+	else
+	{
+		XMVECTOR orientation = XMQuaternionRotationRollPitchYaw(XMConvertToRadians(m_Pitch), XMConvertToRadians(m_Yaw), 0);
+		orientation = XMQuaternionNormalize(orientation);
+		XMStoreFloat4(&m_xmf4Orientation, orientation);
+
+		m_pCameraFrustum->Origin = m_xmf3Position;
+		m_pCameraFrustum->Orientation = m_xmf4Orientation;
+	}
 }
 
 void Third_Person_Camera::Pitch(float angle)
@@ -434,6 +458,8 @@ void Third_Person_Camera::RotateY(float angle)
 	if (m_Yaw < 0.0f) m_Yaw += 360.0f;
 
 }
+
+// 시네마틱 카메라
 
 CinematicCamera::CinematicCamera()
 {

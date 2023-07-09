@@ -40,6 +40,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-0.59f, 0.135f, 0.063f), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90), XMFLOAT3(1, 1, 1), WEAPON_MODEL_NAME, 0);
 	
 	// 바닥
+	// 차후 맵 로드 함수로 이동
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, 0);
 	
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
@@ -50,18 +51,18 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// 몬스터 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), GHOUL_MODEL_NAME, MONSTER_TRACK_CNT);	
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), CYBER_TWINS_MODEL_NAME, MONSTER_TRACK_CNT);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(60, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(60, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
 	
 	// 월드 오브젝트 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 15, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 15, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	
 	// 아이템 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
@@ -226,44 +227,13 @@ void Scene::OnResize(float aspectRatio, float newWidth, float newHeight)
 
 void Scene::Update(float totalTime ,float elapsedTime)
 {
-	ClearObjectLayer();
+	// 오브젝트
+	UpdateObject(elapsedTime);
+	// 카메라
+	UpdateSceneCamera(elapsedTime);
+	// 플레이어
+	UpdatePlayerData(elapsedTime);
 
-#if defined(_DEBUG)
-	XMFLOAT3 xmf3PlayerPosition = g_pPlayer->GetPosition();
-	m_refCnt = xmf3PlayerPosition.x;
-	//m_DebugValue = m_pCamera->GetPosition3f().x;
-
-	m_tTime += elapsedTime;
-#endif
-
-	BoundingFrustum camFus = m_pCamera->m_CameraFrustum;
-	for (int i = 0; i < g_vpAllObjs.size(); ++i)
-	{
-		if (g_vpAllObjs[i]->GetColliderType() == Collider_Box)
-		{
-			BoundingSphere objBS = g_vpAllObjs[i]->GetCollider()->GetBoundingSphere();
-
-			bool res = camFus.Intersects(objBS);
-			if (res)
-				g_vpAllObjs[i]->SetVisible(true);
-			else
-				g_vpAllObjs[i]->SetVisible(false);
-		}
-
-		if (g_vpAllObjs[i]) g_vpAllObjs[i]->Update(elapsedTime);
-	}
-	//g_pPlayer->Update(elapsedTime);
-
-	m_pCamera->Update(elapsedTime);
-	if (m_vpCinematics.size() > m_nCurCinematicNum)
-	{
-		m_vpCinematics[m_nCurCinematicNum]->Update(elapsedTime);
-		if (m_vpCinematics[m_nCurCinematicNum]->GetCinematicEnd())
-			m_bInCinematic = false;
-
-		m_pCinematicCamera->Update(elapsedTime);
-	}
-	
 	// 패스버퍼 업데이트
 	UpdateShadowPassCB(totalTime, elapsedTime);
 	UpdatePassCB(totalTime, elapsedTime);
@@ -278,15 +248,30 @@ void Scene::Update(float totalTime ,float elapsedTime)
 	// UI 이미지 업데이트
 	UpdateUI(elapsedTime);
 
-	m_pPlayerHPBar->Update(elapsedTime);
-	m_pEnemyHPBar->Update(elapsedTime);
-	m_pPlayerAim->Update(elapsedTime);
+}
 
+void Scene::UpdateObject(float elapsedTime)
+{
+	// 오브젝트 정리
+	ClearObjectLayer();
 
-#if defined(_DEBUG)
-	xmf3PlayerPosition = g_pPlayer->GetPosition();
-	m_DebugValue = xmf3PlayerPosition.x;
-#endif
+	// 카메라 프러스텀과 교차를 검증하여 렌더링 여부 업데이트
+	BoundingFrustum* camFus = m_pCamera->m_pCameraFrustum.get();
+	for (int i = 0; i < g_vpAllObjs.size(); ++i)
+	{
+		if (g_vpAllObjs[i]->GetColliderType() == Collider_Box)
+		{
+			BoundingSphere* pObjectBS = g_vpAllObjs[i]->GetCollider()->GetBoundingSphere().get();
+
+			if (camFus->Intersects(*pObjectBS))
+				g_vpAllObjs[i]->SetVisible(true);
+			else
+				g_vpAllObjs[i]->SetVisible(false);
+		}
+
+		if (g_vpAllObjs[i]) g_vpAllObjs[i]->Update(elapsedTime);
+	}
+
 }
 
 void Scene::UpdateUI(float elapsedTime)
@@ -313,12 +298,62 @@ void Scene::UpdateUI(float elapsedTime)
 		m_pEnemyHPBar->SetVisible(false);
 	}
 
-	// 점수 Text 
+	Third_Person_Camera* tmpCam = (Third_Person_Camera*)m_pCamera.get();
+	if (tmpCam->GetIsShoulderView())
+		m_pPlayerAim->SetVisible(true);
+	else
+		m_pPlayerAim->SetVisible(false);
+
+	m_pPlayerAim->SetVisible(true);
+
+	// 점수 Text 갱신
 	wchar_t pstrScore[64] = L"Score : ";
 	wcscat_s(pstrScore, std::to_wstring(pPlayer->GetScore()).c_str());
 
+	// Text UI 업데이트
 	m_pTextUIs->UpdateTextUI(pstrScore, m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Score), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Score), Text_UI_Idx_Score);
 
+	// Scene 이미지 UI 업데이트
+	m_pPlayerHPBar->Update(elapsedTime);
+	m_pEnemyHPBar->Update(elapsedTime);
+	m_pPlayerAim->Update(elapsedTime);
+}
+
+void Scene::UpdatePlayerData(float elapsedTime)
+{
+	if (g_pPlayer)
+	{
+		Third_Person_Camera* tmpCam = (Third_Person_Camera*)m_pCamera.get();
+		Player* tmpPlayer = (Player*)(g_pPlayer.get());
+		tmpPlayer->SetCameraPosition(m_pCamera->GetPosition3f());
+
+		if (tmpCam->GetIsShoulderView())
+		{
+			tmpPlayer->SetIsShoulderView(true);
+			tmpPlayer->GetBody()->SetCharacterPitch(tmpCam->GetShoulderCameraPitch());
+			tmpPlayer->SetRotate(XMFLOAT3(tmpCam->GetShoulderCameraPitch(), m_pCamera->GetYaw(), 0));
+			tmpPlayer->SetCameraRotation(XMFLOAT3(tmpCam->GetShoulderCameraPitch(), m_pCamera->GetYaw(), 0));
+		}
+		else
+		{
+			tmpPlayer->SetIsShoulderView(false);
+			tmpPlayer->GetBody()->SetCharacterPitch(0);
+			tmpPlayer->SetCameraRotation(XMFLOAT3(m_pCamera->GetPitch(), m_pCamera->GetYaw(), 0));
+		}
+	}
+}
+
+void Scene::UpdateSceneCamera(float elapsedTime)
+{
+	m_pCamera->Update(elapsedTime);
+	if (m_vpCinematics.size() > m_nCurCinematicNum)
+	{
+		m_vpCinematics[m_nCurCinematicNum]->Update(elapsedTime);
+		if (m_vpCinematics[m_nCurCinematicNum]->GetCinematicEnd())
+			m_bInCinematic = false;
+
+		m_pCinematicCamera->Update(elapsedTime);
+	}
 }
 
 void Scene::UpdatePassCB(float totalTime, float elapsedTime)
@@ -638,12 +673,10 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 		if (pKeybuffer[VK_RBUTTON] & 0xF0)
 		{
 			tmpCam->SetIsShoulderView(true);
-			m_pPlayerAim->SetVisible(true);
 		}
 		else
 		{
 			tmpCam->SetIsShoulderView(false);
-			m_pPlayerAim->SetVisible(false);
 		}
 		float dx, dy;
 		dx = dy = 0;
@@ -667,24 +700,7 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 
 	if (g_pPlayer)
 	{
-		Third_Person_Camera* tmpCam = (Third_Person_Camera*)m_pCamera.get();
-		Player* tmpPlayer = (Player*)(g_pPlayer.get());
-
 		g_pPlayer->ProcessInput(pKeybuffer);
-
-		if (tmpCam->GetIsShoulderView())
-		{
-			tmpPlayer->SetIsShoulderView(true);
-			tmpPlayer->GetBody()->SetCharacterPitch(tmpCam->GetShoulderCameraPitch());
-			tmpPlayer->SetRotate(XMFLOAT3(tmpCam->GetShoulderCameraPitch(), m_pCamera->GetYaw(), 0));
-			tmpPlayer->SetCameraRotation(XMFLOAT3(tmpCam->GetShoulderCameraPitch(), m_pCamera->GetYaw(), 0));
-		}
-		else
-		{
-			tmpPlayer->SetIsShoulderView(false);
-			tmpPlayer->GetBody()->SetCharacterPitch(0);
-			tmpPlayer->SetCameraRotation(XMFLOAT3(0, m_pCamera->GetYaw(), 0));
-		}
 	}
 	
 #if defined(_DEBUG)
@@ -1206,7 +1222,6 @@ void Scene::GenerateContact()
 		if(g_vpAllObjs[i]->GetBody())
 			g_vpAllObjs[i]->GetBody()->ClearContact();
 	}
-	if(g_pPlayer) g_pPlayer->GetBody()->ClearContact();
 
 	m_CollisionData.Reset(nContactCnt);
 	m_CollisionData.friction = 0;
@@ -1235,7 +1250,7 @@ void Scene::GenerateContact()
 			if (characterBox == g_ppColliderBoxs[i]) continue;
 			// 박스 검사 이전 가능 여부 선행 검사 
 			// BoxAndBox 내부보다 먼저 하는 것이 더 빠름
-			if (!characterBox->GetBoundingSphere().Intersects(g_ppColliderBoxs[i]->GetBoundingSphere()))
+			if (!characterBox->GetBoundingSphere()->Intersects(*(g_ppColliderBoxs[i]->GetBoundingSphere().get())))
 				continue;
 
 			CollisionDetector::BoxAndBox(*characterBox, *g_ppColliderBoxs[i], m_CollisionData, pCharacter.get());
@@ -1272,7 +1287,7 @@ void Scene::GenerateContact()
 
 			// 박스 검사 이전 가능 여부 선행 검사 
 			// BoxAndBox 내부보다 먼저 하는 것이 더 빠름
-			if(!colliderBox->GetBoundingSphere().Intersects(g_ppColliderBoxs[i]->GetBoundingSphere()))
+			if (!colliderBox->GetBoundingSphere()->Intersects(*(g_ppColliderBoxs[i]->GetBoundingSphere().get())))
 				continue;
 			
 			CollisionDetector::BoxAndBox(*colliderBox, *g_ppColliderBoxs[i], m_CollisionData, nullptr);
@@ -1292,7 +1307,6 @@ void Scene::GenerateContact()
 			CollisionDetector::BoxAndHalfSpace(*colliderBox, *g_ppColliderPlanes[i], m_CollisionData);
 		}
 	}
-
 }
 
 void Scene::ProcessPhysics(float elapsedTime)

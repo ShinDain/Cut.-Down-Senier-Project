@@ -162,7 +162,7 @@ void Projectile::Intersect(float elapsedTime)
 			if (!objCollider->GetIsActive() || m_pCollider.get() == objCollider)
 				continue;
 
-			if (m_IntersectCollider.Intersects(objCollider->GetOBB()))
+			if (m_IntersectCollider.Intersects(*objCollider->GetOBB()))
 			{
 				g_vpCharacters[i]->ApplyDamage(projectilePower, xmf3Direction);
 
@@ -187,7 +187,7 @@ void Projectile::Intersect(float elapsedTime)
 			if (!objCollider->GetIsActive() || m_pCollider.get() == objCollider)
 				continue;
 
-			if (m_IntersectCollider.Intersects(objCollider->GetOBB()))
+			if (m_IntersectCollider.Intersects(*objCollider->GetOBB()))
 			{
 				if (g_vpWorldObjs[i]->GetObjectType() == Object_Movable)
 				{
@@ -208,7 +208,7 @@ void Projectile::Intersect(float elapsedTime)
 		// 플레이어와의 검사
 		ColliderBox* playerCollider = (ColliderBox*)g_pPlayer->GetCollider().get();
 
-		if (m_IntersectCollider.Intersects(playerCollider->GetOBB()))
+		if (m_IntersectCollider.Intersects(*playerCollider->GetOBB()))
 		{
 			g_pPlayer->ApplyDamage(projectilePower, xmf3Direction);
 
@@ -231,7 +231,7 @@ void Projectile::Intersect(float elapsedTime)
 			if (!objCollider->GetIsActive() || m_pCollider.get() == objCollider)
 				continue;
 
-			if (m_IntersectCollider.Intersects(objCollider->GetOBB()))
+			if (m_IntersectCollider.Intersects(*objCollider->GetOBB()))
 			{
 				g_vpWorldObjs[i]->ApplyDamage(projectilePower, xmf3Direction);
 				g_vpWorldObjs[i]->GetBody()->SetIsAwake(true);

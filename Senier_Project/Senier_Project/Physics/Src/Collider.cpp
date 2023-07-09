@@ -14,6 +14,8 @@ Collider::~Collider()
 	m_NormalBufferUploader = nullptr;
 	m_IndexBufferGPU = nullptr;
 	m_IndexBufferUploader = nullptr;
+
+	m_pBoundingSphere.reset();
 }
 
 void Collider::UpdateWorldTransform()
@@ -138,8 +140,12 @@ ColliderBox::ColliderBox(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3Extents)
 	if (bestLen < m_xmf3Extents.z * xmf3Scale.z)
 		bestLen = m_xmf3Extents.z * xmf3Scale.z;
 
-	m_BoundingSphere.Radius = bestLen;
-	m_BoundingSphere.Center = m_xmf3Position;
+	m_pBoundingSphere = std::make_shared <BoundingSphere>();
+
+	m_pBoundingSphere->Radius = bestLen;
+	m_pBoundingSphere->Center = m_xmf3Position;
+
+	m_pOBB = std::make_shared<BoundingOrientedBox>();
 
 	CalculateRotateInertiaMatrix();
 	UpdateWorldTransform();
@@ -147,6 +153,7 @@ ColliderBox::ColliderBox(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3Extents)
 
 ColliderBox::~ColliderBox()
 {
+	m_pOBB.reset();
 }
 
 void ColliderBox::CalculateRotateInertiaMatrix()
@@ -174,15 +181,15 @@ void ColliderBox::UpdateWorldTransform()
 
 	if (m_pRigidBody)
 	{
-		m_BoundingSphere.Center = m_xmf3Position;
+		m_pBoundingSphere->Center = m_xmf3Position;
 
-		m_d3dOBB.Center = m_xmf3Position;
-		m_d3dOBB.Orientation = m_pRigidBody->GetOrientation();
+		m_pOBB->Center = m_xmf3Position;
+		m_pOBB->Orientation = m_pRigidBody->GetOrientation();
 
-		m_d3dOBB.Extents = m_xmf3Extents;
-		m_d3dOBB.Extents.x *= m_xmf3Scale.x;
-		m_d3dOBB.Extents.y *= m_xmf3Scale.y;
-		m_d3dOBB.Extents.z *= m_xmf3Scale.z;
+		m_pOBB->Extents = m_xmf3Extents;
+		m_pOBB->Extents.x *= m_xmf3Scale.x;
+		m_pOBB->Extents.y *= m_xmf3Scale.y;
+		m_pOBB->Extents.z *= m_xmf3Scale.z;
 	}
 }
 

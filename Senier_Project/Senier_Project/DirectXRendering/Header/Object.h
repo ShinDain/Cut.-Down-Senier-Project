@@ -15,7 +15,7 @@
 #include "Material.h"
 #include "AnimationController.h"
 
-//#define COLLIDER_RENDER
+#define COLLIDER_RENDER
 
 #define DIR_FORWARD					0x01
 #define DIR_BACKWARD				0x02

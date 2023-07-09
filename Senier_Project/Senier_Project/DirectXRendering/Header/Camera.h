@@ -66,6 +66,7 @@ public:
 
 	virtual void Update(float Etime) { UpdateViewMatrix(); }
 	virtual void UpdateViewMatrix();
+	virtual void UpdateViewFrustum();
 
 
 protected:
@@ -95,7 +96,7 @@ protected:
 
 
 public:
-	BoundingFrustum m_CameraFrustum;
+	std::shared_ptr<BoundingFrustum> m_pCameraFrustum;
 	void SetOrientation(XMFLOAT4 xmf4Orientation) { m_xmf4Orientation = xmf4Orientation; }
 };
 
@@ -109,16 +110,17 @@ public:
 	virtual ~Third_Person_Camera();
 
 	virtual void Update(float Etime) override;
+	virtual void UpdateViewFrustum();
 
 	virtual void Pitch(float angle);
 	virtual void RotateY(float angle);
 
 protected:
-	float m_OffsetLength = 75.0f;
-	float m_OffsetHeight = 10.0f;
+	float m_OffsetLength = 50.0f;
+	float m_OffsetHeight = 15.0f;
 	//DirectX::XMFLOAT3 m_xmf3Offset = { 0.0f, 30.0f, -100.0f };
 
-	float m_ShoulderOffsetLength = 7.0f;
+	float m_ShoulderOffsetLength = 10.0f;
 	float m_ShoulderOffsetHeight = 12.0f;
 	float m_ShoulderCameraPitch = -15.0f;
 	bool m_bShoulderView = false;

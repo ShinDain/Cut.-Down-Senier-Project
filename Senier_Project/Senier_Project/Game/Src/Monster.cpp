@@ -80,8 +80,8 @@ void Monster::Patrol()
 	BoundingSphere boundSphere;
 	boundSphere.Center = xmf3SearchPos;
 	boundSphere.Radius = m_SearchRadius;
-	BoundingOrientedBox playerCollider = std::static_pointer_cast<ColliderBox>(g_pPlayer->GetCollider())->GetOBB();
-	if (boundSphere.Intersects(playerCollider))
+	BoundingOrientedBox* playerCollider = std::static_pointer_cast<ColliderBox>(g_pPlayer->GetCollider())->GetOBB().get();
+	if (boundSphere.Intersects(*playerCollider))
 		m_bFindPlayer = true;
 }
 
@@ -153,8 +153,8 @@ void Monster::CreateAttackSphere(float range, float radius, float damage)
 	XMStoreFloat3(&attackSphere.Center, attackPosition);
 	attackSphere.Center.y = 5.0f;
 	attackSphere.Radius = radius;
-	BoundingOrientedBox playerCollider = std::static_pointer_cast<ColliderBox>(g_pPlayer->GetCollider())->GetOBB();
-	if (attackSphere.Intersects(playerCollider))
+	BoundingOrientedBox* playerCollider = std::static_pointer_cast<ColliderBox>(g_pPlayer->GetCollider())->GetOBB().get();
+	if (attackSphere.Intersects(*playerCollider))
 		g_pPlayer->ApplyDamage(damage, m_xmf3Look);
 }
 

@@ -128,6 +128,9 @@ void Player::Update(float elapsedTime)
 		m_MaxSpeedXZ = m_DefaultMaxSpeedXZ;
 	}
 
+	// 잡힌 물체 위치 조정
+	UpdateGrabedObjectPosition(elapsedTime);
+
 	//if (m_bDecreaseMaxSpeed)
 	//{
 	//	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
@@ -192,6 +195,9 @@ void Player::KeyDownEvent(WPARAM wParam)
 	//	m_bSprint = true;
 	//	m_MaxSpeedXZ = m_SprintSpeed;
 	//	break;
+	case 'F':
+		ObjectGrab();
+		break;
 	default:
 		break;
 	}
@@ -388,46 +394,58 @@ void Player::ThrowProjectile()
 	if (!m_bCanThrow)
 		return;
 
-	m_bCanThrow = false;
+	if (m_pGrabedObject)
+	{
+		// 물체의 속도를 플레이어 전방으로 발사
 
-	XMFLOAT3 xmf3ProjectilePos = m_xmf3Position;
 
-	XMVECTOR cameraLook = XMVectorSet(0, 0, 1, 0);
-	XMVECTOR cameraRight = XMVectorSet(1, 0, 0, 0);
-	XMVECTOR cameraUp = XMVectorSet(0, 1, 0, 0);
-	XMVECTOR cameraRotation = XMLoadFloat3(&m_xmf3CameraRotation);
-	XMMATRIX R = XMMatrixRotationY(XMConvertToRadians(m_xmf3CameraRotation.y));
-	cameraLook = XMVector3TransformNormal(cameraLook, R);
-	cameraRight = XMVector3TransformNormal(cameraRight, R);
-	R = XMMatrixRotationAxis(cameraRight, XMConvertToRadians(m_xmf3CameraRotation.x));
-	cameraLook = XMVector3TransformNormal(cameraLook, R);
-	cameraUp = XMVector3TransformNormal(cameraUp, R);
+		// Grab 상태 초기화
+		m_pGrabedObject = nullptr;
+		m_GrabState = GrabState::Grab_Empty;
+	}
+	else
+	{
+		m_bCanThrow = false;
 
-	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
-	XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
-	XMVECTOR projectilePos = XMLoadFloat3(&xmf3ProjectilePos);
+		XMFLOAT3 xmf3ProjectilePos = m_xmf3Position;
 
-	projectilePos += look * 3;
-	projectilePos += right * 4;
-	projectilePos += cameraUp * m_xmf3ColliderExtents.y * 13;
-	XMStoreFloat3(&xmf3ProjectilePos, projectilePos);
-	XMVECTOR projectileTarget = projectilePos;
-	projectileTarget += cameraLook * 10;
-	projectileTarget += cameraUp;
-	XMVECTOR projectileVelocity = projectileTarget - projectilePos;
-	projectileVelocity = XMVector3Normalize(projectileVelocity);
+		XMVECTOR cameraLook = XMVectorSet(0, 0, 1, 0);
+		XMVECTOR cameraRight = XMVectorSet(1, 0, 0, 0);
+		XMVECTOR cameraUp = XMVectorSet(0, 1, 0, 0);
+		XMVECTOR cameraRotation = XMLoadFloat3(&m_xmf3CameraRotation);
+		XMMATRIX R = XMMatrixRotationY(XMConvertToRadians(m_xmf3CameraRotation.y));
+		cameraLook = XMVector3TransformNormal(cameraLook, R);
+		cameraRight = XMVector3TransformNormal(cameraRight, R);
+		R = XMMatrixRotationAxis(cameraRight, XMConvertToRadians(m_xmf3CameraRotation.x));
+		cameraLook = XMVector3TransformNormal(cameraLook, R);
+		cameraUp = XMVector3TransformNormal(cameraUp, R);
 
-	XMFLOAT3 xmf3ProjectileVelocity;
-	projectileVelocity = projectileVelocity * 300;
+		XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+		XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
+		XMVECTOR projectilePos = XMLoadFloat3(&xmf3ProjectilePos);
 
-	XMVECTOR projectileOrientation = XMLoadFloat4(&m_xmf4Orientation);
-	projectileOrientation = XMQuaternionRotationRollPitchYaw(0, 0, 90);
-	XMFLOAT4 xmf4projectileOrientation;
-	XMStoreFloat4(&xmf4projectileOrientation, projectileOrientation);
-	std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, xmf3ProjectilePos, xmf4projectileOrientation,
-		XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
-	XMStoreFloat3(&xmf3ProjectileVelocity, projectileVelocity);
-	tmp->GetBody()->SetVelocity(xmf3ProjectileVelocity);
+		projectilePos += look * 3;
+		projectilePos += right * 4;
+		projectilePos += cameraUp * m_xmf3ColliderExtents.y * 13;
+		XMStoreFloat3(&xmf3ProjectilePos, projectilePos);
+		XMVECTOR projectileTarget = projectilePos;
+		projectileTarget += cameraLook * 10;
+		projectileTarget += cameraUp;
+		XMVECTOR projectileVelocity = projectileTarget - projectilePos;
+		projectileVelocity = XMVector3Normalize(projectileVelocity);
+
+		XMFLOAT3 xmf3ProjectileVelocity;
+		projectileVelocity = projectileVelocity * 300;
+
+		XMVECTOR projectileOrientation = XMLoadFloat4(&m_xmf4Orientation);
+		projectileOrientation = XMQuaternionRotationRollPitchYaw(0, 0, 90);
+		XMFLOAT4 xmf4projectileOrientation;
+		XMStoreFloat4(&xmf4projectileOrientation, projectileOrientation);
+		std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, xmf3ProjectilePos, xmf4projectileOrientation,
+			XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
+		XMStoreFloat3(&xmf3ProjectileVelocity, projectileVelocity);
+		tmp->GetBody()->SetVelocity(xmf3ProjectileVelocity);
+	}
 }
 
 void Player::RotateToObj()
@@ -840,4 +858,88 @@ void Player::BlendWithIdleMovement(float maxWeight)
 	//	m_pAnimationController->SetTrackWeight(PLAYER_IDLE_TRACK, maxWeight - weight);
 	//	m_pAnimationController->SetTrackWeight(PLAYER_MOVE_TRACK, weight);
 	//}
+}
+
+void Player::ObjectGrab()
+{
+	// 손이 빈 경우만
+	if (m_GrabState != GrabState::Grab_Empty)
+		return;
+
+	// 뷰포트의 중앙에서 발사한 광선과 충돌하는 가장 가까운 무버블 오브젝트를 선택
+	// 오브젝트 중 가장 가까운 물체 탐색
+	// 해당 물체가 무버블인 경우 ok
+
+	XMVECTOR cameraPos = XMLoadFloat3(&m_xmf3CameraPosition);
+
+	XMVECTOR cameraLook = XMVectorSet(0, 0, 1, 0);
+	XMVECTOR cameraRight = XMVectorSet(1, 0, 0, 0);
+	XMVECTOR cameraRotation = XMLoadFloat3(&m_xmf3CameraRotation);
+	XMMATRIX R = XMMatrixRotationY(XMConvertToRadians(m_xmf3CameraRotation.y));
+	cameraLook = XMVector3TransformNormal(cameraLook, R);
+	cameraRight = XMVector3TransformNormal(cameraRight, R);
+	R = XMMatrixRotationAxis(cameraRight, XMConvertToRadians(m_xmf3CameraRotation.x));
+	cameraLook = XMVector3TransformNormal(cameraLook, R);
+
+	// cameraLook => 광선의 방향
+
+	float distance = 0;
+	float standard = 250;
+
+	float closestDistance = 9999;
+	int bestIndex = -1;
+
+	for (int i = 0; i < g_vpWorldObjs.size(); ++i)
+	{
+		if (g_vpWorldObjs[i]->GetColliderType() != ColliderType::Collider_Box)
+			continue;
+		// 이동 가능한 물체만
+		if (g_vpWorldObjs[i]->GetObjectType() != ObjectType::Object_Movable)
+			continue;
+		// 렌더링된 물체만
+		if (!g_vpWorldObjs[i]->GetVisible())
+			continue;
+
+		ColliderBox* pColliderBox = (ColliderBox*)(g_vpWorldObjs[i]->GetCollider().get());
+		BoundingOrientedBox* pOBB = pColliderBox->GetOBB().get();
+		BoundingSphere* pBS = pColliderBox->GetBoundingSphere().get();
+
+		pColliderBox->SetIntersect(0);
+
+		//pOBB->Intersects(cameraPos, cameraLook, distance);
+		pBS->Intersects(cameraPos, cameraLook, distance);
+		// 사거리보다 가까운 / 0 이상인 / 이전 물체보다 가까운
+		if (distance < standard && distance > 0 && distance < closestDistance)
+		{
+			closestDistance = distance;
+			bestIndex = i;
+		}
+	}
+	if (bestIndex >= 0) 
+	{
+		ColliderBox* pColliderBox = (ColliderBox*)(g_vpWorldObjs[bestIndex]->GetCollider().get());
+		pColliderBox->SetIntersect(1);
+
+		m_pGrabedObject = g_vpWorldObjs[bestIndex];
+		m_GrabState = GrabState::Grab_Moving;
+	}
+}
+
+void Player::UpdateGrabedObjectPosition(float elapsedTime)
+{
+	// 잡힌 물체의 경우
+	// 오프셋 위치까지 시간에 따른 이동
+	// 이동 과정에서 물리 충돌 검사 비활성화
+	// 회전하며 이동
+	// 포물선을 그리며 이동하면 베스트
+
+	if (m_GrabState == GrabState::Grab_Moving)
+	{
+
+	}
+	else if (m_GrabState == GrabState::Grab_Complete)
+	{
+		// 시간에 따른 회전
+
+	}
 }

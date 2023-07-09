@@ -171,12 +171,12 @@ void Character::IsFalling()
 			if (thisColliderBox == g_ppColliderBoxs[i].get())
 				continue;
 
-			BoundingOrientedBox obb = g_ppColliderBoxs[i]->GetOBB();
+			BoundingOrientedBox* pOBB = g_ppColliderBoxs[i]->GetOBB().get();
 		
 			XMVECTOR position = XMLoadFloat3(&m_xmf3RenderPosition);
 			XMVECTOR direction = XMVectorSet(0, -1, 0, 0);
 			float distance = 0;
-			bool bIntersect = obb.Intersects(position, direction, distance);
+			bool bIntersect = pOBB->Intersects(position, direction, distance);
 			//if (distance < m_xmf3ColliderExtents.y * 10 && bIntersect)
 			if (distance < 1 && bIntersect)
 			{

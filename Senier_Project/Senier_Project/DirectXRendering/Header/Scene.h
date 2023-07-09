@@ -63,6 +63,9 @@ public:
 
 	virtual void OnResize(float aspectRatio, float newWidth, float newHeight);
 	virtual void Update(float totalTime, float elapsedTime);
+	void UpdateObject(float elapsedTime);
+	void UpdatePlayerData(float elapsedTime);
+	void UpdateSceneCamera(float elapsedTime);
 	void UpdateUI(float elapsedTime);
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 	void RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList);

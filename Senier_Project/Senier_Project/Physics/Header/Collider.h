@@ -20,9 +20,8 @@ public:
 	virtual void CalculateRotateInertiaMatrix() {}
 
 protected:
-
 	std::shared_ptr<RigidBody> m_pRigidBody = nullptr;
-	BoundingSphere m_BoundingSphere;
+	std::shared_ptr<BoundingSphere> m_pBoundingSphere = nullptr;
 
 	XMFLOAT3 m_xmf3Position = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 m_xmf3Scale = XMFLOAT3(1, 1, 1);
@@ -50,7 +49,7 @@ public:
 	void SetPhysics(bool bPhysics) const { m_pRigidBody->SetPhysics(bPhysics); }
 	bool GetPhysics() const { return m_pRigidBody->GetPhysics(); }
 
-	BoundingSphere GetBoundingSphere() const { return m_BoundingSphere; }
+	std::shared_ptr<BoundingSphere> GetBoundingSphere() const { return m_pBoundingSphere; }
 
 #if defined(_DEBUG) | defined(DEBUG)
 protected:
@@ -136,15 +135,13 @@ public:
 private:
 	XMFLOAT3 m_xmf3Extents = XMFLOAT3(0, 0, 0);
 
-	BoundingOrientedBox m_d3dOBB;
+	std::shared_ptr<BoundingOrientedBox> m_pOBB;
 
 public:
 	void SetExtents(const XMFLOAT3& xmf3Extents) { m_xmf3Extents = xmf3Extents; }
 	const XMFLOAT3& GetExtents() const { return m_xmf3Extents; }
 
-	void SetOBBOrientation(XMFLOAT4 xmf4Quaternion) { m_d3dOBB.Orientation = xmf4Quaternion; }
-
-	const BoundingOrientedBox& GetOBB() const { return m_d3dOBB; }
+	std::shared_ptr<BoundingOrientedBox> GetOBB() const { return m_pOBB; }
 };
 
 class ColliderSphere : public Collider
