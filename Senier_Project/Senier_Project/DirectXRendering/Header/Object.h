@@ -217,8 +217,22 @@ public:
 		m_xmf3Rotation.z = fRoll;
 	}
 	void SetRotate(const XMFLOAT3& Rotate);
-	void SetOrientation(const XMFLOAT4& Orientation) { m_xmf4Orientation = Orientation;
-													   XMStoreFloat4(&m_xmf4Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmf4Orientation)));}
+	void SetObjectRotation(const XMFLOAT3& xmf3Rotation);
+	void SetOrientation(const XMFLOAT4& Orientation) 
+	{
+		m_xmf4Orientation = Orientation;
+		XMStoreFloat4(&m_xmf4Orientation, XMQuaternionNormalize(XMLoadFloat4(&m_xmf4Orientation)));
+
+		XMVECTOR l = XMVectorSet(0, 0, 1, 0);
+		XMVECTOR r = XMVectorSet(1, 0, 0, 0);
+		XMVECTOR orientation = XMLoadFloat4(&m_xmf4Orientation);
+
+		XMVector3Rotate(l, orientation);
+		XMVector3Rotate(r, orientation);
+
+		XMStoreFloat3(&m_xmf3Look, l);
+		XMStoreFloat3(&m_xmf3Right, r);
+	}
 	
 
 	void SetIsFalling(bool IsFalling) { m_bIsFalling = IsFalling; }

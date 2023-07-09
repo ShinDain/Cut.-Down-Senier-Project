@@ -119,11 +119,9 @@ public:
 
 	virtual void Attack1();
 
-protected:
-
 };
 
-class HighZombie : public Zombie
+class HighZombie : public Monster
 {
 public:
 	HighZombie() {};
@@ -165,8 +163,171 @@ public:
 	virtual void Trace();
 
 	virtual void Attack1();
-protected:
 
 };
+
+class Scavenger : public Monster
+{
+public:
+	Scavenger() {};
+	Scavenger(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
+	Scavenger(const Scavenger& rhs) = delete;
+	Scavenger& operator=(const Scavenger& rhs) = delete;
+	virtual ~Scavenger();
+
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
+	virtual void UpdateAnimationTrack(float elapsedTime);
+
+private:
+	enum ScavengerAnimationIndex
+	{
+		Scavenger_Anim_Index_Idle1,
+		Scavenger_Anim_Index_Idle2,
+		Scavenger_Anim_Index_Idle3,
+		Scavenger_Anim_Index_Walk,
+		Scavenger_Anim_Index_Attack1,
+		Scavenger_Anim_Index_Attack2,
+		Scavenger_Anim_Index_Block,
+		Scavenger_Anim_Index_Hit1,
+		Scavenger_Anim_Index_Hit2,
+		Scavenger_Anim_Index_Death1,
+		Scavenger_Anim_Index_Death2,
+		Scavenger_Anim_Index_Rage,
+	};
+
+public:
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+public:
+	virtual void StateAction(float elapsedTime);
+	virtual void Trace();
+
+	virtual void Attack1();
+
+};
+
+class Ghoul : public Monster
+{
+public:
+	Ghoul() {};
+	Ghoul(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
+	Ghoul(const Ghoul& rhs) = delete;
+	Ghoul& operator=(const Ghoul& rhs) = delete;
+	virtual ~Ghoul();
+
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
+	virtual void Animate(float elapsedTime);
+	virtual void UpdateAnimationTrack(float elapsedTime);
+
+private:
+	enum GhoulAnimationIndex
+	{
+		Ghoul_Anim_Index_Idle,
+		Ghoul_Anim_Index_Walk,
+		Ghoul_Anim_Index_Run,
+		Ghoul_Anim_Index_Attack1,
+		Ghoul_Anim_Index_Attack2,
+		Ghoul_Anim_Index_Death		
+	};
+
+public:
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+public:
+	virtual void StateAction(float elapsedTime);
+	virtual void Trace();
+
+	virtual void Attack1();
+};
+
+class CyberTwins : public Monster
+{
+public:
+	CyberTwins() {};
+	CyberTwins(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
+	CyberTwins(const CyberTwins& rhs) = delete;
+	CyberTwins& operator=(const CyberTwins& rhs) = delete;
+	virtual ~CyberTwins();
+
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
+	virtual void UpdateAnimationTrack(float elapsedTime);
+
+private:
+	enum CyberTwinsAnimationIndex
+	{
+		CyberTwins_Anim_Index_Idle,
+		CyberTwins_Anim_Index_Run,
+		CyberTwins_Anim_Index_Attack1,
+		CyberTwins_Anim_Index_Attack2,
+		CyberTwins_Anim_Index_Death
+	};
+
+public:
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+public:
+	virtual void StateAction(float elapsedTime);
+	virtual void Trace();
+
+	virtual void Attack1();
+};
+
+class Necromancer : public Monster
+{
+public:
+	Necromancer() {};
+	Necromancer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
+	Necromancer(const Necromancer& rhs) = delete;
+	Necromancer& operator=(const Necromancer& rhs) = delete;
+	virtual ~Necromancer();
+
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		ObjectInitData objData,
+		std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
+
+	virtual void UpdateAnimationTrack(float elapsedTime);
+
+private:
+	enum NecromancerAnimationIndex
+	{
+		Necromancer_Anim_Index_Idle1,
+		Necromancer_Anim_Index_Idle2,
+		Necromancer_Anim_Index_Walk,
+		Necromancer_Anim_Index_Attack1,
+		Necromancer_Anim_Index_Attack2,
+		Necromancer_Anim_Index_Hit,
+		Necromancer_Anim_Index_Death,
+		Necromancer_Anim_Index_Roar,
+		Necromancer_Anim_Index_SpellCast,
+		Necromancer_Anim_Index_Wound
+	};
+
+public:
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+public:
+	virtual void StateAction(float elapsedTime);
+	virtual void Trace();
+
+	virtual void Attack1();
+};
+
 
 #endif // !MONSTER_H

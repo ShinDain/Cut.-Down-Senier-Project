@@ -115,6 +115,8 @@ void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, UINT nHitAn
 
 	Character::ApplyDamage(power, xmf3DamageDirection);
 
+	if (m_HP <= 0)
+		m_bSuperArmor = false;
 	if (m_bSuperArmor)
 		return;
 
@@ -149,6 +151,7 @@ void Monster::CreateAttackSphere(float range, float radius, float damage)
 
 	BoundingSphere attackSphere;
 	XMStoreFloat3(&attackSphere.Center, attackPosition);
+	attackSphere.Center.y = 5.0f;
 	attackSphere.Radius = radius;
 	BoundingOrientedBox playerCollider = std::static_pointer_cast<ColliderBox>(g_pPlayer->GetCollider())->GetOBB();
 	if (attackSphere.Intersects(playerCollider))
@@ -185,12 +188,18 @@ bool Zombie::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 	// 공격력 및 반경 초기화
 	m_AttackDamage = 10.0f;
-	m_AttackRange = 6.0f;
-	m_AttackRadius = 5.0f;
+	m_AttackRange = 15.0f;
+	m_AttackRadius = 7.0f;
 
 	// 체력 초기화
 	m_MaxHP = 100.0f;
 	m_HP = 100.0f;
+
+
+	m_DefaultAccel = 550.0f;
+	m_DefaultMaxSpeedXZ = 100.0f;
+	m_DefaultFriction = 400.0f;
+
 
 	return true;
 }
@@ -327,7 +336,7 @@ void Zombie::Trace()
 	xmf3MyPosition.y = 0;
 	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
 	XMVECTOR accelDir = targetPosition - myPosition;
-	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 0.8f * 3)
+	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.1f)
 	{
 		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
 		xmf3Accel.x = 0;
@@ -362,13 +371,15 @@ void Zombie::Attack1()
 	case Monster_State_Attack1:
 		break;
 	default:
+		//int attackAnimIdx = rand() % 2;
+		int attackAnimIdx = 0;
+
 		m_State = MonsterState::Monster_State_Attack1;
 		UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 		m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
-
-		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Zombie_Anim_Index_Attack1);
 		m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
-		m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+
+		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Zombie_Anim_Index_Attack1 + attackAnimIdx);
 
 		break;
 	}
@@ -405,12 +416,16 @@ bool HighZombie::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 	// 공격력 및 반경 초기화
 	m_AttackDamage = 10.0f;
-	m_AttackRange = 6.0f;
+	m_AttackRange = 16.0f;
 	m_AttackRadius = 5.0f;
 
 	// 체력 초기화
 	m_MaxHP = 200.0f;
 	m_HP = 200.0f;
+
+	m_DefaultAccel = 500.0f;
+	m_DefaultMaxSpeedXZ = 100.0f;
+	m_DefaultFriction = 400.0f;
 
 	return true;
 }
@@ -433,7 +448,7 @@ void HighZombie::UpdateAnimationTrack(float elapsedTime)
 
 			// 약간 앞으로 전진
 			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-			XMVECTOR deltaVelocity = l * 3;
+			XMVECTOR deltaVelocity = l * 4;
 			XMFLOAT3 xmf3DeltaVelocity;
 			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 			m_pBody->AddVelocity(xmf3DeltaVelocity);
@@ -472,7 +487,7 @@ void HighZombie::UpdateAnimationTrack(float elapsedTime)
 
 			// 약간 앞으로 전진
 			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-			XMVECTOR deltaVelocity = l * 3;
+			XMVECTOR deltaVelocity = l * 4;
 			XMFLOAT3 xmf3DeltaVelocity;
 			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 			m_pBody->AddVelocity(xmf3DeltaVelocity);
@@ -484,7 +499,7 @@ void HighZombie::UpdateAnimationTrack(float elapsedTime)
 
 			// 약간 앞으로 전진
 			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-			XMVECTOR deltaVelocity = l * 3;
+			XMVECTOR deltaVelocity = l * 4;
 			XMFLOAT3 xmf3DeltaVelocity;
 			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 			m_pBody->AddVelocity(xmf3DeltaVelocity);
@@ -560,10 +575,10 @@ void HighZombie::UpdateAnimationTrack(float elapsedTime)
 
 void HighZombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
-	int nAttackAnim = rand() % 2;
+	int nHitAnim = rand() % 2;
 
 	UINT hitAnimIdx = HighZombie_Anim_Index_Hit;
-	UINT deathAnimIdx = HighZombie_Anim_Index_Death1 + nAttackAnim;
+	UINT deathAnimIdx = HighZombie_Anim_Index_Death1 + nHitAnim;
 
 	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
 }
@@ -596,7 +611,7 @@ void HighZombie::Trace()
 	xmf3MyPosition.y = 0;
 	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
 	XMVECTOR accelDir = targetPosition - myPosition;
-	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 0.8f * 3)
+	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.1f)
 	{
 		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
 		xmf3Accel.x = 0;
@@ -632,8 +647,7 @@ void HighZombie::Attack1()
 		break;
 	default:
 	{
-		//int attackAnimIdx = rand() % 2;
-		int attackAnimIdx = 1;
+		int attackAnimIdx = rand() % 2;
 
 		UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 		m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
@@ -653,5 +667,1119 @@ void HighZombie::Attack1()
 		}
 	}
 		break;
+	}
+}
+
+/////////////////////////////
+// 사마귀
+/////////////////////////////
+Scavenger::Scavenger(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+{
+	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+}
+
+Scavenger::~Scavenger()
+{
+	Destroy();
+}
+
+bool Scavenger::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+{
+	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	InitAnimationTrack(5.0f);
+	int idleAnimIdx = rand() % 2;
+
+	// 애니메이션 트랙 초기화
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_IDLE_TRACK, Scavenger_Anim_Index_Idle1 + idleAnimIdx);
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_MOVE_TRACK, Scavenger_Anim_Index_Walk);
+
+	// 파괴 타이머 초기화
+	m_DestroyTime = 3.0f;
+	m_DissolveTime = 0.0f;
+
+	// 공격력 및 반경 초기화
+	m_AttackDamage = 10.0f;
+	m_AttackRange = 15.0f;
+	m_AttackRadius = 3.0f;
+
+	// 체력 초기화
+	m_MaxHP = 50.f;
+	m_HP = 50.f;
+
+	m_DefaultAccel = 550.0f;
+	m_DefaultMaxSpeedXZ = 100.0f;
+	m_DefaultFriction = 500.0f;
+
+	// 일단은 100의 속도로 사용
+	// 애니메이션이 걷기 밖에 없기에
+	// 200의 이동속도를 표현하기; 위해선 5배속으로 애니메이션 재생해야함 
+
+
+	return true;
+}
+
+void Scavenger::UpdateAnimationTrack(float elapsedTime)
+{
+	switch (m_State)
+	{
+	case Monster::Monster_State_Idle:
+	case Monster::Monster_State_Trace:
+		BlendWithIdleMovement(1);
+		break;
+	case Monster::Monster_State_Attack1:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+		// 공격 판정
+		if (trackRate > 0.5f && trackRate < 0.6f)
+		{
+			m_bSuperArmor = true;
+
+			// 약간 앞으로 전진
+			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+			XMVECTOR deltaVelocity = l * 3;
+			XMFLOAT3 xmf3DeltaVelocity;
+			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+			m_pBody->AddVelocity(xmf3DeltaVelocity);
+			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
+		}
+
+		if (trackRate < 0.4f)
+		{
+			RotateToPlayer();
+		}
+		else if (trackRate > 0.6f)
+		{
+			m_bSuperArmor = false;
+		}
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.9f, 10.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+	break;
+	case Monster::Monster_State_Attack2:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+		// 공격 판정
+		if (trackRate > 0.4f && trackRate < 0.5f)
+		{
+			m_bSuperArmor = true;
+
+			// 약간 앞으로 전진
+			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+			XMVECTOR deltaVelocity = l * 7;
+			XMFLOAT3 xmf3DeltaVelocity;
+			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+			m_pBody->AddVelocity(xmf3DeltaVelocity);
+			
+		}
+		else if (trackRate > 0.5f && trackRate < 0.6f)
+		{
+			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
+		}
+
+		if (trackRate < 0.3f)
+		{
+			RotateToPlayer();
+		}
+		else if (trackRate > 0.6f)
+		{
+			m_bSuperArmor = false;
+		}
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.9f, 10.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+	break;
+	case Monster::Monster_State_Attack3:
+		break;
+	case Monster::Monster_State_Hit:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.5f, 2.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+	break;
+	case Monster::Monster_State_Death:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+
+		m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			m_bDestroying = true;
+		}
+	}
+	break;
+	case Monster::Monster_State_Special1:
+		break;
+	case Monster::Monster_State_Special2:
+		break;
+	case Monster::Monster_State_Special3:
+		break;
+	default:
+		break;
+	}
+}
+
+void Scavenger::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+{
+	int nHitAnim = rand() % 2;
+
+	UINT hitAnimIdx = Scavenger_Anim_Index_Hit1 + nHitAnim;
+	UINT deathAnimIdx = Scavenger_Anim_Index_Death1 + nHitAnim;
+
+	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
+}
+
+void Scavenger::StateAction(float elapsedTime)
+{
+	switch (m_State)
+	{
+	case Monster_State_Idle:
+		Patrol();
+		if (m_bFindPlayer) m_State = Monster_State_Trace;
+		break;
+	case Monster_State_Trace:
+		Trace();
+		break;
+	default:
+		break;
+	}
+}
+
+void Scavenger::Trace()
+{
+	Monster::Trace();
+
+	XMFLOAT3 xmf3TargetPosition = g_pPlayer->GetPosition();
+	xmf3TargetPosition.y = 0;
+	XMVECTOR targetPosition = XMLoadFloat3(&xmf3TargetPosition);
+
+	XMFLOAT3 xmf3MyPosition = m_xmf3Position;
+	xmf3MyPosition.y = 0;
+	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
+	XMVECTOR accelDir = targetPosition - myPosition;
+	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.1f)
+	{
+		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+		xmf3Accel.x = 0;
+		xmf3Accel.z = 0;
+		m_pBody->SetAcceleration(xmf3Accel);
+
+		Attack1();
+		return;
+	}
+}
+
+void Scavenger::Attack1()
+{
+	XMVECTOR playerPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
+	XMVECTOR myPosition = XMLoadFloat3(&m_xmf3Position);
+	if (XMVectorGetX(XMVector3Length(myPosition - playerPosition)) > m_AttackRange * 3)
+	{
+		m_State = Monster_State_Trace;
+		return;
+	}
+
+	switch (m_State)
+	{
+	//case Monster_State_Idle:
+	//	break;
+	case Monster_State_Attack1:
+		break;
+	default:
+	{
+		int attackAnimIdx = rand() % 2;
+
+		UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+		m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+		m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
+
+		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Scavenger_Anim_Index_Attack1 + attackAnimIdx);
+
+		switch (attackAnimIdx)
+		{
+		case 0:
+			m_State = MonsterState::Monster_State_Attack1;
+			break;
+
+		case 1:
+			m_State = MonsterState::Monster_State_Attack2;
+			break;
+		}
+	}
+	break;
+	}
+}
+
+/////////////////////////////
+// 거대 구울
+/////////////////////////////
+Ghoul::Ghoul(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+{
+	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+}
+
+Ghoul::~Ghoul()
+{
+	Destroy();
+}
+
+bool Ghoul::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+{
+	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	InitAnimationTrack(1);
+
+	// 애니메이션 트랙 초기화
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_IDLE_TRACK, Ghoul_Anim_Index_Idle);
+	//m_pAnimationController->SetTrackAnimationSet(MONSTER_MOVE_TRACK, Ghoul_Anim_Index_Walk);
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_MOVE_TRACK, Ghoul_Anim_Index_Run);
+
+	// 파괴 타이머 초기화
+	m_DestroyTime = 5.0f;
+	m_DissolveTime = 0.0f;
+
+	// 공격력 및 반경 초기화
+	m_AttackDamage = 10.0f;
+	m_AttackRange = 32.0f;
+	m_AttackRadius = 10.0f;
+
+	// 체력 초기화
+	m_MaxHP = 300.0f;
+	m_HP = 300.0f;
+
+	// 
+	m_DefaultAccel = 500.0f;
+	m_DefaultMaxSpeedXZ = 100.0f;
+
+	return true;
+}
+
+void Ghoul::Animate(float elapsedTime)
+{
+	float eTime = elapsedTime;
+
+	// 쳐다보고 있는 동안 멈춘 상태로
+	//if (m_bVisible)
+	//{
+	//	eTime = 0.0f;
+	//}
+
+	if (m_pAnimationController)
+		m_pAnimationController->AdvanceTime(eTime, this);
+
+	if (m_pSibling) { m_pSibling->Animate(eTime); }
+	if (m_pChild) { m_pChild->Animate(eTime); }
+}
+
+void Ghoul::UpdateAnimationTrack(float elapsedTime)
+{
+	//if (m_bVisible)
+	//{
+	//	//m_AnimationSpeed = 0;
+	//	m_DefaultMaxSpeedXZ = 100.0f;
+	//	m_DefaultAccel = 0.0f;
+	//}
+	//else
+	//{
+	//	//m_AnimationSpeed = 1;
+	//	m_DefaultMaxSpeedXZ = 100.0f;
+	//	m_DefaultAccel = 500.0f;
+	//}
+
+	switch (m_State)
+	{
+	case Monster::Monster_State_Idle:
+	case Monster::Monster_State_Trace:
+		BlendWithIdleMovement(1);
+		break;
+	case Monster::Monster_State_Attack1:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+		// 공격 판정
+		if (trackRate > 0.4f && trackRate < 0.5f)
+		{
+			m_bSuperArmor = true;
+
+			// 약간 앞으로 전진
+			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+			XMVECTOR deltaVelocity = l * 3;
+			XMFLOAT3 xmf3DeltaVelocity;
+			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+			m_pBody->AddVelocity(xmf3DeltaVelocity);
+			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
+		}
+		if (trackRate > 0.65f && trackRate < 0.75f)
+		{
+			m_bSuperArmor = true;
+
+			// 약간 앞으로 전진
+			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+			XMVECTOR deltaVelocity = l * 1;
+			XMFLOAT3 xmf3DeltaVelocity;
+			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+			m_pBody->AddVelocity(xmf3DeltaVelocity);
+			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
+		}
+
+		if (trackRate < 0.4f)
+		{
+			RotateToPlayer();
+		}
+		else if (trackRate > 0.86f)
+		{
+			m_bSuperArmor = false;
+		}
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.9f, 10.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+	break;
+	case Monster::Monster_State_Attack2:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+		// 공격 판정
+		if (trackRate > 0.4f && trackRate < 0.5f)
+		{
+			m_bSuperArmor = true;
+
+			// 약간 앞으로 전진
+			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+			XMVECTOR deltaVelocity = l * 1;
+			XMFLOAT3 xmf3DeltaVelocity;
+			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+			m_pBody->AddVelocity(xmf3DeltaVelocity);
+
+		}
+		else if (trackRate > 0.5f && trackRate < 0.6f)
+		{
+			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
+		}
+
+		if (trackRate < 0.4f)
+		{
+			RotateToPlayer();
+		}
+		else if (trackRate > 0.6f)
+		{
+			m_bSuperArmor = false;
+		}
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.9f, 10.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+	break;
+	case Monster::Monster_State_Attack3:
+		break;
+	case Monster::Monster_State_Hit:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.5f, 2.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+	break;
+	case Monster::Monster_State_Death:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+
+		m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			m_bDestroying = true;
+		}
+	}
+	break;
+	case Monster::Monster_State_Special1:
+		break;
+	case Monster::Monster_State_Special2:
+		break;
+	case Monster::Monster_State_Special3:
+		break;
+	default:
+		break;
+	}
+}
+
+void Ghoul::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+{
+	UINT hitAnimIdx = Ghoul_Anim_Index_Death;
+	UINT deathAnimIdx = Ghoul_Anim_Index_Death;
+
+	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
+}
+
+void Ghoul::StateAction(float elapsedTime)
+{
+	switch (m_State)
+	{
+	case Monster_State_Idle:
+		Patrol();
+		if (m_bFindPlayer) m_State = Monster_State_Trace;
+		break;
+	case Monster_State_Trace:
+		Trace();
+		break;
+	default:
+		break;
+	}
+}
+
+void Ghoul::Trace()
+{
+	Monster::Trace();
+
+	XMFLOAT3 xmf3TargetPosition = g_pPlayer->GetPosition();
+	xmf3TargetPosition.y = 0;
+	XMVECTOR targetPosition = XMLoadFloat3(&xmf3TargetPosition);
+
+	XMFLOAT3 xmf3MyPosition = m_xmf3Position;
+	xmf3MyPosition.y = 0;
+	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
+	XMVECTOR accelDir = targetPosition - myPosition;
+	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.1f)
+	{
+		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+		xmf3Accel.x = 0;
+		xmf3Accel.z = 0;
+		m_pBody->SetAcceleration(xmf3Accel);
+
+		Attack1();
+		return;
+	}
+}
+
+void Ghoul::Attack1()
+{
+	XMVECTOR playerPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
+	XMVECTOR myPosition = XMLoadFloat3(&m_xmf3Position);
+	if (XMVectorGetX(XMVector3Length(myPosition - playerPosition)) > m_AttackRange * 3)
+	{
+		m_State = Monster_State_Trace;
+		return;
+	}
+
+	switch (m_State)
+	{
+		//case Monster_State_Idle:
+		//	break;
+	case Monster_State_Attack1:
+		break;
+	default:
+	{
+		int attackAnimIdx = rand() % 2;
+
+		UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+		m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+		m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
+
+		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Ghoul_Anim_Index_Attack1 + attackAnimIdx);
+
+		switch (attackAnimIdx)
+		{
+		case 0:
+			m_State = MonsterState::Monster_State_Attack1;
+			break;
+
+		case 1:
+			m_State = MonsterState::Monster_State_Attack2;
+			break;
+		}
+	}
+	break;
+	}
+}
+
+/////////////////////////////
+// 사이버 트윈스
+/////////////////////////////
+CyberTwins::CyberTwins(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+{
+	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+}
+
+CyberTwins::~CyberTwins()
+{
+	Destroy();
+}
+
+bool CyberTwins::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+{
+	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	InitAnimationTrack(1.5f);
+
+	// 애니메이션 트랙 초기화
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_IDLE_TRACK, CyberTwins_Anim_Index_Idle);
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_MOVE_TRACK, CyberTwins_Anim_Index_Run);
+
+	// 파괴 타이머 초기화
+	m_DestroyTime = 5.0f;
+	m_DissolveTime = 0.0f;
+
+	// 공격력 및 반경 초기화
+	m_AttackDamage = 10.0f;
+	m_AttackRange = 27.0f;
+	m_AttackRadius = 10.0f;
+
+	// 체력 초기화
+	m_MaxHP = 500.0f;
+	m_HP = 500.0f;
+
+	// 
+	m_DefaultAccel = 500.0f;
+	m_DefaultMaxSpeedXZ = 100.0f;
+
+	return true;
+}
+
+void CyberTwins::UpdateAnimationTrack(float elapsedTime)
+{
+	switch (m_State)
+	{
+	case Monster::Monster_State_Idle:
+	case Monster::Monster_State_Trace:
+		BlendWithIdleMovement(1);
+		break;
+	case Monster::Monster_State_Attack1:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+		// 공격 판정
+		if (trackRate > 0.5f && trackRate < 0.6f)
+		{
+			m_bSuperArmor = true;
+
+			// 약간 앞으로 전진
+			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+			XMVECTOR deltaVelocity = l * 3;
+			XMFLOAT3 xmf3DeltaVelocity;
+			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+			m_pBody->AddVelocity(xmf3DeltaVelocity);
+			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
+		}
+
+
+		if (trackRate < 0.4f)
+		{
+			RotateToPlayer();
+		}
+		else if (trackRate > 0.8f)
+		{
+			m_bSuperArmor = false;
+		}
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.9f, 10.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+	break;
+	case Monster::Monster_State_Attack2:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+		// 공격 판정
+		if (trackRate > 0.4f && trackRate < 0.5f)
+		{
+			m_bSuperArmor = true;
+
+			// 약간 앞으로 전진
+			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+			XMVECTOR deltaVelocity = l * 1;
+			XMFLOAT3 xmf3DeltaVelocity;
+			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+			m_pBody->AddVelocity(xmf3DeltaVelocity);
+
+		}
+		else if (trackRate > 0.5f && trackRate < 0.6f)
+		{
+			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
+		}
+
+		if (trackRate < 0.4f)
+		{
+			RotateToPlayer();
+		}
+		else if (trackRate > 0.6f)
+		{
+			m_bSuperArmor = false;
+		}
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.9f, 10.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+	break;
+	case Monster::Monster_State_Attack3:
+		break;
+	case Monster::Monster_State_Hit:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.5f, 2.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+	break;
+	case Monster::Monster_State_Death:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+
+		m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			m_bDestroying = true;
+		}
+	}
+	break;
+	case Monster::Monster_State_Special1:
+		break;
+	case Monster::Monster_State_Special2:
+		break;
+	case Monster::Monster_State_Special3:
+		break;
+	default:
+		break;
+	}
+}
+
+void CyberTwins::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+{
+	UINT hitAnimIdx = CyberTwins_Anim_Index_Death;
+	UINT deathAnimIdx = CyberTwins_Anim_Index_Death;
+
+	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
+}
+
+void CyberTwins::StateAction(float elapsedTime)
+{
+	switch (m_State)
+	{
+	case Monster_State_Idle:
+		Patrol();
+		if (m_bFindPlayer) m_State = Monster_State_Trace;
+		break;
+	case Monster_State_Trace:
+		Trace();
+		break;
+	default:
+		break;
+	}
+}
+
+void CyberTwins::Trace()
+{
+	Monster::Trace();
+
+	XMFLOAT3 xmf3TargetPosition = g_pPlayer->GetPosition();
+	xmf3TargetPosition.y = 0;
+	XMVECTOR targetPosition = XMLoadFloat3(&xmf3TargetPosition);
+
+	XMFLOAT3 xmf3MyPosition = m_xmf3Position;
+	xmf3MyPosition.y = 0;
+	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
+	XMVECTOR accelDir = targetPosition - myPosition;
+	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.1f)
+	{
+		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+		xmf3Accel.x = 0;
+		xmf3Accel.z = 0;
+		m_pBody->SetAcceleration(xmf3Accel);
+
+		Attack1();
+		return;
+	}
+}
+
+void CyberTwins::Attack1()
+{
+	XMVECTOR playerPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
+	XMVECTOR myPosition = XMLoadFloat3(&m_xmf3Position);
+	if (XMVectorGetX(XMVector3Length(myPosition - playerPosition)) > m_AttackRange * 3)
+	{
+		m_State = Monster_State_Trace;
+		return;
+	}
+
+	switch (m_State)
+	{
+		//case Monster_State_Idle:
+		//	break;
+	case Monster_State_Attack1:
+		break;
+	default:
+	{
+		//int attackAnimIdx = rand() % 2;
+		int attackAnimIdx = 0;
+
+		UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+		m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+		m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
+
+		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, CyberTwins_Anim_Index_Attack1 + attackAnimIdx);
+
+		switch (attackAnimIdx)
+		{
+		case 0:
+			m_State = MonsterState::Monster_State_Attack1;
+			break;
+
+		case 1:
+			m_State = MonsterState::Monster_State_Attack2;
+			break;
+		}
+	}
+	break;
+	}
+}
+
+/////////////////////////////
+// 강령 술사
+/////////////////////////////
+Necromancer::Necromancer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+{
+	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+}
+
+Necromancer::~Necromancer()
+{
+	Destroy();
+}
+
+bool Necromancer::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
+{
+	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	InitAnimationTrack(3.0f);
+	int idleAnimIdx = rand() % 2;
+
+	// 애니메이션 트랙 초기화
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_IDLE_TRACK, Necromancer_Anim_Index_Idle1 + idleAnimIdx);
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_MOVE_TRACK, Necromancer_Anim_Index_Walk);
+
+	// 파괴 타이머 초기화
+	m_DestroyTime = 5.0f;
+	m_DissolveTime = 0.0f;
+
+	// 공격력 및 반경 초기화
+	m_AttackDamage = 10.0f;
+	m_AttackRange = 27.0f;
+	m_AttackRadius = 10.0f;
+
+	// 체력 초기화
+	m_MaxHP = 500.0f;
+	m_HP = 500.0f;
+
+	// 
+	m_DefaultAccel = 500.0f;
+	m_DefaultMaxSpeedXZ = 50.0f;
+
+	m_bSuperArmor = true;
+
+	return true;
+}
+
+void Necromancer::UpdateAnimationTrack(float elapsedTime)
+{
+	switch (m_State)
+	{
+	case Monster::Monster_State_Idle:
+	case Monster::Monster_State_Trace:
+		BlendWithIdleMovement(1);
+		break;
+	case Monster::Monster_State_Attack1:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+		// 공격 판정
+		if (trackRate > 0.4f && trackRate < 0.5f)
+		{
+			// 약간 앞으로 전진
+			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+			XMVECTOR deltaVelocity = l * 3;
+			XMFLOAT3 xmf3DeltaVelocity;
+			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+			m_pBody->AddVelocity(xmf3DeltaVelocity);
+			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
+		}
+
+
+		if (trackRate < 0.65f)
+		{
+			RotateToPlayer();
+		}
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.9f, 10.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+	break;
+	case Monster::Monster_State_Attack2:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+		// 공격 판정
+		if (trackRate > 0.4f && trackRate < 0.5f)
+		{
+			// 약간 앞으로 전진
+			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+			XMVECTOR deltaVelocity = l * 1;
+			XMFLOAT3 xmf3DeltaVelocity;
+			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+			m_pBody->AddVelocity(xmf3DeltaVelocity);
+
+		}
+		else if (trackRate > 0.5f && trackRate < 0.6f)
+		{
+			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
+		}
+
+		if (trackRate < 0.4f)
+		{
+			RotateToPlayer();
+		}
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.9f, 10.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+	break;
+	case Monster::Monster_State_Attack3:
+		break;
+	case Monster::Monster_State_Hit:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.5f, 2.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
+	break;
+	case Monster::Monster_State_Death:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+
+		m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			m_bDestroying = true;
+		}
+	}
+	break;
+	case Monster::Monster_State_Special1:
+		break;
+	case Monster::Monster_State_Special2:
+		break;
+	case Monster::Monster_State_Special3:
+		break;
+	default:
+		break;
+	}
+}
+
+void Necromancer::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+{
+	UINT hitAnimIdx = Necromancer_Anim_Index_Hit;
+	UINT deathAnimIdx = Necromancer_Anim_Index_Death;
+
+	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
+}
+																		
+void Necromancer::StateAction(float elapsedTime)
+{
+	switch (m_State)
+	{
+	case Monster_State_Idle:
+		Patrol();
+		if (m_bFindPlayer) m_State = Monster_State_Trace;
+		break;
+	case Monster_State_Trace:
+		Trace();
+		break;
+	default:
+		break;
+	}
+}
+
+void Necromancer::Trace()
+{
+	Monster::Trace();
+
+	XMFLOAT3 xmf3TargetPosition = g_pPlayer->GetPosition();
+	xmf3TargetPosition.y = 0;
+	XMVECTOR targetPosition = XMLoadFloat3(&xmf3TargetPosition);
+
+	XMFLOAT3 xmf3MyPosition = m_xmf3Position;
+	xmf3MyPosition.y = 0;
+	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
+	XMVECTOR accelDir = targetPosition - myPosition;
+	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.1f)
+	{
+		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+		xmf3Accel.x = 0;
+		xmf3Accel.z = 0;
+		m_pBody->SetAcceleration(xmf3Accel);
+
+		Attack1();
+		return;
+	}
+}
+
+void Necromancer::Attack1()
+{
+	XMVECTOR playerPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
+	XMVECTOR myPosition = XMLoadFloat3(&m_xmf3Position);
+	if (XMVectorGetX(XMVector3Length(myPosition - playerPosition)) > m_AttackRange * 3)
+	{
+		m_State = Monster_State_Trace;
+		return;
+	}
+
+	switch (m_State)
+	{
+		//case Monster_State_Idle:
+		//	break;
+	case Monster_State_Attack1:
+		break;
+	default:
+	{
+		//int attackAnimIdx = rand() % 2;
+		int attackAnimIdx = 0;
+
+		UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+		m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+		m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
+
+		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Necromancer_Anim_Index_Attack1 + attackAnimIdx);
+
+		switch (attackAnimIdx)
+		{
+		case 0:
+			m_State = MonsterState::Monster_State_Attack1;
+			break;
+
+		case 1:
+			m_State = MonsterState::Monster_State_Attack2;
+			break;
+		}
+	}
+	break;
 	}
 }

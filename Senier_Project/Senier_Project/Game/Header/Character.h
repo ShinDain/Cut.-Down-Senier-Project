@@ -55,6 +55,7 @@ public:
 protected:
 	float m_DefaultAccel = 500.f;
 	float m_DefaultMaxSpeedXZ = 100.f;
+	float m_DefaultFriction = 350.0f;
 
 	float m_AnimationSpeed = 1.0f;
 

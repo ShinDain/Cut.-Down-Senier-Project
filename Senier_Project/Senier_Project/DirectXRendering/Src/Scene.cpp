@@ -48,11 +48,12 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
 	// 몬스터 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CYBER_TWINS_MODEL_NAME, MONSTER_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GHOUL_MODEL_NAME, MONSTER_TRACK_CNT);	
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(60, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), GHOUL_MODEL_NAME, MONSTER_TRACK_CNT);	
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), CYBER_TWINS_MODEL_NAME, MONSTER_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(60, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
 	
 	// 월드 오브젝트 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
@@ -928,22 +929,26 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 			std::shared_ptr<HighZombie> pMonster = std::make_shared<HighZombie>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 			pObject = std::static_pointer_cast<Object>(pMonster);
 		}
-		//else if (!strcmp(pstrFileName, SCAVENGER_MODEL_NAME))
-		//{
-		//
-		//}
-		//else if (!strcmp(pstrFileName, CYBER_TWINS_MODEL_NAME))
-		//{
-		//
-		//}
-		//else if (!strcmp(pstrFileName, GHOUL_MODEL_NAME))
-		//{
-		//
-		//}
-		//else if (!strcmp(pstrFileName, NECROMANCER_MODEL_NAME))
-		//{
-		//
-		//}
+		else if (!strcmp(pstrFileName, SCAVENGER_MODEL_NAME))
+		{
+			std::shared_ptr<Scavenger> pMonster = std::make_shared<Scavenger>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+			pObject = std::static_pointer_cast<Object>(pMonster);
+		}
+		else if (!strcmp(pstrFileName, GHOUL_MODEL_NAME))
+		{
+			std::shared_ptr<Ghoul> pMonster = std::make_shared<Ghoul>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+			pObject = std::static_pointer_cast<Object>(pMonster);
+		}
+		else if (!strcmp(pstrFileName, CYBER_TWINS_MODEL_NAME))
+		{
+			std::shared_ptr<CyberTwins> pMonster = std::make_shared<CyberTwins>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+			pObject = std::static_pointer_cast<Object>(pMonster);
+		}
+		else if (!strcmp(pstrFileName, NECROMANCER_MODEL_NAME))
+		{
+			std::shared_ptr<Necromancer> pMonster = std::make_shared<Necromancer>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+			pObject = std::static_pointer_cast<Object>(pMonster);
+		}
 		else
 		{
 			// 스킨 메시 애니메이션 테스트용

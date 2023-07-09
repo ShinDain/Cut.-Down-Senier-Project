@@ -187,7 +187,7 @@ void Character::IsFalling()
 
 		m_bIsFalling = true;
 		if(m_bIsShoulderView)
-			m_CharacterFriction = 350.0f;
+			m_CharacterFriction = m_DefaultFriction;
 		else
 			m_CharacterFriction = 30.0f;
 		m_Acceleration = 100.f;
@@ -199,7 +199,7 @@ void Character::DoLanding()
 {
 	m_bIsFalling = false; 
 	m_MaxSpeedXZ = m_DefaultMaxSpeedXZ;
-	m_CharacterFriction = 350.0f;
+	m_CharacterFriction = m_DefaultFriction;
 	m_Acceleration = m_DefaultAccel;
 	m_pBody->SetInGravity(false);
 
@@ -263,7 +263,6 @@ void Character::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 
 	// 체력 감소
 	m_HP -= power;
-
 
 	XMVECTOR damageDirection = XMLoadFloat3(&xmf3DamageDirection);
 	damageDirection = XMVector3Normalize(damageDirection);
@@ -425,6 +424,7 @@ bool AnimTestCharacter::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_pAnimationController->SetTrackEnable(1, true);
 	m_pAnimationController->SetTrackEnable(2, false);
 	m_pAnimationController->SetTrackEnable(3, false);
+	m_pAnimationController->SetTrackEnable(4, false);
 	m_pAnimationController->SetTrackAnimationSet(0, m_tmpAnimationIdx);
 	m_pAnimationController->SetTrackAnimationSet(1, m_tmpAnimationIdx);
 

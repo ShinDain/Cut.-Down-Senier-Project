@@ -183,8 +183,9 @@ void Object::UpdateToRigidBody(float elapsedTime)
 		if (m_pCollider)
 			m_pCollider->UpdateWorldTransform();
 		m_xmf3Position = m_pBody->GetPosition();
-		m_xmf4Orientation = m_pBody->GetOrientation();
-		m_xmf3Rotation = m_pBody->GetRotate();
+		
+		SetOrientation(m_pBody->GetOrientation());
+		SetObjectRotation(m_pBody->GetRotate());
 		m_xmf3Scale = m_pBody->GetScale();
 	}
 	else
@@ -883,4 +884,17 @@ void Object::SetRotate(const XMFLOAT3& Rotate)
 	XMStoreFloat3(&m_xmf3Right, XMVector3TransformNormal(r, xmmatRotate));
 
 	m_pBody->SetRotate(Rotate);
+}
+
+void Object::SetObjectRotation(const XMFLOAT3& xmf3Rotation)
+{
+	SetRotate(xmf3Rotation.x, xmf3Rotation.y, xmf3Rotation.z);
+
+	XMMATRIX xmmatRotate = XMMatrixRotationY(XMConvertToRadians(xmf3Rotation.y));
+	XMVECTOR l = XMVectorSet(0, 0, 1, 0);
+	XMVECTOR r = XMVectorSet(1, 0, 0, 0);
+
+	XMStoreFloat3(&m_xmf3Look, XMVector3TransformNormal(l, xmmatRotate));
+	XMStoreFloat3(&m_xmf3Right, XMVector3TransformNormal(r, xmmatRotate));
+
 }
