@@ -1,6 +1,7 @@
 #include "../Header/CollisionDetact.h"
 
 #define OBJECT_CRASH_LENGTH -65
+#define OBJECT_CRASH_POWER 1000
 
 float TransformToAxis(const ColliderBox& box, FXMVECTOR direction)
 {
@@ -122,8 +123,16 @@ void fillPointFaceBoxBox(
 
 	if (pCharacter != nullptr && pBody2)
 	{
-		float fallingSpeed = pBody2->GetVelocity().y;
-		if (!pBody2->GetIsCharacter() && fallingSpeed < OBJECT_CRASH_LENGTH)
+		//float fallingSpeed = pBody2->GetVelocity().y;
+			//if (!pBody2->GetIsCharacter() && fallingSpeed < OBJECT_CRASH_LENGTH)
+			//	pCharacter->CrashWithObject(depth, xmf3ContactNormal);
+
+		XMFLOAT3 xmf3ObjVelocity = pBody2->GetVelocity();
+		XMVECTOR objPower = XMLoadFloat3(&xmf3ObjVelocity);
+		objPower *= pBody2->GetMass();
+		float power = XMVectorGetX(XMVector3Length(objPower));
+
+		if (!pBody2->GetIsCharacter() && power > OBJECT_CRASH_POWER)
 			pCharacter->CrashWithObject(depth, xmf3ContactNormal);
 	}
 
@@ -466,8 +475,16 @@ int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box
 		// 캐릭터가 물체와 충돌
 		if (pCharacter != nullptr && pBody2)
 		{
-			float fallingSpeed = pBody2->GetVelocity().y;
-			if (!pBody2->GetIsCharacter() && fallingSpeed < OBJECT_CRASH_LENGTH)
+			//float fallingSpeed = pBody2->GetVelocity().y;
+			//if (!pBody2->GetIsCharacter() && fallingSpeed < OBJECT_CRASH_LENGTH)
+			//	pCharacter->CrashWithObject(pen, xmf3ContactNormal);
+
+			XMFLOAT3 xmf3ObjVelocity = pBody2->GetVelocity();
+			XMVECTOR objPower = XMLoadFloat3(&xmf3ObjVelocity);
+			objPower *= pBody2->GetMass();
+			float power = XMVectorGetX(XMVector3Length(objPower));
+
+			if (!pBody2->GetIsCharacter() && power > OBJECT_CRASH_POWER)
 				pCharacter->CrashWithObject(pen, xmf3ContactNormal);
 		}
 

@@ -68,7 +68,6 @@ void RigidBody::Update(float elapsedTime)
 				m_xmf3Velocity.x = 0;
 				m_xmf3Velocity.z = 0;
 			}
-			
 		}
 	}
 

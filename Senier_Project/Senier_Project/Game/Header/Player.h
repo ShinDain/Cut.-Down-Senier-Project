@@ -134,11 +134,19 @@ protected:
 
 	void ObjectGrab();
 	void UpdateGrabedObjectPosition(float elapsedTime);
+	std::shared_ptr<Object> CameraRayToMovableObject(bool bCharacter, float& outDistance);
 
 	std::shared_ptr<Object> m_pGrabedObject = nullptr;
 	GrabState m_GrabState = GrabState::Grab_Empty;
+	float m_GrappleTime = 10.0f;
+	float m_ElapsedGrappleTime = 0.0f;
 
-	XMFLOAT3 m_xmf3GrabOffsetPosition = XMFLOAT3(15, 10, 3);
+	float m_GrapNoiseRight = 0.0f;
+	float m_GrapNoiseUp = 0.0f;
+
+	XMFLOAT3 m_xmf3GrabedObjectStartPosition = XMFLOAT3(0, 0, 0);
+
+	XMFLOAT3 m_xmf3GrabOffsetPosition = XMFLOAT3(10, 10, 4);
 	
 public:
 	std::shared_ptr<Weapon> GetWeapon() { return m_pWeapon; }

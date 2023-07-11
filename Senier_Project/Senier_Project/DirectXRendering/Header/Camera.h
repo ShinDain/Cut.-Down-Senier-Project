@@ -126,7 +126,7 @@ protected:
 	bool m_bShoulderView = false;
 
 	float m_MaxPitch = 40;
-	float m_MinPitch = -10;
+	float m_MinPitch = -35;
 
 	float m_MaxShoulderPitch = 40;
 	float m_MinShoulderPitch = -45;
