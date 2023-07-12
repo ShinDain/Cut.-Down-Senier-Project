@@ -413,7 +413,7 @@ void Player::ThrowProjectile()
 
 	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
 	XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
-
+	
 	if (m_pGrabedObject)
 	{
 		XMFLOAT3 xmf3ProjectilePos = m_pGrabedObject->GetPosition();
@@ -439,6 +439,7 @@ void Player::ThrowProjectile()
 		XMStoreFloat3(&xmf3ProjectileVelocity, projectileVelocity);
 
 		// 물체의 속도를 플레이어 전방으로 발사
+		m_pGrabedObject->GetBody()->SetAngularVelocity(XMFLOAT3(0, 0, 0));
 		m_pGrabedObject->GetBody()->SetVelocity(xmf3ProjectileVelocity);
 
 		// Grab 상태 초기화

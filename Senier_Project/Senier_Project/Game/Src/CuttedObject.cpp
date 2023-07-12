@@ -112,7 +112,49 @@ void CuttedObject::Update(float elapsedTime)
 
 void CuttedObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 {
-	Object::UpdateTransform(NULL);
+	//Object::UpdateTransform(NULL);
+
+	// Animate 후에 호출되어 Bone 행렬을 갱신
+	// 
+	if (pxmf4x4Parent)
+	{
+		XMStoreFloat4x4(&m_xmf4x4World, XMMatrixMultiply(XMLoadFloat4x4(&m_xmf4x4LocalTransform), XMLoadFloat4x4(pxmf4x4Parent)));
+	}
+	else
+	{
+		// RootObject인 경우
+		m_xmf4x4LocalTransform = MathHelper::identity4x4();
+		XMMATRIX world = XMMatrixIdentity();
+		XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
+		XMMATRIX xmmatOrientation = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
+		XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotation.x), XMConvertToRadians(m_xmf3Rotation.y), XMConvertToRadians(m_xmf3Rotation.z));
+		XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
+		// S * R * T
+		xmmatRotate = XMMatrixMultiply(xmmatRotate, xmmatOrientation);
+		//world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatOrientation, xmmatTranslate));
+		world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate));
+
+		XMMATRIX offset = XMMatrixTranslation(-m_xmf3RenderOffsetPosition.x, -m_xmf3RenderOffsetPosition.y, -m_xmf3RenderOffsetPosition.z);
+		XMMATRIX offsetRotate = XMMatrixRotationRollPitchYaw(m_xmf3RenderOffsetRotation.x, m_xmf3RenderOffsetRotation.y, m_xmf3RenderOffsetRotation.z);
+		world = XMMatrixMultiply(XMMatrixMultiply(offsetRotate, offset), world);
+		XMStoreFloat4x4(&m_xmf4x4LocalTransform, world);
+
+		m_xmf4x4World = m_xmf4x4LocalTransform;
+
+		m_xmf3RenderPosition = XMFLOAT3(0, 0, 0);
+		XMVECTOR renderPosition = XMLoadFloat3(&m_xmf3RenderPosition);
+		renderPosition = XMVector3TransformCoord(renderPosition, world);
+		XMStoreFloat3(&m_xmf3RenderPosition, renderPosition);
+	}
+
+	if (m_pCollider) m_pCollider->UpdateWorldTransform();
+
+	if (m_pSibling) {
+		m_pSibling->UpdateTransform(pxmf4x4Parent);
+	}
+	if (m_pChild) {
+		m_pChild->UpdateTransform(&m_xmf4x4World);
+	}
 }
 
 void CuttedObject::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)

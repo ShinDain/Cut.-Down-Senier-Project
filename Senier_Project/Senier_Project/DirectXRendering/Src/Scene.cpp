@@ -49,20 +49,20 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
 
 	// 몬스터 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), GHOUL_MODEL_NAME, MONSTER_TRACK_CNT);	
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), CYBER_TWINS_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(60, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
 	
 	// 월드 오브젝트 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 15, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 15, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	
 	// 아이템 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
@@ -524,9 +524,9 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->GetIsAlive())
 			continue;
 		// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
-		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Animate(0.0f);
-		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->m_pAnimationController)
-			m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->UpdateTransform(NULL);
+		//m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Animate(0.0f);
+		//if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->m_pAnimationController)
+		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->UpdateTransform(NULL);
 		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Render(elapsedTime, pd3dCommandList);
 	}
 
@@ -1065,15 +1065,18 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 	Object* pObject, float direction, XMFLOAT3 xmf3PlaneNormal, bool bIsCutted)
 {
-	float cuttingPower = rand() % 20 + 5; 
-	XMFLOAT3 noiseDir;
-	noiseDir.x = (float)(rand() % 30) / 100 * (1 - xmf3PlaneNormal.x);
-	noiseDir.y = (float)(rand() % 30) / 100 * (1 - xmf3PlaneNormal.y);
-	noiseDir.z = (float)(rand() % 30) / 100 * (1 - xmf3PlaneNormal.z);
+	float cuttingPower = rand() % 30 + 40; 
+	
+	XMVECTOR noiseDir = XMLoadFloat3(&xmf3PlaneNormal);
+	noiseDir *= -1 * (float)(rand() % 30) / 100;
 	
 	float directions[3] = {0,0,0};
 	XMFLOAT3 xmf3PlaneNormals[3] = { XMFLOAT3(0,0,0), XMFLOAT3(0,0,0), XMFLOAT3(0,0,0) };
 	UINT planeCnt = 0;
+
+	XMVECTOR angularVel = XMLoadFloat3(&pObject->GetLookVector());
+	angularVel *= direction;
+
 
 	if (bIsCutted)
 	{
@@ -1093,11 +1096,18 @@ std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D
 		pCuttedObj->AddPlane(direction, xmf3PlaneNormal);
 
 
-		XMFLOAT3 xmf3CuttingVel = xmf3PlaneNormal;
-		xmf3CuttingVel.x *= cuttingPower * direction * -1 + noiseDir.x;
-		xmf3CuttingVel.y *= cuttingPower * direction * -1 + noiseDir.y;
-		xmf3CuttingVel.z *= cuttingPower * direction * -1 + noiseDir.z;
+		XMVECTOR cuttingVel = XMLoadFloat3(&xmf3PlaneNormal);
+		cuttingVel += noiseDir;
+		cuttingVel *= cuttingPower * direction * -1;
+		XMFLOAT3 xmf3CuttingVel;
+		XMStoreFloat3(&xmf3CuttingVel, cuttingVel);
 		pCuttedObj->GetBody()->AddVelocity(xmf3CuttingVel);
+
+		XMVECTOR inverseAngularVel = angularVel;
+		inverseAngularVel *= -1;
+		XMFLOAT3 xmf3InverseAngularVel;
+		XMStoreFloat3(&xmf3InverseAngularVel, inverseAngularVel);
+		pCuttedObj->GetBody()->AddAngleVelocity(xmf3InverseAngularVel);
 	}
 	else
 	{
@@ -1204,11 +1214,16 @@ std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D
 	break;
 	}
 
-	XMFLOAT3 xmf3CuttingVel = xmf3PlaneNormal;
-	xmf3CuttingVel.x *= cuttingPower * direction + noiseDir.x;
-	xmf3CuttingVel.y *= cuttingPower * direction + noiseDir.y;
-	xmf3CuttingVel.z *= cuttingPower * direction + noiseDir.z;
+	XMVECTOR cuttingVel = XMLoadFloat3(&xmf3PlaneNormal);
+	cuttingVel += noiseDir;
+	cuttingVel *= cuttingPower * direction;
+	XMFLOAT3 xmf3CuttingVel;
+	XMStoreFloat3(&xmf3CuttingVel, cuttingVel);
 	tmpObject->GetBody()->AddVelocity(xmf3CuttingVel);
+
+	XMFLOAT3 xmf3Angularvel;
+	XMStoreFloat3(&xmf3Angularvel, angularVel);
+	tmpObject->GetBody()->AddAngleVelocity(xmf3Angularvel);
 
 	return tmpObject;
 }

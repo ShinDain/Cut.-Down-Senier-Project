@@ -183,7 +183,6 @@ void Object::UpdateToRigidBody(float elapsedTime)
 		if (m_pCollider)
 			m_pCollider->UpdateWorldTransform();
 		m_xmf3Position = m_pBody->GetPosition();
-		
 		SetOrientation(m_pBody->GetOrientation());
 		SetObjectRotation(m_pBody->GetRotate());
 		m_xmf3Scale = m_pBody->GetScale();

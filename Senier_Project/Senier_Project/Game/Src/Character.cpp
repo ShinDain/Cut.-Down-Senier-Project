@@ -276,12 +276,15 @@ void Character::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 
 void Character::Cutting(XMFLOAT3 xmf3PlaneNormal)
 {
-	XMVECTOR orientation = XMQuaternionRotationRollPitchYaw(m_xmf3Rotation.x, m_xmf3Rotation.y, m_xmf3Rotation.z);
-	XMStoreFloat4(&m_xmf4Orientation, orientation);
+	//XMVECTOR orientation = XMQuaternionRotationRollPitchYaw(m_xmf3Rotation.x, m_xmf3Rotation.y, m_xmf3Rotation.z);
+	//XMStoreFloat4(&m_xmf4Orientation, orientation);
 
 	m_bIsAlive = false;
-	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, 1, xmf3PlaneNormal, false);
-	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, -1, xmf3PlaneNormal, false);
+	std::shared_ptr<Object> tmp1 = Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, 1, xmf3PlaneNormal, false);
+	std::shared_ptr<Object> tmp2 = Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, -1, xmf3PlaneNormal, false);
+
+	tmp1->GetCollider()->SetIsActive(false);
+	tmp2->GetCollider()->SetIsActive(false);
 }
 
 void Character::BlendWithIdleMovement(float maxWeight)
