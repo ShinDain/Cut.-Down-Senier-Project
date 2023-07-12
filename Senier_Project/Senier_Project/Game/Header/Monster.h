@@ -24,6 +24,7 @@ public:
 	}
 
 	virtual void InitAnimationTrack(float animationSpeed);
+	void initializeState();
 
 	virtual void Update(float elapsedTime);
 	virtual void UpdateAnimationTrack(float elapsedTime);
@@ -208,6 +209,13 @@ public:
 	virtual void Trace();
 
 	virtual void Attack1();
+
+private:
+	UINT m_nAttackCnt = 1;
+	UINT m_nRushNum = 2;
+	bool m_bRush = false;
+
+	XMFLOAT3 m_xmf3RushTargetPosition = XMFLOAT3(0, 0, 0);
 
 };
 
