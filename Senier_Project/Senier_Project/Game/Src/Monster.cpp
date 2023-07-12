@@ -1056,8 +1056,8 @@ bool Ghoul::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_HP = 300.0f;
 
 	// 
-	m_DefaultAccel = 500.0f;
-	m_DefaultMaxSpeedXZ = 100.0f;
+	m_DefaultAccel = 800.0f;
+	m_DefaultMaxSpeedXZ = 200.0f;
 
 	return true;
 }
@@ -1067,10 +1067,27 @@ void Ghoul::Animate(float elapsedTime)
 	float eTime = elapsedTime;
 
 	// 쳐다보고 있는 동안 멈춘 상태로
-	//if (m_bVisible)
-	//{
-	//	eTime = 0.0f;
-	//}
+	switch (m_State)
+	{
+	case Monster::Monster_State_Idle:
+	case Monster::Monster_State_Trace:
+	case Monster::Monster_State_Special1:
+	case Monster::Monster_State_Special2:
+	case Monster::Monster_State_Special3:
+	case Monster::Monster_State_Hit:
+		if (m_bVisible)
+		{
+			eTime = 0.0f;
+		}
+		break;
+
+	case Monster::Monster_State_Attack1:
+	case Monster::Monster_State_Attack2:
+	case Monster::Monster_State_Attack3:
+	case Monster::Monster_State_Death:
+	default:
+		break;
+	}
 
 	if (m_pAnimationController)
 		m_pAnimationController->AdvanceTime(eTime, this);
@@ -1081,19 +1098,6 @@ void Ghoul::Animate(float elapsedTime)
 
 void Ghoul::UpdateAnimationTrack(float elapsedTime)
 {
-	//if (m_bVisible)
-	//{
-	//	//m_AnimationSpeed = 0;
-	//	m_DefaultMaxSpeedXZ = 100.0f;
-	//	m_DefaultAccel = 0.0f;
-	//}
-	//else
-	//{
-	//	//m_AnimationSpeed = 1;
-	//	m_DefaultMaxSpeedXZ = 100.0f;
-	//	m_DefaultAccel = 500.0f;
-	//}
-
 	switch (m_State)
 	{
 	case Monster::Monster_State_Idle:
@@ -1110,7 +1114,7 @@ void Ghoul::UpdateAnimationTrack(float elapsedTime)
 
 			// 약간 앞으로 전진
 			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-			XMVECTOR deltaVelocity = l * 3;
+			XMVECTOR deltaVelocity = l * 7;
 			XMFLOAT3 xmf3DeltaVelocity;
 			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 			m_pBody->AddVelocity(xmf3DeltaVelocity);
@@ -1161,7 +1165,7 @@ void Ghoul::UpdateAnimationTrack(float elapsedTime)
 
 			// 약간 앞으로 전진
 			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-			XMVECTOR deltaVelocity = l * 1;
+			XMVECTOR deltaVelocity = l * 7;
 			XMFLOAT3 xmf3DeltaVelocity;
 			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 			m_pBody->AddVelocity(xmf3DeltaVelocity);
@@ -1265,7 +1269,8 @@ void Ghoul::StateAction(float elapsedTime)
 
 void Ghoul::Trace()
 {
-	Monster::Trace();
+	if (!m_bVisible)
+		Monster::Trace();
 
 	XMFLOAT3 xmf3TargetPosition = g_pPlayer->GetPosition();
 	xmf3TargetPosition.y = 0;
@@ -1275,15 +1280,21 @@ void Ghoul::Trace()
 	xmf3MyPosition.y = 0;
 	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
 	XMVECTOR accelDir = targetPosition - myPosition;
-	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.1f)
-	{
-		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
-		xmf3Accel.x = 0;
-		xmf3Accel.z = 0;
-		m_pBody->SetAcceleration(xmf3Accel);
 
-		Attack1();
-		return;
+
+	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.5f)
+	{
+		accelDir = XMVector3Normalize(accelDir);
+		XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+		if(XMVectorGetX(XMVector3Dot(accelDir, look)) > 0)
+		{ 
+			XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+			xmf3Accel.x = 0;
+			xmf3Accel.z = 0;
+			m_pBody->SetAcceleration(xmf3Accel);
+
+			Attack1();
+		}
 	}
 }
 
@@ -1416,51 +1427,13 @@ void CyberTwins::UpdateAnimationTrack(float elapsedTime)
 		{
 			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 			m_State = MonsterState::Monster_State_Idle;
+
+			// 다음 패턴 
+			m_nPattern = rand() % 3;
 		}
 	}
 	break;
 	case Monster::Monster_State_Attack2:
-	{
-		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
-		// 공격 판정
-		if (trackRate > 0.4f && trackRate < 0.5f)
-		{
-			m_bSuperArmor = true;
-
-			// 약간 앞으로 전진
-			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-			XMVECTOR deltaVelocity = l * 1;
-			XMFLOAT3 xmf3DeltaVelocity;
-			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
-			m_pBody->AddVelocity(xmf3DeltaVelocity);
-
-		}
-		else if (trackRate > 0.5f && trackRate < 0.6f)
-		{
-			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
-		}
-
-		if (trackRate < 0.4f)
-		{
-			RotateToPlayer();
-		}
-		else if (trackRate > 0.6f)
-		{
-			m_bSuperArmor = false;
-		}
-
-		// 시작 블랜딩
-		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
-		// 종료 블랜딩
-		BlendAnimationToIdle(trackRate, 0.9f, 10.0f, MONSTER_ONCE_TRACK_1);
-
-		// 종료
-		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
-		{
-			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
-			m_State = MonsterState::Monster_State_Idle;
-		}
-	}
 	break;
 	case Monster::Monster_State_Attack3:
 		break;
@@ -1543,16 +1516,30 @@ void CyberTwins::Trace()
 	xmf3MyPosition.y = 0;
 	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
 	XMVECTOR accelDir = targetPosition - myPosition;
-	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.1f)
-	{
-		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
-		xmf3Accel.x = 0;
-		xmf3Accel.z = 0;
-		m_pBody->SetAcceleration(xmf3Accel);
 
-		Attack1();
-		return;
+	switch (m_nPattern)
+	{
+	case CyberTwins::Melee_Attack:
+		if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.1f)
+		{
+			XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+			xmf3Accel.x = 0;
+			xmf3Accel.z = 0;
+			m_pBody->SetAcceleration(xmf3Accel);
+
+			Attack1();
+			return;
+		}
+		break;
+	case CyberTwins::Gun_Attack:
+		break;
+	case CyberTwins::Special_Attack:
+		break;
+	default:
+		break;
 	}
+	 
+	
 }
 
 void CyberTwins::Attack1()
@@ -1565,36 +1552,13 @@ void CyberTwins::Attack1()
 		return;
 	}
 
-	switch (m_State)
-	{
-		//case Monster_State_Idle:
-		//	break;
-	case Monster_State_Attack1:
-		break;
-	default:
-	{
-		//int attackAnimIdx = rand() % 2;
-		int attackAnimIdx = 0;
+	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+	m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
 
-		UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
-		m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
-		m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, CyberTwins_Anim_Index_Attack1);
 
-		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, CyberTwins_Anim_Index_Attack1 + attackAnimIdx);
-
-		switch (attackAnimIdx)
-		{
-		case 0:
-			m_State = MonsterState::Monster_State_Attack1;
-			break;
-
-		case 1:
-			m_State = MonsterState::Monster_State_Attack2;
-			break;
-		}
-	}
-	break;
-	}
+	m_State = MonsterState::Monster_State_Attack1;
 }
 
 /////////////////////////////

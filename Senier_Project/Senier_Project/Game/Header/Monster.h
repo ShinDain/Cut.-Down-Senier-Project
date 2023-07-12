@@ -286,6 +286,13 @@ private:
 		CyberTwins_Anim_Index_Death
 	};
 
+	enum CyberTwinsAttackPattern
+	{
+		Melee_Attack,
+		Gun_Attack,
+		Special_Attack
+	};
+
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 public:
@@ -293,6 +300,16 @@ public:
 	virtual void Trace();
 
 	virtual void Attack1();
+
+private:
+	UINT m_nAttackCnt = 1;
+	UINT m_nRushNum = 4;
+
+	UINT m_nPattern = CyberTwinsAttackPattern::Melee_Attack;
+
+	bool m_bRush = false;
+
+	XMFLOAT3 m_xmf3RushTargetPosition = XMFLOAT3(0, 0, 0);
 };
 
 class Necromancer : public Monster
