@@ -101,7 +101,7 @@ protected:
 	bool m_bCanDoubleJump = true;
 	bool m_bCanThrow = true;
 
-	float m_AimmingSpeed = 20.f;
+	float m_AimmingSpeed = 50.0f;
 	//bool m_bSprint = false;
 	//float m_SprintSpeed = 120.0f;
 	//bool m_bDecreaseMaxSpeed = false;
@@ -113,7 +113,7 @@ protected:
 	UINT m_nMaxAttackCombo = 2;
 	UINT m_nAttackCombo = 0;
 	bool m_bCombeAttack = false;
-	float m_AttackRange = 30.0f;
+	float m_AttackRange = 40.0f;
 	float m_AttackAccel = 30.0f;
 
 	UINT m_nCurAttackTrack = 0;
@@ -158,7 +158,7 @@ public:
 	void SetWeapon(std::shared_ptr<Weapon> pWeapon) { m_pWeapon = pWeapon; }
 	void SetCameraRotation(XMFLOAT3 xmf3CameraRotation) { m_xmf3CameraRotation = xmf3CameraRotation; }
 	void SetCameraPosition(XMFLOAT3 xmf3CameraPosition) { m_xmf3CameraPosition = xmf3CameraPosition; }
-
+	void SetPlayerTargetObject(std::shared_ptr<Object> pTargetObject) { m_pTargetObject = pTargetObject; }
 };
 
 #endif

@@ -113,7 +113,6 @@ void Player::Update(float elapsedTime)
 		m_xmf3CrashDirection = { 0,0,0 };
 	}
 
-
 	m_ObjectSearchSphere.Center = m_xmf3Position;
 	if(m_pWeapon) m_pWeapon->Intersect(m_xmf3Look);
 
@@ -468,11 +467,7 @@ void Player::ThrowProjectile()
 		projectileVelocity = projectileVelocity * 300;
 		XMStoreFloat3(&xmf3ProjectileVelocity, projectileVelocity);
 
-		XMVECTOR projectileOrientation = XMLoadFloat4(&m_xmf4Orientation);
-		projectileOrientation = XMQuaternionRotationRollPitchYaw(0, 0, 90);
-		XMFLOAT4 xmf4projectileOrientation;
-		XMStoreFloat4(&xmf4projectileOrientation, projectileOrientation);
-		std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, xmf3ProjectilePos, xmf4projectileOrientation,
+		std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, xmf3ProjectilePos, XMFLOAT4(0,0,0,1),
 			XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
 		tmp->GetBody()->SetVelocity(xmf3ProjectileVelocity);
 	}
@@ -486,17 +481,18 @@ void Player::RotateToObj()
 	
 	float closestDistance = 9999;
 	int closestIdx = -1;
-	for (int i = 0; i < g_vpMovableObjs.size(); ++i)
+
+	for (int i = 0; i < g_vpCharacters.size(); ++i)
 	{
-		if (!(g_vpMovableObjs[i]->GetCollider()->GetIsActive()))
+		if (!(g_vpCharacters[i]->GetCollider()->GetIsActive()))
 			continue;
 
-		XMFLOAT3 xmf3TmpPosition = g_vpMovableObjs[i]->GetPosition();
+		XMFLOAT3 xmf3TmpPosition = g_vpCharacters[i]->GetPosition();
 		//xmf3TmpPosition.y = 0;
 		XMVECTOR tmpPosition = XMLoadFloat3(&xmf3TmpPosition);
 
 		float distance = XMVectorGetX(XMVector3Length(tmpPosition - myPosition));
-		if (distance < closestDistance)
+		if (distance < closestDistance && distance != 0)
 		{
 			closestDistance = distance;
 			closestIdx = i;
@@ -508,8 +504,8 @@ void Player::RotateToObj()
 	xmf3MyPosition.y = 0;
 	myPosition = XMLoadFloat3(&xmf3MyPosition);
 
-	m_pTargetObject = g_vpMovableObjs[closestIdx];
-	XMFLOAT3 xmf3TargetPosition = g_vpMovableObjs[closestIdx]->GetPosition();
+	m_pTargetObject = g_vpCharacters[closestIdx];
+	XMFLOAT3 xmf3TargetPosition = g_vpCharacters[closestIdx]->GetPosition();
 	xmf3TargetPosition.y = 0;
 	XMVECTOR targetPosition = XMLoadFloat3(&xmf3TargetPosition);
 	XMFLOAT3 xmf3TargetLook;
@@ -519,7 +515,7 @@ void Player::RotateToObj()
 
 	// 약간의 전진 -> 몬스터와의 거리에 따라 조절 필요
 	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
-	XMVECTOR addVelocity = look * closestDistance * 2.0f;
+	XMVECTOR addVelocity = look * closestDistance * 5.0f;
 	XMFLOAT3 xmf3AddVelocity;
 	XMStoreFloat3(&xmf3AddVelocity, addVelocity);
 	m_pBody->AddVelocity(xmf3AddVelocity);

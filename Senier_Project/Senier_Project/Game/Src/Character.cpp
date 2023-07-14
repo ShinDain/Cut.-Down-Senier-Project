@@ -186,12 +186,16 @@ void Character::IsFalling()
 		}
 
 		m_bIsFalling = true;
-		if(m_bIsShoulderView)
+		if (m_bIsShoulderView)
+		{
 			m_CharacterFriction = m_DefaultFriction;
+		}
 		else
+		{
 			m_CharacterFriction = 30.0f;
-		m_Acceleration = 100.f;
-		m_pBody->SetInGravity(true);
+			m_Acceleration = 100.f;
+			m_pBody->SetInGravity(true);
+		}
 	}
 }
 

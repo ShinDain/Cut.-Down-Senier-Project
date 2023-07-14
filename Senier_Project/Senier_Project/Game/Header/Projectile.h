@@ -33,13 +33,29 @@ public:
 
 	virtual void Intersect(float elapsedTime);
 
+	void ChasingPlayer(float elapsedTime);
+
 protected:
 	ProjectileProperty m_ProjectileProperty = ProjectileProperty::Projectile_Cnt;
 
+	float m_ProjectileLifeTime = 10.0f;
+	float m_ElapsedLifeTime = 0.0f;
+
+	bool m_bChasePlayer = false;
+
+	float m_ProjectileSpeed = 10.0f;
+	XMFLOAT3 m_xmf3ProjectileDirection = XMFLOAT3(0, 0, 0);
+
 public:
 	ProjectileProperty GetProjectileProperty() { return m_ProjectileProperty; }
-	
+	bool GetChasePlayer() { return m_bChasePlayer; }
+	float GetProjectileSpeed() { return m_ProjectileSpeed; }
+	XMFLOAT3 GetProjectileDirection() { return m_xmf3ProjectileDirection; }
+
 	void SetProjectileProperty(ProjectileProperty nProperty) { m_ProjectileProperty = nProperty; }
+	void SetChasePlayer(bool bChasePlayer) { m_bChasePlayer = bChasePlayer; }
+	void SetProjectileSpeed(float projectileSpeed) { m_ProjectileSpeed = projectileSpeed; }
+	void SetProjectileDirection(XMFLOAT3 xmf3ProjectileDirection) { m_xmf3ProjectileDirection = xmf3ProjectileDirection; }
 
 };
 

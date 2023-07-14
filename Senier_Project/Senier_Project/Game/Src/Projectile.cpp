@@ -96,9 +96,11 @@ bool Projectile::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	if (m_pCollider) m_pCollider->BuildMesh(pd3dDevice, pd3dCommandList);
 #endif
 	BuildConstantBuffers(pd3dDevice);
+	m_IntersectColliderRadius = 2.0f;
 	m_IntersectCollider.Center = m_xmf3Position;
 	m_IntersectCollider.Radius = m_IntersectColliderRadius;
 
+	m_TraceColliderRadius = 20.0f;
 	m_TraceCollider.Center = m_xmf3Position;
 	m_TraceCollider.Radius = m_TraceColliderRadius;
 
@@ -119,11 +121,16 @@ void Projectile::Update(float elapsedTime)
 	if (!m_bDestroying)
 	{
 		m_IntersectCollider.Center = m_xmf3Position;
+		m_TraceCollider.Center = m_xmf3Position;
 		Intersect(elapsedTime);
+		ChasingPlayer(elapsedTime);
+
+		m_ElapsedLifeTime += elapsedTime;
+		if (m_ElapsedLifeTime > m_ProjectileLifeTime)
+			m_bDestroying = true;
 	}
 
-	// 충돌체가 없는 경우 단순 계산으로 위치 고정
-	//if (m_nColliderType == Collider_None && (m_xmf3Position.y < 0))
+	// 0 미만인 경우
 	if (m_xmf3Position.y < 0)
 	{
 		XMFLOAT3 xmf3Position = m_pBody->GetPosition();
@@ -165,6 +172,9 @@ void Projectile::Intersect(float elapsedTime)
 			if (m_IntersectCollider.Intersects(*objCollider->GetOBB()))
 			{
 				g_vpCharacters[i]->ApplyDamage(projectilePower, xmf3Direction);
+
+				Player* pPlayer = (Player*)g_pPlayer.get();
+				pPlayer->SetPlayerTargetObject(g_vpCharacters[i]);
 
 				m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
 				m_DissolveTime = 0;
@@ -208,11 +218,15 @@ void Projectile::Intersect(float elapsedTime)
 		// 플레이어와의 검사
 		ColliderBox* playerCollider = (ColliderBox*)g_pPlayer->GetCollider().get();
 
-		if (m_IntersectCollider.Intersects(*playerCollider->GetOBB()))
+		BoundingOrientedBox* tmp = playerCollider->GetOBB().get();
+
+		if (m_IntersectCollider.Intersects(*tmp))
 		{
 			g_pPlayer->ApplyDamage(projectilePower, xmf3Direction);
 
 			m_bDestroying = true;
+			m_bVisible = false;
+			return;
 		}
 		// 월드 오브젝트와의 검사 (움직이는, 고정된)
 		for (int i = 0; i < g_vpWorldObjs.size(); ++i)
@@ -249,5 +263,33 @@ void Projectile::Intersect(float elapsedTime)
 	default:
 		break;
 	}
+
+}
+
+void Projectile::ChasingPlayer(float elapsedTime)
+{
+	if (!m_bChasePlayer)
+		return;
+
+	// 플레이어와의 검사
+	ColliderBox* playerCollider = (ColliderBox*)g_pPlayer->GetCollider().get();
+	BoundingOrientedBox* tmp = playerCollider->GetOBB().get();
+
+	// 너무 가까워진 경우 추적 해제
+	if (m_TraceCollider.Intersects(*tmp))
+	{
+		m_bChasePlayer = false;
+		return;
+	}
+
+	XMVECTOR playerPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
+	XMVECTOR thisPosition = XMLoadFloat3(&m_xmf3Position);
+	XMVECTOR velocity = XMVector3Normalize(playerPosition - thisPosition);
+	velocity *= m_ProjectileSpeed;
+
+	XMFLOAT3 xmf3Velocity;
+	XMStoreFloat3(&xmf3Velocity, velocity);
+	m_pBody->SetVelocity(xmf3Velocity);
+
 
 }

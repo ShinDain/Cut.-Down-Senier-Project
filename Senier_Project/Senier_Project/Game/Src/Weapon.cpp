@@ -1,4 +1,5 @@
 #include "../Header/Weapon.h"
+#include "../Header/Player.h"
 
 Weapon::Weapon(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 			   ObjectInitData objData, char* pstrFollowObject, std::shared_ptr<Object> pFollowObject,
@@ -186,6 +187,10 @@ void Weapon::Intersect(XMFLOAT3 xmf3PlayerLook)
 			m_pCollider->SetIntersect(1);
 			objCollider->SetIntersect(1);
 #endif
+
+			Player* pPlayer = (Player*)g_pPlayer.get();
+			pPlayer->SetPlayerTargetObject(g_vpMovableObjs[i]);
+
 			g_vpMovableObjs[i]->ApplyDamage(m_Power, xmf3PlayerLook);
 			g_vpMovableObjs[i]->GetBody()->SetIsAwake(true);
 		}

@@ -289,8 +289,14 @@ private:
 	enum CyberTwinsAttackPattern
 	{
 		Melee_Attack,
-		Gun_Attack,
-		Special_Attack
+		Gun_Attack
+	};
+
+	enum GunAttackPattern
+	{
+		Splash_Shoot,
+		Chasing_Shoot,
+		Rapid_Shoot
 	};
 
 public:
@@ -300,6 +306,9 @@ public:
 	virtual void Trace();
 
 	virtual void Attack1();
+	virtual void Attack2();
+
+	void GunFire();
 
 private:
 	UINT m_nAttackCnt = 1;
@@ -307,7 +316,22 @@ private:
 
 	UINT m_nPattern = CyberTwinsAttackPattern::Melee_Attack;
 
+	UINT m_nGunPattern = GunAttackPattern::Rapid_Shoot;
+	UINT m_nFireCnt = 0;
+	UINT m_nMaxFireCnt = 0;
+	bool m_bAttack2Lag = false;
+	float m_Attack2Delay = 1.0f;
+	float m_ElapsedAttack2Delay = 0.0f;
+
+	bool m_bAttackEndLag = true;
+	float m_AttackEndDelay = 0.5f;
+	float m_ElapsedAttackEndDelay = 0.0f;
+
+
+
+	bool m_bRage = false;
 	bool m_bRush = false;
+	bool m_bCanFire = true;
 
 	XMFLOAT3 m_xmf3RushTargetPosition = XMFLOAT3(0, 0, 0);
 };

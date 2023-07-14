@@ -35,7 +35,7 @@ protected:
 	UINT m_nMatCBParameterIdx = 2;
 	UINT m_nDescTableParameterIdx = 5;
 
-	XMFLOAT4 m_xmf4AlbedoColor = {0.0f, 0.0f, 0.0f, 0.0f};
+	XMFLOAT4 m_xmf4AlbedoColor = {1.0f, 1.0f, 1.0f, 1.0f };
 	XMFLOAT4 m_xmf4EmissiveColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 	XMFLOAT4 m_xmf4SpecularColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 	float m_Glossiness = 0.0f;

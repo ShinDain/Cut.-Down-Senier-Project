@@ -1,4 +1,5 @@
 #include "../Header/Monster.h"
+#include "../../DirectXRendering/Header/Scene.h"
 
 #define ZOMBIE_MAXSPEED 50.0f
 
@@ -136,6 +137,7 @@ void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, UINT nHitAn
 
 	Character::ApplyDamage(power, xmf3DamageDirection);
 
+	m_bFindPlayer = true;
 	if (m_HP <= 0)
 		m_bSuperArmor = false;
 	if (m_bSuperArmor)
@@ -810,7 +812,7 @@ void Scavenger::UpdateAnimationTrack(float elapsedTime)
 			XMStoreFloat3(&xmf3RushVelocity, rushVelocity);
 			m_pBody->AddVelocity(xmf3RushVelocity);
 
-			CreateAttackSphere(0, m_xmf3RenderOffsetPosition.y, m_AttackDamage * 1.3f);
+			CreateAttackSphere(0, m_xmf3ColliderExtents.x * 10, m_AttackDamage * 1.3f);
 		}
 		else if (trackRate > 0.8f)
 		{
@@ -1375,6 +1377,9 @@ bool CyberTwins::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	m_MaxHP = 500.0f;
 	m_HP = 500.0f;
 
+	// 기본적으로 상시 슈퍼아머
+	m_bSuperArmor = true;
+
 	// 
 	m_DefaultAccel = 500.0f;
 	m_DefaultMaxSpeedXZ = 100.0f;
@@ -1396,26 +1401,24 @@ void CyberTwins::UpdateAnimationTrack(float elapsedTime)
 		// 공격 판정
 		if (trackRate > 0.5f && trackRate < 0.6f)
 		{
-			m_bSuperArmor = true;
-
 			// 약간 앞으로 전진
 			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-			XMVECTOR deltaVelocity = l * 3;
+			XMVECTOR deltaVelocity = l * 150;
 			XMFLOAT3 xmf3DeltaVelocity;
 			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 			m_pBody->AddVelocity(xmf3DeltaVelocity);
 			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
 		}
 
-
 		if (trackRate < 0.4f)
 		{
+			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 0.5f);
 			RotateToPlayer();
 		}
-		else if (trackRate > 0.8f)
-		{
-			m_bSuperArmor = false;
-		}
+		else if(trackRate > 0.4f && trackRate < 0.8f)
+			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+		else
+			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 0.5f);
 
 		// 시작 블랜딩
 		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
@@ -1425,32 +1428,118 @@ void CyberTwins::UpdateAnimationTrack(float elapsedTime)
 		// 종료
 		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
 		{
+			BlendWithIdleMovement(1);
 			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 			m_State = MonsterState::Monster_State_Idle;
+			
+			m_bAttackEndLag = true;
 
 			// 다음 패턴 
-			m_nPattern = rand() % 3;
+			m_nPattern = rand() % 2;
 		}
 	}
 	break;
 	case Monster::Monster_State_Attack2:
-	break;
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+		// 공격 판정
+		if (trackRate > 0.3f && trackRate < 0.4f)
+		{
+			GunFire();
+		}
+		else if (trackRate > 0.5f && m_nMaxFireCnt > 0)
+		{
+			if (m_nFireCnt < m_nMaxFireCnt)
+			{
+				// 연사
+				m_pAnimationController->SetTrackPosition(MONSTER_ONCE_TRACK_1, 0.3f);
+				m_bCanFire = true;
+				m_nFireCnt += 1;
+			}
+		}
+
+
+		if (trackRate < 0.2f)
+		{
+			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 0.5f);
+		}
+		else if (trackRate > 0.2f && trackRate < 0.3f)
+		{
+			if (m_bAttack2Lag)
+			{
+				m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 0.0f);
+				m_ElapsedAttack2Delay += elapsedTime;
+				if (m_ElapsedAttack2Delay >= m_Attack2Delay)
+				{
+					m_bAttack2Lag = false;
+					m_ElapsedAttack2Delay = 0.0f;
+				}
+			}
+			else
+			{
+				float animSpeed = 0.5f;
+				if (m_bRage)
+					animSpeed = 1.5f;
+
+				if (m_nGunPattern == GunAttackPattern::Rapid_Shoot)
+					m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, animSpeed * 2);
+				else
+					m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, animSpeed);
+			}
+		}
+		else
+			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 0.7f);
+
+		RotateToPlayer();
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.8f, 5.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			BlendWithIdleMovement(1);
+			m_State = MonsterState::Monster_State_Idle;
+
+			m_bCanFire = true;
+			m_nFireCnt = 0;
+			m_bAttackEndLag = true;
+
+			// 다음 패턴 
+			m_nPattern = rand() % 2;
+		}
+	}
+		break;
 	case Monster::Monster_State_Attack3:
 		break;
 	case Monster::Monster_State_Hit:
 	{
 		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
 
+		if (trackRate < 0.5f)
+		{
+			// 약간 앞으로 전진
+			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
+			XMVECTOR deltaVelocity = l * -1;
+			XMFLOAT3 xmf3DeltaVelocity;
+			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
+			m_pBody->AddVelocity(xmf3DeltaVelocity);
+		}
+
 		// 시작 블랜딩
 		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
 		// 종료 블랜딩
-		BlendAnimationToIdle(trackRate, 0.5f, 2.0f, MONSTER_ONCE_TRACK_1);
+		BlendAnimationToIdle(trackRate, 0.4f, 5.0f, MONSTER_ONCE_TRACK_1);
 
-		// 종료
-		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		// 피격 0.6f 이상시 종료 (피격 모션이 따로 없어)
+		if (trackRate > 0.6f)
 		{
 			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 			m_State = MonsterState::Monster_State_Idle;
+			BlendWithIdleMovement(1);
 		}
 	}
 	break;
@@ -1486,6 +1575,10 @@ void CyberTwins::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	UINT deathAnimIdx = CyberTwins_Anim_Index_Death;
 
 	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
+	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 1.0f);
+
+	if (m_HP / m_MaxHP < 0.3f)
+		m_bRage = true;
 }
 
 void CyberTwins::StateAction(float elapsedTime)
@@ -1497,6 +1590,17 @@ void CyberTwins::StateAction(float elapsedTime)
 		if (m_bFindPlayer) m_State = Monster_State_Trace;
 		break;
 	case Monster_State_Trace:
+		if (m_bAttackEndLag)
+		{
+			m_ElapsedAttackEndDelay += elapsedTime;
+			if (m_ElapsedAttackEndDelay >= m_AttackEndDelay)
+			{
+				m_bAttackEndLag = false;
+				m_ElapsedAttackEndDelay = 0.0f;
+			}
+			break;
+		}
+	
 		Trace();
 		break;
 	default:
@@ -1532,14 +1636,20 @@ void CyberTwins::Trace()
 		}
 		break;
 	case CyberTwins::Gun_Attack:
-		break;
-	case CyberTwins::Special_Attack:
+		if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 10.0f)
+		{
+			XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+			xmf3Accel.x = 0;
+			xmf3Accel.z = 0;
+			m_pBody->SetAcceleration(xmf3Accel);
+
+			Attack2();
+			return;
+		}
 		break;
 	default:
 		break;
 	}
-	 
-	
 }
 
 void CyberTwins::Attack1()
@@ -1559,6 +1669,106 @@ void CyberTwins::Attack1()
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, CyberTwins_Anim_Index_Attack1);
 
 	m_State = MonsterState::Monster_State_Attack1;
+}
+
+void CyberTwins::Attack2()
+{
+	// 총 발사
+
+	m_nGunPattern = rand() % 3;	// splash, chase, rapid
+	m_nFireCnt = 0;
+	m_bAttack2Lag = true;
+
+	switch (m_nGunPattern)
+	{
+	case GunAttackPattern::Splash_Shoot:
+		m_nMaxFireCnt = 0 + (m_bRage * 3);
+		break;
+	case GunAttackPattern::Chasing_Shoot:
+		m_nMaxFireCnt = 2 + (m_bRage * 2);
+		break;
+	case GunAttackPattern::Rapid_Shoot:
+		m_nMaxFireCnt = 4 + (m_bRage * 4);
+		break;
+
+	default:
+		break;
+	}
+
+	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+	m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
+
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, CyberTwins_Anim_Index_Attack2);
+
+	m_State = MonsterState::Monster_State_Attack2;
+}
+
+void CyberTwins::GunFire()
+{
+	// 산탄
+	// 유도탄
+	// 연속 발사
+
+	if (m_bCanFire)
+	{
+		m_bCanFire = false;
+
+		XMVECTOR position = XMLoadFloat3(&m_xmf3Position);
+		XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+		XMVECTOR up = XMLoadFloat3(&m_xmf3Up);
+		XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
+		position += look * 18;
+		position += up * 12;
+		position += right * -8;
+		XMFLOAT3 xmf3ProjectilePos;
+		XMStoreFloat3(&xmf3ProjectilePos, position);
+
+		if (m_nGunPattern == GunAttackPattern::Splash_Shoot)
+		{
+			for (int i = 0; i < 5; ++i)
+			{
+				std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+					xmf3ProjectilePos, XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1),
+					ENEMY_PROJECTILE_MODEL_NAME, 0);
+				tmp->GetBody()->SetInGravity(false);
+
+				XMVECTOR targetPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
+				XMVECTOR velocity = targetPosition - position;
+				velocity = XMVector3Normalize(velocity);
+				XMVECTOR rotate = XMQuaternionRotationRollPitchYaw(0, XMConvertToRadians((i * 15) - 30), 0);
+				velocity = XMVector3Rotate(velocity, rotate);
+				velocity *= 300;
+				XMFLOAT3 xmf3Velocity;
+				XMStoreFloat3(&xmf3Velocity, velocity);
+
+				tmp->GetBody()->SetVelocity(xmf3Velocity);
+			}
+		}
+		else
+		{
+			std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+				xmf3ProjectilePos, XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1),
+				ENEMY_PROJECTILE_MODEL_NAME, 0);
+			tmp->GetBody()->SetInGravity(false);
+
+			XMVECTOR targetPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
+			XMVECTOR velocity = targetPosition - position;
+			velocity = XMVector3Normalize(velocity);
+
+			velocity *= 500;
+			XMFLOAT3 xmf3Velocity;
+			XMStoreFloat3(&xmf3Velocity, velocity);
+			tmp->GetBody()->SetVelocity(xmf3Velocity);
+
+			if (m_nGunPattern == GunAttackPattern::Chasing_Shoot)
+			{
+				Projectile* pProjectile = (Projectile*)tmp.get();
+				pProjectile->SetChasePlayer(true);
+				pProjectile->SetProjectileSpeed(150);
+			}
+		}
+	}
 }
 
 /////////////////////////////
