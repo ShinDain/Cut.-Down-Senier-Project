@@ -142,7 +142,6 @@ void Projectile::Update(float elapsedTime)
 
 void Projectile::Intersect(float elapsedTime)
 {
-	float projectilePower = 5;
 	XMFLOAT3 xmf3Direction = m_pBody->GetVelocity();
 	XMVECTOR direction = XMLoadFloat3(&xmf3Direction);
 	direction = XMVector3Normalize(direction);
@@ -171,7 +170,7 @@ void Projectile::Intersect(float elapsedTime)
 
 			if (m_IntersectCollider.Intersects(*objCollider->GetOBB()))
 			{
-				g_vpCharacters[i]->ApplyDamage(projectilePower, xmf3Direction);
+				g_vpCharacters[i]->ApplyDamage(m_ProjectilePower, xmf3Direction);
 
 				Player* pPlayer = (Player*)g_pPlayer.get();
 				pPlayer->SetPlayerTargetObject(g_vpCharacters[i]);
@@ -201,7 +200,7 @@ void Projectile::Intersect(float elapsedTime)
 			{
 				if (g_vpWorldObjs[i]->GetObjectType() == Object_Movable)
 				{
-					g_vpWorldObjs[i]->ApplyDamage(projectilePower, xmf3Direction);
+					g_vpWorldObjs[i]->ApplyDamage(m_ProjectilePower, xmf3Direction);
 					g_vpWorldObjs[i]->GetBody()->SetIsAwake(true);
 				}
 
@@ -222,7 +221,7 @@ void Projectile::Intersect(float elapsedTime)
 
 		if (m_IntersectCollider.Intersects(*tmp))
 		{
-			g_pPlayer->ApplyDamage(projectilePower, xmf3Direction);
+			g_pPlayer->ApplyDamage(m_ProjectilePower, xmf3Direction);
 
 			m_bDestroying = true;
 			m_bVisible = false;
@@ -247,7 +246,7 @@ void Projectile::Intersect(float elapsedTime)
 
 			if (m_IntersectCollider.Intersects(*objCollider->GetOBB()))
 			{
-				g_vpWorldObjs[i]->ApplyDamage(projectilePower, xmf3Direction);
+				g_vpWorldObjs[i]->ApplyDamage(m_ProjectilePower, xmf3Direction);
 				g_vpWorldObjs[i]->GetBody()->SetIsAwake(true);
 
 				m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));

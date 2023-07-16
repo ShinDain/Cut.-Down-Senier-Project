@@ -15,6 +15,8 @@
 #include "Material.h"
 #include "AnimationController.h"
 
+
+
 //#define COLLIDER_RENDER
 
 #define DIR_FORWARD					0x01
@@ -268,6 +270,7 @@ public:
 
 	bool GetIsFalling() { return m_bIsFalling; }
 	bool GetIsAlive() { return m_bIsAlive; }
+	bool GetIsDestroying() { return m_bDestroying; }
 
 	const float& GetMaxHP() { return m_MaxHP; }
 	const float& GetHP() { return m_HP; }

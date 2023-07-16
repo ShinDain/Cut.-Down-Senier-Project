@@ -392,12 +392,12 @@ void Third_Person_Camera::Update(float Etime)
 		{
 			best = m_OffsetLength;
 		}
+		else if (best < 20)
+			best = 20;
 		cameraOffsetLength = best;
 
 		newPos = XMLoadFloat3(&xmf3ObjectPos);
-
 		newPos = -Look * cameraOffsetLength + newPos;
-
 
 		XMFLOAT3 xmf3NewPos;
 		XMStoreFloat3(&xmf3NewPos, newPos);

@@ -60,8 +60,8 @@ bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_AnimationSpeed = 1.0f;
 
 	// 체력 초기화
-	m_MaxHP = 100.0f;
-	m_HP = 100.0f;
+	m_MaxHP = 300.0f;
+	m_HP = 300.0f;
 
 	return true;
 }

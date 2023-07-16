@@ -24,6 +24,9 @@
 // dWrite 라이브러리
 #pragma comment(lib, "Dwrite.lib")
 
+// 사운드를 위한 윈도우 API
+#pragma comment(lib, "Winmm.lib")
+
 class DirectXApp
 {
 protected:

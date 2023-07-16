@@ -83,13 +83,38 @@ void Monster::RotateToPlayer()
 	RotateToTargetLook(0.0f, xmf3TargetLook, 1);
 }
 
+void Monster::StateAction(float elapsedTime)
+{
+	switch (m_State)
+	{
+	case Monster_State_Idle:
+		Patrol();
+		if (m_bFindPlayer) m_State = Monster_State_Trace;
+		break;
+	case Monster_State_Trace:
+		if (m_bAttackEndLag)
+		{
+			m_ElapsedAttackEndDelay += elapsedTime;
+			if (m_ElapsedAttackEndDelay >= m_AttackEndDelay)
+			{
+				m_bAttackEndLag = false;
+				m_ElapsedAttackEndDelay = 0.0f;
+			}
+			break;
+		}
+		Trace();
+		break;
+	default:
+		break;
+	}
+}
+
 void Monster::Patrol()
 {
 	if (!g_pPlayer->GetIsAlive())
 		return;
 
 	// 패트롤, 왔다 갔다
-
 
 	// 탐지 위치 시점 앞으로 이동
 	// 플레이어 탐지 시 추적 상태로 변경
@@ -271,6 +296,7 @@ void Zombie::UpdateAnimationTrack(float elapsedTime)
 		{
 			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 			m_State = MonsterState::Monster_State_Idle;
+			m_bAttackEndLag = true;
 		}
 	}
 		break;
@@ -329,22 +355,6 @@ void Zombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	UINT deathAnimIdx = Zombie_Anim_Index_FallingBack + nAttackAnim;
 
 	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
-}
-
-void Zombie::StateAction(float elapsedTime)
-{
-	switch (m_State)
-	{
-	case Monster_State_Idle:
-		Patrol();
-		if (m_bFindPlayer) m_State = Monster_State_Trace;
-		break;
-	case Monster_State_Trace:
-		Trace();
-		break;
-	default:
-		break;
-	}
 }
 
 void Zombie::Trace()
@@ -438,7 +448,7 @@ bool HighZombie::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	m_DissolveTime = 0.0f;
 
 	// 공격력 및 반경 초기화
-	m_AttackDamage = 10.0f;
+	m_AttackDamage = 15.0f;
 	m_AttackRange = 16.0f;
 	m_AttackRadius = 5.0f;
 
@@ -497,6 +507,7 @@ void HighZombie::UpdateAnimationTrack(float elapsedTime)
 		{
 			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 			m_State = MonsterState::Monster_State_Idle;
+			m_bAttackEndLag = true;
 		}
 	}
 	break;
@@ -548,6 +559,7 @@ void HighZombie::UpdateAnimationTrack(float elapsedTime)
 		{
 			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 			m_State = MonsterState::Monster_State_Idle;
+			m_bAttackEndLag = true;
 		}
 	}
 		break;
@@ -574,7 +586,7 @@ void HighZombie::UpdateAnimationTrack(float elapsedTime)
 	{
 		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
 
-		m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+		m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 3.0f);
 
 		// 시작 블랜딩
 		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
@@ -604,22 +616,6 @@ void HighZombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	UINT deathAnimIdx = HighZombie_Anim_Index_Death1 + nHitAnim;
 
 	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
-}
-
-void HighZombie::StateAction(float elapsedTime)
-{
-	switch (m_State)
-	{
-	case Monster_State_Idle:
-		Patrol();
-		if (m_bFindPlayer) m_State = Monster_State_Trace;
-		break;
-	case Monster_State_Trace:
-		Trace();
-		break;
-	default:
-		break;
-	}
 }
 
 void HighZombie::Trace()
@@ -723,7 +719,7 @@ bool Scavenger::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 
 	// 공격력 및 반경 초기화
 	m_AttackDamage = 10.0f;
-	m_AttackRange = 15.0f;
+	m_AttackRange = 10.0f;
 	m_AttackRadius = 3.0f;
 
 	// 체력 초기화
@@ -763,7 +759,7 @@ void Scavenger::UpdateAnimationTrack(float elapsedTime)
 			XMFLOAT3 xmf3DeltaVelocity;
 			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 			m_pBody->AddVelocity(xmf3DeltaVelocity);
-			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
+			CreateAttackSphere(m_AttackRange, 7, m_AttackDamage);
 		}
 
 		if (trackRate < 0.4f)
@@ -792,6 +788,8 @@ void Scavenger::UpdateAnimationTrack(float elapsedTime)
 				m_bRush = true;
 				m_nAttackCnt = 0;
 			}
+
+			m_bAttackEndLag = true;
 		}
 	}
 	break;
@@ -802,22 +800,27 @@ void Scavenger::UpdateAnimationTrack(float elapsedTime)
 		// 공격 판정
 		if (trackRate < 0.8f && trackRate > 0.2f)
 		{
-			XMVECTOR targetPosition = XMLoadFloat3(&m_xmf3RushTargetPosition);
-			XMVECTOR myPosition = XMLoadFloat3(&m_xmf3Position);
-			XMVECTOR rushVelocity = targetPosition - myPosition;
-			rushVelocity = XMVector3Normalize(rushVelocity);
-			float rushSpeed = 300;
-			rushVelocity *= rushSpeed;
-			XMFLOAT3 xmf3RushVelocity;
-			XMStoreFloat3(&xmf3RushVelocity, rushVelocity);
-			m_pBody->AddVelocity(xmf3RushVelocity);
-
+			m_pCollider->SetIsActive(false); 
 			CreateAttackSphere(0, m_xmf3ColliderExtents.x * 10, m_AttackDamage * 1.3f);
 		}
 		else if (trackRate > 0.8f)
 		{
 			m_bSuperArmor = false;
 			m_pCollider->SetIsActive(true);
+		}
+
+		if (trackRate > 0.2f && m_bRush)
+		{
+			XMVECTOR targetPosition = XMLoadFloat3(&m_xmf3RushTargetPosition);
+			XMVECTOR myPosition = XMLoadFloat3(&m_xmf3Position);
+			XMVECTOR rushVelocity = targetPosition - myPosition;
+			rushVelocity = XMVector3Normalize(rushVelocity);
+			float rushSpeed = 800;
+			rushVelocity *= rushSpeed;
+			XMFLOAT3 xmf3RushVelocity;
+			XMStoreFloat3(&xmf3RushVelocity, rushVelocity);
+			m_pBody->AddVelocity(xmf3RushVelocity);
+			m_bRush = false;
 		}
 
 		// 종료 블랜딩
@@ -828,6 +831,7 @@ void Scavenger::UpdateAnimationTrack(float elapsedTime)
 		{
 			UnableAnimationTrack(MONSTER_ONCE_TRACK_2);
 			m_State = MonsterState::Monster_State_Idle;
+			m_bAttackEndLag = true;
 		}
 	}
 		break;
@@ -893,7 +897,6 @@ void Scavenger::UpdateAnimationTrack(float elapsedTime)
 
 			m_xmf3RushTargetPosition = xmf3TargetPosition;
 			m_bSuperArmor = true;
-			m_pCollider->SetIsActive(false); 
 		}
 	}
 		break;
@@ -915,22 +918,6 @@ void Scavenger::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 
 	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
 	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 2.0f);
-}
-
-void Scavenger::StateAction(float elapsedTime)
-{
-	switch (m_State)
-	{
-	case Monster_State_Idle:
-		Patrol();
-		if (m_bFindPlayer) m_State = Monster_State_Trace;
-		break;
-	case Monster_State_Trace:
-		Trace();
-		break;
-	default:
-		break;
-	}
 }
 
 void Scavenger::Trace()
@@ -1012,7 +999,6 @@ void Scavenger::Attack1()
 			m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_2, Scavenger_Anim_Index_Attack2);
 			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 1.5f);
 			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_2, 3.0f);
-			m_bRush = false;
 			break;
 		}
 	}
@@ -1049,7 +1035,7 @@ bool Ghoul::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_DissolveTime = 0.0f;
 
 	// 공격력 및 반경 초기화
-	m_AttackDamage = 10.0f;
+	m_AttackDamage = 30.0f;
 	m_AttackRange = 32.0f;
 	m_AttackRadius = 10.0f;
 
@@ -1100,6 +1086,8 @@ void Ghoul::Animate(float elapsedTime)
 
 void Ghoul::UpdateAnimationTrack(float elapsedTime)
 {
+	m_bSuperArmor = true;
+
 	switch (m_State)
 	{
 	case Monster::Monster_State_Idle:
@@ -1112,8 +1100,6 @@ void Ghoul::UpdateAnimationTrack(float elapsedTime)
 		// 공격 판정
 		if (trackRate > 0.4f && trackRate < 0.5f)
 		{
-			m_bSuperArmor = true;
-
 			// 약간 앞으로 전진
 			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
 			XMVECTOR deltaVelocity = l * 7;
@@ -1124,8 +1110,6 @@ void Ghoul::UpdateAnimationTrack(float elapsedTime)
 		}
 		if (trackRate > 0.65f && trackRate < 0.75f)
 		{
-			m_bSuperArmor = true;
-
 			// 약간 앞으로 전진
 			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
 			XMVECTOR deltaVelocity = l * 1;
@@ -1139,10 +1123,6 @@ void Ghoul::UpdateAnimationTrack(float elapsedTime)
 		{
 			RotateToPlayer();
 		}
-		else if (trackRate > 0.86f)
-		{
-			m_bSuperArmor = false;
-		}
 
 		// 시작 블랜딩
 		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
@@ -1154,6 +1134,7 @@ void Ghoul::UpdateAnimationTrack(float elapsedTime)
 		{
 			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 			m_State = MonsterState::Monster_State_Idle;
+			m_bAttackEndLag = true;
 		}
 	}
 	break;
@@ -1163,8 +1144,6 @@ void Ghoul::UpdateAnimationTrack(float elapsedTime)
 		// 공격 판정
 		if (trackRate > 0.4f && trackRate < 0.5f)
 		{
-			m_bSuperArmor = true;
-
 			// 약간 앞으로 전진
 			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
 			XMVECTOR deltaVelocity = l * 7;
@@ -1182,10 +1161,6 @@ void Ghoul::UpdateAnimationTrack(float elapsedTime)
 		{
 			RotateToPlayer();
 		}
-		else if (trackRate > 0.6f)
-		{
-			m_bSuperArmor = false;
-		}
 
 		// 시작 블랜딩
 		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
@@ -1197,6 +1172,7 @@ void Ghoul::UpdateAnimationTrack(float elapsedTime)
 		{
 			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 			m_State = MonsterState::Monster_State_Idle;
+			m_bAttackEndLag = true;
 		}
 	}
 	break;
@@ -1251,22 +1227,12 @@ void Ghoul::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	UINT deathAnimIdx = Ghoul_Anim_Index_Death;
 
 	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
-}
 
-void Ghoul::StateAction(float elapsedTime)
-{
-	switch (m_State)
-	{
-	case Monster_State_Idle:
-		Patrol();
-		if (m_bFindPlayer) m_State = Monster_State_Trace;
-		break;
-	case Monster_State_Trace:
-		Trace();
-		break;
-	default:
-		break;
-	}
+	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+	xmf3Velocity.x *= 0.3f;
+	xmf3Velocity.y *= 0.3f;
+	xmf3Velocity.z *= 0.3f;
+	m_pBody->SetVelocity(xmf3Velocity);
 }
 
 void Ghoul::Trace()
@@ -1369,7 +1335,7 @@ bool CyberTwins::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	m_DissolveTime = 0.0f;
 
 	// 공격력 및 반경 초기화
-	m_AttackDamage = 10.0f;
+	m_AttackDamage = 20.0f;
 	m_AttackRange = 27.0f;
 	m_AttackRadius = 10.0f;
 
@@ -1577,35 +1543,8 @@ void CyberTwins::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
 	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 1.0f);
 
-	if (m_HP / m_MaxHP < 0.3f)
+	if (m_HP / m_MaxHP < 0.5f)
 		m_bRage = true;
-}
-
-void CyberTwins::StateAction(float elapsedTime)
-{
-	switch (m_State)
-	{
-	case Monster_State_Idle:
-		Patrol();
-		if (m_bFindPlayer) m_State = Monster_State_Trace;
-		break;
-	case Monster_State_Trace:
-		if (m_bAttackEndLag)
-		{
-			m_ElapsedAttackEndDelay += elapsedTime;
-			if (m_ElapsedAttackEndDelay >= m_AttackEndDelay)
-			{
-				m_bAttackEndLag = false;
-				m_ElapsedAttackEndDelay = 0.0f;
-			}
-			break;
-		}
-	
-		Trace();
-		break;
-	default:
-		break;
-	}
 }
 
 void CyberTwins::Trace()
@@ -1788,11 +1727,10 @@ bool Necromancer::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 {
 	Character::Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 
-	InitAnimationTrack(3.0f);
-	int idleAnimIdx = rand() % 2;
+	InitAnimationTrack(2.0f);
 
 	// 애니메이션 트랙 초기화
-	m_pAnimationController->SetTrackAnimationSet(MONSTER_IDLE_TRACK, Necromancer_Anim_Index_Idle1 + idleAnimIdx);
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_IDLE_TRACK, Necromancer_Anim_Index_Idle1);
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_MOVE_TRACK, Necromancer_Anim_Index_Walk);
 
 	// 파괴 타이머 초기화
@@ -1800,7 +1738,7 @@ bool Necromancer::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_DissolveTime = 0.0f;
 
 	// 공격력 및 반경 초기화
-	m_AttackDamage = 10.0f;
+	m_AttackDamage = 20.0f;
 	m_AttackRange = 27.0f;
 	m_AttackRadius = 10.0f;
 
@@ -1812,13 +1750,13 @@ bool Necromancer::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	m_DefaultAccel = 500.0f;
 	m_DefaultMaxSpeedXZ = 50.0f;
 
-	m_bSuperArmor = true;
-
 	return true;
 }
 
 void Necromancer::UpdateAnimationTrack(float elapsedTime)
 {
+	m_bSuperArmor = true;
+
 	switch (m_State)
 	{
 	case Monster::Monster_State_Idle:
@@ -1829,19 +1767,30 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 	{
 		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
 		// 공격 판정
-		if (trackRate > 0.4f && trackRate < 0.5f)
+		if (trackRate > 0.1f && trackRate < 0.8f)
 		{
+			m_pCollider->SetIsActive(false);
+
+			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 7.0f);
 			// 약간 앞으로 전진
 			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-			XMVECTOR deltaVelocity = l * 3;
+			XMVECTOR deltaVelocity = l * 500;
 			XMFLOAT3 xmf3DeltaVelocity;
 			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 			m_pBody->AddVelocity(xmf3DeltaVelocity);
-			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
+
+			CreateAttackSphere(0, m_xmf3ColliderExtents.x * 20, m_AttackDamage * 1.3f);
+		}
+		else if (trackRate > 0.8f)
+		{
+			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+			m_pCollider->SetIsActive(true);
+
+			if (m_Attack1Cnt < m_bRage * 3)
+				Attack1();
 		}
 
-
-		if (trackRate < 0.65f)
+		if (trackRate < 0.1f)
 		{
 			RotateToPlayer();
 		}
@@ -1854,45 +1803,61 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 		// 종료
 		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
 		{
+			m_Attack1Cnt = 0;
+
 			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 			m_State = MonsterState::Monster_State_Idle;
+			m_bAttackEndLag = true;
+
+			// 다음 패턴 
+			m_nPattern = rand() % 2;
+			m_nAttackCnt++;
+			if (m_nAttackCnt > m_nMaxAttackCnt)
+				m_nPattern = NecromancerAttackPattern::Summon_Monster;
 		}
 	}
 	break;
 	case Monster::Monster_State_Attack2:
-	{
+	{	
 		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
 		// 공격 판정
-		if (trackRate > 0.4f && trackRate < 0.5f)
-		{
-			// 약간 앞으로 전진
-			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-			XMVECTOR deltaVelocity = l * 1;
-			XMFLOAT3 xmf3DeltaVelocity;
-			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
-			m_pBody->AddVelocity(xmf3DeltaVelocity);
-
-		}
-		else if (trackRate > 0.5f && trackRate < 0.6f)
-		{
-			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
-		}
-
-		if (trackRate < 0.4f)
-		{
-			RotateToPlayer();
-		}
+		if (trackRate > 0.25f && trackRate < 0.3f)
+			MagicMissile(m_bRage);
+		else if (trackRate > 0.3f && trackRate < 0.35f)
+			m_bCanFire = true;
+		else if (trackRate > 0.35f && trackRate < 0.4f)
+			MagicMissile(m_bRage);
+		else if (trackRate > 0.4f && trackRate < 0.45f)
+			m_bCanFire = true;
+		else if (trackRate > 0.45f && trackRate < 0.5f)
+			MagicMissile(m_bRage);
+		else if (trackRate > 0.5f && trackRate < 0.55f)
+			m_bCanFire = true;
+		else if (trackRate > 0.77f)
+			SplashMagic();
+		
+		RotateToPlayer();
 
 		// 시작 블랜딩
-		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		BlendIdleToAnimaiton(trackRate, 0.3f, 10 / 3, MONSTER_ONCE_TRACK_1);
 		// 종료 블랜딩
-		BlendAnimationToIdle(trackRate, 0.9f, 10.0f, MONSTER_ONCE_TRACK_1);
+		BlendAnimationToIdle(trackRate, 0.8f, 5.0f, MONSTER_ONCE_TRACK_1);
 
 		// 종료
 		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
 		{
 			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			BlendWithIdleMovement(1);
 			m_State = MonsterState::Monster_State_Idle;
+
+			m_bCanFire = true;
+			m_bAttackEndLag = true;
+
+			// 다음 패턴 
+			m_nPattern = rand() % 2;
+			m_nAttackCnt++;
+			if (m_nAttackCnt > m_nMaxAttackCnt)
+				m_nPattern = NecromancerAttackPattern::Summon_Monster;
 		}
 	}
 	break;
@@ -1905,13 +1870,14 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 		// 시작 블랜딩
 		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
 		// 종료 블랜딩
-		BlendAnimationToIdle(trackRate, 0.5f, 2.0f, MONSTER_ONCE_TRACK_1);
+		BlendAnimationToIdle(trackRate, 0.4f, 10.0f, MONSTER_ONCE_TRACK_1);
 
-		// 종료
-		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		// 두개의 피격모션이 섞여있어 절반만
+		if (trackRate > 0.5f)
 		{
 			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 			m_State = MonsterState::Monster_State_Idle;
+			BlendWithIdleMovement(1);
 		}
 	}
 	break;
@@ -1933,8 +1899,119 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 	case Monster::Monster_State_Special1:
 		break;
 	case Monster::Monster_State_Special2:
+	{
+		m_nSummonCnt = 0;
+		for (int i = 0; i < m_vpSummonedMonsters.size(); ++i)
+		{
+			if (!m_vpSummonedMonsters[i]->GetIsDestroying())
+				m_nSummonCnt++;
+		}
+		if (m_nSummonCnt == 0 && m_bSummonDone)
+			Special3();
+
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+
+		if(m_xmf3Position.y < m_FloatingHeight)
+			m_pBody->SetVelocity(XMFLOAT3(0, 30, 0));
+		else
+		{
+			m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
+			m_pBody->SetInGravity(false);
+		}
+
+		if (trackRate > 0.5f)
+		{
+			if (m_bSummonDone)
+			{
+				if (m_bRage)
+				{
+					MagicMissile(true);
+				}
+			}
+			else
+			{
+				SummonMonster();
+				m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 1.0f);
+				m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
+			}
+			m_pAnimationController->SetTrackPosition(MONSTER_ONCE_TRACK_1, 3.0f);
+		}
+
+		if (!m_bCanFire)
+		{
+			m_ElapsedFireTime += elapsedTime;
+			if (m_ElapsedFireTime > m_FireRate)
+			{
+				m_bCanFire = true;
+				m_ElapsedFireTime = 0.0f;
+			}
+		}
+		RotateToPlayer();
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.8f, 5.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			BlendWithIdleMovement(1);
+			m_State = MonsterState::Monster_State_Idle;
+
+			m_bCanFire = true;
+			m_bAttackEndLag = true;
+			m_bSummonDone = false;
+
+			// 다음 패턴 
+			m_nPattern = rand() % 2;
+			m_nAttackCnt++;
+			if (m_nAttackCnt > m_nMaxAttackCnt)
+				m_nPattern = NecromancerAttackPattern::Summon_Monster;
+		}	
+	}
 		break;
 	case Monster::Monster_State_Special3:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
+
+		if (trackRate > 0.5f && m_bStunned)
+		{
+			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 0.0f);
+
+			m_ElapsedStunnedTime += elapsedTime;
+			if (m_ElapsedStunnedTime > m_StunnedTime)
+			{
+				m_bStunned = false;
+				m_ElapsedStunnedTime = 0.0f;
+			}
+		}
+		else
+			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 2.0f);
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.8f, 5.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			BlendWithIdleMovement(1);
+			m_State = MonsterState::Monster_State_Idle;
+			
+			m_bCanFire = true;
+			m_bAttackEndLag = true;
+			
+			// 다음 패턴 
+			m_nPattern = rand() % 2;
+			m_nAttackCnt++;
+			if (m_nAttackCnt > m_nMaxAttackCnt)
+				m_nPattern = NecromancerAttackPattern::Summon_Monster;
+		}
+	}
 		break;
 	default:
 		break;
@@ -1943,28 +2020,20 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 
 void Necromancer::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
+	// 사운드 재생 테스트
+	//mciSendString(_T("play Sound/Footstep01.wav"), 0, 0, 0);
+
 	UINT hitAnimIdx = Necromancer_Anim_Index_Hit;
 	UINT deathAnimIdx = Necromancer_Anim_Index_Death;
 
 	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
-}
-																		
-void Necromancer::StateAction(float elapsedTime)
-{
-	switch (m_State)
-	{
-	case Monster_State_Idle:
-		Patrol();
-		if (m_bFindPlayer) m_State = Monster_State_Trace;
-		break;
-	case Monster_State_Trace:
-		Trace();
-		break;
-	default:
-		break;
-	}
-}
 
+	if (m_HP / m_MaxHP < 0.5f)
+		m_bRage = true;
+	if (m_State == MonsterState::Monster_State_Special3)
+		m_pAnimationController->SetTrackPosition(MONSTER_ONCE_TRACK_1, 0.8f);
+}
+	
 void Necromancer::Trace()
 {
 	Monster::Trace();
@@ -1977,56 +2046,387 @@ void Necromancer::Trace()
 	xmf3MyPosition.y = 0;
 	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
 	XMVECTOR accelDir = targetPosition - myPosition;
-	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.1f)
-	{
-		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
-		xmf3Accel.x = 0;
-		xmf3Accel.z = 0;
-		m_pBody->SetAcceleration(xmf3Accel);
 
-		Attack1();
-		return;
+	switch (m_nPattern)
+	{
+	case NecromancerAttackPattern::Melee_Attack:
+		if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 8.0f)
+		{
+			XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+			xmf3Accel.x = 0;
+			xmf3Accel.z = 0;
+			m_pBody->SetAcceleration(xmf3Accel);
+
+			Attack1();
+			return;
+		}
+		break;
+
+	case NecromancerAttackPattern::Magic_Cast:
+		if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 10.0f)
+		{
+			XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
+			xmf3Accel.x = 0;
+			xmf3Accel.z = 0;
+			m_pBody->SetAcceleration(xmf3Accel);
+
+			Attack2();
+			return;
+		}
+		break;
+
+	case NecromancerAttackPattern::Summon_Monster:
+		Special2();
+		break;
+
+	default:
+		break;
+	}
+}
+
+void Necromancer::StateAction(float elapsedTime)
+{
+	switch (m_State)
+	{
+	case Monster_State_Idle:
+		Patrol();
+		if (m_bFindPlayer) m_State = Monster_State_Trace;
+		break;
+	case Monster_State_Trace:
+		if (m_bAttackEndLag)
+		{
+			m_ElapsedAttackEndDelay += elapsedTime;
+			if (m_ElapsedAttackEndDelay >= m_AttackEndDelay)
+			{
+				m_bAttackEndLag = false;
+				m_ElapsedAttackEndDelay = 0.0f;
+			}
+			break;
+		}
+		Trace();
+		break;
+	default:
+		break;
 	}
 }
 
 void Necromancer::Attack1()
 {
+	m_Attack1Cnt += 1;
+
 	XMVECTOR playerPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
 	XMVECTOR myPosition = XMLoadFloat3(&m_xmf3Position);
-	if (XMVectorGetX(XMVector3Length(myPosition - playerPosition)) > m_AttackRange * 3)
+
+	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+	m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
+	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 0.75f);
+
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Necromancer_Anim_Index_Attack1);
+	m_State = MonsterState::Monster_State_Attack1;
+}
+
+void Necromancer::Attack2()
+{
+	// 원거리 공격 - 매직 미사일
+	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+	m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
+
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Necromancer_Anim_Index_SpellCast);
+	m_State = MonsterState::Monster_State_Attack2;
+}
+
+void Necromancer::Special2()
+{
+	m_pCollider->SetIsActive(false);
+
+	// 몬스터 소환
+	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+	m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
+
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Necromancer_Anim_Index_Roar);
+	m_State = MonsterState::Monster_State_Special2;
+}
+
+void Necromancer::Special3()
+{
+	BlendWithIdleMovement(1);
+	m_bCanFire = true;
+	m_bAttackEndLag = true;
+	m_bSummonDone = false;
+	m_bStunned = true;
+	m_pBody->SetInGravity(true);
+	m_pCollider->SetIsActive(true);
+
+	// 그로기 상태
+	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+	m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
+
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Necromancer_Anim_Index_Wound);
+	m_State = MonsterState::Monster_State_Special3;
+}
+
+void Necromancer::MagicMissile(bool bChase)
+{
+	if (m_bCanFire)
 	{
-		m_State = Monster_State_Trace;
-		return;
-	}
+		m_bCanFire = false;
 
-	switch (m_State)
-	{
-		//case Monster_State_Idle:
-		//	break;
-	case Monster_State_Attack1:
-		break;
-	default:
-	{
-		//int attackAnimIdx = rand() % 2;
-		int attackAnimIdx = 0;
+		XMVECTOR position = XMLoadFloat3(&m_xmf3Position);
+		XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+		XMVECTOR up = XMLoadFloat3(&m_xmf3Up);
+		XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
+		position += look * 18;
+		position += up * 12;
+		position += right * -6;
+		XMFLOAT3 xmf3ProjectilePos;
+		XMStoreFloat3(&xmf3ProjectilePos, position);
 
-		UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
-		m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
-		m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 0);
 
-		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Necromancer_Anim_Index_Attack1 + attackAnimIdx);
+		std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3ProjectilePos, XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1),
+			ENEMY_PROJECTILE_MODEL_NAME, 0);
+		tmp->GetBody()->SetInGravity(false);
 
-		switch (attackAnimIdx)
+		XMVECTOR targetPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
+		XMVECTOR velocity = targetPosition - position;
+		velocity = XMVector3Normalize(velocity);
+
+		velocity *= 500;
+		XMFLOAT3 xmf3Velocity;
+		XMStoreFloat3(&xmf3Velocity, velocity);
+		tmp->GetBody()->SetVelocity(xmf3Velocity);
+
+		if (bChase)
 		{
-		case 0:
-			m_State = MonsterState::Monster_State_Attack1;
-			break;
-
-		case 1:
-			m_State = MonsterState::Monster_State_Attack2;
-			break;
+			Projectile* pProjectile = (Projectile*)tmp.get();
+			pProjectile->SetChasePlayer(true);
+			pProjectile->SetProjectileSpeed(200);
 		}
 	}
-	break;
+}
+
+void Necromancer::SplashMagic()
+{
+	if (m_bCanFire)
+	{
+		m_bCanFire = false;
+
+		XMVECTOR position = XMLoadFloat3(&m_xmf3Position);
+		XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+		XMVECTOR up = XMLoadFloat3(&m_xmf3Up);
+		XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
+		position += look * 18;
+		position += up * 12;
+		position += right * -6;
+		XMFLOAT3 xmf3ProjectilePos;
+		XMStoreFloat3(&xmf3ProjectilePos, position);
+
+		for (int i = 0; i < 5; ++i)
+		{
+			std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+				xmf3ProjectilePos, XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1),
+				ENEMY_PROJECTILE_MODEL_NAME, 0);
+			tmp->GetBody()->SetInGravity(false);
+
+			XMVECTOR targetPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
+			XMVECTOR velocity = targetPosition - position;
+			velocity = XMVector3Normalize(velocity);
+			XMVECTOR rotate = XMQuaternionRotationRollPitchYaw(0, XMConvertToRadians((i * 15) - 30), 0);
+			velocity = XMVector3Rotate(velocity, rotate);
+			velocity *= 300;
+			XMFLOAT3 xmf3Velocity;
+			XMStoreFloat3(&xmf3Velocity, velocity);
+
+			tmp->GetBody()->SetVelocity(xmf3Velocity);
+		}
 	}
+}
+
+void Necromancer::SummonMonster()
+{
+	if (m_nSummonCnt > 0)
+		return;
+
+	m_nAttackCnt = 0;
+	if(m_bRage)
+		m_nSummonPattern = rand() % 3 + 3;
+	else
+		m_nSummonPattern = rand() % 3;
+
+	XMVECTOR myPosition = XMLoadFloat3(&m_xmf3Position);
+	XMVECTOR centerPosition = myPosition;
+	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+	centerPosition += look * 10;
+	XMVECTOR direction = centerPosition - myPosition;
+	direction = XMVector3Normalize(direction);
+
+	XMVECTOR summonPosition[5];
+	XMFLOAT3 xmf3SummonPosition[5];
+	for (int i = 0; i < 5; ++i)
+	{
+		XMVECTOR tmpDirection = direction;
+
+		XMVECTOR rotate = XMQuaternionRotationRollPitchYaw(0, XMConvertToRadians((i * 45) - 90), 0);
+		tmpDirection = XMVector3Rotate(tmpDirection, rotate);
+		summonPosition[i] = myPosition + tmpDirection * 60;
+
+		XMStoreFloat3(&xmf3SummonPosition[i], summonPosition[i]);
+	}
+
+	////////////////////////////
+	//
+	//	0		N      4
+	//      1      3
+	//          2
+	//
+	////////////////////////////
+	switch (m_nSummonPattern)
+	{
+	case SummonPattern::Summon_1:
+	{
+		// 일반 좀비 3마리
+		std::shared_ptr<Object> pMonster1 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[1], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster2 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[2], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster3 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[3], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+		
+		m_vpSummonedMonsters.emplace_back(pMonster1);
+		m_vpSummonedMonsters.emplace_back(pMonster2);
+		m_vpSummonedMonsters.emplace_back(pMonster3);
+	}
+		break;
+	case SummonPattern::Summon_2:
+	{
+		// 고급 좀비 1마리, 사마귀 2마리
+		std::shared_ptr<Object> pMonster1 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[1], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster2 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[2], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster3 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[3], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
+
+		m_vpSummonedMonsters.emplace_back(pMonster1);
+		m_vpSummonedMonsters.emplace_back(pMonster2);
+		m_vpSummonedMonsters.emplace_back(pMonster3);
+	}
+		break;
+	case SummonPattern::Summon_3:
+	{
+		// 구울 2마리
+		std::shared_ptr<Object> pMonster1 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[1], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			GHOUL_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster2 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[3], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			GHOUL_MODEL_NAME, MONSTER_TRACK_CNT);
+
+		m_vpSummonedMonsters.emplace_back(pMonster1);
+		m_vpSummonedMonsters.emplace_back(pMonster2);
+	}
+		break;
+	case SummonPattern::Summon_4:
+	{
+		// 고급좀비 5마리
+		std::shared_ptr<Object> pMonster1 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[0], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster2 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[1], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster3 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[2], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster4 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[3], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster5 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[4], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+
+		m_vpSummonedMonsters.emplace_back(pMonster1);
+		m_vpSummonedMonsters.emplace_back(pMonster2);
+		m_vpSummonedMonsters.emplace_back(pMonster3);
+	}
+		break;
+	case SummonPattern::Summon_5:
+	{
+		// 사마귀 5마리
+		std::shared_ptr<Object> pMonster1 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[0], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster2 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[1], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster3 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[2], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster4 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[3], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster5 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[4], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+
+		m_vpSummonedMonsters.emplace_back(pMonster1);
+		m_vpSummonedMonsters.emplace_back(pMonster2);
+		m_vpSummonedMonsters.emplace_back(pMonster3);
+		m_vpSummonedMonsters.emplace_back(pMonster4);
+		m_vpSummonedMonsters.emplace_back(pMonster5);
+	}
+		break;
+	case SummonPattern::Summon_6:
+	{
+		// 구울 2마리, 사마리 3마리
+		std::shared_ptr<Object> pMonster1 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[0], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster2 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[1], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster3 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[2], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster4 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[3], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
+		std::shared_ptr<Object> pMonster5 = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			xmf3SummonPosition[4], XMFLOAT4(0, 0, 0, 1), m_xmf3Rotation, XMFLOAT3(1, 1, 1),
+			ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+
+		m_vpSummonedMonsters.emplace_back(pMonster1);
+		m_vpSummonedMonsters.emplace_back(pMonster2);
+		m_vpSummonedMonsters.emplace_back(pMonster3);
+		m_vpSummonedMonsters.emplace_back(pMonster4);
+		m_vpSummonedMonsters.emplace_back(pMonster5);
+	}
+		break;
+	default:
+		break;
+	}
+
+	for (int i = 0; i < m_vpSummonedMonsters.size(); ++i)
+	{
+		Monster* pMonster = (Monster*)m_vpSummonedMonsters[i].get();
+		pMonster->SetFindPlayer(true);
+	}
+	m_nSummonCnt = 0;
+	for (int i = 0; i < m_vpSummonedMonsters.size(); ++i)
+	{
+		if (m_vpSummonedMonsters[i]->GetIsAlive())
+			m_nSummonCnt++;
+	}
+
+	m_bSummonDone = true;
 }

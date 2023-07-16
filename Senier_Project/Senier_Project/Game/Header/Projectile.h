@@ -43,6 +43,7 @@ protected:
 
 	bool m_bChasePlayer = false;
 
+	float m_ProjectilePower = 10.f;
 	float m_ProjectileSpeed = 10.0f;
 	XMFLOAT3 m_xmf3ProjectileDirection = XMFLOAT3(0, 0, 0);
 
@@ -54,6 +55,7 @@ public:
 
 	void SetProjectileProperty(ProjectileProperty nProperty) { m_ProjectileProperty = nProperty; }
 	void SetChasePlayer(bool bChasePlayer) { m_bChasePlayer = bChasePlayer; }
+	void SetProjectilePower(float projectilePower) { m_ProjectilePower = projectilePower; }
 	void SetProjectileSpeed(float projectileSpeed) { m_ProjectileSpeed = projectileSpeed; }
 	void SetProjectileDirection(XMFLOAT3 xmf3ProjectileDirection) { m_xmf3ProjectileDirection = xmf3ProjectileDirection; }
 

@@ -77,7 +77,7 @@ float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 	float3 toEyeW = normalize(gEyePosW - pin.PosW);
 
 	// 간접 조명을 흉내 내는 주변광 항.
-	float4 ambient = gAmbientLight * diffuseAlbedo;
+	float4 ambient = gAmbientLight * diffuseAlbedo ;
 
 	// 직접 조명
 	const float shininess = 1.0f - gRoughness;

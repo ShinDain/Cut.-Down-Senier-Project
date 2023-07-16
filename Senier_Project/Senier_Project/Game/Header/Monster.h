@@ -53,7 +53,7 @@ public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, UINT nHitAnimIdx, UINT nDeathAnimIdx);
 
 public:
-	virtual void StateAction(float elapsedTime) {}
+	virtual void StateAction(float elapsedTime);
 	virtual void Patrol();
 	virtual void Trace();
 
@@ -74,8 +74,15 @@ protected:
 
 	XMFLOAT3 m_xmf3MonsterMovement = XMFLOAT3(0, 0, 0);
 
+	bool m_bAttackEndLag = true;
+	float m_AttackEndDelay = 0.5f;
+	float m_ElapsedAttackEndDelay = 0.0f;
+
 	bool m_bFindPlayer = false;
 	bool m_bSuperArmor = false;
+
+public:
+	void SetFindPlayer(bool bFindPlayer) { m_bFindPlayer = bFindPlayer; }
 };
 
 class Zombie : public Monster
@@ -115,7 +122,6 @@ public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 
 public:
-	virtual void StateAction(float elapsedTime);
 	virtual void Trace();
 
 	virtual void Attack1();
@@ -160,7 +166,6 @@ private:
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 public:
-	virtual void StateAction(float elapsedTime);
 	virtual void Trace();
 
 	virtual void Attack1();
@@ -205,13 +210,12 @@ private:
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 public:
-	virtual void StateAction(float elapsedTime);
 	virtual void Trace();
 
 	virtual void Attack1();
 
 private:
-	UINT m_nAttackCnt = 1;
+	UINT m_nAttackCnt = 0;
 	UINT m_nRushNum = 2;
 	bool m_bRush = false;
 
@@ -252,7 +256,6 @@ private:
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 public:
-	virtual void StateAction(float elapsedTime);
 	virtual void Trace();
 
 	virtual void Attack1();
@@ -302,7 +305,6 @@ private:
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 public:
-	virtual void StateAction(float elapsedTime);
 	virtual void Trace();
 
 	virtual void Attack1();
@@ -311,9 +313,6 @@ public:
 	void GunFire();
 
 private:
-	UINT m_nAttackCnt = 1;
-	UINT m_nRushNum = 4;
-
 	UINT m_nPattern = CyberTwinsAttackPattern::Melee_Attack;
 
 	UINT m_nGunPattern = GunAttackPattern::Rapid_Shoot;
@@ -323,17 +322,9 @@ private:
 	float m_Attack2Delay = 1.0f;
 	float m_ElapsedAttack2Delay = 0.0f;
 
-	bool m_bAttackEndLag = true;
-	float m_AttackEndDelay = 0.5f;
-	float m_ElapsedAttackEndDelay = 0.0f;
-
-
-
 	bool m_bRage = false;
-	bool m_bRush = false;
 	bool m_bCanFire = true;
 
-	XMFLOAT3 m_xmf3RushTargetPosition = XMFLOAT3(0, 0, 0);
 };
 
 class Necromancer : public Monster
@@ -369,13 +360,64 @@ private:
 		Necromancer_Anim_Index_Wound
 	};
 
+	enum NecromancerAttackPattern
+	{
+		Melee_Attack,
+		Magic_Cast,
+		Summon_Monster
+	};
+
+	enum SummonPattern
+	{
+		Summon_1,		  // 일반 좀비 3마리, 사마귀 2마리
+		Summon_2,		  // 고급 좀비 1마리, 일반 좀비 2마리
+		Summon_3,		  // 구울 2마리
+		Summon_4,		  // 사마귀 5마리
+		Summon_5,		  // 고급좀비 3마리
+		Summon_6		  // 구울 1마리, 사마리 3마리
+	};
+
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 public:
-	virtual void StateAction(float elapsedTime);
 	virtual void Trace();
 
-	virtual void Attack1();
+	virtual void StateAction(float elapsedTime);
+
+	virtual void Attack1();		// 낫 근접 공격
+	virtual void Attack2();		// 원거리 공격
+
+	virtual void Special2();	// 몬스터 소환
+	virtual void Special3();	// 그로기
+
+	void MagicMissile(bool bChase);
+	void SplashMagic();
+
+	void SummonMonster();
+
+protected:
+	UINT m_nSummonCnt = 0;
+	bool m_bSummonDone = false;
+	std::vector<std::shared_ptr<Object>> m_vpSummonedMonsters;
+
+	float m_FloatingHeight = 75.0f;
+
+	UINT m_nPattern = NecromancerAttackPattern::Melee_Attack;
+	UINT m_nSummonPattern = SummonPattern::Summon_1;
+	UINT m_nMaxAttackCnt = 4;
+	UINT m_nAttackCnt = 0;
+
+	float m_Attack1Cnt = 0;
+
+	bool m_bStunned = true;
+	float m_StunnedTime = 1.5f;
+	float m_ElapsedStunnedTime = 0.0f;
+
+	bool m_bRage = false;
+
+	bool m_bCanFire = true;
+	float m_FireRate = 1.5f;
+	float m_ElapsedFireTime = 0.0f;
 };
 
 

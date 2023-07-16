@@ -32,6 +32,8 @@
 #include "DDSTextureLoader.h"
 #include "MathHelper.h"
 
+#include <Digitalv.h>
+
 ////////////////////////////////////////////////////////////////////////
 #include <d3d11on12.h>
 #include <d2d1_3.h>

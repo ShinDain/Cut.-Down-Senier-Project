@@ -473,6 +473,8 @@ FodyWeavers.xsd
 
 # ex File
 *.txt
+*.wav
+*.mp3
 
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
