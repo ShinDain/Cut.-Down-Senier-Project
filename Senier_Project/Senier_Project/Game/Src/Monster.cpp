@@ -236,8 +236,8 @@ bool Zombie::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 	// 공격력 및 반경 초기화
 	m_AttackDamage = 10.0f;
-	m_AttackRange = 15.0f;
-	m_AttackRadius = 7.0f;
+	m_AttackRange = 10.0f;
+	m_AttackRadius = 3.0f;
 
 	// 체력 초기화
 	m_MaxHP = 100.0f;
@@ -369,7 +369,7 @@ void Zombie::Trace()
 	xmf3MyPosition.y = 0;
 	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
 	XMVECTOR accelDir = targetPosition - myPosition;
-	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.1f)
+	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.5f)
 	{
 		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
 		xmf3Accel.x = 0;
@@ -449,8 +449,8 @@ bool HighZombie::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 	// 공격력 및 반경 초기화
 	m_AttackDamage = 15.0f;
-	m_AttackRange = 16.0f;
-	m_AttackRadius = 5.0f;
+	m_AttackRange = 10.0f;
+	m_AttackRadius = 2.0f;
 
 	// 체력 초기화
 	m_MaxHP = 200.0f;
@@ -521,7 +521,7 @@ void HighZombie::UpdateAnimationTrack(float elapsedTime)
 
 			// 약간 앞으로 전진
 			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-			XMVECTOR deltaVelocity = l * 4;
+			XMVECTOR deltaVelocity = l * 5;
 			XMFLOAT3 xmf3DeltaVelocity;
 			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 			m_pBody->AddVelocity(xmf3DeltaVelocity);
@@ -630,7 +630,7 @@ void HighZombie::Trace()
 	xmf3MyPosition.y = 0;
 	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
 	XMVECTOR accelDir = targetPosition - myPosition;
-	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.1f)
+	if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.5f)
 	{
 		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
 		xmf3Accel.x = 0;
@@ -720,7 +720,7 @@ bool Scavenger::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	// 공격력 및 반경 초기화
 	m_AttackDamage = 10.0f;
 	m_AttackRange = 10.0f;
-	m_AttackRadius = 3.0f;
+	m_AttackRadius = 5.0f;
 
 	// 체력 초기화
 	m_MaxHP = 50.f;
@@ -759,7 +759,7 @@ void Scavenger::UpdateAnimationTrack(float elapsedTime)
 			XMFLOAT3 xmf3DeltaVelocity;
 			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 			m_pBody->AddVelocity(xmf3DeltaVelocity);
-			CreateAttackSphere(m_AttackRange, 7, m_AttackDamage);
+			CreateAttackSphere(m_AttackRange, m_AttackRadius, m_AttackDamage);
 		}
 
 		if (trackRate < 0.4f)
@@ -948,7 +948,7 @@ void Scavenger::Trace()
 	}
 	else
 	{
-		if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.1f)
+		if (XMVectorGetX(XMVector3Length(accelDir)) < m_AttackRange * 1.5f)
 		{
 			XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
 			xmf3Accel.x = 0;
@@ -1036,8 +1036,8 @@ bool Ghoul::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	// 공격력 및 반경 초기화
 	m_AttackDamage = 30.0f;
-	m_AttackRange = 32.0f;
-	m_AttackRadius = 10.0f;
+	m_AttackRange = 25.0f;
+	m_AttackRadius = 20.0f;
 
 	// 체력 초기화
 	m_MaxHP = 300.0f;
@@ -1337,7 +1337,7 @@ bool CyberTwins::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	// 공격력 및 반경 초기화
 	m_AttackDamage = 20.0f;
 	m_AttackRange = 27.0f;
-	m_AttackRadius = 10.0f;
+	m_AttackRadius = 20.0f;
 
 	// 체력 초기화
 	m_MaxHP = 500.0f;
@@ -1740,7 +1740,7 @@ bool Necromancer::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	// 공격력 및 반경 초기화
 	m_AttackDamage = 20.0f;
 	m_AttackRange = 27.0f;
-	m_AttackRadius = 10.0f;
+	m_AttackRadius = 20.0f;
 
 	// 체력 초기화
 	m_MaxHP = 500.0f;

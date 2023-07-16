@@ -50,6 +50,7 @@ enum RenderLayer : UINT
 	Render_Static,
 	Render_TextureMesh,
 	Render_Skinned,
+	Render_Effect,
 	Render_Image,
 	Render_WireFrame,
 	Render_CuttedStatic,
@@ -76,6 +77,7 @@ enum ObjectType : UINT
 	Object_PlayerProjectile,
 	Object_EnemyProjectile,
 	Object_Item,
+	Object_Effect,
 	Object_UI,
 	Object_None
 };

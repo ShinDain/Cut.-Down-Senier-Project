@@ -34,6 +34,8 @@ public:
 	virtual void UpdateAnimationTrack(float elapsedTime) {}
 	virtual void UnableAnimationTrack(int nAnimationTrack);
 
+	void SpawnBloodEffect(UINT nCnt);
+
 public:
 	virtual void Move(DWORD dwDirection) {}
 	virtual void Jump() {}

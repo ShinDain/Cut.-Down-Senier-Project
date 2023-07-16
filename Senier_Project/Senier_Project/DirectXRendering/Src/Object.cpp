@@ -75,7 +75,7 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 	case Collider_None:
 	{
-		pBody = nullptr;
+		pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation, objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
 		pCollider = nullptr;
 
 		m_xmf3Position = objData.xmf3Position;
@@ -158,6 +158,17 @@ void Object::Update(float elapsedTime)
 
 	if(m_nObjectType != ObjectType::Object_World)
 		UpdateToRigidBody(elapsedTime);
+
+	if (m_bActiveTimer)
+	{
+		m_ElapsedActiveTime += elapsedTime;
+		if (m_ElapsedActiveTime > m_ActiveTime)
+		{
+			m_bActiveTimer = false;
+			m_pCollider->SetIsActive(true);
+			m_ElapsedActiveTime = 0.0f;
+		}
+	}
 
 	if (m_pObjectCB) UpdateObjectCB();
 

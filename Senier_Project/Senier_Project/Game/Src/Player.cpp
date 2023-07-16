@@ -442,7 +442,7 @@ void Player::ThrowProjectile()
 		m_pGrabedObject->GetBody()->SetVelocity(xmf3ProjectileVelocity);
 
 		// Grab 상태 초기화
-		m_pGrabedObject->GetCollider()->SetIsActive(true);
+		m_pGrabedObject->SetActiveTimer(true);
 		m_pGrabedObject = nullptr;
 		m_GrabState = GrabState::Grab_Empty;
 
@@ -467,8 +467,23 @@ void Player::ThrowProjectile()
 		projectileVelocity = projectileVelocity * 300;
 		XMStoreFloat3(&xmf3ProjectileVelocity, projectileVelocity);
 
+		int nRand = rand() % 3;
+		char pstr[64];
+		switch (nRand)
+		{
+		case 0:
+			strcpy_s(pstr, PLAYER_PROJECTILE1_MODEL_NAME);
+			break;
+		case 1:
+			strcpy_s(pstr, PLAYER_PROJECTILE2_MODEL_NAME);
+			break;
+		case 2:
+			strcpy_s(pstr, PLAYER_PROJECTILE3_MODEL_NAME);
+			break;
+		}
+
 		std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, xmf3ProjectilePos, XMFLOAT4(0,0,0,1),
-			XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
+			XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), pstr, 0);
 		tmp->GetBody()->SetVelocity(xmf3ProjectileVelocity);
 	}
 }
@@ -566,7 +581,7 @@ void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	if (m_bInvincible || m_nAnimationState == Player_State_Death)
 		return;
 
-	Object::ApplyDamage(power, xmf3DamageDirection);
+	Character::ApplyDamage(power, xmf3DamageDirection);
 	InitializeState();
 
 	m_bIgnoreInput = true;

@@ -156,6 +156,10 @@ protected:
 	bool m_bInvincible = false;
 	bool m_bVisible = true;
 
+
+	bool m_bActiveTimer = false;
+	float m_ActiveTime = 0.1f;
+	float m_ElapsedActiveTime = 0.0f;
 	
 public:
 	virtual void Move(DWORD dwDirection) {}
@@ -239,11 +243,17 @@ public:
 
 	void SetIsFalling(bool IsFalling) { m_bIsFalling = IsFalling; }
 	void SetIsAlive(bool IsAlive) { m_bIsAlive = IsAlive; }
+	void SetIsDestroying(bool bDestroying) { m_bDestroying = bDestroying; }
 
 	void SetMaxHP(float maxHp) { m_MaxHP = maxHp; }
 	void SetHP(float hp) { m_HP = hp; }
 	void SetInvincible(bool bInvincible) { m_bInvincible = bInvincible; }
 	void SetVisible(bool bVisible) { m_bVisible = bVisible; }
+	void SetActiveTimer(bool bActiveTimer) { m_bActiveTimer = bActiveTimer; }
+
+	void SetDestroyTime(float destroyTime) { m_DestroyTime = destroyTime; }
+	void SetDissolveTime(float dissolveTime) { m_DissolveTime = dissolveTime; }
+
 
 	bool GetIsMesh() { return m_pMesh ? true : false; }
 

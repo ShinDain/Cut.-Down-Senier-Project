@@ -156,6 +156,53 @@ void Character::UnableAnimationTrack(int nAnimationTrack)
 	m_pAnimationController->SetTrackPosition(nAnimationTrack, 0);
 }
 
+void Character::SpawnBloodEffect(UINT nCnt)
+{
+	int nNum = 0;
+	char pstr[64];
+	for (int i = 0; i < nCnt; ++i)
+	{
+		nNum = rand() % 7;
+		switch (nNum)
+		{
+		case 0:
+			strcpy_s(pstr, BLOOD1_EFFECT_MODEL_NAME);
+			break;
+		case 1:
+			strcpy_s(pstr, BLOOD2_EFFECT_MODEL_NAME);
+			break;
+		case 2:
+			strcpy_s(pstr, BLOOD3_EFFECT_MODEL_NAME);
+			break;
+		case 3:
+			strcpy_s(pstr, BLOOD4_EFFECT_MODEL_NAME);
+			break;
+		case 4:
+			strcpy_s(pstr, BLOOD5_EFFECT_MODEL_NAME);
+			break;
+		case 5:
+			strcpy_s(pstr, BLOOD6_EFFECT_MODEL_NAME);
+			break;
+		case 6:
+			strcpy_s(pstr, BLOOD7_EFFECT_MODEL_NAME);
+			break;
+		}
+
+		std::shared_ptr<Object> pObject = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+			m_xmf3Position, XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1),
+			pstr, 0);
+
+		XMFLOAT3 xmf3Velocity;
+		xmf3Velocity.x = rand() % 60 - 30;
+		xmf3Velocity.y = rand() % 30;
+		xmf3Velocity.z = rand() % 60 - 30;
+
+		pObject->GetBody()->SetVelocity(xmf3Velocity);
+		pObject->SetDissolveTime(2.0f);
+		pObject->SetIsDestroying(true);
+	}
+}
+
 void Character::IsFalling()
 {
 	if (m_xmf3RenderPosition.y < 0)
@@ -276,6 +323,9 @@ void Character::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 
 	m_pBody->AddVelocity(xmf3DeltaVelocity);
+
+	UINT nEffectCnt = (UINT)power / 5 + 1;
+	SpawnBloodEffect(nEffectCnt);
 }
 
 void Character::Cutting(XMFLOAT3 xmf3PlaneNormal)
