@@ -1669,7 +1669,7 @@ void CyberTwins::GunFire()
 			{
 				std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
 					xmf3ProjectilePos, XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1),
-					ENEMY_PROJECTILE_MODEL_NAME, 0);
+					ENEMY_BULLET_MODEL_NAME, 0);
 				tmp->GetBody()->SetInGravity(false);
 
 				XMVECTOR targetPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
@@ -1686,11 +1686,6 @@ void CyberTwins::GunFire()
 		}
 		else
 		{
-			std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
-				xmf3ProjectilePos, XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1),
-				ENEMY_PROJECTILE_MODEL_NAME, 0);
-			tmp->GetBody()->SetInGravity(false);
-
 			XMVECTOR targetPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
 			XMVECTOR velocity = targetPosition - position;
 			velocity = XMVector3Normalize(velocity);
@@ -1698,13 +1693,41 @@ void CyberTwins::GunFire()
 			velocity *= 500;
 			XMFLOAT3 xmf3Velocity;
 			XMStoreFloat3(&xmf3Velocity, velocity);
-			tmp->GetBody()->SetVelocity(xmf3Velocity);
-
 			if (m_nGunPattern == GunAttackPattern::Chasing_Shoot)
 			{
-				Projectile* pProjectile = (Projectile*)tmp.get();
-				pProjectile->SetChasePlayer(true);
-				pProjectile->SetProjectileSpeed(150);
+				int nRandNum = rand() % 2;
+				if (nRandNum)
+				{
+					std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+						xmf3ProjectilePos, XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1),
+						ENEMY_MISSILE1_MODEL_NAME, 0);
+					tmp->GetBody()->SetInGravity(false);
+					tmp->GetBody()->SetVelocity(xmf3Velocity);
+
+					Projectile* pProjectile = (Projectile*)tmp.get();
+					pProjectile->SetChasePlayer(true);
+					pProjectile->SetProjectileSpeed(150);
+				}
+				else
+				{
+					std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+						xmf3ProjectilePos, XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1),
+						ENEMY_MISSILE2_MODEL_NAME, 0);
+					tmp->GetBody()->SetInGravity(false);
+					tmp->GetBody()->SetVelocity(xmf3Velocity);
+
+					Projectile* pProjectile = (Projectile*)tmp.get();
+					pProjectile->SetChasePlayer(true);
+					pProjectile->SetProjectileSpeed(150);
+				}
+			}
+			else
+			{
+				std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+					xmf3ProjectilePos, XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1),
+					ENEMY_BULLET_MODEL_NAME, 0);
+				tmp->GetBody()->SetInGravity(false);
+				tmp->GetBody()->SetVelocity(xmf3Velocity);
 			}
 		}
 	}
@@ -2021,7 +2044,8 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 void Necromancer::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 {
 	// 사운드 재생 테스트
-	//mciSendString(_T("play Sound/Footstep01.wav"), 0, 0, 0);
+	Sound::PlaySoundFile(L"Sound/123.wav", true);
+	//Sound::PlayBGM(L"Sound/123.wav", t);
 
 	UINT hitAnimIdx = Necromancer_Anim_Index_Hit;
 	UINT deathAnimIdx = Necromancer_Anim_Index_Death;
@@ -2185,12 +2209,6 @@ void Necromancer::MagicMissile(bool bChase)
 		XMFLOAT3 xmf3ProjectilePos;
 		XMStoreFloat3(&xmf3ProjectilePos, position);
 
-
-		std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
-			xmf3ProjectilePos, XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1),
-			ENEMY_PROJECTILE_MODEL_NAME, 0);
-		tmp->GetBody()->SetInGravity(false);
-
 		XMVECTOR targetPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
 		XMVECTOR velocity = targetPosition - position;
 		velocity = XMVector3Normalize(velocity);
@@ -2198,13 +2216,26 @@ void Necromancer::MagicMissile(bool bChase)
 		velocity *= 500;
 		XMFLOAT3 xmf3Velocity;
 		XMStoreFloat3(&xmf3Velocity, velocity);
-		tmp->GetBody()->SetVelocity(xmf3Velocity);
 
 		if (bChase)
 		{
+			std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+				xmf3ProjectilePos, XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1),
+				ENEMY_MAGIC2_MODEL_NAME, 0);
+			tmp->GetBody()->SetInGravity(false);
+			tmp->GetBody()->SetVelocity(xmf3Velocity);
+
 			Projectile* pProjectile = (Projectile*)tmp.get();
 			pProjectile->SetChasePlayer(true);
 			pProjectile->SetProjectileSpeed(200);
+		}
+		else
+		{
+			std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
+				xmf3ProjectilePos, XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1),
+				ENEMY_MAGIC1_MODEL_NAME, 0);
+			tmp->GetBody()->SetInGravity(false);
+			tmp->GetBody()->SetVelocity(xmf3Velocity);
 		}
 	}
 }
@@ -2229,7 +2260,7 @@ void Necromancer::SplashMagic()
 		{
 			std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList,
 				xmf3ProjectilePos, XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1),
-				ENEMY_PROJECTILE_MODEL_NAME, 0);
+				ENEMY_MAGIC1_MODEL_NAME, 0);
 			tmp->GetBody()->SetInGravity(false);
 
 			XMVECTOR targetPosition = XMLoadFloat3(&g_pPlayer->GetPosition());

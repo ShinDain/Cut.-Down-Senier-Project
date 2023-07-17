@@ -7,18 +7,6 @@
 #include "Weapon.h"
 #include "../../DirectXRendering/Header/AnimationController.h"
 
-enum PlayerAnimationState
-{
-	Player_State_Idle,
-	Player_State_Jump,
-	Player_State_Falling,
-	Player_State_Land,
-	Player_State_Melee,
-	Player_State_Hit,
-	Player_State_Death,
-	Player_State_Throw
-};
-
 class Player : public Character
 {
 public:
@@ -40,7 +28,19 @@ public:
 	virtual void Destroy();
 
 private:
-	enum PlayerAnimationIndex
+	enum PlayerAnimationState
+	{
+		Player_State_Idle,
+		Player_State_Jump,
+		Player_State_Falling,
+		Player_State_Land,
+		Player_State_Melee,
+		Player_State_Hit,
+		Player_State_Death,
+		Player_State_Throw
+	};
+
+	enum PlayerAnimationIndex 
 	{
 		Player_Anim_Index_Idle,
 		Player_Anim_Index_RunForward,
@@ -62,6 +62,29 @@ private:
 		Player_Anim_Index_ThrowIdle,
 		Player_Anim_Index_Throw
 	};
+
+	// »ç¿îµå ÆÄÀÏ ÀÌ¸§
+	LPCWSTR idle1_SoundFileName = L"";
+	LPCWSTR idle2_SoundFileName = L"";
+	LPCWSTR idle3_SoundFileName = L"";
+	LPCWSTR walk1_SoundFileName = L"Sound/Footstep01.wav";
+	LPCWSTR walk2_SoundFileName = L"Sound/Footstep02.wav";
+	LPCWSTR run1_SoundFileName = L"";
+	LPCWSTR run2_SoundFileName = L"";
+	LPCWSTR jump_SoundFileName = L"Sound/Footstep03.wav";
+	LPCWSTR doublejump_SoundFileName = L"Sound/123.wav";
+	LPCWSTR land_SoundFileName = L"Sound/Footstep04.wav";
+	LPCWSTR attack1_SoundFileName = L"Sound/123.wav";
+	LPCWSTR attack2_SoundFileName = L"Sound/Footstep04.wav";
+	LPCWSTR attack3_SoundFileName = L"Sound/Footstep03.wav";
+	LPCWSTR hit1_SoundFileName = L"Sound/123.wav";
+	LPCWSTR hit2_SoundFileName = L"Sound/Footstep04.wav";
+	LPCWSTR death1_SoundFileName = L"Sound/Footstep01.wav";
+	LPCWSTR death2_SoundFileName = L"Sound/Footstep02.wav";
+	LPCWSTR grab1_SoundFileName = L"Sound/Footstep01.wav";		// ±×·¦
+	LPCWSTR grab2_SoundFileName = L"Sound/Footstep02.wav";		// ±×·¦
+	LPCWSTR throw1_SoundFileName = L"Sound/123.wav";		// ÅõÃ´
+	LPCWSTR throw2_SoundFileName = L"Sound/123.wav";		// ÅõÃ´
 
 public:
 	virtual void ProcessInput(UCHAR* pKeybuffer);

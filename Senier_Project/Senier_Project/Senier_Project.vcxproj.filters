@@ -140,6 +140,9 @@
     <ClCompile Include="Game\Src\Cinematic.cpp">
       <Filter>Game\Src</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Src\Sound.cpp">
+      <Filter>Game\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Physics\Header\Collider.h">
@@ -248,6 +251,9 @@
       <Filter>Game\Header</Filter>
     </ClInclude>
     <ClInclude Include="Game\Header\Cinematic.h">
+      <Filter>Game\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Header\Sound.h">
       <Filter>Game\Header</Filter>
     </ClInclude>
   </ItemGroup>

@@ -16,7 +16,7 @@
 		</Mesh>
 		<Materials>: 1
 			<Material>: 0
-				<AlbedoColor>: 1 1 1 1
+				<AlbedoColor>: 1 0 0 1
 				<EmissiveColor>: 0 0 0 0.9999999
 				<Glossiness>: 0.5
 				<Metallic>: 0

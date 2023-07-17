@@ -7,7 +7,7 @@
 #define ANIMATION_TYPE_LOOP				1
 #define ANIMATION_TYPE_PINGPONG			2
 
-#define ANIMATION_CALLBACK_EPSILON	0.00165f
+#define ANIMATION_CALLBACK_EPSILON	0.0165f
 
 using namespace DirectX;
 
@@ -121,6 +121,7 @@ public:
 
 	float GetPosition() { return m_Position; }
 	int GetAnimaitionSet() { return m_nAnimationSet; }
+	float GetWeight() { return m_Weight; }
 };
 
 class ModelDataInfo
@@ -255,6 +256,11 @@ public:
 	{
 		if (nAnimationTrack < m_vpAnimationTracks.size()) return m_vpAnimationTracks[nAnimationTrack]->GetPosition();
 	}
+	float GetTrackWeight(int nAnimationTrack)
+	{
+		if (nAnimationTrack < m_vpAnimationTracks.size()) return m_vpAnimationTracks[nAnimationTrack]->GetWeight();
+	}
+
 };
 
 

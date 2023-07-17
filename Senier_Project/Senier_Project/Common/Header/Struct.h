@@ -77,6 +77,7 @@ enum ObjectType : UINT
 	Object_PlayerProjectile,
 	Object_EnemyProjectile,
 	Object_Item,
+	Object_Event,
 	Object_Effect,
 	Object_UI,
 	Object_None

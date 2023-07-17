@@ -13,7 +13,7 @@ Object::Object(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandL
 	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
 	m_nObjectCBParameterIdx = 3;
 
-	m_DestroyTime = 0.0f;
+	m_DestroyTime = 0.0;
 	m_DissolveTime = 0.0f;
 }
 

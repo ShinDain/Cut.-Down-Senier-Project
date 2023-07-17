@@ -63,6 +63,11 @@ bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_MaxHP = 300.0f;
 	m_HP = 300.0f;
 
+#if defined(_DEBUG) || defined(DEBUG)
+	m_MaxHP = 20.0f;
+	m_HP = 20.0f;
+#endif
+
 	return true;
 }
 
@@ -288,7 +293,12 @@ void Player::Jump()
 	if (!m_bIsFalling || m_bCanDoubleJump)
 	{
 		if (m_bIsFalling)
+		{
 			m_bCanDoubleJump = false;
+			Sound::PlaySoundFile(doublejump_SoundFileName, true);
+		}
+		else
+			Sound::PlaySoundFile(jump_SoundFileName, true);
 
 		XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
 		float length = xmf3Velocity.y;
@@ -308,6 +318,8 @@ void Player::ChangeToJumpState()
 {
 	m_nAnimationState = PlayerAnimationState::Player_State_Jump;
 	UnableAnimationTrack(PLAYER_ONCE_TRACK_1);
+	UnableAnimationTrack(PLAYER_ONCE_TRACK_2);
+	UnableAnimationTrack(PLAYER_ONCE_TRACK_3);
 	m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_1, true);
 	m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1);
 
@@ -393,6 +405,13 @@ void Player::ThrowProjectile()
 {
 	if (!m_bCanThrow)
 		return;
+
+	// 사운드
+	int nRand = rand() % 2;
+	if (nRand)
+		Sound::PlaySoundFile(throw1_SoundFileName, true);
+	else
+		Sound::PlaySoundFile(throw2_SoundFileName, true);
 
 	float pickDistance = 0;
 	std::shared_ptr<Object> pickedObject = CameraRayToMovableObject(true, pickDistance);
@@ -605,6 +624,12 @@ void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 		m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_1, true);
 		m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_GetHit);
 		m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1);
+
+		int nRand = rand() % 2;
+		if (nRand)
+			Sound::PlaySoundFile(hit1_SoundFileName, true);
+		else
+			Sound::PlaySoundFile(hit2_SoundFileName, true);
 	}
 	else
 	{
@@ -618,6 +643,12 @@ void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 		m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_1, true);
 		m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_Death);
 		m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1);
+
+		int nRand = rand() % 2;
+		if (nRand)
+			Sound::PlaySoundFile(death1_SoundFileName, true);
+		else
+			Sound::PlaySoundFile(death2_SoundFileName, true);
 	}
 	
 }
@@ -644,6 +675,8 @@ void Player::DoLanding()
 		m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_JumpDown);
 		m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_1, true);
 		m_nAnimationState = PlayerAnimationState::Player_State_Land;
+
+		Sound::PlaySoundFile(land_SoundFileName, true);
 		break;
 	case Player_State_Land:
 		break;
@@ -677,6 +710,16 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 	{
 	case Player_State_Idle:
 	{
+		float trackWeight = m_pAnimationController->GetTrackWeight(PLAYER_MOVE_TRACK);
+		float trackPosition = m_pAnimationController->GetTrackPosition(PLAYER_MOVE_TRACK);
+		if (trackWeight > 0.5f)
+		{
+			if (MathHelper::IsEqual(0.33f, trackPosition, ANIMATION_CALLBACK_EPSILON))
+				Sound::PlaySoundFile(walk1_SoundFileName, true);
+			if (MathHelper::IsEqual(0.65f, trackPosition, ANIMATION_CALLBACK_EPSILON))
+				Sound::PlaySoundFile(walk2_SoundFileName, true);
+		}
+
 		// 바닥에서의 기본 움직임
 		BlendWithIdleMovement(1);
 	}
@@ -753,9 +796,25 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 				BlendWithIdleMovement(weight);
 			}
 		}
-
 		else if(trackRate > 0.2f)
 		{
+			float trackPosition = m_pAnimationController->GetTrackPosition(PLAYER_ONCE_TRACK_1 + m_nCurAttackTrack);
+			switch (m_nCurAttackTrack)
+			{
+			case 0:
+				if (MathHelper::IsEqual(0.33f, trackPosition, ANIMATION_CALLBACK_EPSILON))
+					Sound::PlaySoundFile(attack1_SoundFileName, true);
+				break;
+			case 1:
+				if (MathHelper::IsEqual(0.65f, trackPosition, ANIMATION_CALLBACK_EPSILON))
+					Sound::PlaySoundFile(attack2_SoundFileName, true);
+				break;
+			case 2:
+				if (MathHelper::IsEqual(0.8f, trackPosition, ANIMATION_CALLBACK_EPSILON))
+					Sound::PlaySoundFile(attack3_SoundFileName, true);
+				break;
+			}
+			
 			m_pWeapon->SetActive(true);
 		}
 
@@ -915,6 +974,13 @@ void Player::ObjectGrab()
 		// 손이 빈 경우
 		if (m_GrabState == GrabState::Grab_Empty)
 		{
+			int nRand = rand() % 2;
+			if (nRand)
+				Sound::PlaySoundFile(grab1_SoundFileName, true);
+			else
+				Sound::PlaySoundFile(grab2_SoundFileName, true);
+
+
 			ColliderBox* pColliderBox = (ColliderBox*)(pickedObject->GetCollider().get());
 
 			// 디버그용

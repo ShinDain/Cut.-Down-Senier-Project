@@ -118,6 +118,25 @@ void Projectile::Update(float elapsedTime)
 {
 	Object::Update(elapsedTime);
 
+	// 진행 방향
+	XMFLOAT3 xmf3TargetLook = m_pBody->GetVelocity();
+	xmf3TargetLook.y = 0;
+	XMVECTOR targetLook = XMLoadFloat3(&xmf3TargetLook);
+	{
+		targetLook = XMVector3Normalize(targetLook);
+		XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+		float angleBetweenLook = XMVectorGetX(XMVector3AngleBetweenVectors(targetLook, look));
+		angleBetweenLook = XMConvertToDegrees(angleBetweenLook);
+
+		if (!XMVectorGetX(XMVectorIsNaN(XMVectorReplicate(angleBetweenLook))))
+		{
+			// 값이 너무 커지지 않도록
+			float tmp = (int)(m_xmf3Rotation.y + angleBetweenLook) % 360;
+
+			SetRotate(XMFLOAT3(m_xmf3Rotation.x, tmp, m_xmf3Rotation.z));
+		}
+	}
+
 	if (!m_bDestroying)
 	{
 		m_IntersectCollider.Center = m_xmf3Position;
@@ -136,6 +155,8 @@ void Projectile::Update(float elapsedTime)
 		XMFLOAT3 xmf3Position = m_pBody->GetPosition();
 		m_pBody->SetPosition(XMFLOAT3(xmf3Position.x, 0, xmf3Position.z));
 		m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
+
+		//m_DissolveTime = 0;
 		m_bDestroying = true;
 	}
 }

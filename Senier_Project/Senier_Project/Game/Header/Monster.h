@@ -377,6 +377,25 @@ private:
 		Summon_6		  // 구울 1마리, 사마리 3마리
 	};
 
+	struct SoundList
+	{
+		LPCWSTR IDLE1_SOUND = L"";
+		LPCWSTR IDLE2_SOUND = L"";
+		LPCWSTR IDLE3_SOUND = L"";
+		LPCWSTR WALK1_SOUND = L"";
+		LPCWSTR WALK2_SOUND = L"";
+		LPCWSTR RUN1_SOUND = L"";
+		LPCWSTR RUN2_SOUND = L"";
+		LPCWSTR ATTACK1_SOUND = L"";
+		LPCWSTR ATTACK2_SOUND = L"";
+		LPCWSTR HIT1_SOUND = L"";
+		LPCWSTR HIT2_SOUND = L"";
+		LPCWSTR DEATH1_SOUND = L"";
+		LPCWSTR DEATH2_SOUND = L"";
+		LPCWSTR SPECIAL1_SOUND = L"";
+		LPCWSTR SPECIAL2_SOUND = L"";
+	};
+
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
 public:
@@ -403,6 +422,7 @@ protected:
 	float m_FloatingHeight = 75.0f;
 
 	UINT m_nPattern = NecromancerAttackPattern::Melee_Attack;
+	//UINT m_nPattern = NecromancerAttackPattern::Magic_Cast;
 	UINT m_nSummonPattern = SummonPattern::Summon_1;
 	UINT m_nMaxAttackCnt = 4;
 	UINT m_nAttackCnt = 0;

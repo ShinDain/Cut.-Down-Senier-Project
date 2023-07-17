@@ -44,6 +44,7 @@
     <ClCompile Include="Game\Src\ObjectDefaultData.cpp" />
     <ClCompile Include="Game\Src\Player.cpp" />
     <ClCompile Include="Game\Src\Projectile.cpp" />
+    <ClCompile Include="Game\Src\Sound.cpp" />
     <ClCompile Include="Game\Src\Weapon.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Physics\Src\CollisionDetact.cpp" />
@@ -83,6 +84,7 @@
     <ClInclude Include="Game\Header\ObjectDefaultData.h" />
     <ClInclude Include="Game\Header\Player.h" />
     <ClInclude Include="Game\Header\Projectile.h" />
+    <ClInclude Include="Game\Header\Sound.h" />
     <ClInclude Include="Game\Header\Weapon.h" />
     <ClInclude Include="Physics\Header\CollisionDetact.h" />
     <ClInclude Include="Physics\Header\CollisionResolver.h" />

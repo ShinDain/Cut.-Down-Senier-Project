@@ -14,6 +14,7 @@
 #include "Mesh.h"
 #include "Material.h"
 #include "AnimationController.h"
+#include "../../Game/Header/Sound.h"
 
 
 
@@ -155,7 +156,6 @@ protected:
 	float m_ElapsedInvincibleTime = 0.0f;
 	bool m_bInvincible = false;
 	bool m_bVisible = true;
-
 
 	bool m_bActiveTimer = false;
 	float m_ActiveTime = 0.1f;
