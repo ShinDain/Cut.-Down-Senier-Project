@@ -130,7 +130,6 @@ void Object::Update(float elapsedTime)
 			m_DissolveValue = m_ElapsedDestroyTime / (m_DestroyTime);
 			if (m_ElapsedDestroyTime >= m_DestroyTime)
 			{
-				//Cutting(XMFLOAT3(0, 1, 0));
 				m_bIsAlive = false;
 				return;
 			}
@@ -707,6 +706,58 @@ void Object::Cutting(XMFLOAT3 xmf3PlaneNormal)
 	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, -1, xmf3PlaneNormal, false);
 }
 
+void Object::DegradedBroken()
+{
+	// 최대 3개의 절단 평면을 가질 수 있음
+	// 무작위의 3개의 벡터
+	
+	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
+	XMVECTOR right = XMLoadFloat3(&m_xmf3Right);
+	XMVECTOR up = XMVectorSet(0, 1, 0, 0); 
+
+	float Angle_X = rand() % 60 - 30;
+	float Angle_Y = rand() % 30 - 15;
+	float Angle_Z = rand() % 60 - 30;
+
+	XMMATRIX rotateMat = XMMatrixRotationRollPitchYaw(XMConvertToRadians(Angle_X), XMConvertToRadians(Angle_Y), XMConvertToRadians(Angle_Z));
+
+	
+	// 무작위 평면 전달
+	XMFLOAT3 xmf3PlaneNormal[3];
+	XMVECTOR planeNormal[3];	// 상하 분리
+	XMFLOAT3 xmf3RandVector3 = { 0,0,0 };
+	for (int i = 0; i < 3; ++i)
+	{
+		xmf3RandVector3.x = rand() % 100;
+		xmf3RandVector3.y = rand() % 100;
+		xmf3RandVector3.z = rand() % 100;
+		planeNormal[i] = XMLoadFloat3(&xmf3RandVector3);
+		planeNormal[i] = XMVector3TransformNormal(planeNormal[i], rotateMat);
+		planeNormal[i] = XMVector3Normalize(planeNormal[i]);
+		XMStoreFloat3(&xmf3PlaneNormal[i], planeNormal[i]);
+	}
+
+	std::shared_ptr<Object> pCuttedPositive_1 = Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+		this, 1, xmf3PlaneNormal[0], false);
+	std::shared_ptr<Object> pCuttedPositive_2 = Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+		pCuttedPositive_1.get(), 1, xmf3PlaneNormal[1], true);
+	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+		pCuttedPositive_1.get(), 1, xmf3PlaneNormal[2], true);
+	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+		pCuttedPositive_2.get(), 1, xmf3PlaneNormal[2], true);
+
+	std::shared_ptr<Object> pCuttedNegative_1 = Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+		this, -1, xmf3PlaneNormal[0], false);
+	std::shared_ptr<Object> pCuttedNegative_2 = Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+		pCuttedNegative_1.get(), 1, xmf3PlaneNormal[1], true);
+	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+		pCuttedNegative_1.get(), 1, xmf3PlaneNormal[2], true);
+	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+		pCuttedNegative_2.get(), 1, xmf3PlaneNormal[2], true);
+
+	m_bIsAlive = false;
+}
+
 void Object::Destroy()
 {
 	m_bIsAlive = false;
@@ -940,7 +991,7 @@ void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 		m_bDestroying = true;
 
 		// 파괴된 위치에 아이템 생성
-		CreateScoreItems(5);
+		CreateScoreItems(m_MaxHP / 5);
 
 		CreateHealItems(1);
 	}

@@ -46,7 +46,6 @@ void Character::Update(float elapsedTime)
 			}
 			if (m_ElapsedDestroyTime >= m_DestroyTime)
 			{
-				//Cutting(XMFLOAT3(1, 0, 0));
 				m_bIsAlive = false;
 				return;
 			}

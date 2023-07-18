@@ -67,6 +67,7 @@ public:
 	void LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject, const char* pstrFileName, const char* pstrTexPath);
 
 	virtual void Cutting(XMFLOAT3 xmf3PlaneNormal);
+	virtual void DegradedBroken();
 	virtual void Destroy();
 	virtual void DestroyRunTime();
 

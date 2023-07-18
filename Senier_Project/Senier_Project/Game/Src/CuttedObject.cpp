@@ -186,7 +186,7 @@ void CuttedObject::UpdateCuttedCB()
 	XMStoreFloat3(&xmf3PlaneNormal_1, planeNormal_1);
 	cuttedConstant.xmf3PlaneNormal_1 = xmf3PlaneNormal_1;
 	XMVECTOR planeDistanceVec_1 = thisPosition * planeNormal_1;
-	float planeDistance_1 = XMVectorGetX(XMVectorSum(planeDistanceVec_1));
+	float planeDistance_1 = XMVectorGetX(XMVectorSum(planeDistanceVec_1)) + m_PlaneDistance[0];
 	cuttedConstant.PlaneDistance_1 = planeDistance_1;
 
 	XMVECTOR planeNormal_2 = XMLoadFloat3(&m_PlaneNormal[1]);
@@ -196,7 +196,7 @@ void CuttedObject::UpdateCuttedCB()
 	XMStoreFloat3(&xmf3PlaneNormal_2, planeNormal_2);
 	cuttedConstant.xmf3PlaneNormal_2 = xmf3PlaneNormal_2;
 	XMVECTOR planeDistanceVec_2 = thisPosition * planeNormal_2;
-	float planeDistance_2 = XMVectorGetX(XMVectorSum(planeDistanceVec_2));
+	float planeDistance_2 = XMVectorGetX(XMVectorSum(planeDistanceVec_2)) + m_PlaneDistance[1];
 	cuttedConstant.PlaneDistance_2 = planeDistance_2;
 
 	XMVECTOR planeNormal_3 = XMLoadFloat3(&m_PlaneNormal[2]);
@@ -206,7 +206,7 @@ void CuttedObject::UpdateCuttedCB()
 	XMStoreFloat3(&xmf3PlaneNormal_3, planeNormal_3);
 	cuttedConstant.xmf3PlaneNormal_3 = xmf3PlaneNormal_3;
 	XMVECTOR planeDistanceVec_3 = thisPosition * planeNormal_3;
-	float planeDistance_3 = XMVectorGetX(XMVectorSum(planeDistanceVec_3));
+	float planeDistance_3 = XMVectorGetX(XMVectorSum(planeDistanceVec_3)) + m_PlaneDistance[2];
 	cuttedConstant.PlaneDistance_3 = planeDistance_3;
 
 

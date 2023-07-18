@@ -24,7 +24,7 @@ bool Item::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 
 	m_pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation, objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
 
-	XMFLOAT3 xmf3RandVelocity;
+	XMFLOAT3 xmf3RandVelocity = {0,0,0};
 	xmf3RandVelocity.x = rand() % 100 - 50;
 	xmf3RandVelocity.y = rand() % 20 + 20;
 	xmf3RandVelocity.z = rand() % 100 - 50;
@@ -188,5 +188,6 @@ void Item::TracePlayer(float elapsedTime)
 	XMVECTOR velocity = direction * m_Speed;
 	XMFLOAT3 xmf3Velocity;
 	XMStoreFloat3(&xmf3Velocity, velocity);
+	m_pBody->SetIsAwake(true);
 	m_pBody->SetVelocity(xmf3Velocity);
 }

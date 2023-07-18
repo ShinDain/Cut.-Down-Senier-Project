@@ -180,7 +180,6 @@ void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, UINT nHitAn
 	{
 		m_pCollider->SetIsActive(false);
 
-		//Cutting(XMFLOAT3(1, 0, 0));
 		m_State = MonsterState::Monster_State_Death;
 		m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
 		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, nDeathAnimIdx);

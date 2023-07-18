@@ -48,6 +48,7 @@ protected:
 	UINT m_CuttedCBByteSize = 0;
 
 	UINT m_nPlaneCnt = 0;
+	float m_PlaneDistance[3] = { 0,0,0 };
 	float m_PlaneDirection[3] = { 1,0,0 };
 	XMFLOAT3 m_PlaneNormal[3] = { XMFLOAT3(1,0,0), XMFLOAT3(0,1,0) ,XMFLOAT3(0,0,1) };
 
