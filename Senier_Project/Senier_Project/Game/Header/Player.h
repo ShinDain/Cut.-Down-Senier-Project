@@ -104,7 +104,7 @@ public:
 
 	void InitializeState();
 
-	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
 
 	virtual void DoLanding();
 

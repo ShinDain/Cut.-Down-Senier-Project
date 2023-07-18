@@ -96,7 +96,7 @@ bool Projectile::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	if (m_pCollider) m_pCollider->BuildMesh(pd3dDevice, pd3dCommandList);
 #endif
 	BuildConstantBuffers(pd3dDevice);
-	m_IntersectColliderRadius = 2.0f;
+	m_IntersectColliderRadius = 5.0f;
 	m_IntersectCollider.Center = m_xmf3Position;
 	m_IntersectCollider.Radius = m_IntersectColliderRadius;
 
@@ -156,7 +156,7 @@ void Projectile::Update(float elapsedTime)
 		m_pBody->SetPosition(XMFLOAT3(xmf3Position.x, 0, xmf3Position.z));
 		m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
 
-		//m_DissolveTime = 0;
+
 		m_bDestroying = true;
 	}
 }
@@ -191,7 +191,7 @@ void Projectile::Intersect(float elapsedTime)
 
 			if (m_IntersectCollider.Intersects(*objCollider->GetOBB()))
 			{
-				g_vpCharacters[i]->ApplyDamage(m_ProjectilePower, xmf3Direction);
+				g_vpCharacters[i]->ApplyDamage(m_ProjectilePower, xmf3Direction, XMFLOAT3(0,0,0));
 
 				Player* pPlayer = (Player*)g_pPlayer.get();
 				pPlayer->SetPlayerTargetObject(g_vpCharacters[i]);
@@ -221,13 +221,11 @@ void Projectile::Intersect(float elapsedTime)
 			{
 				if (g_vpWorldObjs[i]->GetObjectType() == Object_Movable)
 				{
-					g_vpWorldObjs[i]->ApplyDamage(m_ProjectilePower, xmf3Direction);
+					g_vpWorldObjs[i]->ApplyDamage(m_ProjectilePower, xmf3Direction, XMFLOAT3(0, 0, 0));
 					g_vpWorldObjs[i]->GetBody()->SetIsAwake(true);
 				}
 
 				m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
-				m_DissolveTime = 0;
-
 				m_bDestroying = true;
 				return;
 			}
@@ -242,7 +240,7 @@ void Projectile::Intersect(float elapsedTime)
 
 		if (m_IntersectCollider.Intersects(*tmp))
 		{
-			g_pPlayer->ApplyDamage(m_ProjectilePower, xmf3Direction);
+			g_pPlayer->ApplyDamage(m_ProjectilePower, xmf3Direction, XMFLOAT3(0, 0, 0));
 
 			m_bDestroying = true;
 			m_bVisible = false;
@@ -267,12 +265,10 @@ void Projectile::Intersect(float elapsedTime)
 
 			if (m_IntersectCollider.Intersects(*objCollider->GetOBB()))
 			{
-				g_vpWorldObjs[i]->ApplyDamage(m_ProjectilePower, xmf3Direction);
+				g_vpWorldObjs[i]->ApplyDamage(m_ProjectilePower, xmf3Direction, XMFLOAT3(0, 0, 0));
 				g_vpWorldObjs[i]->GetBody()->SetIsAwake(true);
 
 				m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
-				m_DissolveTime = 0;
-
 				m_bDestroying = true;
 				return;
 			}

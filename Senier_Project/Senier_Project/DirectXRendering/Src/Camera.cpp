@@ -375,17 +375,23 @@ void Third_Person_Camera::Update(float Etime)
 		camDir = XMVector3Normalize(camDir);
 		float distance = 9999;
 		float best = 9999;
-		for (int i = 1; i < g_ppColliderBoxs.size(); ++i)
+		UINT nClosest = 0;
+		for (int i = 1; i < g_vpWorldObjs.size(); ++i)
 		{
-			if (!g_ppColliderBoxs[i]->GetIsActive())
+			if (!g_vpWorldObjs[i]->GetIsAlive()) continue;
+			if (g_vpWorldObjs[i]->GetColliderType() != ColliderType::Collider_Box) continue;
+
+			ColliderBox* pColliderBox = (ColliderBox*)g_vpWorldObjs[i]->GetCollider().get();
+			if (!pColliderBox->GetIsActive())
 				continue;
 
-			BoundingOrientedBox* pOBB = g_ppColliderBoxs[i]->GetOBB().get();
+			BoundingOrientedBox* pOBB = pColliderBox->GetOBB().get();
 			if (!pOBB->Intersects(objectPos, camDir, distance))
 				continue;
 			if (distance < best && distance != 0)
 			{
 				best = distance;
+				nClosest = i;
 			}
 		}
 		if (best > m_OffsetLength)
@@ -393,7 +399,10 @@ void Third_Person_Camera::Update(float Etime)
 			best = m_OffsetLength;
 		}
 		else if (best < 20)
+		{
 			best = 20;
+			g_vpWorldObjs[nClosest]->SetVisible(false);
+		}
 		cameraOffsetLength = best;
 
 		newPos = XMLoadFloat3(&xmf3ObjectPos);

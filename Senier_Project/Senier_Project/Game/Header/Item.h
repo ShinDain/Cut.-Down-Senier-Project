@@ -44,7 +44,7 @@ public:
 protected:
 	BoundingSphere m_IntersectCollider;
 	BoundingSphere m_TraceCollider;
-	float m_IntersectColliderRadius = 1.0f;
+	float m_IntersectColliderRadius = 5.0f;
 	float m_TraceColliderRadius = 30.0f;
 
 	bool m_bIsActive = false;
@@ -58,10 +58,14 @@ protected:
 	UINT m_nItemType = 0;
 
 private:
-	XMFLOAT3 m_xmf3StartPosition = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 m_xmf3CrushVelocity = XMFLOAT3(0, 0, 0);
+	bool m_bCalced = false;
+
+	void CalcStartVelocity();
 
 public:
 	void SetItemType(UINT nItemType) { m_nItemType = nItemType; }
+	void SetCrushVelocity(XMFLOAT3 xmf3CrushVelocity) { m_xmf3CrushVelocity = xmf3CrushVelocity; }
 
 };
 

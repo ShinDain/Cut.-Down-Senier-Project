@@ -110,16 +110,16 @@ void Player::Update(float elapsedTime)
 	IsFalling();
 	UpdateAnimationTrack(elapsedTime);
 
-	if (m_bCrashWithObject)
-	{
-		ApplyDamage(m_CrashPower, m_xmf3CrashDirection);
-		m_bCrashWithObject = false;
-		m_CrashPower = 0;
-		m_xmf3CrashDirection = { 0,0,0 };
-	}
-
 	m_ObjectSearchSphere.Center = m_xmf3Position;
-	if(m_pWeapon) m_pWeapon->Intersect(m_xmf3Look);
+	if (m_pWeapon)
+	{
+		XMFLOAT3 xmf3CuttingNormal = XMFLOAT3(0, 0, 0);
+		if (m_nCurAttackTrack == 0)
+			xmf3CuttingNormal.y = 1;
+		else
+			xmf3CuttingNormal.x = 1;
+		m_pWeapon->Intersect(m_xmf3Look, xmf3CuttingNormal);
+	}
 
 	if (m_bIsShoulderView)
 	{
@@ -183,7 +183,7 @@ void Player::KeyDownEvent(WPARAM wParam)
 #if defined(_DEBUG) || defined(DEBUG)
 	if (wParam == 'K')
 	{
-		ApplyDamage(10, XMFLOAT3(0, 0, -1));
+		ApplyDamage(10, XMFLOAT3(0, 0, -1), XMFLOAT3(0,0,0));
 	}
 #endif
 
@@ -615,12 +615,12 @@ void Player::InitializeState()
 	BlendWithIdleMovement(1);
 }
 
-void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
 {
 	if (m_bInvincible || m_nAnimationState == Player_State_Death)
 		return;
 
-	Character::ApplyDamage(power, xmf3DamageDirection);
+	Character::ApplyDamage(power, xmf3DamageDirection, xmf3CuttingDirection);
 	InitializeState();
 
 	m_bIgnoreInput = true;

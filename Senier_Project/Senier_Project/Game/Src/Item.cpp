@@ -49,11 +49,13 @@ bool Item::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 
 	m_TraceCollider.Center = m_xmf3Position;
 	m_TraceCollider.Radius = m_TraceColliderRadius;
-	m_xmf3StartPosition = m_xmf3Position;
 
 	m_bShadow = objData.bShadow;
 
 	UpdateTransform(nullptr);
+
+	// 시작 속도 결정
+	CalcStartVelocity();
 
 	return true;
 }
@@ -84,20 +86,34 @@ void Item::Update(float elapsedTime)
 	UpdateTransform(NULL);
 
 	UpdateToRigidBody(elapsedTime);
-	if (m_xmf3StartPosition.y + 5 > m_xmf3Position.y && m_bIsActive)
+
+	if (m_xmf3Position.y < 10 && !m_bTrace)
 	{
-		//m_pBody->SetInGravity(false);
-		m_xmf3Position.y = m_xmf3StartPosition.y + 5;
-		m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
+		m_pBody->SetInGravity(false);
+		m_xmf3Position.y = 10;
+		XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+		xmf3Velocity.x *= 0.9f;
+		xmf3Velocity.y = 0;
+		xmf3Velocity.z *= 0.9f;
+		if (xmf3Velocity.x < 1)
+			xmf3Velocity.x = 0;
+		if (xmf3Velocity.z < 1)
+			xmf3Velocity.z = 0;
+		m_pBody->SetVelocity(xmf3Velocity);
 	}
 	else
 	{
-		XMFLOAT3 xmfVelocity = m_pBody->GetVelocity();
-		xmfVelocity.x *= 0.5f;
-		//xmfVelocity.y *= 0.6f;
-		xmfVelocity.z *= 0.5f;
+		XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+		xmf3Velocity.x *= 0.9f;
+		xmf3Velocity.z *= 0.9f;
+		if (xmf3Velocity.x < 1)
+			xmf3Velocity.x = 0;
+		if (xmf3Velocity.z < 1)
+			xmf3Velocity.z = 0;
+		m_pBody->SetVelocity(xmf3Velocity);
 	}
 
+	
 	m_IntersectCollider.Center = m_xmf3Position;
 	m_TraceCollider.Center = m_xmf3Position;
 
@@ -109,7 +125,6 @@ void Item::Update(float elapsedTime)
 	if (m_pChild) {
 		m_pChild->Update(elapsedTime);
 	}
-
 	
 }
 
@@ -190,4 +205,47 @@ void Item::TracePlayer(float elapsedTime)
 	XMStoreFloat3(&xmf3Velocity, velocity);
 	m_pBody->SetIsAwake(true);
 	m_pBody->SetVelocity(xmf3Velocity);
+}
+
+void Item::CalcStartVelocity()
+{
+	// 월드 오브젝트와의 검사 (움직이는, 고정된)
+	if (!m_bCalced)
+	{
+
+		for (int i = 0; i < g_vpWorldObjs.size(); ++i)
+		{
+			if (g_vpWorldObjs[i]->GetObjectType() == ObjectType::Object_Movable) continue;
+			if (g_vpWorldObjs[i].get() == this || g_vpWorldObjs[i]->GetColliderType() != Collider_Box)
+				continue;
+
+			ColliderBox* objCollider = std::static_pointer_cast<ColliderBox>(g_vpWorldObjs[i]->GetCollider()).get();
+
+			if (!objCollider->GetIsActive())
+				continue;
+
+			if (m_IntersectCollider.Intersects(*objCollider->GetOBB()))
+			{
+				XMVECTOR curVelocity = XMLoadFloat3(&m_pBody->GetVelocity());
+				XMVECTOR crushVel = XMLoadFloat3(&m_xmf3CrushVelocity);
+				crushVel = XMVector3Normalize(crushVel) * -1;
+				curVelocity = XMVector3Normalize(curVelocity);
+				if (XMVectorGetX(XMVector3Dot(curVelocity, crushVel)) < 0)
+					curVelocity *= -1;
+
+				curVelocity *= 50;
+				XMFLOAT3 xmf3RandVelocity;
+				XMStoreFloat3(&xmf3RandVelocity, curVelocity);
+
+				XMVECTOR newPosition = XMLoadFloat3(&m_xmf3Position);
+				newPosition += crushVel * 5;
+				XMFLOAT3 xmf3NewPosition;
+				XMStoreFloat3(&xmf3NewPosition, newPosition);
+
+				m_pBody->SetPosition(xmf3NewPosition);
+				m_pBody->SetVelocity(xmf3RandVelocity);
+				m_bCalced = true;
+			}
+		}
+	}
 }

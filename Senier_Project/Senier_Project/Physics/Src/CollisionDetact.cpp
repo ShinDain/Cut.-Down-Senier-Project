@@ -1,6 +1,6 @@
 #include "../Header/CollisionDetact.h"
 
-#define OBJECT_CRASH_LENGTH 100
+#define OBJECT_CRASH_LENGTH 400
 
 float TransformToAxis(const ColliderBox& box, FXMVECTOR direction)
 {
@@ -79,6 +79,46 @@ bool tryAxis(
 	return true;
 }
 
+void ObjectCrushTest(Object* pObject1, Object* pObject2)
+{
+	float length = 0;
+	float power = 0;
+	float maxPower = 30;
+	XMFLOAT3 xmf3Direction[2] = { {0,0,0}, {0,0,0} };
+	if (pObject1->GetBody()->GetPhysics())
+	{
+		XMFLOAT3 xmf3ObjVelocity = pObject1->GetBody()->GetVelocity();
+		XMVECTOR velocity = XMLoadFloat3(&xmf3ObjVelocity);
+		float speed = XMVectorGetX(XMVector3Length(velocity));
+		length += speed;
+		power += speed * pObject1->GetBody()->GetMass();
+
+		velocity = XMVector3Normalize(velocity);
+		XMStoreFloat3(&xmf3Direction[0], velocity);
+	}
+	if (pObject2->GetBody()->GetPhysics())
+	{
+		XMFLOAT3 xmf3ObjVelocity = pObject2->GetBody()->GetVelocity();
+		XMVECTOR velocity = XMLoadFloat3(&xmf3ObjVelocity);
+		float speed = XMVectorGetX(XMVector3Length(velocity));
+		length += speed;
+		power += speed * pObject2->GetBody()->GetMass();
+
+		velocity = XMVector3Normalize(velocity);
+		XMStoreFloat3(&xmf3Direction[1], velocity);
+	}
+
+	if (power > maxPower)
+		power = maxPower;
+	if (length > OBJECT_CRASH_LENGTH)
+	{
+		if (pObject1->GetBody()->GetPhysics())
+			pObject1->ApplyDamage(power, xmf3Direction[0], XMFLOAT3(0,0,0));
+		if (pObject2->GetBody()->GetPhysics())
+			pObject2->ApplyDamage(power, xmf3Direction[1], XMFLOAT3(0, 0, 0));
+	}
+}
+
 void fillPointFaceBoxBox(
 	const ColliderBox& box1,
 	const ColliderBox& box2,
@@ -86,7 +126,7 @@ void fillPointFaceBoxBox(
 	CollisionData& pData,
 	int best,
 	float depth,
-	Character* pCharacter
+	Object* pObject1, Object* pObject2
 )
 {
 	XMVECTOR normal = box1.GetAxis(best);
@@ -120,18 +160,9 @@ void fillPointFaceBoxBox(
 
 	assert(pBody1 != nullptr || pBody2 != nullptr);
 
-	if (pCharacter != nullptr && pBody2)
-	{
-		XMFLOAT3 xmf3ObjVelocity = pBody2->GetVelocity();
-		XMVECTOR objPower = XMLoadFloat3(&xmf3ObjVelocity);
-		float length = XMVectorGetX(XMVector3Length(objPower));
-		objPower *= pBody2->GetMass();
-		float power = XMVectorGetX(XMVector3Length(objPower));
-
-		if (!pBody2->GetIsCharacter() && length > OBJECT_CRASH_LENGTH)
-			pCharacter->CrashWithObject(power, xmf3ContactNormal);
-	}
-
+	// 오브젝트 데미지 적용 테스트
+	ObjectCrushTest(pObject1, pObject2);
+	
 	pData.addContact(pBody1, pBody2, pData.friction, pData.restitution, xmf3ContactPoint, xmf3ContactNormal, depth);
 }
 
@@ -338,7 +369,7 @@ int CollisionDetector::BoxAndHalfSpace(const ColliderBox& box, const ColliderPla
 	return contactCnt;
 }
 
-int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box2, CollisionData& pData, Character* pCharacter)
+int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box2, CollisionData& pData, Object* pObject1, Object* pObject2)
 {
 	if (!box1.GetIsActive() || !box2.GetIsActive())
 		return 0;
@@ -389,13 +420,13 @@ int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box
 
 	if (best < 3)
 	{
-		fillPointFaceBoxBox(box1, box2, toCentre, pData, best, pen, pCharacter);
+		fillPointFaceBoxBox(box1, box2, toCentre, pData, best, pen, pObject1, pObject2);
 		return 1;
 	}
 	else if (best < 6)
 	{
 		// 반대 방향
-		fillPointFaceBoxBox(box2, box1, -toCentre, pData, best - 3, pen, pCharacter);
+		fillPointFaceBoxBox(box2, box1, -toCentre, pData, best - 3, pen, pObject1, pObject2);
 		return 1;
 	}
 	else
@@ -467,19 +498,8 @@ int CollisionDetector::BoxAndBox(const ColliderBox& box1, const ColliderBox& box
 
 		assert(pBody1 != nullptr || pBody2 != nullptr);
 
-
-		// 캐릭터가 물체와 충돌
-		if (pCharacter != nullptr && pBody2)
-		{
-			XMFLOAT3 xmf3ObjVelocity = pBody2->GetVelocity();
-			XMVECTOR objPower = XMLoadFloat3(&xmf3ObjVelocity);
-			float length = XMVectorGetX(XMVector3Length(objPower));
-			objPower *= pBody2->GetMass();
-			float power = XMVectorGetX(XMVector3Length(objPower));
-
-			if (!pBody2->GetIsCharacter() && length > OBJECT_CRASH_LENGTH)
-				pCharacter->CrashWithObject(power, xmf3ContactNormal);
-		}
+		// 오브젝트 데미지 적용 테스트;
+		ObjectCrushTest(pObject1, pObject2);
 
 		pData.addContact(pBody1, pBody2, pData.friction, pData.restitution, xmf3ContactPoint, xmf3ContactNormal, pen);
 		return 1;

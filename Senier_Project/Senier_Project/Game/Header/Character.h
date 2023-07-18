@@ -46,7 +46,7 @@ public:
 	virtual	void RotateToMove(float elapsedTime);
 	virtual	void RotateToTargetLook(float elapsedTime, XMFLOAT3 xmf3TargetLook, float divideConst);
 
-	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
 	virtual void Cutting(XMFLOAT3 xmf3PlaneNormal);
 
 	virtual void BlendWithIdleMovement(float maxWeight);
@@ -67,20 +67,11 @@ protected:
 
 	float m_TurnSpeed = 1;
 
-	bool m_bCrashWithObject = false;
-	float m_CrashPower = 0;
-	XMFLOAT3 m_xmf3CrashDirection = { 0,0,0 };
-
 	bool m_bIsShoulderView = false;
 
 	void ApplyCharacterFriction(float elapsedTime);
 
 public:
-	void CrashWithObject(float crashPower, XMFLOAT3 xmf3CrashDirection);
-
-	void SetCrashWithObject(bool bCrashWithObject) { m_bCrashWithObject = bCrashWithObject; }
-	void SetCrashPower(float crashPower) { m_CrashPower = crashPower; }
-	void SetCrashDirection(XMFLOAT3 xmf3CrashDirection) { m_xmf3CrashDirection = xmf3CrashDirection; }
 	void SetIsShoulderView(bool bIsShoulderView) { m_bIsShoulderView = bIsShoulderView; }
 };
 

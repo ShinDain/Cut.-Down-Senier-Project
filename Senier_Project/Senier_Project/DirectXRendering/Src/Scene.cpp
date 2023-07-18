@@ -60,7 +60,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 15, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
 	
@@ -69,7 +69,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
-	//InitMapData(pd3dDevice, pd3dCommandList);
+	InitMapData(pd3dDevice, pd3dCommandList);
 	// UI 초기화
 	InitUI(pd3dDevice, pd3dCommandList, pDWriteText);
 	// 시네마틱 초기화
@@ -259,6 +259,8 @@ void Scene::UpdateObject(float elapsedTime)
 	BoundingFrustum* camFus = m_pCamera->m_pCameraFrustum.get();
 	for (int i = 0; i < g_vpAllObjs.size(); ++i)
 	{
+		if (!g_vpAllObjs[i]->GetIsAlive()) continue;
+
 		if (g_vpAllObjs[i]->GetColliderType() == Collider_Box)
 		{
 			BoundingSphere* pObjectBS = g_vpAllObjs[i]->GetCollider()->GetBoundingSphere().get();
@@ -1018,7 +1020,6 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		pObject = std::static_pointer_cast<Object>(pItem);
 
 		g_vpAllObjs.emplace_back(pObject);
-		g_vpWorldObjs.emplace_back(pObject);
 		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
 	}
 	break;
@@ -1264,7 +1265,8 @@ void Scene::GenerateContact()
 	// 캐릭터 검사
 	for (int k = 0; k < g_vpCharacters.size(); ++k)
 	{
-		std::shared_ptr<ColliderBox> characterBox = std::static_pointer_cast<ColliderBox>(g_vpCharacters[k]->GetCollider());
+		if (!g_vpCharacters[k]->GetIsAlive()) continue;
+		ColliderBox* characterBox = (ColliderBox*)g_vpCharacters[k]->GetCollider().get();
 
 		if (!characterBox) continue;
 
@@ -1274,19 +1276,23 @@ void Scene::GenerateContact()
 			CollisionDetector::BoxAndHalfSpace(*characterBox, *g_ppColliderPlanes[i], m_CollisionData);
 		}
 
-		std::shared_ptr<Character> pCharacter = std::static_pointer_cast<Character>(g_vpCharacters[k]);
-
-		for (int i = 0; i < g_ppColliderBoxs.size(); ++i)
+		for (int i = 0; i < g_vpAllObjs.size(); ++i)
 		{
 			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+			if (!g_vpAllObjs[i]->GetIsAlive()) continue;
+			if (g_vpAllObjs[i]->GetColliderType() != ColliderType::Collider_Box) continue;
 
-			if (characterBox == g_ppColliderBoxs[i]) continue;
+			ColliderBox* pColliderBox = (ColliderBox*)g_vpAllObjs[i]->GetCollider().get();
+
+			if (characterBox == pColliderBox) continue;
+
 			// 박스 검사 이전 가능 여부 선행 검사 
-			// BoxAndBox 내부보다 먼저 하는 것이 더 빠름
-			if (!characterBox->GetBoundingSphere()->Intersects(*(g_ppColliderBoxs[i]->GetBoundingSphere().get())))
+			if (!characterBox->GetBoundingSphere()->Intersects(*(pColliderBox->GetBoundingSphere().get())))
 				continue;
 
-			CollisionDetector::BoxAndBox(*characterBox, *g_ppColliderBoxs[i], m_CollisionData, pCharacter.get());
+			Object* pObject1 = g_vpCharacters[k].get();
+			Object* pObject2 = g_vpAllObjs[i].get();
+			CollisionDetector::BoxAndBox(*characterBox, *pColliderBox, m_CollisionData, pObject1, pObject2);
 		}
 	}
 
@@ -1297,6 +1303,7 @@ void Scene::GenerateContact()
 		XMVECTOR planeNormal = XMLoadFloat3(&g_ppColliderPlanes[i]->GetDirection());
 		for (int k = 0; k < g_vpWorldObjs.size(); ++k)
 		{
+			if (!g_vpWorldObjs[k]->GetIsAlive()) continue;
 			if (m_CollisionData.ContactCnt() > nContactCnt) return;
 			std::shared_ptr<ColliderBox> colliderBox = std::static_pointer_cast<ColliderBox>(g_vpWorldObjs[k]->GetCollider());
 			if (!colliderBox) continue;
@@ -1307,23 +1314,29 @@ void Scene::GenerateContact()
 		}
 	}
 	// 박스끼리 검사
-	for (int i = 0; i < g_ppColliderBoxs.size(); ++i)
+	for (int i = 0; i < g_vpWorldObjs.size() - 1; ++i)
 	{
-		for (int k = 0; k < g_vpWorldObjs.size(); ++k)
+		if (!g_vpWorldObjs[i]->GetIsAlive()) continue;
+		if (g_vpWorldObjs[i]->GetColliderType() != ColliderType::Collider_Box) continue;
+		ColliderBox* pColliderBox1 = (ColliderBox*)g_vpWorldObjs[i]->GetCollider().get();
+
+		for (int k = i + 1; k < g_vpWorldObjs.size(); ++k)
 		{
 			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+			if (!g_vpWorldObjs[k]->GetIsAlive()) continue;
+			if (g_vpWorldObjs[k]->GetColliderType() != ColliderType::Collider_Box) continue;
 
-			if (g_vpWorldObjs[k]->GetColliderType() != ColliderType::Collider_Box)
-				continue;
-			std::shared_ptr<ColliderBox> colliderBox = std::static_pointer_cast<ColliderBox>(g_vpWorldObjs[k]->GetCollider());
-			if (!colliderBox || colliderBox == g_ppColliderBoxs[i]) continue;
+			ColliderBox* pColliderBox2 = (ColliderBox*)g_vpWorldObjs[k]->GetCollider().get();
+
+			if (pColliderBox1 == pColliderBox2) continue;
 
 			// 박스 검사 이전 가능 여부 선행 검사 
-			// BoxAndBox 내부보다 먼저 하는 것이 더 빠름
-			if (!colliderBox->GetBoundingSphere()->Intersects(*(g_ppColliderBoxs[i]->GetBoundingSphere().get())))
+			if (!pColliderBox1->GetBoundingSphere()->Intersects(*(pColliderBox2->GetBoundingSphere().get())))
 				continue;
-			
-			CollisionDetector::BoxAndBox(*colliderBox, *g_ppColliderBoxs[i], m_CollisionData, nullptr);
+
+			Object* pObject1 = g_vpWorldObjs[i].get();
+			Object* pObject2 = g_vpWorldObjs[k].get();
+			CollisionDetector::BoxAndBox(*pColliderBox1, *pColliderBox2, m_CollisionData, pObject1, pObject2);
 		}
 	}
 

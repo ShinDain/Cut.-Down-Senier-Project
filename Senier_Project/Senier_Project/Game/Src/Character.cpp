@@ -87,14 +87,6 @@ void Character::Update(float elapsedTime)
 		RotateToMove(elapsedTime);
 	IsFalling();
 	UpdateAnimationTrack(elapsedTime);
-
-	if (m_bCrashWithObject)
-	{
-		ApplyDamage(m_CrashPower, m_xmf3CrashDirection);
-		m_bCrashWithObject = false;
-		m_CrashPower = 0;
-		m_xmf3CrashDirection = { 0,0,0 };
-	}
 }
 
 void Character::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
@@ -304,7 +296,7 @@ void Character::RotateToTargetLook(float elapsedTime, XMFLOAT3 xmf3TargetLook, f
 	}
 }
 
-void Character::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+void Character::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
 {
 	if (m_bInvincible)
 		return;
@@ -446,16 +438,6 @@ void Character::ApplyCharacterFriction(float elapsedTime)
 		newVelocity.y = xmf3Velocity.y;
 		m_pBody->SetVelocity(newVelocity);
 	}
-}
-
-void Character::CrashWithObject(float crashPower, XMFLOAT3 xmf3CrashDirection)
-{
-	m_bCrashWithObject = true;
-	//m_CrashPower = crashPower * 10;
-
-	// 일단 20으로 고정
-	m_CrashPower = 20;
-	m_xmf3CrashDirection = xmf3CrashDirection;
 }
 
 ///////////////////////////////////////////////////////////////

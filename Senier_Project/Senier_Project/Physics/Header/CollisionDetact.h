@@ -58,7 +58,8 @@ public:
 	static int BoxAndBox(
 		const ColliderBox& box1,
 		const ColliderBox& box2,
-		CollisionData& pData, Character* pCharacter);
+		CollisionData& pData, 
+		Object* pObject1, Object* pObject2);
 
 	static int BoxAndSphere(
 		const ColliderBox& box,

@@ -29,7 +29,7 @@ public:
 
 	virtual void UpdateToRigidBody(float elapsedTime);
 
-	void Intersect(XMFLOAT3 xmf3PlayerLook);
+	void Intersect(XMFLOAT3 xmf3PlayerLook, XMFLOAT3 xmf3CuttingNormal);
 
 
 	virtual void Destroy();

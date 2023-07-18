@@ -349,6 +349,9 @@ void Object::CreateScoreItems(int nCnt)
 {
 	int nRand;
 
+	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+	xmf3Velocity.y = 0;
+
 	for (int i = 0; i < nCnt; ++i)
 	{
 		nRand = rand() % 5;
@@ -362,6 +365,7 @@ void Object::CreateScoreItems(int nCnt)
 
 			Item* pItem = (Item*)pObject.get();
 			pItem->SetItemType(Item::ItemType::Score_1);
+			pItem->SetCrushVelocity(xmf3Velocity);
 		}
 			break;
 		case 1:
@@ -371,6 +375,7 @@ void Object::CreateScoreItems(int nCnt)
 
 			Item* pItem = (Item*)pObject.get();
 			pItem->SetItemType(Item::ItemType::Score_2);
+			pItem->SetCrushVelocity(xmf3Velocity);
 		}
 		break;
 		case 2:
@@ -380,6 +385,7 @@ void Object::CreateScoreItems(int nCnt)
 
 			Item* pItem = (Item*)pObject.get();
 			pItem->SetItemType(Item::ItemType::Score_3);
+			pItem->SetCrushVelocity(xmf3Velocity);
 		}
 		break;
 		case 3:
@@ -389,6 +395,7 @@ void Object::CreateScoreItems(int nCnt)
 
 			Item* pItem = (Item*)pObject.get();
 			pItem->SetItemType(Item::ItemType::Score_4);
+			pItem->SetCrushVelocity(xmf3Velocity);
 		}
 		break;
 		case 4:
@@ -398,6 +405,7 @@ void Object::CreateScoreItems(int nCnt)
 
 			Item* pItem = (Item*)pObject.get();
 			pItem->SetItemType(Item::ItemType::Score_5);
+			pItem->SetCrushVelocity(xmf3Velocity);
 		}
 		break;
 		}
@@ -406,6 +414,9 @@ void Object::CreateScoreItems(int nCnt)
 
 void Object::CreateHealItems(int nCnt)
 {
+	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
+	xmf3Velocity.y = 0;
+
 	for (int i = 0; i < nCnt; ++i)
 	{
 		std::shared_ptr<Object> pObject = Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position,
@@ -413,6 +424,7 @@ void Object::CreateHealItems(int nCnt)
 
 		Item* pItem = (Item*)pObject.get();
 		pItem->SetItemType(Item::ItemType::Heal_1);
+		pItem->SetCrushVelocity(xmf3Velocity);
 	}
 }
 
@@ -977,7 +989,7 @@ void Object::IsFalling()
 	}
 }
 
-void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
 {
 	if (m_bInvincible)
 		return;
@@ -992,8 +1004,12 @@ void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 
 		// 파괴된 위치에 아이템 생성
 		CreateScoreItems(m_MaxHP / 5);
-
 		CreateHealItems(1);
+
+		if (XMVectorGetX(XMVector3Length(XMLoadFloat3(&xmf3CuttingDirection))))
+			Cutting(xmf3CuttingDirection);
+		else
+			DegradedBroken();
 	}
 
 	XMVECTOR damageDirection = XMLoadFloat3(&xmf3DamageDirection);

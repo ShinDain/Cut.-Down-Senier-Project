@@ -155,12 +155,12 @@ void Monster::Trace()
 	m_pBody->SetAcceleration(xmf3Accel);
 }
 
-void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, UINT nHitAnimIdx, UINT nDeathAnimIdx)
+void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection, UINT nHitAnimIdx, UINT nDeathAnimIdx)
 {
 	if (m_State == MonsterState::Monster_State_Death || m_bInvincible)
 		return;
 
-	Character::ApplyDamage(power, xmf3DamageDirection);
+	Character::ApplyDamage(power, xmf3DamageDirection, xmf3CuttingDirection);
 
 	m_bFindPlayer = true;
 	if (m_HP <= 0)
@@ -178,6 +178,13 @@ void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, UINT nHitAn
 	}
 	else
 	{
+		// 파괴된 위치에 아이템 생성
+		CreateScoreItems(m_MaxHP / 5);
+		CreateHealItems(1);
+
+		if (XMVectorGetX(XMVector3Length(XMLoadFloat3(&xmf3CuttingDirection))))
+			Cutting(xmf3CuttingDirection);
+
 		m_pCollider->SetIsActive(false);
 
 		m_State = MonsterState::Monster_State_Death;
@@ -202,7 +209,7 @@ void Monster::CreateAttackSphere(float range, float radius, float damage)
 	attackSphere.Radius = radius;
 	BoundingOrientedBox* playerCollider = std::static_pointer_cast<ColliderBox>(g_pPlayer->GetCollider())->GetOBB().get();
 	if (attackSphere.Intersects(*playerCollider))
-		g_pPlayer->ApplyDamage(damage, m_xmf3Look);
+		g_pPlayer->ApplyDamage(damage, m_xmf3Look, XMFLOAT3(0,0,0));
 }
 
 /////////////////////////////
@@ -346,14 +353,14 @@ void Zombie::UpdateAnimationTrack(float elapsedTime)
 	}
 }
 
-void Zombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+void Zombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
 {
 	int nAttackAnim = rand() % 2;
 
 	UINT hitAnimIdx = Zombie_Anim_Index_Hit1 + nAttackAnim;
 	UINT deathAnimIdx = Zombie_Anim_Index_FallingBack + nAttackAnim;
 
-	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
+	Monster::ApplyDamage(power, xmf3DamageDirection, xmf3CuttingDirection, hitAnimIdx, deathAnimIdx);
 }
 
 void Zombie::Trace()
@@ -607,14 +614,14 @@ void HighZombie::UpdateAnimationTrack(float elapsedTime)
 	}
 }
 
-void HighZombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+void HighZombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
 {
 	int nHitAnim = rand() % 2;
 
 	UINT hitAnimIdx = HighZombie_Anim_Index_Hit;
 	UINT deathAnimIdx = HighZombie_Anim_Index_Death1 + nHitAnim;
 
-	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
+	Monster::ApplyDamage(power, xmf3DamageDirection, xmf3CuttingDirection, hitAnimIdx, deathAnimIdx);
 }
 
 void HighZombie::Trace()
@@ -908,14 +915,14 @@ void Scavenger::UpdateAnimationTrack(float elapsedTime)
 	}
 }
 
-void Scavenger::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+void Scavenger::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
 {
 	int nHitAnim = rand() % 2;
 
 	UINT hitAnimIdx = Scavenger_Anim_Index_Hit1 + nHitAnim;
 	UINT deathAnimIdx = Scavenger_Anim_Index_Death1 + nHitAnim;
 
-	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
+	Monster::ApplyDamage(power, xmf3DamageDirection, xmf3CuttingDirection, hitAnimIdx, deathAnimIdx);
 	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 2.0f);
 }
 
@@ -1220,12 +1227,12 @@ void Ghoul::UpdateAnimationTrack(float elapsedTime)
 	}
 }
 
-void Ghoul::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+void Ghoul::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
 {
 	UINT hitAnimIdx = Ghoul_Anim_Index_Death;
 	UINT deathAnimIdx = Ghoul_Anim_Index_Death;
 
-	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
+	Monster::ApplyDamage(power, xmf3DamageDirection, xmf3CuttingDirection, hitAnimIdx, deathAnimIdx);
 
 	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
 	xmf3Velocity.x *= 0.3f;
@@ -1534,12 +1541,12 @@ void CyberTwins::UpdateAnimationTrack(float elapsedTime)
 	}
 }
 
-void CyberTwins::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+void CyberTwins::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
 {
 	UINT hitAnimIdx = CyberTwins_Anim_Index_Death;
 	UINT deathAnimIdx = CyberTwins_Anim_Index_Death;
 
-	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
+	Monster::ApplyDamage(power, xmf3DamageDirection, xmf3CuttingDirection, hitAnimIdx, deathAnimIdx);
 	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 1.0f);
 
 	if (m_HP / m_MaxHP < 0.5f)
@@ -2040,7 +2047,7 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 	}
 }
 
-void Necromancer::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
+void Necromancer::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
 {
 	// 사운드 재생 테스트
 	Sound::PlaySoundFile(L"Sound/123.wav", true);
@@ -2049,7 +2056,7 @@ void Necromancer::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	UINT hitAnimIdx = Necromancer_Anim_Index_Hit;
 	UINT deathAnimIdx = Necromancer_Anim_Index_Death;
 
-	Monster::ApplyDamage(power, xmf3DamageDirection, hitAnimIdx, deathAnimIdx);
+	Monster::ApplyDamage(power, xmf3DamageDirection, xmf3CuttingDirection, hitAnimIdx, deathAnimIdx);
 
 	if (m_HP / m_MaxHP < 0.5f)
 		m_bRage = true;

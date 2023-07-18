@@ -50,7 +50,7 @@ protected:
 public:
 	virtual void MonsterMove(XMFLOAT3 xmf3Direction);
 	virtual void RotateToPlayer();
-	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, UINT nHitAnimIdx, UINT nDeathAnimIdx);
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection, UINT nHitAnimIdx, UINT nDeathAnimIdx);
 
 public:
 	virtual void StateAction(float elapsedTime);
@@ -119,7 +119,7 @@ private:
 	};
 
 public:
-	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
 
 public:
 	virtual void Trace();
@@ -164,7 +164,7 @@ private:
 	};
 
 public:
-	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
 public:
 	virtual void Trace();
 
@@ -208,7 +208,7 @@ private:
 	};
 
 public:
-	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
 public:
 	virtual void Trace();
 
@@ -254,7 +254,7 @@ private:
 	};
 
 public:
-	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
 public:
 	virtual void Trace();
 
@@ -303,7 +303,7 @@ private:
 	};
 
 public:
-	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
 public:
 	virtual void Trace();
 
@@ -397,7 +397,7 @@ private:
 	};
 
 public:
-	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection);
+	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
 public:
 	virtual void Trace();
 

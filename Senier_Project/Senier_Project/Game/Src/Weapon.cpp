@@ -148,7 +148,7 @@ void Weapon::UpdateToRigidBody(float elapsedTime)
 	}
 }
 
-void Weapon::Intersect(XMFLOAT3 xmf3PlayerLook)
+void Weapon::Intersect(XMFLOAT3 xmf3PlayerLook, XMFLOAT3 xmf3CuttingNormal)
 {
 	if(!m_bActive)
 		return;
@@ -191,7 +191,7 @@ void Weapon::Intersect(XMFLOAT3 xmf3PlayerLook)
 			Player* pPlayer = (Player*)g_pPlayer.get();
 			pPlayer->SetPlayerTargetObject(g_vpMovableObjs[i]);
 
-			g_vpMovableObjs[i]->ApplyDamage(m_Power, xmf3PlayerLook);
+			g_vpMovableObjs[i]->ApplyDamage(m_Power, xmf3PlayerLook, xmf3CuttingNormal);
 			g_vpMovableObjs[i]->GetBody()->SetIsAwake(true);
 		}
 	}
