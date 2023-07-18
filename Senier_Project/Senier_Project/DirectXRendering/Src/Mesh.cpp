@@ -147,6 +147,22 @@ void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 					TextureC0BufferByteSize, sizeof(XMFLOAT2),
 					&m_TexC0BufferView, vTextureC0.data());
 			}
+			else
+			{
+				m_nType |= VERTEXT_TEXTURE_COORD0;
+
+				nTexC0 = m_nVertices;
+				vTextureC0.resize(nTexC0);
+				for (int i = 0; i < nTexC0; ++i)
+					vTextureC0.push_back(XMFLOAT2(0, 0));
+
+				UINT TextureC0BufferByteSize = sizeof(XMFLOAT2) * nTexC0;
+
+				CreateVertexBuffer(pd3dDevice, pd3dCommandList,
+					&m_TexC0BufferGPU, &m_TexC0BufferUploader,
+					TextureC0BufferByteSize, sizeof(XMFLOAT2),
+					&m_TexC0BufferView, vTextureC0.data());
+			}
 		}
 		else if (!strcmp(pstrToken, "<TextureCoords1>:"))
 		{

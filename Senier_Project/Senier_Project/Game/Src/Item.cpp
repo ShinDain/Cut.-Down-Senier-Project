@@ -22,7 +22,14 @@ bool Item::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 	if (nAnimationTracks > 0)
 		m_pAnimationController = std::make_unique<AnimationController>(pd3dDevice, pd3dCommandList, nAnimationTracks, pModelData);
 
-	m_pBody = nullptr;
+	m_pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation, objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
+
+	XMFLOAT3 xmf3RandVelocity;
+	xmf3RandVelocity.x = rand() % 100 - 50;
+	xmf3RandVelocity.y = rand() % 20 + 20;
+	xmf3RandVelocity.z = rand() % 100 - 50;
+	m_pBody->SetVelocity(xmf3RandVelocity);
+
 	m_pCollider = nullptr;
 	m_xmf3RenderOffsetPosition = objData.xmf3MeshOffsetPosition;
 	m_xmf3RenderOffsetRotation = objData.xmf3MeshOffsetRotation;
@@ -42,6 +49,7 @@ bool Item::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 
 	m_TraceCollider.Center = m_xmf3Position;
 	m_TraceCollider.Radius = m_TraceColliderRadius;
+	m_xmf3StartPosition = m_xmf3Position;
 
 	m_bShadow = objData.bShadow;
 
@@ -65,12 +73,33 @@ void Item::Update(float elapsedTime)
 	else
 	{
 		m_ElapsedActiveTime += elapsedTime;
+
 		if (m_ElapsedActiveTime > m_ActiveTime)
-			m_bIsActive = true;		
+		{
+			m_bIsActive = true;
+		}
 	}
 
 	Animate(elapsedTime);
 	UpdateTransform(NULL);
+
+	UpdateToRigidBody(elapsedTime);
+	if (m_xmf3StartPosition.y + 5 > m_xmf3Position.y && m_bIsActive)
+	{
+		//m_pBody->SetInGravity(false);
+		m_xmf3Position.y = m_xmf3StartPosition.y + 5;
+		m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
+	}
+	else
+	{
+		XMFLOAT3 xmfVelocity = m_pBody->GetVelocity();
+		xmfVelocity.x *= 0.5f;
+		//xmfVelocity.y *= 0.6f;
+		xmfVelocity.z *= 0.5f;
+	}
+
+	m_IntersectCollider.Center = m_xmf3Position;
+	m_TraceCollider.Center = m_xmf3Position;
 
 	if (m_pObjectCB) UpdateObjectCB();
 
@@ -80,6 +109,8 @@ void Item::Update(float elapsedTime)
 	if (m_pChild) {
 		m_pChild->Update(elapsedTime);
 	}
+
+	
 }
 
 void Item::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
@@ -154,8 +185,8 @@ void Item::TracePlayer(float elapsedTime)
 
 	XMVECTOR direction = playerPos - thisPos;
 	direction = XMVector3Normalize(direction);
-	XMVECTOR newPosition = thisPos + direction * m_Speed * elapsedTime;
-	XMStoreFloat3(&m_xmf3Position, newPosition);
-
-	m_IntersectCollider.Center = m_xmf3Position;
+	XMVECTOR velocity = direction * m_Speed;
+	XMFLOAT3 xmf3Velocity;
+	XMStoreFloat3(&xmf3Velocity, velocity);
+	m_pBody->SetVelocity(xmf3Velocity);
 }

@@ -64,8 +64,8 @@ bool Player::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_HP = 300.0f;
 
 #if defined(_DEBUG) || defined(DEBUG)
-	m_MaxHP = 20.0f;
-	m_HP = 20.0f;
+	//m_MaxHP = 20.0f;
+	//m_HP = 20.0f;
 #endif
 
 	return true;
@@ -559,8 +559,28 @@ void Player::AcquireItem(UINT itemType)
 {
 	switch (itemType)
 	{
+	case Item::ItemType::Score_1:
+		m_nScore += 300;
+		break;
+	case Item::ItemType::Score_2:
+		m_nScore += 300;
+		break;
+	case Item::ItemType::Score_3:
+		m_nScore += 300;
+		break;
+	case Item::ItemType::Score_4:
+		m_nScore += 300;
+		break;
+	case Item::ItemType::Score_5:
+		m_nScore += 300;
+		break;
+	case Item::ItemType::Heal_1:
+		m_HP += 50;
+		if (m_HP > m_MaxHP)
+			m_HP = m_MaxHP;
+		break;
 	default:
-		m_nScore += 100;
+		
 		break;
 	}
 }

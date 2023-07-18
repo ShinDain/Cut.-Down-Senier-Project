@@ -346,6 +346,77 @@ void Object::BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice)
 	if (m_pChild) m_pChild->BuildTextureDescriptorHeap(pd3dDevice);
 }
 
+void Object::CreateScoreItems(int nCnt)
+{
+	int nRand;
+
+	for (int i = 0; i < nCnt; ++i)
+	{
+		nRand = rand() % 5;
+
+		switch (nRand)
+		{
+		case 0:
+		{
+			std::shared_ptr<Object> pObject = Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position,
+			XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCOREITEM1_MODEL_NAME, 0);
+
+			Item* pItem = (Item*)pObject.get();
+			pItem->SetItemType(Item::ItemType::Score_1);
+		}
+			break;
+		case 1:
+		{
+			std::shared_ptr<Object> pObject = Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position,
+				XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCOREITEM2_MODEL_NAME, 0);
+
+			Item* pItem = (Item*)pObject.get();
+			pItem->SetItemType(Item::ItemType::Score_2);
+		}
+		break;
+		case 2:
+		{
+			std::shared_ptr<Object> pObject = Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position,
+				XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCOREITEM3_MODEL_NAME, 0);
+
+			Item* pItem = (Item*)pObject.get();
+			pItem->SetItemType(Item::ItemType::Score_3);
+		}
+		break;
+		case 3:
+		{
+			std::shared_ptr<Object> pObject = Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position,
+				XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCOREITEM4_MODEL_NAME, 0);
+
+			Item* pItem = (Item*)pObject.get();
+			pItem->SetItemType(Item::ItemType::Score_4);
+		}
+		break;
+		case 4:
+		{
+			std::shared_ptr<Object> pObject = Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position,
+				XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCOREITEM5_MODEL_NAME, 0);
+
+			Item* pItem = (Item*)pObject.get();
+			pItem->SetItemType(Item::ItemType::Score_5);
+		}
+		break;
+		}
+	}
+}
+
+void Object::CreateHealItems(int nCnt)
+{
+	for (int i = 0; i < nCnt; ++i)
+	{
+		std::shared_ptr<Object> pObject = Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position,
+			XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HEALITEM_MODEL_NAME, 0);
+
+		Item* pItem = (Item*)pObject.get();
+		pItem->SetItemType(Item::ItemType::Heal_1);
+	}
+}
+
 std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 	const char* pstrFileName, const char* pstrObjectPath, const char* pstrTexPath)
 {
@@ -867,9 +938,11 @@ void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection)
 	if (m_HP <= 0)
 	{
 		m_bDestroying = true;
+
 		// 파괴된 위치에 아이템 생성
-		Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position, 
-			XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
+		CreateScoreItems(5);
+
+		CreateHealItems(1);
 	}
 
 	XMVECTOR damageDirection = XMLoadFloat3(&xmf3DamageDirection);

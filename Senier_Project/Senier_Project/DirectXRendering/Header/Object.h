@@ -75,6 +75,9 @@ protected:
 	virtual void BuildConstantBuffers(ID3D12Device* pd3dDevice);
 	virtual void BuildTextureDescriptorHeap(ID3D12Device* pd3dDevice);
 
+	void CreateScoreItems(int nCnt);
+	void CreateHealItems(int nCnt);
+
 protected:
 	char m_FrameName[64];
 

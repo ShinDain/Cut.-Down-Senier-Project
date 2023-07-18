@@ -71,7 +71,7 @@ private:
 	LPCWSTR walk2_SoundFileName = L"Sound/Footstep02.wav";
 	LPCWSTR run1_SoundFileName = L"";
 	LPCWSTR run2_SoundFileName = L"";
-	LPCWSTR jump_SoundFileName = L"Sound/Footstep03.wav";
+	LPCWSTR jump_SoundFileName = L"Sound/Evil_Machine_Loop_00.wav";
 	LPCWSTR doublejump_SoundFileName = L"Sound/123.wav";
 	LPCWSTR land_SoundFileName = L"Sound/Footstep04.wav";
 	LPCWSTR attack1_SoundFileName = L"Sound/123.wav";

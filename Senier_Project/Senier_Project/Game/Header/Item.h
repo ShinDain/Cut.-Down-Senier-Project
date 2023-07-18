@@ -30,6 +30,17 @@ public:
 	virtual void Intersect(float elapsedTime);
 	void TracePlayer(float elapsedTime);
 
+public:
+	enum ItemType
+	{
+		Score_1,
+		Score_2,
+		Score_3,
+		Score_4,
+		Score_5,
+		Heal_1
+	};
+
 protected:
 	BoundingSphere m_IntersectCollider;
 	BoundingSphere m_TraceCollider;
@@ -45,6 +56,12 @@ protected:
 	float m_Speed = 100.0f;
 
 	UINT m_nItemType = 0;
+
+private:
+	XMFLOAT3 m_xmf3StartPosition = XMFLOAT3(0, 0, 0);
+
+public:
+	void SetItemType(UINT nItemType) { m_nItemType = nItemType; }
 
 };
 
