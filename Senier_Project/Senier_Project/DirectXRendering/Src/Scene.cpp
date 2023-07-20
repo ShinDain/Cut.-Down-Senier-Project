@@ -42,31 +42,14 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// 바닥
 	// 차후 맵 로드 함수로 이동
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, 0);
-	
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 200), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), GROUND_MODEL_NAME, 0);
-
-	// 몬스터 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), GHOUL_MODEL_NAME, MONSTER_TRACK_CNT);	
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), CYBER_TWINS_MODEL_NAME, MONSTER_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(60, 10, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 180, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, -1, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -460);
 	
 	// 월드 오브젝트 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), WALL_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SHELF_CRATE_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), SERVER_RACK_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(10, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 15, 100), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), VASE_MODEL_NAME, 0);
-	
-	// 아이템 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(100, 10, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), ITEM_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 5, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), PLAYER_PROJECTILE_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HOSPITAL_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), BENCH_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), METAL_FENCE_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(30, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ELECTO_PANEL_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), OUTSIDE_WOOD_CHAIR_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
 	InitMapData(pd3dDevice, pd3dCommandList);
@@ -74,6 +57,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	InitUI(pd3dDevice, pd3dCommandList, pDWriteText);
 	// 시네마틱 초기화
 	//InitCinematic();
+
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), EVENT_BOX_MODEL_NAME, 0);
 
 	// 카메라 초기화
 	if (g_pPlayer)
@@ -94,7 +79,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 bool Scene::InitMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	LoadMapData(pd3dDevice, pd3dCommandList, "Map");
+	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
+	LoadMapData(pd3dDevice, pd3dCommandList, "OutSideMap");
 
 	return true;
 }
@@ -387,9 +373,9 @@ void Scene::UpdatePassCB(float totalTime, float elapsedTime)
 	passConstant.FarZ = 100.0f;
 	passConstant.TotalTime = totalTime;
 	passConstant.DeltaTime = elapsedTime;
-	passConstant.AmbientLight = { 0.7f, 0.7f, 0.7f, 1.0f };
+	passConstant.AmbientLight = { 0.3f, 0.3f, 0.3f, 1.0f };
 	passConstant.Lights[0].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[0].Strength = { 0.3f, 0.3f, 0.3f };
+	passConstant.Lights[0].Strength = { 0.1f, 0.1f, 0.1f };
 	//passConstant.Lights[0].Strength = { 0.0f, 0.0f, 0.0f };
 	passConstant.Lights[0].Position = { 0, 30.0f, 20 };
 
@@ -400,7 +386,7 @@ void Scene::UpdatePassCB(float totalTime, float elapsedTime)
 
 void Scene::UpdateShadowPassCB(float totalTime, float elapsedTime)
 {
-	float sceneBoundRadius = 200;
+	float sceneBoundRadius = 300;
 
 	// Only the first "main" light casts a shadow.
 	XMVECTOR lightDir = XMLoadFloat3(&m_BaseLightDirections[0]);
@@ -733,8 +719,19 @@ void Scene::KeyDownEvent(WPARAM wParam)
 		if(m_FadeInValue < 0.0f)
 			m_FadeInValue = 0.0f;
 		break;
+	case 'O':
+		//for (int i = 0; i < g_vpAllObjs.size(); ++i)
+		//{
+		//	if (g_pPlayer.get() == g_vpAllObjs[i].get()) continue;
+		//	//if ( == g_vpAllObjs[i].get()) continue;
+		//
+		//	g_vpAllObjs[i]->SetIsAlive(false);
+		//}
+		//
+		//LoadMapData(g_pd3dDevice, g_pd3dCommandList, "OutSideMap");
+		break;
 	case 'P':
-		PlayCinematic(0);
+		//PlayCinematic(0);
 		break;
 	}
 	
@@ -858,10 +855,7 @@ void Scene::LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 		}
 		else if (!strcmp(pstrToken, "</Frame>"))
 		{
-			if (!strcmp(pstrObjectName, ZOMBIE_MODEL_NAME))
-				CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, xmf3Scale, pstrObjectName, MONSTER_TRACK_CNT);
-			else
-				CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, xmf3Scale, pstrObjectName, 0);
+			CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, XMFLOAT3(1,1,1), pstrObjectName, 0);
 		}
 		else if (!strcmp(pstrToken, "</Hierarchy>"))
 		{
@@ -888,6 +882,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		objectData.nMass = 9999;
 		objectData.objectType = Object_World;
 		objectData.colliderType = Collider_Plane;
+		objectData.xmf3Extents.x = nAnimationTracks;
 	}
 	else
 	{
@@ -903,7 +898,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		objectData.xmf3MeshOffsetRotation = g_DefaultObjectData[pstrFileName].xmf3MeshOffsetRotation;
 		objectData.bShadow = g_DefaultObjectData[pstrFileName].bShadowed;
 	}
-	
+
 	std::shared_ptr<ModelDataInfo> pModelData;
 	std::shared_ptr<Object> pObject;
 	std::string strFileName;

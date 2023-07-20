@@ -64,27 +64,49 @@ private:
 	};
 
 	// »ç¿îµå ÆÄÀÏ ÀÌ¸§
+	//LPCWSTR idle1_SoundFileName = L"";
+	//LPCWSTR idle2_SoundFileName = L"";
+	//LPCWSTR idle3_SoundFileName = L"";
+	//LPCWSTR walk1_SoundFileName = L"Sound/Footstep01.wav";
+	//LPCWSTR walk2_SoundFileName = L"Sound/Footstep02.wav";
+	//LPCWSTR run1_SoundFileName = L"";
+	//LPCWSTR run2_SoundFileName = L"";
+	//LPCWSTR jump_SoundFileName = L"Sound/Evil_Machine_Loop_00.wav";
+	//LPCWSTR doublejump_SoundFileName = L"Sound/123.wav";
+	//LPCWSTR land_SoundFileName = L"Sound/Footstep04.wav";
+	//LPCWSTR attack1_SoundFileName = L"Sound/123.wav";
+	//LPCWSTR attack2_SoundFileName = L"Sound/Footstep04.wav";
+	//LPCWSTR attack3_SoundFileName = L"Sound/Footstep03.wav";
+	//LPCWSTR hit1_SoundFileName = L"Sound/123.wav";
+	//LPCWSTR hit2_SoundFileName = L"Sound/Footstep04.wav";
+	//LPCWSTR death1_SoundFileName = L"Sound/Footstep01.wav";
+	//LPCWSTR death2_SoundFileName = L"Sound/Footstep02.wav";
+	//LPCWSTR grab1_SoundFileName = L"Sound/Footstep01.wav";		// ±×·¦
+	//LPCWSTR grab2_SoundFileName = L"Sound/Footstep02.wav";		// ±×·¦
+	//LPCWSTR throw1_SoundFileName = L"Sound/123.wav";		// ÅõÃ´
+	//LPCWSTR throw2_SoundFileName = L"Sound/123.wav";		// ÅõÃ´
+
 	LPCWSTR idle1_SoundFileName = L"";
 	LPCWSTR idle2_SoundFileName = L"";
 	LPCWSTR idle3_SoundFileName = L"";
-	LPCWSTR walk1_SoundFileName = L"Sound/Footstep01.wav";
-	LPCWSTR walk2_SoundFileName = L"Sound/Footstep02.wav";
+	LPCWSTR walk1_SoundFileName =  L"";
+	LPCWSTR walk2_SoundFileName =  L"";
 	LPCWSTR run1_SoundFileName = L"";
 	LPCWSTR run2_SoundFileName = L"";
-	LPCWSTR jump_SoundFileName = L"Sound/Evil_Machine_Loop_00.wav";
-	LPCWSTR doublejump_SoundFileName = L"Sound/123.wav";
-	LPCWSTR land_SoundFileName = L"Sound/Footstep04.wav";
-	LPCWSTR attack1_SoundFileName = L"Sound/123.wav";
-	LPCWSTR attack2_SoundFileName = L"Sound/Footstep04.wav";
-	LPCWSTR attack3_SoundFileName = L"Sound/Footstep03.wav";
-	LPCWSTR hit1_SoundFileName = L"Sound/123.wav";
-	LPCWSTR hit2_SoundFileName = L"Sound/Footstep04.wav";
-	LPCWSTR death1_SoundFileName = L"Sound/Footstep01.wav";
-	LPCWSTR death2_SoundFileName = L"Sound/Footstep02.wav";
-	LPCWSTR grab1_SoundFileName = L"Sound/Footstep01.wav";		// ±×·¦
-	LPCWSTR grab2_SoundFileName = L"Sound/Footstep02.wav";		// ±×·¦
-	LPCWSTR throw1_SoundFileName = L"Sound/123.wav";		// ÅõÃ´
-	LPCWSTR throw2_SoundFileName = L"Sound/123.wav";		// ÅõÃ´
+	LPCWSTR jump_SoundFileName = L"";
+	LPCWSTR doublejump_SoundFileName = L"";
+	LPCWSTR land_SoundFileName = L"";
+	LPCWSTR attack1_SoundFileName =  L"";
+	LPCWSTR attack2_SoundFileName =  L"";
+	LPCWSTR attack3_SoundFileName =  L"";
+	LPCWSTR hit1_SoundFileName = L"";
+	LPCWSTR hit2_SoundFileName = L"";
+	LPCWSTR death1_SoundFileName =  L"";
+	LPCWSTR death2_SoundFileName =  L"";
+	LPCWSTR grab1_SoundFileName =  L"";		// ±×·¦
+	LPCWSTR grab2_SoundFileName =  L"";		// ±×·¦
+	LPCWSTR throw1_SoundFileName =  L"";		// ÅõÃ´
+	LPCWSTR throw2_SoundFileName =  L"";		// ÅõÃ´
 
 public:
 	virtual void ProcessInput(UCHAR* pKeybuffer);
@@ -121,7 +143,7 @@ protected:
 	XMFLOAT3 m_xmf3CameraRotation = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 m_xmf3CameraPosition = XMFLOAT3(0, 0, 0);
 	//XMFLOAT3 m_xmf3CameraLook = XMFLOAT3(0, 0, 0);
-	bool m_bCanDoubleJump = true;
+	//bool m_bCanDoubleJump = true;
 	bool m_bCanThrow = true;
 
 	float m_AimmingSpeed = 50.0f;

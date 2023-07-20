@@ -3,6 +3,8 @@
 void CreateObjectDefaultData()
 {
 	ObjectDefaultData tmpData;
+
+	// 캐릭터
 	tmpData.pstrObjectPath = CHARACTER_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = CHARACTER_MODEL_TEXPATH;
 	tmpData.xmf3Extents = CHARACTER_MODEL_EXTENTS;
@@ -17,6 +19,93 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ CHARACTER_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(CHARACTER_MODEL_NAME);
 
+
+	tmpData.pstrObjectPath = ZOMBIE_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = ZOMBIE_MODEL_TEXPATH;
+	tmpData.xmf3Extents = ZOMBIE_MODEL_EXTENTS;
+	tmpData.objectType = ZOMBIE_MODEL_TYPE;
+	tmpData.colliderType = ZOMBIE_MODEL_COLLIDERTYPE;
+	tmpData.nMass = ZOMBIE_MODEL_MASS;
+	tmpData.xmf3OffsetScale = ZOMBIE_MODEL_SCALE;
+	tmpData.renderLayer = ZOMBIE_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = ZOMBIE_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ ZOMBIE_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(ZOMBIE_MODEL_NAME);
+
+	tmpData.pstrObjectPath = HIGHZOMBIE_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = HIGHZOMBIE_MODEL_TEXPATH;
+	tmpData.xmf3Extents = HIGHZOMBIE_MODEL_EXTENTS;
+	tmpData.objectType = HIGHZOMBIE_MODEL_TYPE;
+	tmpData.colliderType = HIGHZOMBIE_MODEL_COLLIDERTYPE;
+	tmpData.nMass = HIGHZOMBIE_MODEL_MASS;
+	tmpData.xmf3OffsetScale = HIGHZOMBIE_MODEL_SCALE;
+	tmpData.renderLayer = HIGHZOMBIE_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = HIGHZOMBIE_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ HIGHZOMBIE_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(HIGHZOMBIE_MODEL_NAME);
+
+	tmpData.pstrObjectPath = SCAVENGER_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = SCAVENGER_MODEL_TEXPATH;
+	tmpData.xmf3Extents = SCAVENGER_MODEL_EXTENTS;
+	tmpData.objectType = SCAVENGER_MODEL_TYPE;
+	tmpData.colliderType = SCAVENGER_MODEL_COLLIDERTYPE;
+	tmpData.nMass = SCAVENGER_MODEL_MASS;
+	tmpData.xmf3OffsetScale = SCAVENGER_MODEL_SCALE;
+	tmpData.renderLayer = SCAVENGER_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = SCAVENGER_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ SCAVENGER_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(SCAVENGER_MODEL_NAME);
+
+	tmpData.pstrObjectPath = CYBER_TWINS_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = CYBER_TWINS_MODEL_TEXPATH;
+	tmpData.xmf3Extents = CYBER_TWINS_MODEL_EXTENTS;
+	tmpData.objectType = CYBER_TWINS_MODEL_TYPE;
+	tmpData.colliderType = CYBER_TWINS_MODEL_COLLIDERTYPE;
+	tmpData.nMass = CYBER_TWINS_MODEL_MASS;
+	tmpData.xmf3OffsetScale = CYBER_TWINS_MODEL_SCALE;
+	tmpData.renderLayer = CYBER_TWINS_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = CYBER_TWINS_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ CYBER_TWINS_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(CYBER_TWINS_MODEL_NAME);
+
+	tmpData.pstrObjectPath = GHOUL_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = GHOUL_MODEL_TEXPATH;
+	tmpData.xmf3Extents = GHOUL_MODEL_EXTENTS;
+	tmpData.objectType = GHOUL_MODEL_TYPE;
+	tmpData.colliderType = GHOUL_MODEL_COLLIDERTYPE;
+	tmpData.nMass = GHOUL_MODEL_MASS;
+	tmpData.xmf3OffsetScale = GHOUL_MODEL_SCALE;
+	tmpData.renderLayer = GHOUL_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = GHOUL_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ GHOUL_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(GHOUL_MODEL_NAME);
+
+	tmpData.pstrObjectPath = NECROMANCER_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = NECROMANCER_MODEL_TEXPATH;
+	tmpData.xmf3Extents = NECROMANCER_MODEL_EXTENTS;
+	tmpData.objectType = NECROMANCER_MODEL_TYPE;
+	tmpData.colliderType = NECROMANCER_MODEL_COLLIDERTYPE;
+	tmpData.nMass = NECROMANCER_MODEL_MASS;
+	tmpData.xmf3OffsetScale = NECROMANCER_MODEL_SCALE;
+	tmpData.renderLayer = NECROMANCER_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = NECROMANCER_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ NECROMANCER_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(NECROMANCER_MODEL_NAME);
+
+
+	// 투사체
 	tmpData.pstrObjectPath = PLAYER_PROJECTILE1_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = PLAYER_PROJECTILE1_MODEL_TEXPATH;
 	tmpData.xmf3Extents = PLAYER_PROJECTILE1_MODEL_EXTENTS;
@@ -128,7 +217,8 @@ void CreateObjectDefaultData()
 	tmpData.bShadowed = ENEMY_MAGIC2_MODEL_SHADOW;
 	g_DefaultObjectData.insert({ ENEMY_MAGIC2_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(ENEMY_MAGIC2_MODEL_NAME);
-
+	
+	// 이펙트
 	tmpData.pstrObjectPath = BLOOD1_EFFECT_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = BLOOD1_EFFECT_MODEL_TEXPATH;
 	tmpData.xmf3Extents = BLOOD1_EFFECT_MODEL_EXTENTS;
@@ -227,90 +317,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ BLOOD7_EFFECT_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(BLOOD7_EFFECT_MODEL_NAME);
 
-	tmpData.pstrObjectPath = ZOMBIE_MODEL_OBJECTPATH;
-	tmpData.pstrTexPath = ZOMBIE_MODEL_TEXPATH;
-	tmpData.xmf3Extents = ZOMBIE_MODEL_EXTENTS;
-	tmpData.objectType = ZOMBIE_MODEL_TYPE;
-	tmpData.colliderType = ZOMBIE_MODEL_COLLIDERTYPE;
-	tmpData.nMass = ZOMBIE_MODEL_MASS;
-	tmpData.xmf3OffsetScale = ZOMBIE_MODEL_SCALE;
-	tmpData.renderLayer = ZOMBIE_MODEL_RENDERLAYER;
-	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	tmpData.bShadowed = ZOMBIE_MODEL_SHADOW;
-	g_DefaultObjectData.insert({ ZOMBIE_MODEL_NAME, tmpData });
-	g_DefaultObjectNames.emplace_back(ZOMBIE_MODEL_NAME);	
-	
-	tmpData.pstrObjectPath = HIGHZOMBIE_MODEL_OBJECTPATH;
-	tmpData.pstrTexPath = HIGHZOMBIE_MODEL_TEXPATH;
-	tmpData.xmf3Extents = HIGHZOMBIE_MODEL_EXTENTS;
-	tmpData.objectType = HIGHZOMBIE_MODEL_TYPE;
-	tmpData.colliderType = HIGHZOMBIE_MODEL_COLLIDERTYPE;
-	tmpData.nMass = HIGHZOMBIE_MODEL_MASS;
-	tmpData.xmf3OffsetScale = HIGHZOMBIE_MODEL_SCALE;
-	tmpData.renderLayer = HIGHZOMBIE_MODEL_RENDERLAYER;
-	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	tmpData.bShadowed = HIGHZOMBIE_MODEL_SHADOW;
-	g_DefaultObjectData.insert({ HIGHZOMBIE_MODEL_NAME, tmpData });
-	g_DefaultObjectNames.emplace_back(HIGHZOMBIE_MODEL_NAME);
-
-	tmpData.pstrObjectPath = SCAVENGER_MODEL_OBJECTPATH;
-	tmpData.pstrTexPath = SCAVENGER_MODEL_TEXPATH;
-	tmpData.xmf3Extents = SCAVENGER_MODEL_EXTENTS;
-	tmpData.objectType = SCAVENGER_MODEL_TYPE;
-	tmpData.colliderType = SCAVENGER_MODEL_COLLIDERTYPE;
-	tmpData.nMass = SCAVENGER_MODEL_MASS;
-	tmpData.xmf3OffsetScale = SCAVENGER_MODEL_SCALE;
-	tmpData.renderLayer = SCAVENGER_MODEL_RENDERLAYER;
-	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	tmpData.bShadowed = SCAVENGER_MODEL_SHADOW;
-	g_DefaultObjectData.insert({ SCAVENGER_MODEL_NAME, tmpData });
-	g_DefaultObjectNames.emplace_back(SCAVENGER_MODEL_NAME);
-
-	tmpData.pstrObjectPath = CYBER_TWINS_MODEL_OBJECTPATH;
-	tmpData.pstrTexPath = CYBER_TWINS_MODEL_TEXPATH;
-	tmpData.xmf3Extents = CYBER_TWINS_MODEL_EXTENTS;
-	tmpData.objectType = CYBER_TWINS_MODEL_TYPE;
-	tmpData.colliderType = CYBER_TWINS_MODEL_COLLIDERTYPE;
-	tmpData.nMass = CYBER_TWINS_MODEL_MASS;
-	tmpData.xmf3OffsetScale = CYBER_TWINS_MODEL_SCALE;
-	tmpData.renderLayer = CYBER_TWINS_MODEL_RENDERLAYER;
-	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	tmpData.bShadowed = CYBER_TWINS_MODEL_SHADOW;
-	g_DefaultObjectData.insert({ CYBER_TWINS_MODEL_NAME, tmpData });
-	g_DefaultObjectNames.emplace_back(CYBER_TWINS_MODEL_NAME);
-
-	tmpData.pstrObjectPath = GHOUL_MODEL_OBJECTPATH;
-	tmpData.pstrTexPath = GHOUL_MODEL_TEXPATH;
-	tmpData.xmf3Extents = GHOUL_MODEL_EXTENTS;
-	tmpData.objectType = GHOUL_MODEL_TYPE;
-	tmpData.colliderType = GHOUL_MODEL_COLLIDERTYPE;
-	tmpData.nMass = GHOUL_MODEL_MASS;
-	tmpData.xmf3OffsetScale = GHOUL_MODEL_SCALE;
-	tmpData.renderLayer = GHOUL_MODEL_RENDERLAYER;
-	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	tmpData.bShadowed = GHOUL_MODEL_SHADOW;
-	g_DefaultObjectData.insert({ GHOUL_MODEL_NAME, tmpData });
-	g_DefaultObjectNames.emplace_back(GHOUL_MODEL_NAME);
-
-	tmpData.pstrObjectPath = NECROMANCER_MODEL_OBJECTPATH;
-	tmpData.pstrTexPath = NECROMANCER_MODEL_TEXPATH;
-	tmpData.xmf3Extents = NECROMANCER_MODEL_EXTENTS;
-	tmpData.objectType = NECROMANCER_MODEL_TYPE;
-	tmpData.colliderType = NECROMANCER_MODEL_COLLIDERTYPE;
-	tmpData.nMass = NECROMANCER_MODEL_MASS;
-	tmpData.xmf3OffsetScale = NECROMANCER_MODEL_SCALE;
-	tmpData.renderLayer = NECROMANCER_MODEL_RENDERLAYER;
-	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	tmpData.bShadowed = NECROMANCER_MODEL_SHADOW;
-	g_DefaultObjectData.insert({ NECROMANCER_MODEL_NAME, tmpData });
-	g_DefaultObjectNames.emplace_back(NECROMANCER_MODEL_NAME);
-
+	// 오브젝트
 	tmpData.pstrObjectPath = WEAPON_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = WEAPON_MODEL_TEXPATH;
 	tmpData.xmf3Extents = WEAPON_MODEL_EXTENTS;
@@ -339,6 +346,7 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ CUBE_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(CUBE_MODEL_NAME);
 
+	// 기본 데모 오브젝트
 	tmpData.pstrObjectPath = GROUND_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = GROUND_MODEL_TEXPATH;
 	tmpData.xmf3Extents = GROUND_MODEL_EXTENTS;
@@ -604,7 +612,8 @@ void CreateObjectDefaultData()
 	tmpData.bShadowed = PLATFORM_MODEL_SHADOW;
 	g_DefaultObjectData.insert({ PLATFORM_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(PLATFORM_MODEL_NAME);
-	
+
+	// 아이템
 	tmpData.pstrObjectPath = SCOREITEM1_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = SCOREITEM1_MODEL_TEXPATH;
 	tmpData.xmf3Extents = SCOREITEM1_MODEL_EXTENTS;
@@ -689,17 +698,619 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ HEALITEM_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(HEALITEM_MODEL_NAME);
 
-	tmpData.pstrObjectPath = EVENT_BOX_MODEL_OBJECTPATH;
-	tmpData.pstrTexPath = EVENT_BOX_MODEL_TEXPATH;
-	tmpData.xmf3Extents = EVENT_BOX_MODEL_EXTENTS;
-	tmpData.objectType = EVENT_BOX_MODEL_TYPE;
-	tmpData.colliderType = EVENT_BOX_MODEL_COLLIDERTYPE;
-	tmpData.nMass = EVENT_BOX_MODEL_MASS;
-	tmpData.xmf3OffsetScale = EVENT_BOX_MODEL_SCALE;
-	tmpData.renderLayer = EVENT_BOX_MODEL_RENDERLAYER;
+	// 이벤트 오브젝트
+	tmpData.pstrObjectPath = ENTER_BOX_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = ENTER_BOX_MODEL_TEXPATH;
+	tmpData.xmf3Extents = ENTER_BOX_MODEL_EXTENTS;
+	tmpData.objectType = ENTER_BOX_MODEL_TYPE;
+	tmpData.colliderType = ENTER_BOX_MODEL_COLLIDERTYPE;
+	tmpData.nMass = ENTER_BOX_MODEL_MASS;
+	tmpData.xmf3OffsetScale = ENTER_BOX_MODEL_SCALE;
+	tmpData.renderLayer = ENTER_BOX_MODEL_RENDERLAYER;
 	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
 	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	tmpData.bShadowed = EVENT_BOX_MODEL_SHADOW;
-	g_DefaultObjectData.insert({ EVENT_BOX_MODEL_NAME, tmpData });
-	g_DefaultObjectNames.emplace_back(EVENT_BOX_MODEL_NAME);
+	tmpData.bShadowed = ENTER_BOX_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ ENTER_BOX_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(ENTER_BOX_MODEL_NAME);
+
+	// Outside 오브젝트
+	tmpData.pstrObjectPath = GRASS_GROUND_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = GRASS_GROUND_MODEL_TEXPATH;
+	tmpData.xmf3Extents = GRASS_GROUND_MODEL_EXTENTS;
+	tmpData.objectType = GRASS_GROUND_MODEL_TYPE;
+	tmpData.colliderType = GRASS_GROUND_MODEL_COLLIDERTYPE;
+	tmpData.nMass = GRASS_GROUND_MODEL_MASS;
+	tmpData.xmf3OffsetScale = GRASS_GROUND_MODEL_SCALE;
+	tmpData.renderLayer = GRASS_GROUND_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = GRASS_GROUND_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ GRASS_GROUND_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(GRASS_GROUND_MODEL_NAME);
+
+	tmpData.pstrObjectPath = HOSPITAL_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = HOSPITAL_MODEL_TEXPATH;
+	tmpData.xmf3Extents = HOSPITAL_MODEL_EXTENTS;
+	tmpData.objectType = HOSPITAL_MODEL_TYPE;
+	tmpData.colliderType = HOSPITAL_MODEL_COLLIDERTYPE;
+	tmpData.nMass = HOSPITAL_MODEL_MASS;
+	tmpData.xmf3OffsetScale = HOSPITAL_MODEL_SCALE;
+	tmpData.renderLayer = HOSPITAL_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = HOSPITAL_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ HOSPITAL_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(HOSPITAL_MODEL_NAME);
+
+	tmpData.pstrObjectPath = BARREL1_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = BARREL1_MODEL_TEXPATH;
+	tmpData.xmf3Extents = BARREL1_MODEL_EXTENTS;
+	tmpData.objectType = BARREL1_MODEL_TYPE;
+	tmpData.colliderType = BARREL1_MODEL_COLLIDERTYPE;
+	tmpData.nMass = BARREL1_MODEL_MASS;
+	tmpData.xmf3OffsetScale = BARREL1_MODEL_SCALE;
+	tmpData.renderLayer = BARREL1_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, tmpData.xmf3Extents.z);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = BARREL1_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ BARREL1_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(BARREL1_MODEL_NAME);
+
+	tmpData.pstrObjectPath = BARREL2_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = BARREL2_MODEL_TEXPATH;
+	tmpData.xmf3Extents = BARREL2_MODEL_EXTENTS;
+	tmpData.objectType = BARREL2_MODEL_TYPE;
+	tmpData.colliderType = BARREL2_MODEL_COLLIDERTYPE;
+	tmpData.nMass = BARREL2_MODEL_MASS;
+	tmpData.xmf3OffsetScale = BARREL2_MODEL_SCALE;
+	tmpData.renderLayer = BARREL2_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = BARREL2_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ BARREL2_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(BARREL2_MODEL_NAME);
+
+	tmpData.pstrObjectPath = BARREL3_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = BARREL3_MODEL_TEXPATH;
+	tmpData.xmf3Extents = BARREL3_MODEL_EXTENTS;
+	tmpData.objectType = BARREL3_MODEL_TYPE;
+	tmpData.colliderType = BARREL3_MODEL_COLLIDERTYPE;
+	tmpData.nMass = BARREL3_MODEL_MASS;
+	tmpData.xmf3OffsetScale = BARREL3_MODEL_SCALE;
+	tmpData.renderLayer = BARREL3_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, tmpData.xmf3Extents.z);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = BARREL3_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ BARREL3_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(BARREL3_MODEL_NAME);
+
+	tmpData.pstrObjectPath = BARREL4_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = BARREL4_MODEL_TEXPATH;
+	tmpData.xmf3Extents = BARREL4_MODEL_EXTENTS;
+	tmpData.objectType = BARREL4_MODEL_TYPE;
+	tmpData.colliderType = BARREL4_MODEL_COLLIDERTYPE;
+	tmpData.nMass = BARREL4_MODEL_MASS;
+	tmpData.xmf3OffsetScale = BARREL4_MODEL_SCALE;
+	tmpData.renderLayer = BARREL4_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, tmpData.xmf3Extents.z);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = BARREL4_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ BARREL4_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(BARREL4_MODEL_NAME);
+
+	tmpData.pstrObjectPath = BARREL5_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = BARREL5_MODEL_TEXPATH;
+	tmpData.xmf3Extents = BARREL5_MODEL_EXTENTS;
+	tmpData.objectType = BARREL5_MODEL_TYPE;
+	tmpData.colliderType = BARREL5_MODEL_COLLIDERTYPE;
+	tmpData.nMass = BARREL5_MODEL_MASS;
+	tmpData.xmf3OffsetScale = BARREL5_MODEL_SCALE;
+	tmpData.renderLayer = BARREL5_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, tmpData.xmf3Extents.z);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = BARREL5_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ BARREL5_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(BARREL5_MODEL_NAME);
+
+	tmpData.pstrObjectPath = BENCH_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = BENCH_MODEL_TEXPATH;
+	tmpData.xmf3Extents = BENCH_MODEL_EXTENTS;
+	tmpData.objectType = BENCH_MODEL_TYPE;
+	tmpData.colliderType = BENCH_MODEL_COLLIDERTYPE;
+	tmpData.nMass = BENCH_MODEL_MASS;
+	tmpData.xmf3OffsetScale = BENCH_MODEL_SCALE;
+	tmpData.renderLayer = BENCH_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = BENCH_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ BENCH_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(BENCH_MODEL_NAME);
+
+	tmpData.pstrObjectPath = BOILER_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = BOILER_MODEL_TEXPATH;
+	tmpData.xmf3Extents = BOILER_MODEL_EXTENTS;
+	tmpData.objectType = BOILER_MODEL_TYPE;
+	tmpData.colliderType = BOILER_MODEL_COLLIDERTYPE;
+	tmpData.nMass = BOILER_MODEL_MASS;
+	tmpData.xmf3OffsetScale = BOILER_MODEL_SCALE;
+	tmpData.renderLayer = BOILER_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = BOILER_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ BOILER_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(BOILER_MODEL_NAME);
+
+	tmpData.pstrObjectPath = BIGSHELF_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = BIGSHELF_MODEL_TEXPATH;
+	tmpData.xmf3Extents = BIGSHELF_MODEL_EXTENTS;
+	tmpData.objectType = BIGSHELF_MODEL_TYPE;
+	tmpData.colliderType = BIGSHELF_MODEL_COLLIDERTYPE;
+	tmpData.nMass = BIGSHELF_MODEL_MASS;
+	tmpData.xmf3OffsetScale = BIGSHELF_MODEL_SCALE;
+	tmpData.renderLayer = BIGSHELF_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = BIGSHELF_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ BIGSHELF_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(BIGSHELF_MODEL_NAME);
+
+	tmpData.pstrObjectPath = BIGSHELF_STOCK_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = BIGSHELF_STOCK_MODEL_TEXPATH;
+	tmpData.xmf3Extents = BIGSHELF_STOCK_MODEL_EXTENTS;
+	tmpData.objectType = BIGSHELF_STOCK_MODEL_TYPE;
+	tmpData.colliderType = BIGSHELF_STOCK_MODEL_COLLIDERTYPE;
+	tmpData.nMass = BIGSHELF_STOCK_MODEL_MASS;
+	tmpData.xmf3OffsetScale = BIGSHELF_STOCK_MODEL_SCALE;
+	tmpData.renderLayer = BIGSHELF_STOCK_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = BIGSHELF_STOCK_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ BIGSHELF_STOCK_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(BIGSHELF_STOCK_MODEL_NAME);
+
+	tmpData.pstrObjectPath = WOOD_BOX1_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = WOOD_BOX1_MODEL_TEXPATH;
+	tmpData.xmf3Extents = WOOD_BOX1_MODEL_EXTENTS;
+	tmpData.objectType = WOOD_BOX1_MODEL_TYPE;
+	tmpData.colliderType = WOOD_BOX1_MODEL_COLLIDERTYPE;
+	tmpData.nMass = WOOD_BOX1_MODEL_MASS;
+	tmpData.xmf3OffsetScale = WOOD_BOX1_MODEL_SCALE;
+	tmpData.renderLayer = WOOD_BOX1_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = WOOD_BOX1_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ WOOD_BOX1_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(WOOD_BOX1_MODEL_NAME);
+
+	tmpData.pstrObjectPath = CABELS_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = CABELS_MODEL_TEXPATH;
+	tmpData.xmf3Extents = CABELS_MODEL_EXTENTS;
+	tmpData.objectType = CABELS_MODEL_TYPE;
+	tmpData.colliderType = CABELS_MODEL_COLLIDERTYPE;
+	tmpData.nMass = CABELS_MODEL_MASS;
+	tmpData.xmf3OffsetScale = CABELS_MODEL_SCALE;
+	tmpData.renderLayer = CABELS_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = CABELS_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ CABELS_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(CABELS_MODEL_NAME);
+	tmpData.pstrObjectPath = CABELS_MODEL_OBJECTPATH;
+
+	tmpData.pstrTexPath =  CAN_MODEL_TEXPATH;
+	tmpData.xmf3Extents =  CAN_MODEL_EXTENTS;
+	tmpData.objectType =  CAN_MODEL_TYPE;
+	tmpData.colliderType =  CAN_MODEL_COLLIDERTYPE;
+	tmpData.nMass =  CAN_MODEL_MASS;
+	tmpData.xmf3OffsetScale =  CAN_MODEL_SCALE;
+	tmpData.renderLayer =  CAN_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed =  CAN_MODEL_SHADOW;
+	g_DefaultObjectData.insert({  CAN_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back( CAN_MODEL_NAME);
+
+	tmpData.pstrTexPath = CAN_DAMAGED_MODEL_TEXPATH;
+	tmpData.xmf3Extents = CAN_DAMAGED_MODEL_EXTENTS;
+	tmpData.objectType = CAN_DAMAGED_MODEL_TYPE;
+	tmpData.colliderType = CAN_DAMAGED_MODEL_COLLIDERTYPE;
+	tmpData.nMass = CAN_DAMAGED_MODEL_MASS;
+	tmpData.xmf3OffsetScale = CAN_DAMAGED_MODEL_SCALE;
+	tmpData.renderLayer = CAN_DAMAGED_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = CAN_DAMAGED_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ CAN_DAMAGED_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(CAN_DAMAGED_MODEL_NAME);
+
+	tmpData.pstrTexPath = CONTAINER_MODEL_TEXPATH;
+	tmpData.xmf3Extents = CONTAINER_MODEL_EXTENTS;
+	tmpData.objectType = CONTAINER_MODEL_TYPE;
+	tmpData.colliderType = CONTAINER_MODEL_COLLIDERTYPE;
+	tmpData.nMass = CONTAINER_MODEL_MASS;
+	tmpData.xmf3OffsetScale = CONTAINER_MODEL_SCALE;
+	tmpData.renderLayer = CONTAINER_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = CONTAINER_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ CONTAINER_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(CONTAINER_MODEL_NAME);
+
+	tmpData.pstrTexPath =  DUMP_CONTAINER_MODEL_TEXPATH;
+	tmpData.xmf3Extents =  DUMP_CONTAINER_MODEL_EXTENTS;
+	tmpData.objectType =  DUMP_CONTAINER_MODEL_TYPE;
+	tmpData.colliderType =  DUMP_CONTAINER_MODEL_COLLIDERTYPE;
+	tmpData.nMass =  DUMP_CONTAINER_MODEL_MASS;
+	tmpData.xmf3OffsetScale =  DUMP_CONTAINER_MODEL_SCALE;
+	tmpData.renderLayer =  DUMP_CONTAINER_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed =  DUMP_CONTAINER_MODEL_SHADOW;
+	g_DefaultObjectData.insert({  DUMP_CONTAINER_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back( DUMP_CONTAINER_MODEL_NAME);
+
+	tmpData.pstrTexPath = OUTSIDE_WOOD_CHAIR_MODEL_TEXPATH;
+	tmpData.xmf3Extents = OUTSIDE_WOOD_CHAIR_MODEL_EXTENTS;
+	tmpData.objectType = OUTSIDE_WOOD_CHAIR_MODEL_TYPE;
+	tmpData.colliderType = OUTSIDE_WOOD_CHAIR_MODEL_COLLIDERTYPE;
+	tmpData.nMass = OUTSIDE_WOOD_CHAIR_MODEL_MASS;
+	tmpData.xmf3OffsetScale = OUTSIDE_WOOD_CHAIR_MODEL_SCALE;
+	tmpData.renderLayer = OUTSIDE_WOOD_CHAIR_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, tmpData.xmf3Extents.z);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = OUTSIDE_WOOD_CHAIR_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ OUTSIDE_WOOD_CHAIR_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(OUTSIDE_WOOD_CHAIR_MODEL_NAME);
+
+	tmpData.pstrTexPath = CONCRETE_FENCE1_MODEL_TEXPATH;
+	tmpData.xmf3Extents = CONCRETE_FENCE1_MODEL_EXTENTS;
+	tmpData.objectType = CONCRETE_FENCE1_MODEL_TYPE;
+	tmpData.colliderType = CONCRETE_FENCE1_MODEL_COLLIDERTYPE;
+	tmpData.nMass = CONCRETE_FENCE1_MODEL_MASS;
+	tmpData.xmf3OffsetScale = CONCRETE_FENCE1_MODEL_SCALE;
+	tmpData.renderLayer = CONCRETE_FENCE1_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = CONCRETE_FENCE1_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ CONCRETE_FENCE1_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(CONCRETE_FENCE1_MODEL_NAME);
+
+	tmpData.pstrTexPath = CONCRETE_FENCE2_MODEL_TEXPATH;
+	tmpData.xmf3Extents = CONCRETE_FENCE2_MODEL_EXTENTS;
+	tmpData.objectType = CONCRETE_FENCE2_MODEL_TYPE;
+	tmpData.colliderType = CONCRETE_FENCE2_MODEL_COLLIDERTYPE;
+	tmpData.nMass = CONCRETE_FENCE2_MODEL_MASS;
+	tmpData.xmf3OffsetScale = CONCRETE_FENCE2_MODEL_SCALE;
+	tmpData.renderLayer = CONCRETE_FENCE2_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = CONCRETE_FENCE2_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ CONCRETE_FENCE2_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(CONCRETE_FENCE2_MODEL_NAME);
+
+	tmpData.pstrTexPath = CONCRETE_FENCE3_MODEL_TEXPATH;
+	tmpData.xmf3Extents = CONCRETE_FENCE3_MODEL_EXTENTS;
+	tmpData.objectType = CONCRETE_FENCE3_MODEL_TYPE;
+	tmpData.colliderType = CONCRETE_FENCE3_MODEL_COLLIDERTYPE;
+	tmpData.nMass = CONCRETE_FENCE3_MODEL_MASS;
+	tmpData.xmf3OffsetScale = CONCRETE_FENCE3_MODEL_SCALE;
+	tmpData.renderLayer = CONCRETE_FENCE3_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = CONCRETE_FENCE3_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ CONCRETE_FENCE3_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(CONCRETE_FENCE3_MODEL_NAME);
+
+	tmpData.pstrTexPath = ELECTO_PANEL_MODEL_TEXPATH;
+	tmpData.xmf3Extents = ELECTO_PANEL_MODEL_EXTENTS;
+	tmpData.objectType = ELECTO_PANEL_MODEL_TYPE;
+	tmpData.colliderType = ELECTO_PANEL_MODEL_COLLIDERTYPE;
+	tmpData.nMass = ELECTO_PANEL_MODEL_MASS;
+	tmpData.xmf3OffsetScale = ELECTO_PANEL_MODEL_SCALE;
+	tmpData.renderLayer = ELECTO_PANEL_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, tmpData.xmf3Extents.z);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = ELECTO_PANEL_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ ELECTO_PANEL_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(ELECTO_PANEL_MODEL_NAME);
+
+	tmpData.pstrTexPath = METAL_FENCE_MODEL_TEXPATH;
+	tmpData.xmf3Extents = METAL_FENCE_MODEL_EXTENTS;
+	tmpData.objectType = METAL_FENCE_MODEL_TYPE;
+	tmpData.colliderType = METAL_FENCE_MODEL_COLLIDERTYPE;
+	tmpData.nMass = METAL_FENCE_MODEL_MASS;
+	tmpData.xmf3OffsetScale = METAL_FENCE_MODEL_SCALE;
+	tmpData.renderLayer = METAL_FENCE_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, tmpData.xmf3Extents.z);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = METAL_FENCE_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ METAL_FENCE_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(METAL_FENCE_MODEL_NAME);
+
+	tmpData.pstrTexPath = FLOOR_PANEL2_MODEL_TEXPATH;
+	tmpData.xmf3Extents = FLOOR_PANEL2_MODEL_EXTENTS;
+	tmpData.objectType = FLOOR_PANEL2_MODEL_TYPE;
+	tmpData.colliderType = FLOOR_PANEL2_MODEL_COLLIDERTYPE;
+	tmpData.nMass = FLOOR_PANEL2_MODEL_MASS;
+	tmpData.xmf3OffsetScale = FLOOR_PANEL2_MODEL_SCALE;
+	tmpData.renderLayer = FLOOR_PANEL2_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = FLOOR_PANEL2_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ FLOOR_PANEL2_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(FLOOR_PANEL2_MODEL_NAME);
+
+	tmpData.pstrTexPath = HANGAR_MODEL_TEXPATH;
+	tmpData.xmf3Extents = HANGAR_MODEL_EXTENTS;
+	tmpData.objectType = HANGAR_MODEL_TYPE;
+	tmpData.colliderType = HANGAR_MODEL_COLLIDERTYPE;
+	tmpData.nMass = HANGAR_MODEL_MASS;
+	tmpData.xmf3OffsetScale = HANGAR_MODEL_SCALE;
+	tmpData.renderLayer = HANGAR_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = HANGAR_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ HANGAR_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(HANGAR_MODEL_NAME);
+
+	tmpData.pstrTexPath = MACHINE1_MODEL_TEXPATH;
+	tmpData.xmf3Extents = MACHINE1_MODEL_EXTENTS;
+	tmpData.objectType = MACHINE1_MODEL_TYPE;
+	tmpData.colliderType = MACHINE1_MODEL_COLLIDERTYPE;
+	tmpData.nMass = MACHINE1_MODEL_MASS;
+	tmpData.xmf3OffsetScale = MACHINE1_MODEL_SCALE;
+	tmpData.renderLayer = MACHINE1_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = MACHINE1_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ MACHINE1_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(MACHINE1_MODEL_NAME);
+
+	tmpData.pstrTexPath = MACHINE2_MODEL_TEXPATH;
+	tmpData.xmf3Extents = MACHINE2_MODEL_EXTENTS;
+	tmpData.objectType = MACHINE2_MODEL_TYPE;
+	tmpData.colliderType = MACHINE2_MODEL_COLLIDERTYPE;
+	tmpData.nMass = MACHINE2_MODEL_MASS;
+	tmpData.xmf3OffsetScale = MACHINE2_MODEL_SCALE;
+	tmpData.renderLayer = MACHINE2_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = MACHINE2_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ MACHINE2_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(MACHINE2_MODEL_NAME);
+
+	tmpData.pstrTexPath =  MACHINE3_MODEL_TEXPATH;
+	tmpData.xmf3Extents =  MACHINE3_MODEL_EXTENTS;
+	tmpData.objectType =  MACHINE3_MODEL_TYPE;
+	tmpData.colliderType =  MACHINE3_MODEL_COLLIDERTYPE;
+	tmpData.nMass =  MACHINE3_MODEL_MASS;
+	tmpData.xmf3OffsetScale =  MACHINE3_MODEL_SCALE;
+	tmpData.renderLayer =  MACHINE3_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed =  MACHINE3_MODEL_SHADOW;
+	g_DefaultObjectData.insert({  MACHINE3_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back( MACHINE3_MODEL_NAME);
+
+	tmpData.pstrTexPath = MACHINE6_MODEL_TEXPATH;
+	tmpData.xmf3Extents = MACHINE6_MODEL_EXTENTS;
+	tmpData.objectType = MACHINE6_MODEL_TYPE;
+	tmpData.colliderType = MACHINE6_MODEL_COLLIDERTYPE;
+	tmpData.nMass = MACHINE6_MODEL_MASS;
+	tmpData.xmf3OffsetScale = MACHINE6_MODEL_SCALE;
+	tmpData.renderLayer = MACHINE6_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = MACHINE6_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ MACHINE6_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(MACHINE6_MODEL_NAME);
+
+	tmpData.pstrTexPath = MACHINE7_MODEL_TEXPATH;
+	tmpData.xmf3Extents = MACHINE7_MODEL_EXTENTS;
+	tmpData.objectType = MACHINE7_MODEL_TYPE;
+	tmpData.colliderType = MACHINE7_MODEL_COLLIDERTYPE;
+	tmpData.nMass = MACHINE7_MODEL_MASS;
+	tmpData.xmf3OffsetScale = MACHINE7_MODEL_SCALE;
+	tmpData.renderLayer = MACHINE7_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = MACHINE7_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ MACHINE7_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(MACHINE7_MODEL_NAME);
+
+	tmpData.pstrTexPath = OIL_TANK_MODEL_TEXPATH;
+	tmpData.xmf3Extents = OIL_TANK_MODEL_EXTENTS;
+	tmpData.objectType = OIL_TANK_MODEL_TYPE;
+	tmpData.colliderType = OIL_TANK_MODEL_COLLIDERTYPE;
+	tmpData.nMass = OIL_TANK_MODEL_MASS;
+	tmpData.xmf3OffsetScale = OIL_TANK_MODEL_SCALE;
+	tmpData.renderLayer = OIL_TANK_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = OIL_TANK_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ OIL_TANK_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(OIL_TANK_MODEL_NAME);
+
+	tmpData.pstrTexPath = OLD_SEA_TREE_MODEL_TEXPATH;
+	tmpData.xmf3Extents = OLD_SEA_TREE_MODEL_EXTENTS;
+	tmpData.objectType = OLD_SEA_TREE_MODEL_TYPE;
+	tmpData.colliderType = OLD_SEA_TREE_MODEL_COLLIDERTYPE;
+	tmpData.nMass = OLD_SEA_TREE_MODEL_MASS;
+	tmpData.xmf3OffsetScale = OLD_SEA_TREE_MODEL_SCALE;
+	tmpData.renderLayer = OLD_SEA_TREE_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = OLD_SEA_TREE_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ OLD_SEA_TREE_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(OLD_SEA_TREE_MODEL_NAME);
+
+	tmpData.pstrTexPath =  PIPE_MODEL_TEXPATH;
+	tmpData.xmf3Extents =  PIPE_MODEL_EXTENTS;
+	tmpData.objectType =  PIPE_MODEL_TYPE;
+	tmpData.colliderType =  PIPE_MODEL_COLLIDERTYPE;
+	tmpData.nMass =  PIPE_MODEL_MASS;
+	tmpData.xmf3OffsetScale =  PIPE_MODEL_SCALE;
+	tmpData.renderLayer =  PIPE_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed =  PIPE_MODEL_SHADOW;
+	g_DefaultObjectData.insert({  PIPE_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back( PIPE_MODEL_NAME);
+
+	tmpData.pstrTexPath = PIPE_PILE1_MODEL_TEXPATH;
+	tmpData.xmf3Extents = PIPE_PILE1_MODEL_EXTENTS;
+	tmpData.objectType = PIPE_PILE1_MODEL_TYPE;
+	tmpData.colliderType = PIPE_PILE1_MODEL_COLLIDERTYPE;
+	tmpData.nMass = PIPE_PILE1_MODEL_MASS;
+	tmpData.xmf3OffsetScale = PIPE_PILE1_MODEL_SCALE;
+	tmpData.renderLayer = PIPE_PILE1_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0,0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = PIPE_PILE1_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ PIPE_PILE1_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(PIPE_PILE1_MODEL_NAME);
+
+	tmpData.pstrTexPath = PIPE_PILE2_MODEL_TEXPATH;
+	tmpData.xmf3Extents = PIPE_PILE2_MODEL_EXTENTS;
+	tmpData.objectType = PIPE_PILE2_MODEL_TYPE;
+	tmpData.colliderType = PIPE_PILE2_MODEL_COLLIDERTYPE;
+	tmpData.nMass = PIPE_PILE2_MODEL_MASS;
+	tmpData.xmf3OffsetScale = PIPE_PILE2_MODEL_SCALE;
+	tmpData.renderLayer = PIPE_PILE2_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0,0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = PIPE_PILE2_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ PIPE_PILE2_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(PIPE_PILE2_MODEL_NAME);
+
+	tmpData.pstrTexPath = ROAD_BLOCK_MODEL_TEXPATH;
+	tmpData.xmf3Extents = ROAD_BLOCK_MODEL_EXTENTS;
+	tmpData.objectType = ROAD_BLOCK_MODEL_TYPE;
+	tmpData.colliderType = ROAD_BLOCK_MODEL_COLLIDERTYPE;
+	tmpData.nMass = ROAD_BLOCK_MODEL_MASS;
+	tmpData.xmf3OffsetScale = ROAD_BLOCK_MODEL_SCALE;
+	tmpData.renderLayer = ROAD_BLOCK_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = ROAD_BLOCK_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ ROAD_BLOCK_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(ROAD_BLOCK_MODEL_NAME);
+
+	tmpData.pstrTexPath = ROAD_B_FLOOR_MODEL_TEXPATH;
+	tmpData.xmf3Extents = ROAD_B_FLOOR_MODEL_EXTENTS;
+	tmpData.objectType = ROAD_B_FLOOR_MODEL_TYPE;
+	tmpData.colliderType = ROAD_B_FLOOR_MODEL_COLLIDERTYPE;
+	tmpData.nMass = ROAD_B_FLOOR_MODEL_MASS;
+	tmpData.xmf3OffsetScale = ROAD_B_FLOOR_MODEL_SCALE;
+	tmpData.renderLayer = ROAD_B_FLOOR_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = ROAD_B_FLOOR_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ ROAD_B_FLOOR_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(ROAD_B_FLOOR_MODEL_NAME);
+
+	tmpData.pstrTexPath = ROAD_S_BEND2_MODEL_TEXPATH;
+	tmpData.xmf3Extents = ROAD_S_BEND2_MODEL_EXTENTS;
+	tmpData.objectType = ROAD_S_BEND2_MODEL_TYPE;
+	tmpData.colliderType = ROAD_S_BEND2_MODEL_COLLIDERTYPE;
+	tmpData.nMass = ROAD_S_BEND2_MODEL_MASS;
+	tmpData.xmf3OffsetScale = ROAD_S_BEND2_MODEL_SCALE;
+	tmpData.renderLayer = ROAD_S_BEND2_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = ROAD_S_BEND2_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ ROAD_S_BEND2_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(ROAD_S_BEND2_MODEL_NAME);
+
+	tmpData.pstrTexPath = ROAD_S_FLOOR_MODEL_TEXPATH;
+	tmpData.xmf3Extents = ROAD_S_FLOOR_MODEL_EXTENTS;
+	tmpData.objectType = ROAD_S_FLOOR_MODEL_TYPE;
+	tmpData.colliderType = ROAD_S_FLOOR_MODEL_COLLIDERTYPE;
+	tmpData.nMass = ROAD_S_FLOOR_MODEL_MASS;
+	tmpData.xmf3OffsetScale = ROAD_S_FLOOR_MODEL_SCALE;
+	tmpData.renderLayer = ROAD_S_FLOOR_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = ROAD_S_FLOOR_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ ROAD_S_FLOOR_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(ROAD_S_FLOOR_MODEL_NAME);
+
+	tmpData.pstrTexPath = ROAD_S_TILE_MODEL_TEXPATH;
+	tmpData.xmf3Extents = ROAD_S_TILE_MODEL_EXTENTS;
+	tmpData.objectType = ROAD_S_TILE_MODEL_TYPE;
+	tmpData.colliderType = ROAD_S_TILE_MODEL_COLLIDERTYPE;
+	tmpData.nMass = ROAD_S_TILE_MODEL_MASS;
+	tmpData.xmf3OffsetScale = ROAD_S_TILE_MODEL_SCALE;
+	tmpData.renderLayer = ROAD_S_TILE_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = ROAD_S_TILE_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ ROAD_S_TILE_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(ROAD_S_TILE_MODEL_NAME);
+
+	tmpData.pstrTexPath = SMALL_METALIC_CASE_MODEL_TEXPATH;
+	tmpData.xmf3Extents = SMALL_METALIC_CASE_MODEL_EXTENTS;
+	tmpData.objectType = SMALL_METALIC_CASE_MODEL_TYPE;
+	tmpData.colliderType = SMALL_METALIC_CASE_MODEL_COLLIDERTYPE;
+	tmpData.nMass = SMALL_METALIC_CASE_MODEL_MASS;
+	tmpData.xmf3OffsetScale = SMALL_METALIC_CASE_MODEL_SCALE;
+	tmpData.renderLayer = SMALL_METALIC_CASE_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = SMALL_METALIC_CASE_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ SMALL_METALIC_CASE_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(SMALL_METALIC_CASE_MODEL_NAME);
+
+	tmpData.pstrTexPath = TOWER_MODEL_TEXPATH;
+	tmpData.xmf3Extents = TOWER_MODEL_EXTENTS;
+	tmpData.objectType = TOWER_MODEL_TYPE;
+	tmpData.colliderType = TOWER_MODEL_COLLIDERTYPE;
+	tmpData.nMass = TOWER_MODEL_MASS;
+	tmpData.xmf3OffsetScale = TOWER_MODEL_SCALE;
+	tmpData.renderLayer = TOWER_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, tmpData.xmf3Extents.z);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = TOWER_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ TOWER_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(TOWER_MODEL_NAME);
+
+	tmpData.pstrTexPath = TOWER_SHORT_MODEL_TEXPATH;
+	tmpData.xmf3Extents = TOWER_SHORT_MODEL_EXTENTS;
+	tmpData.objectType = TOWER_SHORT_MODEL_TYPE;
+	tmpData.colliderType = TOWER_SHORT_MODEL_COLLIDERTYPE;
+	tmpData.nMass = TOWER_SHORT_MODEL_MASS;
+	tmpData.xmf3OffsetScale = TOWER_SHORT_MODEL_SCALE;
+	tmpData.renderLayer = TOWER_SHORT_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, tmpData.xmf3Extents.z);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = TOWER_SHORT_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ TOWER_SHORT_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(TOWER_SHORT_MODEL_NAME);
+
+	tmpData.pstrTexPath = WOODEN_BOX_MODEL_TEXPATH;
+	tmpData.xmf3Extents = WOODEN_BOX_MODEL_EXTENTS;
+	tmpData.objectType = WOODEN_BOX_MODEL_TYPE;
+	tmpData.colliderType = WOODEN_BOX_MODEL_COLLIDERTYPE;
+	tmpData.nMass = WOODEN_BOX_MODEL_MASS;
+	tmpData.xmf3OffsetScale = WOODEN_BOX_MODEL_SCALE;
+	tmpData.renderLayer = WOODEN_BOX_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = WOODEN_BOX_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ WOODEN_BOX_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(WOODEN_BOX_MODEL_NAME);
+
+	tmpData.pstrTexPath = WOODEN_BOX_SQUARE_MODEL_TEXPATH;
+	tmpData.xmf3Extents = WOODEN_BOX_SQUARE_MODEL_EXTENTS;
+	tmpData.objectType = WOODEN_BOX_SQUARE_MODEL_TYPE;
+	tmpData.colliderType = WOODEN_BOX_SQUARE_MODEL_COLLIDERTYPE;
+	tmpData.nMass = WOODEN_BOX_SQUARE_MODEL_MASS;
+	tmpData.xmf3OffsetScale = WOODEN_BOX_SQUARE_MODEL_SCALE;
+	tmpData.renderLayer = WOODEN_BOX_SQUARE_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = WOODEN_BOX_SQUARE_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ WOODEN_BOX_SQUARE_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(WOODEN_BOX_SQUARE_MODEL_NAME);
+
 }

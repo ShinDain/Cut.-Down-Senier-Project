@@ -121,7 +121,8 @@ void SenierProjectApp::Render(float elapsedTime)
 	// ·»´õ Å¸°Ù, ±íÀÌ/½ºÅÙ½Ç ¹öÆÛ ÃÊ±âÈ­ ÈÄ ¼³Á¤
 	const D3D12_CPU_DESCRIPTOR_HANDLE currentBackBufferView = CurrentBackBufferView();
 	const D3D12_CPU_DESCRIPTOR_HANDLE depthStencilBufferView = DepthStencilView();
-	m_CommandList->ClearRenderTargetView(currentBackBufferView, Colors::LightSteelBlue, 0, nullptr);
+	XMVECTORF32 clearColors = { 0.1f, 0.1f, 0.15f, 1.0f };
+	m_CommandList->ClearRenderTargetView(currentBackBufferView, clearColors, 0, nullptr);
 	m_CommandList->ClearDepthStencilView(depthStencilBufferView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
 		1.0f, 0, 0, NULL);
 	m_CommandList->OMSetRenderTargets(1, &currentBackBufferView, true, &depthStencilBufferView);

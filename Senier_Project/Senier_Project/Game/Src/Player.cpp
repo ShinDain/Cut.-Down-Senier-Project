@@ -290,11 +290,11 @@ void Player::Jump()
 	if (m_bIsShoulderView)
 		return;
 
-	if (!m_bIsFalling || m_bCanDoubleJump)
+	if (!m_bIsFalling)// || m_bCanDoubleJump)
 	{
 		if (m_bIsFalling)
 		{
-			m_bCanDoubleJump = false;
+			//m_bCanDoubleJump = false;
 			Sound::PlaySoundFile(doublejump_SoundFileName, true);
 		}
 		else
@@ -602,7 +602,7 @@ void Player::InitializeState()
 	m_bCombeAttack = false;
 
 	m_bIsFalling = false;
-	m_bCanDoubleJump = true;
+	//m_bCanDoubleJump = true;
 	m_bCanThrow = true;
 	m_MaxSpeedXZ = m_DefaultMaxSpeedXZ;
 	m_CharacterFriction = 350.0f;
@@ -704,7 +704,7 @@ void Player::DoLanding()
 		Character::DoLanding();
 		m_Acceleration = m_AttackAccel;
 		m_TurnSpeed = 0;
-		m_bCanDoubleJump = true;
+		//m_bCanDoubleJump = true;
 		return;
 	default:
 		break;
@@ -717,7 +717,7 @@ void Player::DoLanding()
 	//m_CharacterFriction = 350.0f;
 	//m_Acceleration = m_DefaultAccel;
 	//m_pBody->SetInGravity(false);
-	m_bCanDoubleJump = true;
+	//m_bCanDoubleJump = true;
 	m_TurnSpeed = 1;
 
 }

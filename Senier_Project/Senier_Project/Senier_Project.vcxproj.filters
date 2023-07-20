@@ -41,6 +41,9 @@
     <Filter Include="Game\Header">
       <UniqueIdentifier>{5048186c-89f6-4f98-953b-914898915eea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataDefine">
+      <UniqueIdentifier>{5d34b492-5e3f-4396-91d8-40b204086cb9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Physics\Src\Collider.cpp">
@@ -255,6 +258,21 @@
     </ClInclude>
     <ClInclude Include="Game\Header\Sound.h">
       <Filter>Game\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="DataDefine\CharacterData.h">
+      <Filter>DataDefine</Filter>
+    </ClInclude>
+    <ClInclude Include="DataDefine\ItemAndEventData.h">
+      <Filter>DataDefine</Filter>
+    </ClInclude>
+    <ClInclude Include="DataDefine\ProjectileData.h">
+      <Filter>DataDefine</Filter>
+    </ClInclude>
+    <ClInclude Include="DataDefine\OutsideObjectData.h">
+      <Filter>DataDefine</Filter>
+    </ClInclude>
+    <ClInclude Include="DataDefine\EffectData.h">
+      <Filter>DataDefine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

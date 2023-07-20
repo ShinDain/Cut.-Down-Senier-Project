@@ -39,7 +39,7 @@ public:
 	Mesh& operator=(const Mesh& rhs) = delete;
 	virtual ~Mesh();
 
-	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
+	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList, UINT nMeshIdx);
 	virtual void LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile);
 
 protected:

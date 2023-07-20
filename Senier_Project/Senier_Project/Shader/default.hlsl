@@ -106,8 +106,8 @@ float4 TexturePS(VertexOut pin) : SV_Target
 	//clip(diffuseAlbedo.a - 0.1f);
 
 	pin.NormalW = normalize(pin.NormalW);
-	float4 normalMapSample = gNormalMap.Sample(gsamAnisotropicWrap, pin.TexC);
-	float3 bumpedNormalW = NormalSampleToWorldSpace(normalMapSample.rgb, pin.NormalW, pin.TangentW);
+	//float4 normalMapSample = gNormalMap.Sample(gsamAnisotropicWrap, pin.TexC);
+	//float3 bumpedNormalW = NormalSampleToWorldSpace(normalMapSample.rgb, pin.NormalW, pin.TangentW);
 
 	float3 toEyeW = normalize(gEyePosW - pin.PosW);
 
@@ -121,7 +121,7 @@ float4 TexturePS(VertexOut pin) : SV_Target
 	float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
 	shadowFactor[0] = CalcShadowFactor(pin.ShadowPosH);
 
-	float4 directLight = ComputeLighting(gLights, mat, pin.PosW, bumpedNormalW, toEyeW, shadowFactor);
+	float4 directLight = ComputeLighting(gLights, mat, pin.PosW, pin.NormalW, toEyeW, shadowFactor);
 
 	float4 litColor = ambient + directLight;
 

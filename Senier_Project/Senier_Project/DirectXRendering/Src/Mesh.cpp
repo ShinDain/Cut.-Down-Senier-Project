@@ -50,16 +50,14 @@ void Mesh::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList)
     pd3dCommandList->IASetPrimitiveTopology(m_PrimitiveTopology);
 }
 
-void Mesh::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
+void Mesh::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList, UINT nMeshIdx)
 {
 	OnPrepareRender(pd3dCommandList);
 
-    for (int i = 0 ; i< m_vDrawArgs.size(); ++i)
-    {
-		pd3dCommandList->IASetIndexBuffer(&m_vIndexBufferView[i]);
-        pd3dCommandList->DrawIndexedInstanced(
-            m_vDrawArgs[i].IndexCount, 1, m_vDrawArgs[i].StartIndexLocation, m_vDrawArgs[i].BaseVertexLocation, 0);
-    }
+	pd3dCommandList->IASetIndexBuffer(&m_vIndexBufferView[nMeshIdx]);
+    pd3dCommandList->DrawIndexedInstanced(
+        m_vDrawArgs[nMeshIdx].IndexCount, 1, m_vDrawArgs[nMeshIdx].StartIndexLocation, m_vDrawArgs[nMeshIdx].BaseVertexLocation, 0);
+    
 }
 
 void Mesh::LoadMeshFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile)

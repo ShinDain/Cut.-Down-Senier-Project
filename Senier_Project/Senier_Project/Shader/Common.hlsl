@@ -116,5 +116,12 @@ float CalcShadowFactor(float4 shadowPosH)
     }
 
     //return 1.0f;
-    return percentLit / 9.0f;
+
+    percentLit = percentLit / 9.0f;
+    //if (percentLit < 0)
+    //    percentLit = 1.0f;
+    
+    return percentLit;
+
+   
 }

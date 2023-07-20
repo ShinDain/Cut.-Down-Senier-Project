@@ -286,7 +286,7 @@ void Object::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandLis
 		{
 			m_vpMaterials[i]->MaterialSet(pd3dCommandList);
 
-			m_pMesh->Render(elapsedTime, pd3dCommandList);
+			m_pMesh->Render(elapsedTime, pd3dCommandList, i);
 		}
 	}
 
@@ -320,7 +320,7 @@ void Object::DepthRender(float elapsedTime, ID3D12GraphicsCommandList* pd3dComma
 
 		for (int i = 0; i < m_vpMaterials.size(); ++i)
 		{
-			m_pMesh->Render(elapsedTime, pd3dCommandList);
+			m_pMesh->Render(elapsedTime, pd3dCommandList, i);
 		}
 	}
 
@@ -433,7 +433,7 @@ std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dD
 {
 	FILE* pInFile = NULL;
 
-	char pstrFilePath[64] = { '\0' };
+	char pstrFilePath[128] = { '\0' };
 	strcpy_s(pstrFilePath, 64, "Model/");
 	if (strlen(pstrObjectPath))
 	{

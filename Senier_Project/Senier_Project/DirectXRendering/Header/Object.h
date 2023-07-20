@@ -16,8 +16,6 @@
 #include "AnimationController.h"
 #include "../../Game/Header/Sound.h"
 
-
-
 //#define COLLIDER_RENDER
 
 #define DIR_FORWARD					0x01
