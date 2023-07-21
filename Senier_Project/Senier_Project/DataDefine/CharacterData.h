@@ -1,4 +1,4 @@
-#ifndef PROJECTILEDATA_H
+#ifndef CHARACTERDATA_H
 
 #define CHARACTERDATA_H
 
@@ -22,7 +22,7 @@ using namespace DirectX;
 
 #define ZOMBIE_MODEL_NAME "Zombie1"
 #define ZOMBIE_MODEL_OBJECTPATH "Monster"
-#define ZOMBIE_MODEL_TEXPATH "Zombie1"
+#define ZOMBIE_MODEL_TEXPATH "Monster/Zombie1"
 #define ZOMBIE_MODEL_EXTENTS XMFLOAT3(0.3f, 0.8f, 0.2f)
 #define ZOMBIE_MODEL_TYPE Object_Monster
 #define ZOMBIE_MODEL_COLLIDERTYPE Collider_Box
@@ -33,7 +33,7 @@ using namespace DirectX;
 
 #define HIGHZOMBIE_MODEL_NAME "HighZombie"
 #define HIGHZOMBIE_MODEL_OBJECTPATH "Monster"
-#define HIGHZOMBIE_MODEL_TEXPATH "HighZombie"
+#define HIGHZOMBIE_MODEL_TEXPATH "Monster/HighZombie"
 #define HIGHZOMBIE_MODEL_EXTENTS XMFLOAT3(0.4f, 0.8f, 0.3f)
 #define HIGHZOMBIE_MODEL_TYPE Object_Monster
 #define HIGHZOMBIE_MODEL_COLLIDERTYPE Collider_Box
@@ -44,7 +44,7 @@ using namespace DirectX;
 
 #define SCAVENGER_MODEL_NAME "scavenger"
 #define SCAVENGER_MODEL_OBJECTPATH "Monster"
-#define SCAVENGER_MODEL_TEXPATH "scavenger"
+#define SCAVENGER_MODEL_TEXPATH "Monster/scavenger"
 #define SCAVENGER_MODEL_EXTENTS XMFLOAT3(0.25f, 0.8f, 0.3f)
 #define SCAVENGER_MODEL_TYPE Object_Monster
 #define SCAVENGER_MODEL_COLLIDERTYPE Collider_Box
@@ -55,7 +55,7 @@ using namespace DirectX;
 
 #define CYBER_TWINS_MODEL_NAME "Cyber_Monsters_2"
 #define CYBER_TWINS_MODEL_OBJECTPATH "Monster"
-#define CYBER_TWINS_MODEL_TEXPATH "Cyber_Monsters_2"
+#define CYBER_TWINS_MODEL_TEXPATH "Monster/Cyber_Monsters_2"
 #define CYBER_TWINS_MODEL_EXTENTS XMFLOAT3(0.4f, 0.8f, 0.3f)
 #define CYBER_TWINS_MODEL_TYPE Object_Monster
 #define CYBER_TWINS_MODEL_COLLIDERTYPE Collider_Box
@@ -66,7 +66,7 @@ using namespace DirectX;
 
 #define GHOUL_MODEL_NAME "Ghoul"
 #define GHOUL_MODEL_OBJECTPATH "Monster"
-#define GHOUL_MODEL_TEXPATH "Ghoul"
+#define GHOUL_MODEL_TEXPATH "Monster/Ghoul"
 #define GHOUL_MODEL_EXTENTS XMFLOAT3(0.65f, 1.5f, 0.4f)
 #define GHOUL_MODEL_TYPE Object_Monster
 #define GHOUL_MODEL_COLLIDERTYPE Collider_Box
@@ -77,7 +77,7 @@ using namespace DirectX;
 
 #define NECROMANCER_MODEL_NAME "Necromanser"
 #define NECROMANCER_MODEL_OBJECTPATH "Monster"
-#define NECROMANCER_MODEL_TEXPATH "Necromanser"
+#define NECROMANCER_MODEL_TEXPATH "Monster/Necromanser"
 #define NECROMANCER_MODEL_EXTENTS XMFLOAT3(0.3f, 0.8f, 0.3f)
 #define NECROMANCER_MODEL_TYPE Object_Monster
 #define NECROMANCER_MODEL_COLLIDERTYPE Collider_Box

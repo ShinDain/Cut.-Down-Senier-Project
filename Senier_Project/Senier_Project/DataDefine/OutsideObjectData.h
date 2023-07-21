@@ -10,7 +10,7 @@ using namespace DirectX;
 
 #define GRASS_GROUND_MODEL_NAME "Pod_trava"
 #define GRASS_GROUND_MODEL_OBJECTPATH "WorldObject/Outside"
-#define GRASS_GROUND_MODEL_TEXPATH "Outside"
+#define GRASS_GROUND_MODEL_TEXPATH "WorldObject"
 #define GRASS_GROUND_MODEL_EXTENTS XMFLOAT3(0.0f,0.0f,0.0f)
 #define GRASS_GROUND_MODEL_TYPE Object_World
 #define GRASS_GROUND_MODEL_COLLIDERTYPE Collider_None
@@ -21,7 +21,7 @@ using namespace DirectX;
 
 #define HOSPITAL_MODEL_NAME "Hospital"
 #define HOSPITAL_MODEL_OBJECTPATH "WorldObject/Outside"
-#define HOSPITAL_MODEL_TEXPATH "Outside/Hospital"
+#define HOSPITAL_MODEL_TEXPATH "WorldObject/Hospital"
 #define HOSPITAL_MODEL_EXTENTS XMFLOAT3(0.0f,0.0f,0.0f)
 #define HOSPITAL_MODEL_TYPE Object_World
 #define HOSPITAL_MODEL_COLLIDERTYPE Collider_None
@@ -32,7 +32,7 @@ using namespace DirectX;
 
 #define BARREL1_MODEL_NAME "barrel"
 #define BARREL1_MODEL_OBJECTPATH "WorldObject/Outside"
-#define BARREL1_MODEL_TEXPATH "Outside/Barrel"
+#define BARREL1_MODEL_TEXPATH "WorldObject/Barrel"
 #define BARREL1_MODEL_EXTENTS XMFLOAT3(0.4f, 0.4f, 0.7f)
 #define BARREL1_MODEL_TYPE Object_Movable
 #define BARREL1_MODEL_COLLIDERTYPE Collider_Box
@@ -43,7 +43,7 @@ using namespace DirectX;
 
 #define BARREL2_MODEL_NAME "Barrel_v1_LD2"
 #define BARREL2_MODEL_OBJECTPATH "WorldObject/Outside"
-#define BARREL2_MODEL_TEXPATH "Outside/Barrel"
+#define BARREL2_MODEL_TEXPATH "WorldObject/Barrel"
 #define BARREL2_MODEL_EXTENTS XMFLOAT3(0.3f, 0.5f, 0.3f)
 #define BARREL2_MODEL_TYPE Object_Movable
 #define BARREL2_MODEL_COLLIDERTYPE Collider_Box
@@ -54,7 +54,7 @@ using namespace DirectX;
 
 #define BARREL3_MODEL_NAME "Barrels_1"
 #define BARREL3_MODEL_OBJECTPATH "WorldObject/Outside"
-#define BARREL3_MODEL_TEXPATH "Outside/Barrel"
+#define BARREL3_MODEL_TEXPATH "WorldObject/Barrel"
 #define BARREL3_MODEL_EXTENTS XMFLOAT3(0.27f, 0.27f, 0.4f)
 #define BARREL3_MODEL_TYPE Object_Movable
 #define BARREL3_MODEL_COLLIDERTYPE Collider_Box
@@ -65,7 +65,7 @@ using namespace DirectX;
 
 #define BARREL4_MODEL_NAME "Barrels_2"
 #define BARREL4_MODEL_OBJECTPATH "WorldObject/Outside"
-#define BARREL4_MODEL_TEXPATH "Outside/Barrel"
+#define BARREL4_MODEL_TEXPATH "WorldObject/Barrel"
 #define BARREL4_MODEL_EXTENTS XMFLOAT3(0.27f, 0.27f, 0.4f)
 #define BARREL4_MODEL_TYPE Object_Movable
 #define BARREL4_MODEL_COLLIDERTYPE Collider_Box
@@ -76,7 +76,7 @@ using namespace DirectX;
 
 #define BARREL5_MODEL_NAME "Barrels_3"
 #define BARREL5_MODEL_OBJECTPATH "WorldObject/Outside"
-#define BARREL5_MODEL_TEXPATH "Outside/Barrel"
+#define BARREL5_MODEL_TEXPATH "WorldObject/Barrel"
 #define BARREL5_MODEL_EXTENTS XMFLOAT3(0.27f, 0.27f, 0.4f)
 #define BARREL5_MODEL_TYPE Object_Movable
 #define BARREL5_MODEL_COLLIDERTYPE Collider_Box
@@ -87,7 +87,7 @@ using namespace DirectX;
 
 #define BENCH_MODEL_NAME "Bench"
 #define BENCH_MODEL_OBJECTPATH "WorldObject/Outside"
-#define BENCH_MODEL_TEXPATH "Outside/Bench"
+#define BENCH_MODEL_TEXPATH "WorldObject/Bench"
 #define BENCH_MODEL_EXTENTS XMFLOAT3(0.9f, 0.35f, 0.15f)
 #define BENCH_MODEL_TYPE Object_Movable
 #define BENCH_MODEL_COLLIDERTYPE Collider_Box
@@ -98,7 +98,7 @@ using namespace DirectX;
 
 #define BOILER_MODEL_NAME "BigBoiler"
 #define BOILER_MODEL_OBJECTPATH "WorldObject/Outside"
-#define BOILER_MODEL_TEXPATH "Outside/Big_Boiler"
+#define BOILER_MODEL_TEXPATH "WorldObject/Big_Boiler"
 #define BOILER_MODEL_EXTENTS XMFLOAT3(0.9f, 0.65f, 0.9f)
 #define BOILER_MODEL_TYPE Object_World
 #define BOILER_MODEL_COLLIDERTYPE Collider_Box
@@ -109,7 +109,7 @@ using namespace DirectX;
 
 #define BIGSHELF_MODEL_NAME "BigShelf"
 #define BIGSHELF_MODEL_OBJECTPATH "WorldObject/Outside"
-#define BIGSHELF_MODEL_TEXPATH "Outside/BigShelf"
+#define BIGSHELF_MODEL_TEXPATH "WorldObject/BigShelf"
 #define BIGSHELF_MODEL_EXTENTS XMFLOAT3(1.15f, 1.3f, 0.6f)
 #define BIGSHELF_MODEL_TYPE Object_World
 #define BIGSHELF_MODEL_COLLIDERTYPE Collider_Box
@@ -120,7 +120,7 @@ using namespace DirectX;
 
 #define BIGSHELF_STOCK_MODEL_NAME "BigShelf_Stock"
 #define BIGSHELF_STOCK_MODEL_OBJECTPATH "WorldObject/Outside"
-#define BIGSHELF_STOCK_MODEL_TEXPATH "Outside/BigShelf"
+#define BIGSHELF_STOCK_MODEL_TEXPATH "WorldObject/BigShelf"
 #define BIGSHELF_STOCK_MODEL_EXTENTS XMFLOAT3(0.75, 1.15, 0.4)
 #define BIGSHELF_STOCK_MODEL_TYPE Object_World
 #define BIGSHELF_STOCK_MODEL_COLLIDERTYPE Collider_Box
@@ -131,7 +131,7 @@ using namespace DirectX;
 
 #define WOOD_BOX1_MODEL_NAME "Box_V1"
 #define WOOD_BOX1_MODEL_OBJECTPATH "WorldObject/Outside"
-#define WOOD_BOX1_MODEL_TEXPATH "Outside/Box"
+#define WOOD_BOX1_MODEL_TEXPATH "WorldObject/Box"
 #define WOOD_BOX1_MODEL_EXTENTS XMFLOAT3(0.25, 0.1, 0.2)
 #define WOOD_BOX1_MODEL_TYPE Object_Movable
 #define WOOD_BOX1_MODEL_COLLIDERTYPE Collider_Box
@@ -142,7 +142,7 @@ using namespace DirectX;
 
 #define CABELS_MODEL_NAME "Cabels"
 #define CABELS_MODEL_OBJECTPATH "WorldObject/Outside"
-#define CABELS_MODEL_TEXPATH "Outside/Cabels"
+#define CABELS_MODEL_TEXPATH "WorldObject/Cabels"
 #define CABELS_MODEL_EXTENTS XMFLOAT3(0.0f,0.0f,0.0f)
 #define CABELS_MODEL_TYPE Object_World
 #define CABELS_MODEL_COLLIDERTYPE Collider_None
@@ -153,7 +153,7 @@ using namespace DirectX;
 
 #define CAN_MODEL_NAME "CanOld"
 #define CAN_MODEL_OBJECTPATH "WorldObject/Outside"
-#define CAN_MODEL_TEXPATH "Outside/Can"
+#define CAN_MODEL_TEXPATH "WorldObject/Can"
 #define CAN_MODEL_EXTENTS XMFLOAT3(0.05f, 0.1f, 0.05f)
 #define CAN_MODEL_TYPE Object_Movable
 #define CAN_MODEL_COLLIDERTYPE Collider_Box
@@ -164,7 +164,7 @@ using namespace DirectX;
 
 #define CAN_DAMAGED_MODEL_NAME "CanOld_Damaged"
 #define CAN_DAMAGED_MODEL_OBJECTPATH "WorldObject/Outside"
-#define CAN_DAMAGED_MODEL_TEXPATH "Outside/Can"
+#define CAN_DAMAGED_MODEL_TEXPATH "WorldObject/Can"
 #define CAN_DAMAGED_MODEL_EXTENTS XMFLOAT3(0.1f, 0.05f, 0.05f)
 #define CAN_DAMAGED_MODEL_TYPE Object_Movable
 #define CAN_DAMAGED_MODEL_COLLIDERTYPE Collider_Box
@@ -175,7 +175,7 @@ using namespace DirectX;
 
 #define CONTAINER_MODEL_NAME "Cargo_container_v1_LD1close"
 #define CONTAINER_MODEL_OBJECTPATH "WorldObject/Outside"
-#define CONTAINER_MODEL_TEXPATH "Outside/Container"
+#define CONTAINER_MODEL_TEXPATH "WorldObject/Container"
 #define CONTAINER_MODEL_EXTENTS XMFLOAT3(4.0f, 1.5f, 1.5f)
 #define CONTAINER_MODEL_TYPE Object_World
 #define CONTAINER_MODEL_COLLIDERTYPE Collider_Box
@@ -186,7 +186,7 @@ using namespace DirectX;
 
 #define DUMP_CONTAINER_MODEL_NAME "Dumpsters_v1_garbadge"
 #define DUMP_CONTAINER_MODEL_OBJECTPATH "WorldObject/Outside"
-#define DUMP_CONTAINER_MODEL_TEXPATH "Outside/Container"
+#define DUMP_CONTAINER_MODEL_TEXPATH "WorldObject/Container"
 #define DUMP_CONTAINER_MODEL_EXTENTS XMFLOAT3(2.5f, 1.0f, 0.9f)
 #define DUMP_CONTAINER_MODEL_TYPE Object_World
 #define DUMP_CONTAINER_MODEL_COLLIDERTYPE Collider_Box
@@ -197,7 +197,7 @@ using namespace DirectX;
 
 #define OUTSIDE_WOOD_CHAIR_MODEL_NAME "chair"
 #define OUTSIDE_WOOD_CHAIR_MODEL_OBJECTPATH "WorldObject/Outside"
-#define OUTSIDE_WOOD_CHAIR_MODEL_TEXPATH "Outside/Planks"
+#define OUTSIDE_WOOD_CHAIR_MODEL_TEXPATH "WorldObject/Planks"
 #define OUTSIDE_WOOD_CHAIR_MODEL_EXTENTS XMFLOAT3(0.25f, 0.2f, 0.3f)
 #define OUTSIDE_WOOD_CHAIR_MODEL_TYPE Object_Movable
 #define OUTSIDE_WOOD_CHAIR_MODEL_COLLIDERTYPE Collider_Box
@@ -208,7 +208,7 @@ using namespace DirectX;
 
 #define CONCRETE_FENCE1_MODEL_NAME "Concrete_fence_v1_column"
 #define CONCRETE_FENCE1_MODEL_OBJECTPATH "WorldObject/Outside"
-#define CONCRETE_FENCE1_MODEL_TEXPATH "Outside/Concrete_fence"
+#define CONCRETE_FENCE1_MODEL_TEXPATH "WorldObject/Concrete_fence"
 #define CONCRETE_FENCE1_MODEL_EXTENTS XMFLOAT3(0.35f, 1.7f, 0.35f)
 #define CONCRETE_FENCE1_MODEL_TYPE Object_World
 #define CONCRETE_FENCE1_MODEL_COLLIDERTYPE Collider_Box
@@ -219,7 +219,7 @@ using namespace DirectX;
 
 #define CONCRETE_FENCE2_MODEL_NAME "Concrete_fence_v1_wall_set_v1"
 #define CONCRETE_FENCE2_MODEL_OBJECTPATH "WorldObject/Outside"
-#define CONCRETE_FENCE2_MODEL_TEXPATH "Outside/Concrete_fence"
+#define CONCRETE_FENCE2_MODEL_TEXPATH "WorldObject/Concrete_fence"
 #define CONCRETE_FENCE2_MODEL_EXTENTS XMFLOAT3(0.4f, 1.6f, 4.5f)
 #define CONCRETE_FENCE2_MODEL_TYPE Object_World
 #define CONCRETE_FENCE2_MODEL_COLLIDERTYPE Collider_Box
@@ -230,7 +230,7 @@ using namespace DirectX;
 
 #define CONCRETE_FENCE3_MODEL_NAME "Concrete_fence_v1_wall_set_v2"
 #define CONCRETE_FENCE3_MODEL_OBJECTPATH "WorldObject/Outside"
-#define CONCRETE_FENCE3_MODEL_TEXPATH "Outside/Concrete_fence"
+#define CONCRETE_FENCE3_MODEL_TEXPATH "WorldObject/Concrete_fence"
 #define CONCRETE_FENCE3_MODEL_EXTENTS XMFLOAT3(0.4f, 1.6f, 9.4f)
 #define CONCRETE_FENCE3_MODEL_TYPE Object_World
 #define CONCRETE_FENCE3_MODEL_COLLIDERTYPE Collider_Box
@@ -241,7 +241,7 @@ using namespace DirectX;
 
 #define ELECTO_PANEL_MODEL_NAME "ElectoPanel"
 #define ELECTO_PANEL_MODEL_OBJECTPATH "WorldObject/Outside"
-#define ELECTO_PANEL_MODEL_TEXPATH "Outside/ElectricalPanel"
+#define ELECTO_PANEL_MODEL_TEXPATH "WorldObject/ElectricalPanel"
 #define ELECTO_PANEL_MODEL_EXTENTS XMFLOAT3(0.14f, 0.22f, 1.3f)
 #define ELECTO_PANEL_MODEL_TYPE Object_World
 #define ELECTO_PANEL_MODEL_COLLIDERTYPE Collider_Box
@@ -252,7 +252,7 @@ using namespace DirectX;
 
 #define METAL_FENCE_MODEL_NAME "fence_segment_1"
 #define METAL_FENCE_MODEL_OBJECTPATH "WorldObject/Outside"
-#define METAL_FENCE_MODEL_TEXPATH "Outside/Fence"
+#define METAL_FENCE_MODEL_TEXPATH "WorldObject/Fence"
 #define METAL_FENCE_MODEL_EXTENTS XMFLOAT3(0.06f, 1.45f, 1.2f)
 #define METAL_FENCE_MODEL_TYPE Object_World
 #define METAL_FENCE_MODEL_COLLIDERTYPE Collider_Box
@@ -263,7 +263,7 @@ using namespace DirectX;
 
 #define FLOOR_PANEL2_MODEL_NAME "floor-panel2"
 #define FLOOR_PANEL2_MODEL_OBJECTPATH "WorldObject/Outside"
-#define FLOOR_PANEL2_MODEL_TEXPATH "Outside/cor1_low_floor"
+#define FLOOR_PANEL2_MODEL_TEXPATH "WorldObject/cor1_low_floor"
 #define FLOOR_PANEL2_MODEL_EXTENTS XMFLOAT3(0.0f,0.0f,0.0f)
 #define FLOOR_PANEL2_MODEL_TYPE Object_World
 #define FLOOR_PANEL2_MODEL_COLLIDERTYPE Collider_None
@@ -274,7 +274,7 @@ using namespace DirectX;
 
 #define HANGAR_MODEL_NAME "Hangar_v1_full"
 #define HANGAR_MODEL_OBJECTPATH "WorldObject/Outside"
-#define HANGAR_MODEL_TEXPATH "Outside/Hangar"
+#define HANGAR_MODEL_TEXPATH "WorldObject/Hangar"
 #define HANGAR_MODEL_EXTENTS XMFLOAT3(4.8f, 2.35f, 3.7f)
 #define HANGAR_MODEL_TYPE Object_World
 #define HANGAR_MODEL_COLLIDERTYPE Collider_Box
@@ -283,9 +283,20 @@ using namespace DirectX;
 #define HANGAR_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
 #define HANGAR_MODEL_SHADOW true
 
+#define MAIN_DOOR_MODEL_NAME "MainDoor"
+#define MAIN_DOOR_MODEL_OBJECTPATH "WorldObject/Outside"
+#define MAIN_DOOR_MODEL_TEXPATH "WorldObject/Hospital"
+#define MAIN_DOOR_MODEL_EXTENTS XMFLOAT3(0.0f, 1.4375f, 0.0f)
+#define MAIN_DOOR_MODEL_TYPE Object_World
+#define MAIN_DOOR_MODEL_COLLIDERTYPE Collider_None
+#define MAIN_DOOR_MODEL_MASS 9999
+#define MAIN_DOOR_MODEL_SCALE XMFLOAT3(10,10,10)
+#define MAIN_DOOR_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
+#define MAIN_DOOR_MODEL_SHADOW false
+
 #define MACHINE1_MODEL_NAME "Machine_1"
 #define MACHINE1_MODEL_OBJECTPATH "WorldObject/Outside"
-#define MACHINE1_MODEL_TEXPATH "Outside/Machine"
+#define MACHINE1_MODEL_TEXPATH "WorldObject/Machine"
 #define MACHINE1_MODEL_EXTENTS XMFLOAT3(1.65f, 0.64f, 1.1f)
 #define MACHINE1_MODEL_TYPE Object_World
 #define MACHINE1_MODEL_COLLIDERTYPE Collider_Box
@@ -296,7 +307,7 @@ using namespace DirectX;
 
 #define MACHINE2_MODEL_NAME "Machine_2"
 #define MACHINE2_MODEL_OBJECTPATH "WorldObject/Outside"
-#define MACHINE2_MODEL_TEXPATH "Outside/Machine"
+#define MACHINE2_MODEL_TEXPATH "WorldObject/Machine"
 #define MACHINE2_MODEL_EXTENTS XMFLOAT3(2.2f, 1.0f, 1.05f)
 #define MACHINE2_MODEL_TYPE Object_World
 #define MACHINE2_MODEL_COLLIDERTYPE Collider_Box
@@ -307,7 +318,7 @@ using namespace DirectX;
 
 #define MACHINE3_MODEL_NAME "Machine_3"
 #define MACHINE3_MODEL_OBJECTPATH "WorldObject/Outside"
-#define MACHINE3_MODEL_TEXPATH "Outside/Machine"
+#define MACHINE3_MODEL_TEXPATH "WorldObject/Machine"
 #define MACHINE3_MODEL_EXTENTS XMFLOAT3(2.5f, 1.05f, 1.6f)
 #define MACHINE3_MODEL_TYPE Object_World
 #define MACHINE3_MODEL_COLLIDERTYPE Collider_Box
@@ -318,7 +329,7 @@ using namespace DirectX;
 
 #define MACHINE6_MODEL_NAME "Machine_6"
 #define MACHINE6_MODEL_OBJECTPATH "WorldObject/Outside"
-#define MACHINE6_MODEL_TEXPATH "Outside/Machine"
+#define MACHINE6_MODEL_TEXPATH "WorldObject/Machine"
 #define MACHINE6_MODEL_EXTENTS XMFLOAT3(1.75f, 1.05f, 1.9f)
 #define MACHINE6_MODEL_TYPE Object_World
 #define MACHINE6_MODEL_COLLIDERTYPE Collider_Box
@@ -329,7 +340,7 @@ using namespace DirectX;
 
 #define MACHINE7_MODEL_NAME "Machine_7"
 #define MACHINE7_MODEL_OBJECTPATH "WorldObject/Outside"
-#define MACHINE7_MODEL_TEXPATH "Outside/Machine"
+#define MACHINE7_MODEL_TEXPATH "WorldObject/Machine"
 #define MACHINE7_MODEL_EXTENTS XMFLOAT3(1.25f, 1.25f, 0.05f)
 #define MACHINE7_MODEL_TYPE Object_World
 #define MACHINE7_MODEL_COLLIDERTYPE Collider_Box
@@ -340,7 +351,7 @@ using namespace DirectX;
 
 #define OIL_TANK_MODEL_NAME "Oil_tank_v1"
 #define OIL_TANK_MODEL_OBJECTPATH "WorldObject/Outside"
-#define OIL_TANK_MODEL_TEXPATH "Outside/Oil_tank"
+#define OIL_TANK_MODEL_TEXPATH "WorldObject/Oil_tank"
 #define OIL_TANK_MODEL_EXTENTS XMFLOAT3(5.0f, 3.25f, 5.0f)
 #define OIL_TANK_MODEL_TYPE Object_World
 #define OIL_TANK_MODEL_COLLIDERTYPE Collider_Box
@@ -351,7 +362,7 @@ using namespace DirectX;
 
 #define OLD_SEA_TREE_MODEL_NAME "Old_Sea_Port_Tree"
 #define OLD_SEA_TREE_MODEL_OBJECTPATH "WorldObject/Outside"
-#define OLD_SEA_TREE_MODEL_TEXPATH "Outside/Tree"
+#define OLD_SEA_TREE_MODEL_TEXPATH "WorldObject/Tree"
 #define OLD_SEA_TREE_MODEL_EXTENTS XMFLOAT3(0.0f,0.0f,0.0f)
 #define OLD_SEA_TREE_MODEL_TYPE Object_World
 #define OLD_SEA_TREE_MODEL_COLLIDERTYPE Collider_None
@@ -362,7 +373,7 @@ using namespace DirectX;
 
 #define PIPE_MODEL_NAME "Pipe"
 #define PIPE_MODEL_OBJECTPATH "WorldObject/Outside"
-#define PIPE_MODEL_TEXPATH "Outside/Pipe"
+#define PIPE_MODEL_TEXPATH "WorldObject/Pipe"
 #define PIPE_MODEL_EXTENTS XMFLOAT3(0.1f, 3.6f, 0.1f)
 #define PIPE_MODEL_TYPE Object_World
 #define PIPE_MODEL_COLLIDERTYPE Collider_Box
@@ -373,7 +384,7 @@ using namespace DirectX;
 
 #define PIPE_PILE1_MODEL_NAME "Pipepile"
 #define PIPE_PILE1_MODEL_OBJECTPATH "WorldObject/Outside"
-#define PIPE_PILE1_MODEL_TEXPATH "Outside/Pipe"
+#define PIPE_PILE1_MODEL_TEXPATH "WorldObject/Pipe"
 #define PIPE_PILE1_MODEL_EXTENTS XMFLOAT3(1.65f, 0.6f, 0.9f)
 #define PIPE_PILE1_MODEL_TYPE Object_World
 #define PIPE_PILE1_MODEL_COLLIDERTYPE Collider_Box
@@ -384,7 +395,7 @@ using namespace DirectX;
 
 #define PIPE_PILE2_MODEL_NAME "Pipepile1"
 #define PIPE_PILE2_MODEL_OBJECTPATH "WorldObject/Outside"
-#define PIPE_PILE2_MODEL_TEXPATH "Outside/Pipe"
+#define PIPE_PILE2_MODEL_TEXPATH "WorldObject/Pipe"
 #define PIPE_PILE2_MODEL_EXTENTS XMFLOAT3(1.65f, 0.27f, 0.55f)
 #define PIPE_PILE2_MODEL_TYPE Object_World
 #define PIPE_PILE2_MODEL_COLLIDERTYPE Collider_Box
@@ -395,7 +406,7 @@ using namespace DirectX;
 
 #define ROAD_BLOCK_MODEL_NAME "Road_block_v1"
 #define ROAD_BLOCK_MODEL_OBJECTPATH "WorldObject/Outside"
-#define ROAD_BLOCK_MODEL_TEXPATH "Outside/Road_Block"
+#define ROAD_BLOCK_MODEL_TEXPATH "WorldObject/Road_Block"
 #define ROAD_BLOCK_MODEL_EXTENTS XMFLOAT3(1.15f, 0.55f, 0.5f)
 #define ROAD_BLOCK_MODEL_TYPE Object_World
 #define ROAD_BLOCK_MODEL_COLLIDERTYPE Collider_Box
@@ -406,7 +417,7 @@ using namespace DirectX;
 
 #define ROAD_B_FLOOR_MODEL_NAME "Road_set_v1_b_floor"
 #define ROAD_B_FLOOR_MODEL_OBJECTPATH "WorldObject/Outside"
-#define ROAD_B_FLOOR_MODEL_TEXPATH "Outside/Road"
+#define ROAD_B_FLOOR_MODEL_TEXPATH "WorldObject/Road"
 #define ROAD_B_FLOOR_MODEL_EXTENTS XMFLOAT3(0.0f,0.0f,0.0f)
 #define ROAD_B_FLOOR_MODEL_TYPE Object_World
 #define ROAD_B_FLOOR_MODEL_COLLIDERTYPE Collider_None
@@ -417,7 +428,7 @@ using namespace DirectX;
 
 #define ROAD_S_BEND2_MODEL_NAME "Road_set_v1_s_bend_2"
 #define ROAD_S_BEND2_MODEL_OBJECTPATH "WorldObject/Outside"
-#define ROAD_S_BEND2_MODEL_TEXPATH "Outside/Road"
+#define ROAD_S_BEND2_MODEL_TEXPATH "WorldObject/Road"
 #define ROAD_S_BEND2_MODEL_EXTENTS XMFLOAT3(0.0f,0.0f,0.0f)
 #define ROAD_S_BEND2_MODEL_TYPE Object_World
 #define ROAD_S_BEND2_MODEL_COLLIDERTYPE Collider_None
@@ -428,7 +439,7 @@ using namespace DirectX;
 
 #define ROAD_S_FLOOR_MODEL_NAME "Road_set_v1_s_floor"
 #define ROAD_S_FLOOR_MODEL_OBJECTPATH "WorldObject/Outside"
-#define ROAD_S_FLOOR_MODEL_TEXPATH "Outside/Road"
+#define ROAD_S_FLOOR_MODEL_TEXPATH "WorldObject/Road"
 #define ROAD_S_FLOOR_MODEL_EXTENTS XMFLOAT3(0.0f,0.0f,0.0f)
 #define ROAD_S_FLOOR_MODEL_TYPE Object_World
 #define ROAD_S_FLOOR_MODEL_COLLIDERTYPE Collider_None
@@ -439,7 +450,7 @@ using namespace DirectX;
 
 #define ROAD_S_TILE_MODEL_NAME "Road_set_v1_s_tile_2"
 #define ROAD_S_TILE_MODEL_OBJECTPATH "WorldObject/Outside"
-#define ROAD_S_TILE_MODEL_TEXPATH "Outside/Road"
+#define ROAD_S_TILE_MODEL_TEXPATH "WorldObject/Road"
 #define ROAD_S_TILE_MODEL_EXTENTS XMFLOAT3(0.0f,0.0f,0.0f)
 #define ROAD_S_TILE_MODEL_TYPE Object_World
 #define ROAD_S_TILE_MODEL_COLLIDERTYPE Collider_None
@@ -450,7 +461,7 @@ using namespace DirectX;
 
 #define SMALL_METALIC_CASE_MODEL_NAME "SmallMetalicCase"
 #define SMALL_METALIC_CASE_MODEL_OBJECTPATH "WorldObject/Outside"
-#define SMALL_METALIC_CASE_MODEL_TEXPATH "Outside/SmallMetalicCase"
+#define SMALL_METALIC_CASE_MODEL_TEXPATH "WorldObject/SmallMetalicCase"
 #define SMALL_METALIC_CASE_MODEL_EXTENTS XMFLOAT3(0.425f, 0.34f, 0.3f)
 #define SMALL_METALIC_CASE_MODEL_TYPE Object_Movable
 #define SMALL_METALIC_CASE_MODEL_COLLIDERTYPE Collider_Box
@@ -461,7 +472,7 @@ using namespace DirectX;
 
 #define TOWER_MODEL_NAME "tower"
 #define TOWER_MODEL_OBJECTPATH "WorldObject/Outside"
-#define TOWER_MODEL_TEXPATH "Outside/Brick_Wall"
+#define TOWER_MODEL_TEXPATH "WorldObject/Brick_Wall"
 #define TOWER_MODEL_EXTENTS XMFLOAT3(3.0f, 3.0f, 4.0f)
 #define TOWER_MODEL_TYPE Object_World
 #define TOWER_MODEL_COLLIDERTYPE Collider_Box
@@ -472,7 +483,7 @@ using namespace DirectX;
 
 #define TOWER_SHORT_MODEL_NAME "tower_short"
 #define TOWER_SHORT_MODEL_OBJECTPATH "WorldObject/Outside"
-#define TOWER_SHORT_MODEL_TEXPATH "Outside/Brick_Wall"
+#define TOWER_SHORT_MODEL_TEXPATH "WorldObject/Brick_Wall"
 #define TOWER_SHORT_MODEL_EXTENTS XMFLOAT3(3.0f, 3.0f, 4.0f)
 #define TOWER_SHORT_MODEL_TYPE Object_World
 #define TOWER_SHORT_MODEL_COLLIDERTYPE Collider_Box
@@ -483,7 +494,7 @@ using namespace DirectX;
 
 #define WOODEN_BOX_MODEL_NAME "Wooden_box_v1_LD1"
 #define WOODEN_BOX_MODEL_OBJECTPATH "WorldObject/Outside"
-#define WOODEN_BOX_MODEL_TEXPATH "Outside/Box"
+#define WOODEN_BOX_MODEL_TEXPATH "WorldObject/Box"
 #define WOODEN_BOX_MODEL_EXTENTS XMFLOAT3(0.55f, 0.34f, 0.95f)
 #define WOODEN_BOX_MODEL_TYPE Object_Movable
 #define WOODEN_BOX_MODEL_COLLIDERTYPE Collider_Box
@@ -494,7 +505,7 @@ using namespace DirectX;
 
 #define WOODEN_BOX_SQUARE_MODEL_NAME "Wooden_box_v1_LD1square"
 #define WOODEN_BOX_SQUARE_MODEL_OBJECTPATH "WorldObject/Outside"
-#define WOODEN_BOX_SQUARE_MODEL_TEXPATH "Outside/Box"
+#define WOODEN_BOX_SQUARE_MODEL_TEXPATH "WorldObject/Box"
 #define WOODEN_BOX_SQUARE_MODEL_EXTENTS XMFLOAT3(0.4f, 0.4f, 0.4f)
 #define WOODEN_BOX_SQUARE_MODEL_TYPE Object_Movable
 #define WOODEN_BOX_SQUARE_MODEL_COLLIDERTYPE Collider_Box

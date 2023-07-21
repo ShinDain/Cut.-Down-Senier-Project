@@ -43,13 +43,12 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// 차후 맵 로드 함수로 이동
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, 0);
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, -1, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -460);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(1, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -150);
 	
 	// 월드 오브젝트 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HOSPITAL_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), BENCH_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), METAL_FENCE_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(30, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ELECTO_PANEL_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), OUTSIDE_WOOD_CHAIR_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), STOCK_FLOOR_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), MORGUE_BOX_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
 	InitMapData(pd3dDevice, pd3dCommandList);
@@ -80,7 +79,9 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 bool Scene::InitMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
-	LoadMapData(pd3dDevice, pd3dCommandList, "OutSideMap");
+	//LoadMapData(pd3dDevice, pd3dCommandList, "OutSideMap");
+	//LoadMapData(pd3dDevice, pd3dCommandList, "HospitalInsideMap");
+	LoadMapData(pd3dDevice, pd3dCommandList, "DungeonMap");
 
 	return true;
 }
@@ -373,9 +374,9 @@ void Scene::UpdatePassCB(float totalTime, float elapsedTime)
 	passConstant.FarZ = 100.0f;
 	passConstant.TotalTime = totalTime;
 	passConstant.DeltaTime = elapsedTime;
-	passConstant.AmbientLight = { 0.3f, 0.3f, 0.3f, 1.0f };
+	passConstant.AmbientLight = { 0.7f, 0.7f, 0.7f, 1.0f };
 	passConstant.Lights[0].Direction = m_BaseLightDirections[0];
-	passConstant.Lights[0].Strength = { 0.1f, 0.1f, 0.1f };
+	passConstant.Lights[0].Strength = { 0.2f, 0.2f, 0.3f };
 	//passConstant.Lights[0].Strength = { 0.0f, 0.0f, 0.0f };
 	passConstant.Lights[0].Position = { 0, 30.0f, 20 };
 
@@ -911,6 +912,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		{
 			// 로드되지 않은 모델인 경우
 			assert(false);
+			//return nullptr;
 		}
 		else	// 이미 로드한 모델인 경우
 		{

@@ -274,6 +274,12 @@
     <ClInclude Include="DataDefine\EffectData.h">
       <Filter>DataDefine</Filter>
     </ClInclude>
+    <ClInclude Include="DataDefine\InsideObjectData.h">
+      <Filter>DataDefine</Filter>
+    </ClInclude>
+    <ClInclude Include="DataDefine\DungeonObjectData.h">
+      <Filter>DataDefine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\default.hlsl">

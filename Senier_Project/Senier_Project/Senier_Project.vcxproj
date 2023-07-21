@@ -64,7 +64,9 @@
     <ClInclude Include="Common\Header\Struct.h" />
     <ClInclude Include="Common\Header\UploadBuffer.h" />
     <ClInclude Include="DataDefine\CharacterData.h" />
+    <ClInclude Include="DataDefine\DungeonObjectData.h" />
     <ClInclude Include="DataDefine\EffectData.h" />
+    <ClInclude Include="DataDefine\InsideObjectData.h" />
     <ClInclude Include="DataDefine\ItemAndEventData.h" />
     <ClInclude Include="DataDefine\ProjectileData.h" />
     <ClInclude Include="DataDefine\OutsideObjectData.h" />

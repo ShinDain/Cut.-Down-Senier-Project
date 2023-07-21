@@ -12,7 +12,7 @@ using namespace DirectX;
 
 #define PLAYER_PROJECTILE1_MODEL_NAME "Stone_1"
 #define PLAYER_PROJECTILE1_MODEL_OBJECTPATH "PlayerProjectile"
-#define PLAYER_PROJECTILE1_MODEL_TEXPATH "Player_Stone"
+#define PLAYER_PROJECTILE1_MODEL_TEXPATH "Projectile/Player_Stone"
 #define PLAYER_PROJECTILE1_MODEL_EXTENTS XMFLOAT3(0.2f, 0.5f, 0.2f)
 #define PLAYER_PROJECTILE1_MODEL_TYPE Object_PlayerProjectile
 #define PLAYER_PROJECTILE1_MODEL_COLLIDERTYPE Collider_None
@@ -23,7 +23,7 @@ using namespace DirectX;
 
 #define PLAYER_PROJECTILE2_MODEL_NAME "Stone_2"
 #define PLAYER_PROJECTILE2_MODEL_OBJECTPATH "PlayerProjectile"
-#define PLAYER_PROJECTILE2_MODEL_TEXPATH "Player_Stone"
+#define PLAYER_PROJECTILE2_MODEL_TEXPATH "Projectile/Player_Stone"
 #define PLAYER_PROJECTILE2_MODEL_EXTENTS XMFLOAT3(0.2f, 0.5f, 0.2f)
 #define PLAYER_PROJECTILE2_MODEL_TYPE Object_PlayerProjectile
 #define PLAYER_PROJECTILE2_MODEL_COLLIDERTYPE Collider_None
@@ -34,7 +34,7 @@ using namespace DirectX;
 
 #define PLAYER_PROJECTILE3_MODEL_NAME "Stone_3"
 #define PLAYER_PROJECTILE3_MODEL_OBJECTPATH "PlayerProjectile"
-#define PLAYER_PROJECTILE3_MODEL_TEXPATH "Player_Stone"
+#define PLAYER_PROJECTILE3_MODEL_TEXPATH "Projectile/Player_Stone"
 #define PLAYER_PROJECTILE3_MODEL_EXTENTS XMFLOAT3(0.2f, 0.5f, 0.2f)
 #define PLAYER_PROJECTILE3_MODEL_TYPE Object_PlayerProjectile
 #define PLAYER_PROJECTILE3_MODEL_COLLIDERTYPE Collider_None
@@ -45,7 +45,7 @@ using namespace DirectX;
 
 #define ENEMY_BULLET_MODEL_NAME "Bullet"
 #define ENEMY_BULLET_MODEL_OBJECTPATH "Enemy_Projectile"
-#define ENEMY_BULLET_MODEL_TEXPATH "Enemy_Projectile"
+#define ENEMY_BULLET_MODEL_TEXPATH "Projectile/Enemy_Projectile"
 #define ENEMY_BULLET_MODEL_EXTENTS XMFLOAT3(0.2f, 0.5f, 0.2f)
 #define ENEMY_BULLET_MODEL_TYPE Object_EnemyProjectile
 #define ENEMY_BULLET_MODEL_COLLIDERTYPE Collider_None
@@ -56,7 +56,7 @@ using namespace DirectX;
 
 #define ENEMY_MISSILE1_MODEL_NAME "missile"
 #define ENEMY_MISSILE1_MODEL_OBJECTPATH "Enemy_Projectile"
-#define ENEMY_MISSILE1_MODEL_TEXPATH "Enemy_Projectile"
+#define ENEMY_MISSILE1_MODEL_TEXPATH "Projectile/Enemy_Projectile"
 #define ENEMY_MISSILE1_MODEL_EXTENTS XMFLOAT3(0.2f, 0.5f, 0.2f)
 #define ENEMY_MISSILE1_MODEL_TYPE Object_EnemyProjectile
 #define ENEMY_MISSILE1_MODEL_COLLIDERTYPE Collider_None
@@ -67,7 +67,7 @@ using namespace DirectX;
 
 #define ENEMY_MISSILE2_MODEL_NAME "missile_green"
 #define ENEMY_MISSILE2_MODEL_OBJECTPATH "Enemy_Projectile"
-#define ENEMY_MISSILE2_MODEL_TEXPATH "Enemy_Projectile"
+#define ENEMY_MISSILE2_MODEL_TEXPATH "Projectile/Enemy_Projectile"
 #define ENEMY_MISSILE2_MODEL_EXTENTS XMFLOAT3(0.2f, 0.5f, 0.2f)
 #define ENEMY_MISSILE2_MODEL_TYPE Object_EnemyProjectile
 #define ENEMY_MISSILE2_MODEL_COLLIDERTYPE Collider_None
@@ -78,7 +78,7 @@ using namespace DirectX;
 
 #define ENEMY_MAGIC1_MODEL_NAME "Magic_Projectile"
 #define ENEMY_MAGIC1_MODEL_OBJECTPATH "Enemy_Projectile"
-#define ENEMY_MAGIC1_MODEL_TEXPATH "Enemy_Projectile"
+#define ENEMY_MAGIC1_MODEL_TEXPATH "Projectile/Enemy_Projectile"
 #define ENEMY_MAGIC1_MODEL_EXTENTS XMFLOAT3(0.2f, 0.5f, 0.2f)
 #define ENEMY_MAGIC1_MODEL_TYPE Object_EnemyProjectile
 #define ENEMY_MAGIC1_MODEL_COLLIDERTYPE Collider_None
@@ -89,7 +89,7 @@ using namespace DirectX;
 
 #define ENEMY_MAGIC2_MODEL_NAME "Magic_Projectile_Chase"
 #define ENEMY_MAGIC2_MODEL_OBJECTPATH "Enemy_Projectile"
-#define ENEMY_MAGIC2_MODEL_TEXPATH "Enemy_Projectile"
+#define ENEMY_MAGIC2_MODEL_TEXPATH "Projectile/Enemy_Projectile"
 #define ENEMY_MAGIC2_MODEL_EXTENTS XMFLOAT3(0.2f, 0.5f, 0.2f)
 #define ENEMY_MAGIC2_MODEL_TYPE Object_EnemyProjectile
 #define ENEMY_MAGIC2_MODEL_COLLIDERTYPE Collider_None

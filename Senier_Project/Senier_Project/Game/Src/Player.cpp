@@ -192,9 +192,9 @@ void Player::KeyDownEvent(WPARAM wParam)
 
 	switch (wParam)
 	{
-	case VK_SPACE:
-		Jump();
-		break;
+	//case VK_SPACE:
+	//	Jump();
+	//	break;
 	//case VK_SHIFT:
 	//	m_bSprint = true;
 	//	m_MaxSpeedXZ = m_SprintSpeed;
@@ -1153,6 +1153,9 @@ std::shared_ptr<Object> Player::CameraRayToMovableObject(bool bCharacter, float&
 			if (objType == ObjectType::Object_Monster || objType == ObjectType::Object_Player)
 				continue;
 		}
+		// 이미 잡힌 물체 제외
+		if (g_vpMovableObjs[i] == m_pGrabedObject)
+			continue;
 		// 렌더링된 물체만
 		if (!g_vpMovableObjs[i]->GetVisible())
 			continue;
