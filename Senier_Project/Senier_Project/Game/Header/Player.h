@@ -79,8 +79,6 @@ private:
 	//LPCWSTR attack3_SoundFileName = L"Sound/Footstep03.wav";
 	//LPCWSTR hit1_SoundFileName = L"Sound/123.wav";
 	//LPCWSTR hit2_SoundFileName = L"Sound/Footstep04.wav";
-	//LPCWSTR death1_SoundFileName = L"Sound/Footstep01.wav";
-	//LPCWSTR death2_SoundFileName = L"Sound/Footstep02.wav";
 	//LPCWSTR grab1_SoundFileName = L"Sound/Footstep01.wav";		// ±×·¦
 	//LPCWSTR grab2_SoundFileName = L"Sound/Footstep02.wav";		// ±×·¦
 	//LPCWSTR throw1_SoundFileName = L"Sound/123.wav";		// ÅõÃ´
@@ -101,8 +99,6 @@ private:
 	LPCWSTR attack3_SoundFileName =  L"";
 	LPCWSTR hit1_SoundFileName = L"";
 	LPCWSTR hit2_SoundFileName = L"";
-	LPCWSTR death1_SoundFileName =  L"";
-	LPCWSTR death2_SoundFileName =  L"";
 	LPCWSTR grab1_SoundFileName =  L"";		// ±×·¦
 	LPCWSTR grab2_SoundFileName =  L"";		// ±×·¦
 	LPCWSTR throw1_SoundFileName =  L"";		// ÅõÃ´

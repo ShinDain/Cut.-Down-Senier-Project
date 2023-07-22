@@ -806,13 +806,13 @@ void Scavenger::UpdateAnimationTrack(float elapsedTime)
 		// 공격 판정
 		if (trackRate < 0.8f && trackRate > 0.2f)
 		{
-			m_pCollider->SetIsActive(false); 
+			m_pCollider->SetCharacterActive(false);
 			CreateAttackSphere(0, m_xmf3ColliderExtents.x * 10, m_AttackDamage * 1.3f);
 		}
 		else if (trackRate > 0.8f)
 		{
 			m_bSuperArmor = false;
-			m_pCollider->SetIsActive(true);
+			m_pCollider->SetCharacterActive(true);
 		}
 
 		if (trackRate > 0.2f && m_bRush)
@@ -1798,12 +1798,12 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 		// 공격 판정
 		if (trackRate > 0.1f && trackRate < 0.8f)
 		{
-			m_pCollider->SetIsActive(false);
+			m_pCollider->SetCharacterActive(false);
 
 			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 7.0f);
 			// 약간 앞으로 전진
 			XMVECTOR l = XMLoadFloat3(&m_xmf3Look);
-			XMVECTOR deltaVelocity = l * 500;
+			XMVECTOR deltaVelocity = l * 300;
 			XMFLOAT3 xmf3DeltaVelocity;
 			XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);
 			m_pBody->AddVelocity(xmf3DeltaVelocity);
@@ -1813,7 +1813,7 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 		else if (trackRate > 0.8f)
 		{
 			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
-			m_pCollider->SetIsActive(true);
+			m_pCollider->SetCharacterActive(true);
 
 			if (m_Attack1Cnt < m_bRage * 3)
 				Attack1();
@@ -1840,9 +1840,10 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 
 			// 다음 패턴 
 			m_nPattern = rand() % 2;
-			m_nAttackCnt++;
-			if (m_nAttackCnt > m_nMaxAttackCnt)
-				m_nPattern = NecromancerAttackPattern::Summon_Monster;
+			m_nPattern = NecromancerAttackPattern::Melee_Attack;
+			//m_nAttackCnt++;
+			//if (m_nAttackCnt > m_nMaxAttackCnt)
+			//	m_nPattern = NecromancerAttackPattern::Summon_Monster;
 		}
 	}
 	break;
@@ -2169,7 +2170,7 @@ void Necromancer::Attack2()
 
 void Necromancer::Special2()
 {
-	m_pCollider->SetIsActive(false);
+	m_pCollider->SetCharacterActive(false);
 
 	// 몬스터 소환
 	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
@@ -2188,7 +2189,7 @@ void Necromancer::Special3()
 	m_bSummonDone = false;
 	m_bStunned = true;
 	m_pBody->SetInGravity(true);
-	m_pCollider->SetIsActive(true);
+	m_pCollider->SetCharacterActive(true);
 
 	// 그로기 상태
 	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);

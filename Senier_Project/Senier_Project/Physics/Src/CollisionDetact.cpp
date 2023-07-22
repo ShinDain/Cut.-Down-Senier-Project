@@ -1,6 +1,6 @@
 #include "../Header/CollisionDetact.h"
 
-#define OBJECT_CRASH_LENGTH 400
+#define OBJECT_CRASH_LENGTH 250
 
 float TransformToAxis(const ColliderBox& box, FXMVECTOR direction)
 {
@@ -81,6 +81,9 @@ bool tryAxis(
 
 void ObjectCrushTest(Object* pObject1, Object* pObject2)
 {
+	if (!pObject1->GetCollider()->GetCharacterActive())
+		return;
+
 	float length = 0;
 	float power = 0;
 	float maxPower = 30;

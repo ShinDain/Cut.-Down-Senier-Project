@@ -76,7 +76,7 @@ void RigidBody::Update(float elapsedTime)
 	if (m_bInGravity)
 	{
 		// 중력가속도 적용 (중력 * 물체 질량 / 물체 질량(선성분만 분리하기 위해) )
-		m_xmf3LastFrameAcceleration.y += Physics::xmf3Gravity.y * m_Mass;
+		m_xmf3LastFrameAcceleration.y += Physics::xmf3Gravity.y * m_Mass * 0.2f;
 	}
 
 	XMVECTOR linearAccel = XMLoadFloat3(&m_xmf3LastFrameAcceleration);
@@ -119,12 +119,15 @@ void RigidBody::Update(float elapsedTime)
 		float currentMotion = XMVectorGetX(XMVectorSum(velocity * velocity)) +
 			XMVectorGetX(XMVectorSum(angularVelocity * angularVelocity));
 
-		float bias = powf(0.5f, elapsedTime);
+		//float bias = powf(0.5f, elapsedTime);
+		//m_Motion = bias * m_Motion + (1 - bias) * currentMotion;
+
+		float bias = 0.3f;
 		m_Motion = bias * m_Motion + (1 - bias) * currentMotion;
 
 		if (m_Motion < Physics::sleepEpsilon)
 			SetIsAwake(false);
-		else if (m_Motion > 10 * Physics::sleepEpsilon) m_Motion = 10 * Physics::sleepEpsilon;
+		else if (m_Motion > 3 * Physics::sleepEpsilon) m_Motion = 3 * Physics::sleepEpsilon;
 
 		m_lastMotion = m_Motion;
 	}

@@ -29,6 +29,7 @@ protected:
 	XMFLOAT4X4 m_xmf4x4World = MathHelper::identity4x4();
 
 	bool m_bIsActive = true;
+	bool m_bCharacterActive = true;
 	float m_Intersect = 0;
 
 public:
@@ -43,6 +44,8 @@ public:
 
 	void SetIsActive(bool bIsActive) { m_bIsActive = bIsActive; }
 	const bool GetIsActive() const { return m_bIsActive; }
+	void SetCharacterActive(bool bIsActive) { m_bCharacterActive = bIsActive; }
+	const bool GetCharacterActive() const { return m_bCharacterActive; }
 	void SetIntersect(float intersect) { m_Intersect = intersect; }
 	const float GetIntersect() { return m_Intersect; }
 

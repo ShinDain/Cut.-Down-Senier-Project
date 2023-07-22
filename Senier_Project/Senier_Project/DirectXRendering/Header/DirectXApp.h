@@ -108,6 +108,9 @@ protected:
 
 	GameTimer m_Timer;
 
+	float m_ElapsedRenderingTime = 0.0f;
+	float m_RenderingTime = 0.0166665f;
+
 	/// /////////////////////////////////////////////	
 	// D3D12
 

@@ -278,7 +278,7 @@ using namespace DirectX;
 #define STATUE_MODEL_EXTENTS XMFLOAT3(1.0f, 1.65f, 0.8f)
 #define STATUE_MODEL_TYPE Object_Movable
 #define STATUE_MODEL_COLLIDERTYPE Collider_Box
-#define STATUE_MODEL_MASS 20
+#define STATUE_MODEL_MASS 10
 #define STATUE_MODEL_SCALE XMFLOAT3(10.0f, 10.0f, 10.0f)
 #define STATUE_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
 #define STATUE_MODEL_SHADOW true
@@ -290,7 +290,7 @@ using namespace DirectX;
 #define STATUE2_MODEL_EXTENTS XMFLOAT3(1.0f, 1.65f, 0.8f)
 #define STATUE2_MODEL_TYPE Object_Movable
 #define STATUE2_MODEL_COLLIDERTYPE Collider_Box
-#define STATUE2_MODEL_MASS 20
+#define STATUE2_MODEL_MASS 10
 #define STATUE2_MODEL_SCALE XMFLOAT3(10.0f, 10.0f, 10.0f)
 #define STATUE2_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
 #define STATUE2_MODEL_SHADOW true

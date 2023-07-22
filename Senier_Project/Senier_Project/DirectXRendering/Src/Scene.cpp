@@ -49,6 +49,14 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HOSPITAL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), STOCK_FLOOR_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), MORGUE_BOX_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
 	InitMapData(pd3dDevice, pd3dCommandList);
@@ -57,6 +65,13 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// 시네마틱 초기화
 	//InitCinematic();
 
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(400, 20, -400), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CYBER_TWINS_MODEL_NAME, MONSTER_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 25), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 25), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 30), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 30), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
+	
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), EVENT_BOX_MODEL_NAME, 0);
 
 	// 카메라 초기화
@@ -80,8 +95,8 @@ bool Scene::InitMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 {
 	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 	//LoadMapData(pd3dDevice, pd3dCommandList, "OutSideMap");
-	//LoadMapData(pd3dDevice, pd3dCommandList, "HospitalInsideMap");
-	LoadMapData(pd3dDevice, pd3dCommandList, "DungeonMap");
+	LoadMapData(pd3dDevice, pd3dCommandList, "HospitalInsideMap");
+	//LoadMapData(pd3dDevice, pd3dCommandList, "DungeonMap");
 
 	return true;
 }
@@ -247,6 +262,12 @@ void Scene::UpdateObject(float elapsedTime)
 	for (int i = 0; i < g_vpAllObjs.size(); ++i)
 	{
 		if (!g_vpAllObjs[i]->GetIsAlive()) continue;
+
+		if (g_vpAllObjs[i]->m_pAnimationController)
+		{
+			g_vpAllObjs[i]->SetVisible(false);
+			g_vpAllObjs[i]->Animate(elapsedTime);
+		}
 
 		if (g_vpAllObjs[i]->GetColliderType() == Collider_Box)
 		{
@@ -451,6 +472,19 @@ void Scene::UpdateShadowPassCB(float totalTime, float elapsedTime)
 
 void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
+	{
+		if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
+		{
+			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->GetIsAlive())
+				continue;
+			// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
+			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(0.0f);
+			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
+				m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
+		}
+	}
+
 	ChangeShader(ShaderType::Shader_Static, pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
 	{
@@ -479,9 +513,9 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->GetIsAlive())
 				continue;
 			// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
-			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(elapsedTime);
-			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
-				m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
+			//m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(0.0f);
+			//if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
+			//	m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
 			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(elapsedTime, pd3dCommandList);
 		}
 	}
@@ -1075,6 +1109,8 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 
 	if (pObject && strFileName.c_str() != nullptr) strcpy_s(pObject->m_pstrFileName, strFileName.c_str());
 
+	pObject->SetDeathSoundFileName(L"Sound/123.wav");
+
 	return pObject;
 }
 
@@ -1279,6 +1315,8 @@ void Scene::GenerateContact()
 			if (!g_vpAllObjs[i]->GetIsAlive()) continue;
 			if (g_vpAllObjs[i]->GetColliderType() != ColliderType::Collider_Box) continue;
 
+			if (!g_vpAllObjs[i]->GetCollider()->GetCharacterActive()) continue;
+
 			ColliderBox* pColliderBox = (ColliderBox*)g_vpAllObjs[i]->GetCollider().get();
 
 			if (characterBox == pColliderBox) continue;
@@ -1311,17 +1349,25 @@ void Scene::GenerateContact()
 		}
 	}
 	// 박스끼리 검사
-	for (int i = 0; i < g_vpWorldObjs.size() - 1; ++i)
+	for (int i = 0; i < g_vpWorldObjs.size(); ++i)
 	{
 		if (!g_vpWorldObjs[i]->GetIsAlive()) continue;
 		if (g_vpWorldObjs[i]->GetColliderType() != ColliderType::Collider_Box) continue;
+		if (g_vpWorldObjs[i]->GetObjectType() != ObjectType::Object_Movable) continue;
 		ColliderBox* pColliderBox1 = (ColliderBox*)g_vpWorldObjs[i]->GetCollider().get();
 
-		for (int k = i + 1; k < g_vpWorldObjs.size(); ++k)
+		XMVECTOR position_1 = XMLoadFloat3(&g_vpWorldObjs[i]->GetPosition());
+
+		for (int k = 0; k < g_vpWorldObjs.size(); ++k)
 		{
 			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+			if (g_vpWorldObjs[i] == g_vpWorldObjs[k]) continue;
 			if (!g_vpWorldObjs[k]->GetIsAlive()) continue;
 			if (g_vpWorldObjs[k]->GetColliderType() != ColliderType::Collider_Box) continue;
+
+			//XMVECTOR position_2 = XMLoadFloat3(&g_vpWorldObjs[k]->GetPosition());
+			//float distance = XMVectorGetX(XMVector3Length(position_1 - position_2));
+			//if (distance > 100) continue;
 
 			ColliderBox* pColliderBox2 = (ColliderBox*)g_vpWorldObjs[k]->GetCollider().get();
 
@@ -1348,6 +1394,33 @@ void Scene::GenerateContact()
 
 			if (m_CollisionData.ContactCnt() > nContactCnt) return;
 			CollisionDetector::BoxAndHalfSpace(*colliderBox, *g_ppColliderPlanes[i], m_CollisionData);
+		}
+	}
+	// 박스와 검사
+	for (int i = 0; i < g_vpCuttedObjects.size(); ++i)
+	{
+		if (!g_vpCuttedObjects[i]->GetIsAlive()) continue;
+		ColliderBox* pColliderBox1 = (ColliderBox*)g_vpCuttedObjects[i]->GetCollider().get();
+
+		XMVECTOR position_1 = XMLoadFloat3(&g_vpCuttedObjects[i]->GetPosition());
+
+		for (int k = 0; k < g_vpWorldObjs.size(); ++k)
+		{
+			if (m_CollisionData.ContactCnt() > nContactCnt) return;
+			if (!g_vpWorldObjs[k]->GetIsAlive()) continue;
+			if (g_vpWorldObjs[k]->GetColliderType() != ColliderType::Collider_Box) continue;
+
+			XMVECTOR position_2 = XMLoadFloat3(&g_vpWorldObjs[k]->GetPosition());
+			float distance = XMVectorGetX(XMVector3Length(position_1 - position_2));
+			if (distance > 100) continue;
+
+			ColliderBox* pColliderBox2 = (ColliderBox*)g_vpWorldObjs[k]->GetCollider().get();
+
+			if (pColliderBox1 == pColliderBox2) continue;
+
+			Object* pObject1 = g_vpCuttedObjects[i].get();
+			Object* pObject2 = g_vpWorldObjs[k].get();
+			CollisionDetector::BoxAndBox(*pColliderBox1, *pColliderBox2, m_CollisionData, pObject1, pObject2);
 		}
 	}
 }

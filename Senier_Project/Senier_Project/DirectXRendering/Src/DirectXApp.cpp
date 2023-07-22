@@ -97,9 +97,23 @@ int DirectXApp::Run()
 
 			if (!m_AppPaused)
 			{
+				
 				CalculateFrameStats();
 				Update(elapsedTime);
-				Render(elapsedTime);
+				//Render(elapsedTime);
+
+				m_ElapsedRenderingTime += elapsedTime;
+				if (m_ElapsedRenderingTime > m_RenderingTime)
+				{
+					//m_ElapsedRenderingTime -= m_RenderingTime;
+					m_ElapsedRenderingTime = 0.0f;
+					Render(m_RenderingTime);
+				}
+				//else
+				//{
+				//	Update(elapsedTime + m_UpdateOffset);
+				//	m_UpdateOffset = 0.0f;
+				//}
 			}
 			else
 			{

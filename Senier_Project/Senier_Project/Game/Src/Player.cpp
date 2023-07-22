@@ -452,8 +452,13 @@ void Player::ThrowProjectile()
 		XMVECTOR projectileVelocity = projectileTarget - projectilePos;
 		projectileVelocity = XMVector3Normalize(projectileVelocity);
 
+		//if (XMVectorGetX(XMVector3Length(projectileVelocity)) < 200)
+		//{
+		//	projectileVelocity = projectileVelocity * 200;
+		//}
+
 		XMFLOAT3 xmf3ProjectileVelocity;
-		projectileVelocity = projectileVelocity * 500;
+		projectileVelocity = projectileVelocity * 300;
 		XMStoreFloat3(&xmf3ProjectileVelocity, projectileVelocity);
 
 		// 물체의 속도를 플레이어 전방으로 발사
@@ -664,11 +669,7 @@ void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf
 		m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_Death);
 		m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1);
 
-		int nRand = rand() % 2;
-		if (nRand)
-			Sound::PlaySoundFile(death1_SoundFileName, true);
-		else
-			Sound::PlaySoundFile(death2_SoundFileName, true);
+		Sound::PlaySoundFile(m_Death_SoundFileName, true);
 	}
 	
 }

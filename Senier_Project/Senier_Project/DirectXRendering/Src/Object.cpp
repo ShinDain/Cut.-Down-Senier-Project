@@ -168,7 +168,7 @@ void Object::Update(float elapsedTime)
 			m_ElapsedActiveTime = 0.0f;
 		}
 	}
-
+	
 	if (m_pObjectCB) UpdateObjectCB();
 
 	if (m_pSibling) {
@@ -713,9 +713,15 @@ void Object::LoadMaterialsFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 void Object::Cutting(XMFLOAT3 xmf3PlaneNormal)
 {
+	XMFLOAT3 xmf3CutNormal = xmf3PlaneNormal;
+	XMVECTOR cutNormal = XMLoadFloat3(&xmf3CutNormal);
+	XMMATRIX xmmatOrientation = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
+	cutNormal = XMVector3TransformNormal(cutNormal, xmmatOrientation);
+	XMStoreFloat3(&xmf3CutNormal, cutNormal);
+
 	m_bIsAlive = false;
-	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, 1, xmf3PlaneNormal, false);
-	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, -1, xmf3PlaneNormal, false);
+	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, 1, xmf3CutNormal, false);
+	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, -1, xmf3CutNormal, false);
 }
 
 void Object::DegradedBroken()
@@ -768,6 +774,7 @@ void Object::DegradedBroken()
 		pCuttedNegative_2.get(), 1, xmf3PlaneNormal[2], true);
 
 	m_bIsAlive = false;
+	
 }
 
 void Object::Destroy()
@@ -991,7 +998,10 @@ void Object::IsFalling()
 
 void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
 {
-	if (m_bInvincible)
+	if (m_nObjectType == ObjectType::Object_World)
+		return;
+
+	if (m_bInvincible || m_bDestroying)
 		return;
 	// 피격 무적
 	m_bInvincible = true;
@@ -1001,6 +1011,8 @@ void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf
 	if (m_HP <= 0)
 	{
 		m_bDestroying = true;
+		// 설정된 파괴 사운드 재생
+		//Sound::PlaySoundFile(m_Death_SoundFileName, true);
 
 		// 파괴된 위치에 아이템 생성
 		CreateScoreItems(m_MaxHP / 5);
@@ -1010,6 +1022,8 @@ void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf
 			Cutting(xmf3CuttingDirection);
 		else
 			DegradedBroken();
+
+		return;
 	}
 
 	XMVECTOR damageDirection = XMLoadFloat3(&xmf3DamageDirection);

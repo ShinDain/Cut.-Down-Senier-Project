@@ -26,7 +26,7 @@ bool Item::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 
 	XMFLOAT3 xmf3RandVelocity = {0,0,0};
 	xmf3RandVelocity.x = rand() % 100 - 50;
-	xmf3RandVelocity.y = rand() % 20 + 20;
+	xmf3RandVelocity.y = rand() % 20 + 5;
 	xmf3RandVelocity.z = rand() % 100 - 50;
 	m_pBody->SetVelocity(xmf3RandVelocity);
 
@@ -60,11 +60,6 @@ bool Item::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 	return true;
 }
 
-void Item::Animate(float elapsedTime)
-{
-	m_xmf3Rotation.y += elapsedTime * 500;
-}
-
 void Item::Update(float elapsedTime)
 {
 	if (!m_bIsAlive)
@@ -82,7 +77,7 @@ void Item::Update(float elapsedTime)
 		}
 	}
 
-	Animate(elapsedTime);
+	m_pBody->SetAngularVelocity(XMFLOAT3(0, 5, 0));
 	UpdateTransform(NULL);
 
 	UpdateToRigidBody(elapsedTime);
@@ -140,9 +135,11 @@ void Item::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
 		m_xmf4x4LocalTransform = MathHelper::identity4x4();
 		XMMATRIX world = XMMatrixIdentity();
 		XMMATRIX xmmatScale = XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z);
+		XMMATRIX xmmatOrientation = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
 		XMMATRIX xmmatRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotation.x), XMConvertToRadians(m_xmf3Rotation.y), XMConvertToRadians(m_xmf3Rotation.z));
 		XMMATRIX xmmatTranslate = XMMatrixTranslation(m_xmf3Position.x, m_xmf3Position.y, m_xmf3Position.z);
 		// S * R * T
+		xmmatRotate = XMMatrixMultiply(xmmatRotate, xmmatOrientation);
 		world = XMMatrixMultiply(xmmatScale, XMMatrixMultiply(xmmatRotate, xmmatTranslate));
 
 		XMMATRIX offset = XMMatrixTranslation(-m_xmf3RenderOffsetPosition.x, -m_xmf3RenderOffsetPosition.y, -m_xmf3RenderOffsetPosition.z);

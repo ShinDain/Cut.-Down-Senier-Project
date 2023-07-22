@@ -77,7 +77,7 @@ using namespace DirectX;
 //#define DRAWER_MODEL_EXTENTS XMFLOAT3(0.4f, 0.45f, 0.45f)
 //#define DRAWER_MODEL_TYPE Object_Movable
 //#define DRAWER_MODEL_COLLIDERTYPE Collider_Box
-//#define DRAWER_MODEL_MASS 20
+//#define DRAWER_MODEL_MASS 10
 //#define DRAWER_MODEL_SCALE XMFLOAT3(10,10,10)
 //#define DRAWER_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
 //#define DRAWER_MODEL_SHADOW true

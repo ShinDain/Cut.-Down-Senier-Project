@@ -163,6 +163,9 @@ protected:
 	float m_ActiveTime = 0.1f;
 	float m_ElapsedActiveTime = 0.0f;
 	
+	// 사운드 파일
+	wchar_t m_Death_SoundFileName[64];
+
 public:
 	virtual void Move(DWORD dwDirection) {}
 	virtual void Rotate(float x, float y, float z) {}
@@ -256,6 +259,7 @@ public:
 	void SetDestroyTime(float destroyTime) { m_DestroyTime = destroyTime; }
 	void SetDissolveTime(float dissolveTime) { m_DissolveTime = dissolveTime; }
 
+	void SetDeathSoundFileName(const wchar_t* pstrSoundFileName) {wcscpy_s(m_Death_SoundFileName, pstrSoundFileName);	}
 
 	bool GetIsMesh() { return m_pMesh ? true : false; }
 
