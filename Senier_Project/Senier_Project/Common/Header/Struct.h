@@ -83,6 +83,18 @@ enum ObjectType : UINT
 	Object_None
 };
 
+enum SoundType : UINT
+{
+	Sound_Wood_Heavy,
+	Sound_Wood_Light,
+	Sound_Stone,
+	Sound_Steel_Heavy,
+	Sound_Steel_Light,
+	Sound_Fabric,
+	Sound_Character,
+	Sound_None
+};
+
 //////////////// 상수 버퍼 구조체 //////////////////////
 
 struct ObjConstant
@@ -157,6 +169,7 @@ struct ObjectDefaultData
 	XMFLOAT3 xmf3Extents;
 	ObjectType objectType;
 	ColliderType colliderType;
+	SoundType soundType;
 	int nMass;
 	XMFLOAT3 xmf3OffsetScale;
 	RenderLayer renderLayer;
@@ -175,6 +188,7 @@ struct ObjectInitData
 	ObjectType objectType = Object_None;
 	unsigned int nMass = 1;
 	ColliderType colliderType = Collider_None;
+	SoundType soundType = SoundType::Sound_Wood_Light;
 	XMFLOAT3 xmf3Extents = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
 	XMFLOAT3 xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);

@@ -312,7 +312,14 @@ Third_Person_Camera::~Third_Person_Camera()
 
 void Third_Person_Camera::Update(float Etime)
 {
+	// 오브젝트의 크기에 따라 가변
+	XMFLOAT3 xmf3Scale = m_pObject->GetScale();
+	xmf3Scale.x /= 10;
+	xmf3Scale.y /= 10;
+	xmf3Scale.z /= 10;
 	float cameraOffsetLength = m_OffsetLength;
+
+	cameraOffsetLength *= xmf3Scale.x;
 
 	XMVECTOR Look = XMVectorSet(0, 0, 1, 0);
 	XMVECTOR Right = XMVectorSet(1, 0, 0, 0);
@@ -323,6 +330,7 @@ void Third_Person_Camera::Update(float Etime)
 	Right = XMVector3TransformNormal(Right, R);
 	Up = XMVector3TransformNormal(Up, R);
 
+
 	if (m_bShoulderView)
 	{
 		// Pitch 적용
@@ -331,13 +339,16 @@ void Third_Person_Camera::Update(float Etime)
 		Look = XMVector3TransformNormal(Look, R);
 		Up = XMVector3TransformNormal(Up, R);
 
-		float cameraOffsetHeight = m_ShoulderOffsetHeight;// -(m_ShoulderCameraPitch) / 10;
+		float cameraOffsetHeight = m_ShoulderOffsetHeight;
+
+		cameraOffsetHeight *= xmf3Scale.y;
 
 		XMFLOAT3 xmf3ObjectPos = m_pObject->GetPosition();
 		//xmf3ObjectPos.y += cameraOffsetHeight;
 		XMVECTOR objectPos = XMLoadFloat3(&xmf3ObjectPos);
 
-		float cameraOffsetLength = m_ShoulderOffsetLength;// - (m_ShoulderCameraPitch) / 2;
+		cameraOffsetLength = m_ShoulderOffsetLength;
+		cameraOffsetLength *= xmf3Scale.x;
 
 		objectPos = Up * cameraOffsetHeight + objectPos;
 		objectPos = Right * 4 + objectPos;
@@ -364,7 +375,7 @@ void Third_Person_Camera::Update(float Etime)
 		Up = XMVector3TransformNormal(Up, R);
 
 		XMFLOAT3 xmf3ObjectPos = m_pObject->GetPosition();
-		xmf3ObjectPos.y += m_OffsetHeight;
+		xmf3ObjectPos.y += m_OffsetHeight * xmf3Scale.y;;
 		XMVECTOR objectPos = XMLoadFloat3(&xmf3ObjectPos);
 
 		XMVECTOR newPos = XMLoadFloat3(&xmf3ObjectPos);
@@ -388,15 +399,15 @@ void Third_Person_Camera::Update(float Etime)
 			BoundingOrientedBox* pOBB = pColliderBox->GetOBB().get();
 			if (!pOBB->Intersects(objectPos, camDir, distance))
 				continue;
-			if (distance < best && distance != 0)
+			if (distance < best && distance != 0 && distance > 10)
 			{
 				best = distance;
 				nClosest = i;
 			}
 		}
-		if (best > m_OffsetLength)
+		if (best > m_OffsetLength * xmf3Scale.x)
 		{
-			best = m_OffsetLength;
+			best = m_OffsetLength * xmf3Scale.x;
 		}
 		else if (best < 20)
 		{

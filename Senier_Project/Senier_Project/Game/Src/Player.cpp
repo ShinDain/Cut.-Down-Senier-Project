@@ -509,6 +509,10 @@ void Player::ThrowProjectile()
 		std::shared_ptr<Object> tmp = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, xmf3ProjectilePos, XMFLOAT4(0,0,0,1),
 			XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), pstr, 0);
 		tmp->GetBody()->SetVelocity(xmf3ProjectileVelocity);
+
+		// 투사체 충돌음 설정
+		Projectile* pProjectile = (Projectile*)tmp.get();
+		pProjectile->SetHitSoundFilePath("Sound/PlayerProjectile/PlayerProjectile_Hit.wav");
 	}
 }
 
@@ -521,12 +525,12 @@ void Player::RotateToObj()
 	float closestDistance = 9999;
 	int closestIdx = -1;
 
-	for (int i = 0; i < g_vpCharacters.size(); ++i)
+	for (int i = 0; i < g_vpMovableObjs.size(); ++i)
 	{
-		if (!(g_vpCharacters[i]->GetCollider()->GetIsActive()))
+		if (!(g_vpMovableObjs[i]->GetCollider()->GetIsActive()))
 			continue;
 
-		XMFLOAT3 xmf3TmpPosition = g_vpCharacters[i]->GetPosition();
+		XMFLOAT3 xmf3TmpPosition = g_vpMovableObjs[i]->GetPosition();
 		//xmf3TmpPosition.y = 0;
 		XMVECTOR tmpPosition = XMLoadFloat3(&xmf3TmpPosition);
 
@@ -543,8 +547,8 @@ void Player::RotateToObj()
 	xmf3MyPosition.y = 0;
 	myPosition = XMLoadFloat3(&xmf3MyPosition);
 
-	m_pTargetObject = g_vpCharacters[closestIdx];
-	XMFLOAT3 xmf3TargetPosition = g_vpCharacters[closestIdx]->GetPosition();
+	m_pTargetObject = g_vpMovableObjs[closestIdx];
+	XMFLOAT3 xmf3TargetPosition = g_vpMovableObjs[closestIdx]->GetPosition();
 	xmf3TargetPosition.y = 0;
 	XMVECTOR targetPosition = XMLoadFloat3(&xmf3TargetPosition);
 	XMFLOAT3 xmf3TargetLook;
@@ -554,7 +558,7 @@ void Player::RotateToObj()
 
 	// 약간의 전진 -> 몬스터와의 거리에 따라 조절 필요
 	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
-	XMVECTOR addVelocity = look * closestDistance * 5.0f;
+	XMVECTOR addVelocity = look * closestDistance * 3.0f;
 	XMFLOAT3 xmf3AddVelocity;
 	XMStoreFloat3(&xmf3AddVelocity, addVelocity);
 	m_pBody->AddVelocity(xmf3AddVelocity);
@@ -565,24 +569,30 @@ void Player::AcquireItem(UINT itemType)
 	switch (itemType)
 	{
 	case Item::ItemType::Score_1:
-		m_nScore += 300;
-		break;
 	case Item::ItemType::Score_2:
-		m_nScore += 300;
-		break;
 	case Item::ItemType::Score_3:
-		m_nScore += 300;
-		break;
 	case Item::ItemType::Score_4:
-		m_nScore += 300;
-		break;
 	case Item::ItemType::Score_5:
+	{
+		char pstrFilePath[64] ="Sound/Item/Intersect";
+		strcat_s(pstrFilePath, ".wav");
+
+		float pitch = (float)(rand() % 30) / 100 + 0.6f;
+		Scene::EmitSound(pstrFilePath, false, pitch, 0.1f);
+
 		m_nScore += 300;
+	}
 		break;
 	case Item::ItemType::Heal_1:
+	{
+		char pstrFilePath[64] = "Sound/Item/Heal";
+		strcat_s(pstrFilePath, ".wav");
+		Scene::EmitSound(pstrFilePath, false, 1.0f, 0.1f);
+
 		m_HP += 50;
 		if (m_HP > m_MaxHP)
 			m_HP = m_MaxHP;
+	}
 		break;
 	default:
 		

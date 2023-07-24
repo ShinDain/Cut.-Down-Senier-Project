@@ -24,6 +24,7 @@
 #include "../../Game/header/CuttedObject.h"
 #include "../../Game/Header/Projectile.h"
 #include "../../Game/Header/Sound.h"
+#include "../../DataDefine/SoundFilePath.h"
 
 #include "../../Physics/Header/Contact.h"
 #include "../../Physics/Header/Collider.h"
@@ -162,6 +163,10 @@ public:
 // »ç¿îµå
 public:
 	static void EmitSound(const char* pstrFilePath, bool bLoop);
+	static void EmitSound(const char* pstrFilePath, bool bLoop, float pitch, float volume);
+	static void EmitHitSound(SoundType nType, bool bLoop);
+	static void EmitCutSound(SoundType nType, bool bLoop);
+	static void EmitBrokenSound(SoundType nType, bool bLoop);
 
 protected:
 	static std::shared_ptr<CSound> m_pMainBGM;

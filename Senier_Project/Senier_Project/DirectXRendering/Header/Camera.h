@@ -2,7 +2,9 @@
 // Camera.h by Frank Luna (C) 2011 All Rights Reserved.
 //   
 //***************************************************************************************
-#pragma once
+#ifndef CAMERA_H
+
+#define CAMERA_H
 
 #include "../../Common/Header/D3DUtil.h"
 #include "Global.h"
@@ -160,3 +162,5 @@ public:
 
 	virtual void Update(float Etime) override;
 };
+
+#endif

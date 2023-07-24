@@ -319,6 +319,8 @@ void Character::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 
 	if (nEffectCnt > 10)
 		nEffectCnt = 10;
 	SpawnBloodEffect(nEffectCnt);
+	
+	Scene::EmitHitSound(m_nSoundType, false);
 }
 
 void Character::Cutting(XMFLOAT3 xmf3PlaneNormal)
@@ -332,6 +334,8 @@ void Character::Cutting(XMFLOAT3 xmf3PlaneNormal)
 
 	tmp1->GetCollider()->SetIsActive(false);
 	tmp2->GetCollider()->SetIsActive(false);
+
+	Scene::EmitCutSound(m_nSoundType, false);
 }
 
 void Character::BlendWithIdleMovement(float maxWeight)

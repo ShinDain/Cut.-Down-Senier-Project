@@ -4,6 +4,7 @@
 
 #include "../../Common/Header/D3DUtil.h"
 #include "../../DirectXRendering/Header/Global.h"
+#include "../../DirectXRendering/Header/Object.h"
 
 // FMOD
 //#include "../../FMOD/inc/fmod.h"
@@ -12,7 +13,7 @@
 
 #define VOLUME_MAX 1.0f
 #define VOLUME_MIN 0.0f
-#define VOLUME_DEFAULT 0.5f
+#define VOLUME_DEFAULT 0.3f
 #define VOLUME_WEIGHT 0.1f;
 
 class CSound
@@ -38,6 +39,7 @@ public:
 	void VolumeDown();
 
 	void SetVolme(float volumeSize);
+	void SetPitch(float pitchSize);
 
 protected:
 	static FMOD::System* g_pSystem;

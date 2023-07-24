@@ -41,7 +41,7 @@ void CSound::Release()
 void CSound::Update()
 {
 	m_pChannel->isPlaying(&m_bIsPlaying);
-
+	
 	if(m_bIsPlaying)
 		g_pSystem->update();
 }
@@ -93,4 +93,15 @@ void CSound::SetVolme(float volumeSize)
 		m_Volume = 1.0f;
 
 	m_pChannel->setVolume(m_Volume);
+}
+
+void CSound::SetPitch(float pitchSize)
+{
+	//if (m_Volume < VOLUME_MIN)
+	//	m_Volume = 0.0f;
+	//
+	//if (m_Volume > VOLUME_MAX)
+	//	m_Volume = 1.0f;
+
+	m_pChannel->setPitch(pitchSize);
 }

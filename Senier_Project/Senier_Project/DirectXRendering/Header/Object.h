@@ -94,6 +94,7 @@ protected:
 
 public:
 	char m_pstrFileName[64];
+	char m_pstrOutName[64];
 	std::unique_ptr<AnimationController> m_pAnimationController = nullptr;
 	UINT m_nObjectConstantsParameterIdx = 0;
 	UINT m_nObjectCBParameterIdx = 3;
@@ -133,6 +134,7 @@ protected:
 	XMFLOAT3 m_xmf3ColliderExtents = XMFLOAT3(0, 0, 0);
 
 	ObjectType m_nObjectType = Object_None;
+	SoundType m_nSoundType = SoundType::Sound_Wood_Light;
 
 	float m_Mass = 1.0f;
 
@@ -162,9 +164,6 @@ protected:
 	bool m_bActiveTimer = false;
 	float m_ActiveTime = 0.1f;
 	float m_ElapsedActiveTime = 0.0f;
-	
-	// 사운드 파일
-	const char* m_DeathSoundFilePath = "Sound/123.wav";
 
 public:
 	virtual void Move(DWORD dwDirection) {}
@@ -266,6 +265,7 @@ public:
 	const XMFLOAT4X4& GetLocalTransform() { return m_xmf4x4LocalTransform; }
 
 	const char* GetName() { return m_FrameName; }
+	const char* GetOutName() { return m_pstrOutName; }
 	const XMFLOAT3& GetPosition() { return(m_xmf3Position); }
 	const XMFLOAT3& GetRenderPosition() { return(m_xmf3RenderPosition); }
 	const XMFLOAT3& GetScale() { return(m_xmf3Scale); }

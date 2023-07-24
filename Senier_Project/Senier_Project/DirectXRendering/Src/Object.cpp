@@ -40,6 +40,7 @@ bool Object::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_nObjectType = objData.objectType;
 	// 충돌체 타입에 따라 
 	m_nColliderType = objData.colliderType;
+	m_nSoundType = objData.soundType;
 	switch (objData.colliderType)
 	{
 	case Collider_Plane:
@@ -410,6 +411,9 @@ void Object::CreateScoreItems(int nCnt)
 		break;
 		}
 	}
+
+	// 생성 효과음
+	Scene::EmitSound("Sound/Item/SpawnScore.wav", false, 0.75f, 0.1f);
 }
 
 void Object::CreateHealItems(int nCnt)
@@ -426,6 +430,9 @@ void Object::CreateHealItems(int nCnt)
 		pItem->SetItemType(Item::ItemType::Heal_1);
 		pItem->SetCrushVelocity(xmf3Velocity);
 	}
+
+	// 생성 효과음
+	Scene::EmitSound("Sound/Item/SpawnHeal.wav", false, 1.0f, 0.1f);
 }
 
 std::shared_ptr<ModelDataInfo> Object::LoadModelDataFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
@@ -722,6 +729,9 @@ void Object::Cutting(XMFLOAT3 xmf3PlaneNormal)
 	m_bIsAlive = false;
 	Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList, this, 1, xmf3CutNormal, false);
 	Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList, this, -1, xmf3CutNormal, false);
+
+	// 베여 갈라지는 소리
+	Scene::EmitCutSound(m_nSoundType, false);
 }
 
 void Object::DegradedBroken()
@@ -739,7 +749,6 @@ void Object::DegradedBroken()
 
 	XMMATRIX rotateMat = XMMatrixRotationRollPitchYaw(XMConvertToRadians(Angle_X), XMConvertToRadians(Angle_Y), XMConvertToRadians(Angle_Z));
 
-	
 	// 무작위 평면 전달
 	XMFLOAT3 xmf3PlaneNormal[3];
 	XMVECTOR planeNormal[3];	// 상하 분리
@@ -775,6 +784,9 @@ void Object::DegradedBroken()
 
 	m_bIsAlive = false;
 	
+	// 부숴지는 소리
+	Scene::EmitBrokenSound(m_nSoundType, false);
+
 }
 
 void Object::Destroy()
@@ -1008,6 +1020,7 @@ void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf
 
 	// 체력 감소
 	m_HP -= power;
+
 	if (m_HP <= 0)
 	{
 		m_bDestroying = true;
@@ -1015,18 +1028,23 @@ void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf
 		//Sound::PlaySoundFile(m_Death_SoundFileName, true);
 
 		// 파괴된 위치에 아이템 생성
-		CreateScoreItems(m_MaxHP / 5);
-		CreateHealItems(1);
+		int tmp = rand() % 10;
+		if(tmp > 2)
+			CreateScoreItems(m_MaxHP / 10);
+		else
+			CreateHealItems(1);
 
 		if (XMVectorGetX(XMVector3Length(XMLoadFloat3(&xmf3CuttingDirection))))
 			Cutting(xmf3CuttingDirection);
 		else
 			DegradedBroken();
 
-		Scene::EmitSound(m_DeathSoundFilePath, false);
-
 		return;
 	}
+
+	// 일반적인 충격음
+	Scene::EmitHitSound(m_nSoundType, false);
+
 
 	XMVECTOR damageDirection = XMLoadFloat3(&xmf3DamageDirection);
 	damageDirection = XMVector3Normalize(damageDirection);

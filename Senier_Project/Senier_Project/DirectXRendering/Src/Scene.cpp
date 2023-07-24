@@ -19,15 +19,14 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-	//m_pMainBGM.reset();
-	//for (int i = 0; i < m_vpSounds.size(); ++i)
-	//	m_vpSounds[i].reset();
-   //
+	m_pMainBGM.reset();
+	for (int i = 0; i < m_vpSounds.size(); ++i)
+		m_vpSounds[i].reset();
+	   
 }
 
 bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText)
 {
-
 	// 패스 버퍼 생성
 	m_pPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
 	m_pShadowPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
@@ -37,7 +36,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	BuildDescriptorHeap(pd3dDevice, pd3dCommandList);
 
 	// 캐릭터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,15, -20), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0), XMFLOAT3(1, 1, 1), CHARACTER_MODEL_NAME, PLAYER_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,15, -20), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0), XMFLOAT3(0.8f, 0.8f, 0.8f), CHARACTER_MODEL_NAME, PLAYER_TRACK_CNT);
 
 	// 무기
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-0.59f, 0.135f, 0.063f), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90), XMFLOAT3(1, 1, 1), WEAPON_MODEL_NAME, 0);
@@ -49,19 +48,19 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(1, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -150);
 	
 	// 월드 오브젝트 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HOSPITAL_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFL OAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HOSPITAL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), STOCK_FLOOR_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), MORGUE_BOX_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
-	//InitMapData(pd3dDevice, pd3dCommandList);
+	InitMapData(pd3dDevice, pd3dCommandList);
 	// UI 초기화
 	InitUI(pd3dDevice, pd3dCommandList, pDWriteText);
 	// 시네마틱 초기화
 	//InitCinematic();
 
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(400, 20, -400), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CYBER_TWINS_MODEL_NAME, MONSTER_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(0.8f, 0.8f, 0.8f), CYBER_TWINS_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 25), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 25), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 30), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
@@ -91,8 +90,10 @@ bool Scene::InitMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 	//LoadMapData(pd3dDevice, pd3dCommandList, "OutSideMap");
 	LoadMapData(pd3dDevice, pd3dCommandList, "HospitalInsideMap");
-	m_pMainBGM = std::make_shared<CSound>("Sound/testBGM.wav", true);
+	// 실내맵에선 캐릭터들의 사이즈를 80%로 조정
+	m_pMainBGM = std::make_shared<CSound>("Sound/BGM/testBGM.wav", true);
 	m_pMainBGM->Play();
+	m_pMainBGM->SetVolme(0.3f);
 	//LoadMapData(pd3dDevice, pd3dCommandList, "DungeonMap");
 
 	return true;
@@ -116,6 +117,18 @@ bool Scene::InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComm
 	m_pTextUIs = pDWriteText;
 	m_pTextUIs->AddTextUI(L"HP ", 35, -CLIENT_HEIGHT / 2 + 40);
 	m_pTextUIs->AddTextUI(L"Score ", 35, -CLIENT_HEIGHT / 2 + 80);
+
+	
+	char tmpstr[64];
+	strcpy_s(tmpstr, g_pPlayer->GetOutName());
+	
+	wchar_t* pstr;
+	int strSize = MultiByteToWideChar(CP_ACP, 0, tmpstr, -1, NULL, NULL);
+	
+	pstr = new wchar_t[strSize];
+	
+	MultiByteToWideChar(CP_ACP, 0, tmpstr, strlen(tmpstr)+1, pstr, strSize);
+	m_pTextUIs->AddTextUI(pstr, 35, -CLIENT_HEIGHT / 2 + 120);
 
 	return true;
 }
@@ -301,6 +314,7 @@ void Scene::UpdateUI(float elapsedTime)
 		float targetHPRate = pTargetObject->GetHP() / pTargetObject->GetMaxHP();
 		float targetHPBarWidth = ENEMY_HP_BAR_WIDTH * targetHPRate;
 		m_pEnemyHPBar->ChangeSize(targetHPBarWidth, ENEMY_HP_BAR_HEIGHT);
+
 	}
 	else
 	{
@@ -778,6 +792,7 @@ void Scene::KeyDownEvent(WPARAM wParam)
 			m_FadeInValue = 0.0f;
 		break;
 	case 'O':
+		g_pPlayer->GetBody()->SetScale(XMFLOAT3(10.0f, 10.0f, 10.0f));
 		//for (int i = 0; i < g_vpAllObjs.size(); ++i)
 		//{
 		//	if (g_pPlayer.get() == g_vpAllObjs[i].get()) continue;
@@ -951,6 +966,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		objectData.nMass = g_DefaultObjectData[pstrFileName].nMass;
 		objectData.objectType = g_DefaultObjectData[pstrFileName].objectType;
 		objectData.colliderType = g_DefaultObjectData[pstrFileName].colliderType;
+		objectData.soundType = g_DefaultObjectData[pstrFileName].soundType;
 		objectData.xmf3Extents = g_DefaultObjectData[pstrFileName].xmf3Extents;
 		objectData.xmf3MeshOffsetPosition = g_DefaultObjectData[pstrFileName].xmf3MeshOffsetPosition;
 		objectData.xmf3MeshOffsetRotation = g_DefaultObjectData[pstrFileName].xmf3MeshOffsetRotation;
@@ -988,6 +1004,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	{
 		std::shared_ptr<Player> pPlayer = std::make_shared<Player>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 		strcpy_s(pPlayer->m_pstrFileName, strFileName.c_str());
+		strcpy_s(pPlayer->m_pstrOutName, strFileName.c_str());
 		//m_pPlayer = pPlayer;
 		pObject = std::static_pointer_cast<Object>(pPlayer);
 
@@ -1461,14 +1478,6 @@ void Scene::PlayCinematic(UINT nCinematicNum)
 	m_vpCinematics[m_nCurCinematicNum]->Play();
 }
 
-void Scene::EmitSound(const char* pstrFilePath, bool bLoop)
-{
-	std::shared_ptr<CSound> newSound = std::make_shared<CSound>(pstrFilePath, bLoop);
-	newSound->Play();
-
-	m_vpSounds.emplace_back(newSound);
-}
-
 void Scene::ClearObjectLayer()
 {
 	for (int j = 0; j < g_ppColliderBoxs.size(); ++j)
@@ -1547,4 +1556,154 @@ void Scene::ClearObjectLayer()
 			}
 		}
 	}
+}
+
+// Sound
+void Scene::EmitSound(const char* pstrFilePath, bool bLoop)
+{
+	std::shared_ptr<CSound> newSound = std::make_shared<CSound>(pstrFilePath, bLoop);
+	newSound->Play();
+	m_vpSounds.emplace_back(newSound);
+}
+
+void Scene::EmitSound(const char* pstrFilePath, bool bLoop, float pitch, float volume)
+{
+	std::shared_ptr<CSound> newSound = std::make_shared<CSound>(pstrFilePath, bLoop);
+	newSound->Play();
+	newSound->SetPitch(pitch);
+	newSound->SetVolme(volume);
+	m_vpSounds.emplace_back(newSound);
+}
+
+void Scene::EmitHitSound(SoundType nType, bool bLoop)
+{
+	char pstrFilePath[64];
+	int tmpRand;
+
+	switch (nType)
+	{
+	case Sound_Wood_Light:
+		strcpy_s(pstrFilePath, WOOD_LIGHT_HIT_SOUND);
+		tmpRand = rand() % 2 + 1;
+		break;
+	case Sound_Wood_Heavy:
+		strcpy_s(pstrFilePath, WOOD_HEAVY_HIT_SOUND);
+		tmpRand = rand() % 2 + 1;
+		break;
+	case Sound_Stone:
+		strcpy_s(pstrFilePath, STONE_HIT_SOUND);
+		tmpRand = rand() % 2 + 1;
+		break;
+	case Sound_Steel_Light:
+		strcpy_s(pstrFilePath, STEEL_LIGHT_HIT_SOUND);
+		tmpRand = rand() % 3 + 1;
+		break;
+	case Sound_Steel_Heavy:
+		strcpy_s(pstrFilePath, STEEL_HEAVY_HIT_SOUND);
+		tmpRand = rand() % 2 + 1;
+		break;
+	case Sound_Fabric:
+		strcpy_s(pstrFilePath, FABRIC_HIT_SOUND);
+		tmpRand = rand() % 1 + 1;
+		break;
+	case Sound_Character:
+		strcpy_s(pstrFilePath, CHARACTER_HIT_SOUND);
+		tmpRand = rand() % 3 + 1;
+		break;
+	default:
+		return;
+	}
+
+	strcat_s(pstrFilePath, std::to_string(tmpRand).c_str());
+	strcat_s(pstrFilePath, ".wav");
+	EmitSound(pstrFilePath, bLoop, 1.0f, 0.3f);
+}
+
+void Scene::EmitCutSound(SoundType nType, bool bLoop)
+{
+	char pstrFilePath[64];
+	int tmpRand;
+
+	switch (nType)
+	{
+	case Sound_Wood_Light:
+		strcpy_s(pstrFilePath, WOOD_LIGHT_CUT_SOUND);
+		tmpRand = rand() % 2 + 1;
+		break;
+	case Sound_Wood_Heavy:
+		strcpy_s(pstrFilePath, WOOD_HEAVY_CUT_SOUND);
+		tmpRand = rand() % 2 + 1;
+		break;
+	case Sound_Stone:
+		strcpy_s(pstrFilePath, STONE_CUT_SOUND);
+		tmpRand = rand() % 2 + 1;
+		break;
+	case Sound_Steel_Light:
+		strcpy_s(pstrFilePath, STEEL_LIGHT_CUT_SOUND);
+		tmpRand = rand() % 3 + 1;
+		break;
+	case Sound_Steel_Heavy:
+		strcpy_s(pstrFilePath, STEEL_HEAVY_CUT_SOUND);
+		tmpRand = rand() % 3 + 1;
+		break;
+	case Sound_Fabric:
+		strcpy_s(pstrFilePath, FABRIC_CUT_SOUND);
+		tmpRand = rand() % 1 + 1;
+		break;
+	case Sound_Character:
+		strcpy_s(pstrFilePath, CHARACTER_CUT_SOUND);
+		tmpRand = rand() % 8 + 1;
+		break;
+	default:
+		return;
+	}
+
+	strcat_s(pstrFilePath, std::to_string(tmpRand).c_str());
+	strcat_s(pstrFilePath, ".wav");
+
+	EmitSound(pstrFilePath, bLoop, 1.0f, 0.3f);
+}
+
+
+void Scene::EmitBrokenSound(SoundType nType, bool bLoop)
+{
+	char pstrFilePath[64];
+	int tmpRand;
+	float volume = 0.3f;
+
+	switch (nType)
+	{
+	case Sound_Wood_Light:
+		strcpy_s(pstrFilePath, WOOD_LIGHT_BROKEN_SOUND);
+		tmpRand = rand() % 2 + 1;
+		break;
+	case Sound_Wood_Heavy:
+		strcpy_s(pstrFilePath, WOOD_HEAVY_BROKEN_SOUND);
+		tmpRand = rand() % 4 + 1;
+		break;
+	case Sound_Stone:
+		strcpy_s(pstrFilePath, STONE_BROKEN_SOUND);
+		tmpRand = rand() % 3 + 1;
+		break;
+	case Sound_Steel_Light:
+		strcpy_s(pstrFilePath, STEEL_LIGHT_BROKEN_SOUND);
+		tmpRand = rand() % 2 + 1;
+		break;
+	case Sound_Steel_Heavy:
+		strcpy_s(pstrFilePath, STEEL_HEAVY_BROKEN_SOUND);
+		tmpRand = rand() % 2 + 1;
+		volume = 0.1f;
+		break;
+	case Sound_Fabric:
+		strcpy_s(pstrFilePath, FABRIC_BROKEN_SOUND);
+		tmpRand = rand() % 1 + 1;
+		volume = 0.5f;
+		break;
+	default:
+		return;
+	}
+
+	strcat_s(pstrFilePath, std::to_string(tmpRand).c_str());
+	strcat_s(pstrFilePath, ".wav");
+	EmitSound(pstrFilePath, bLoop, 1.0f, volume);
 }

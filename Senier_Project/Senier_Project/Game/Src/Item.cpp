@@ -1,4 +1,5 @@
 #include "../Header/Item.h"
+#include "../../DirectXRendering/Header/Scene.h"
 
 Item::Item()
 {
@@ -171,6 +172,7 @@ void Item::Intersect(float elapsedTime)
 	{
 		TracePlayer(elapsedTime);
 
+		// 플레이어와 충돌
 		if (m_IntersectCollider.Intersects(*playerCollider))
 		{
 			std::shared_ptr<Player> pPlayer = std::static_pointer_cast<Player>(g_pPlayer);

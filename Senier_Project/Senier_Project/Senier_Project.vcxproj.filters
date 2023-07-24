@@ -280,6 +280,9 @@
     <ClInclude Include="DataDefine\DungeonObjectData.h">
       <Filter>DataDefine</Filter>
     </ClInclude>
+    <ClInclude Include="DataDefine\SoundFilePath.h">
+      <Filter>DataDefine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\default.hlsl">

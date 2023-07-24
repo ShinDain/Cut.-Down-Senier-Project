@@ -10,6 +10,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CHARACTER_MODEL_EXTENTS;
 	tmpData.objectType = CHARACTER_MODEL_TYPE;
 	tmpData.colliderType = CHARACTER_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Character;
 	tmpData.nMass = CHARACTER_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CHARACTER_MODEL_SCALE;
 	tmpData.renderLayer = CHARACTER_MODEL_RENDERLAYER;
@@ -24,6 +25,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ZOMBIE_MODEL_EXTENTS;
 	tmpData.objectType = ZOMBIE_MODEL_TYPE;
 	tmpData.colliderType = ZOMBIE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Character;
 	tmpData.nMass = ZOMBIE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ZOMBIE_MODEL_SCALE;
 	tmpData.renderLayer = ZOMBIE_MODEL_RENDERLAYER;
@@ -38,6 +40,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = HIGHZOMBIE_MODEL_EXTENTS;
 	tmpData.objectType = HIGHZOMBIE_MODEL_TYPE;
 	tmpData.colliderType = HIGHZOMBIE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Character;
 	tmpData.nMass = HIGHZOMBIE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = HIGHZOMBIE_MODEL_SCALE;
 	tmpData.renderLayer = HIGHZOMBIE_MODEL_RENDERLAYER;
@@ -52,6 +55,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = SCAVENGER_MODEL_EXTENTS;
 	tmpData.objectType = SCAVENGER_MODEL_TYPE;
 	tmpData.colliderType = SCAVENGER_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Character;
 	tmpData.nMass = SCAVENGER_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SCAVENGER_MODEL_SCALE;
 	tmpData.renderLayer = SCAVENGER_MODEL_RENDERLAYER;
@@ -66,6 +70,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CYBER_TWINS_MODEL_EXTENTS;
 	tmpData.objectType = CYBER_TWINS_MODEL_TYPE;
 	tmpData.colliderType = CYBER_TWINS_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Character;
 	tmpData.nMass = CYBER_TWINS_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CYBER_TWINS_MODEL_SCALE;
 	tmpData.renderLayer = CYBER_TWINS_MODEL_RENDERLAYER;
@@ -80,6 +85,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = GHOUL_MODEL_EXTENTS;
 	tmpData.objectType = GHOUL_MODEL_TYPE;
 	tmpData.colliderType = GHOUL_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Character;
 	tmpData.nMass = GHOUL_MODEL_MASS;
 	tmpData.xmf3OffsetScale = GHOUL_MODEL_SCALE;
 	tmpData.renderLayer = GHOUL_MODEL_RENDERLAYER;
@@ -94,6 +100,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = NECROMANCER_MODEL_EXTENTS;
 	tmpData.objectType = NECROMANCER_MODEL_TYPE;
 	tmpData.colliderType = NECROMANCER_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Character;
 	tmpData.nMass = NECROMANCER_MODEL_MASS;
 	tmpData.xmf3OffsetScale = NECROMANCER_MODEL_SCALE;
 	tmpData.renderLayer = NECROMANCER_MODEL_RENDERLAYER;
@@ -110,6 +117,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = PLAYER_PROJECTILE1_MODEL_EXTENTS;
 	tmpData.objectType = PLAYER_PROJECTILE1_MODEL_TYPE;
 	tmpData.colliderType = PLAYER_PROJECTILE1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = PLAYER_PROJECTILE1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = PLAYER_PROJECTILE1_MODEL_SCALE;
 	tmpData.renderLayer = PLAYER_PROJECTILE1_MODEL_RENDERLAYER;
@@ -124,6 +132,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = PLAYER_PROJECTILE2_MODEL_EXTENTS;
 	tmpData.objectType = PLAYER_PROJECTILE2_MODEL_TYPE;
 	tmpData.colliderType = PLAYER_PROJECTILE2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = PLAYER_PROJECTILE2_MODEL_MASS;
 	tmpData.xmf3OffsetScale = PLAYER_PROJECTILE2_MODEL_SCALE;
 	tmpData.renderLayer = PLAYER_PROJECTILE2_MODEL_RENDERLAYER;
@@ -138,6 +147,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = PLAYER_PROJECTILE3_MODEL_EXTENTS;
 	tmpData.objectType = PLAYER_PROJECTILE3_MODEL_TYPE;
 	tmpData.colliderType = PLAYER_PROJECTILE3_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = PLAYER_PROJECTILE3_MODEL_MASS;
 	tmpData.xmf3OffsetScale = PLAYER_PROJECTILE3_MODEL_SCALE;
 	tmpData.renderLayer = PLAYER_PROJECTILE3_MODEL_RENDERLAYER;
@@ -152,6 +162,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ENEMY_BULLET_MODEL_EXTENTS;
 	tmpData.objectType = ENEMY_BULLET_MODEL_TYPE;
 	tmpData.colliderType = ENEMY_BULLET_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = ENEMY_BULLET_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ENEMY_BULLET_MODEL_SCALE;
 	tmpData.renderLayer = ENEMY_BULLET_MODEL_RENDERLAYER;
@@ -166,6 +177,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ENEMY_MISSILE1_MODEL_EXTENTS;
 	tmpData.objectType = ENEMY_MISSILE1_MODEL_TYPE;
 	tmpData.colliderType = ENEMY_MISSILE1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = ENEMY_MISSILE1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ENEMY_MISSILE1_MODEL_SCALE;
 	tmpData.renderLayer = ENEMY_MISSILE1_MODEL_RENDERLAYER;
@@ -180,6 +192,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ENEMY_MISSILE2_MODEL_EXTENTS;
 	tmpData.objectType = ENEMY_MISSILE2_MODEL_TYPE;
 	tmpData.colliderType = ENEMY_MISSILE2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = ENEMY_MISSILE2_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ENEMY_MISSILE2_MODEL_SCALE;
 	tmpData.renderLayer = ENEMY_MISSILE2_MODEL_RENDERLAYER;
@@ -194,6 +207,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ENEMY_MAGIC1_MODEL_EXTENTS;
 	tmpData.objectType = ENEMY_MAGIC1_MODEL_TYPE;
 	tmpData.colliderType = ENEMY_MAGIC1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = ENEMY_MAGIC1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ENEMY_MAGIC1_MODEL_SCALE;
 	tmpData.renderLayer = ENEMY_MAGIC1_MODEL_RENDERLAYER;
@@ -208,6 +222,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ENEMY_MAGIC2_MODEL_EXTENTS;
 	tmpData.objectType = ENEMY_MAGIC2_MODEL_TYPE;
 	tmpData.colliderType = ENEMY_MAGIC2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = ENEMY_MAGIC2_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ENEMY_MAGIC2_MODEL_SCALE;
 	tmpData.renderLayer = ENEMY_MAGIC2_MODEL_RENDERLAYER;
@@ -223,6 +238,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BLOOD1_EFFECT_MODEL_EXTENTS;
 	tmpData.objectType = BLOOD1_EFFECT_MODEL_TYPE;
 	tmpData.colliderType = BLOOD1_EFFECT_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BLOOD1_EFFECT_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BLOOD1_EFFECT_MODEL_SCALE;
 	tmpData.renderLayer = BLOOD1_EFFECT_MODEL_RENDERLAYER;
@@ -237,6 +253,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BLOOD2_EFFECT_MODEL_EXTENTS;
 	tmpData.objectType = BLOOD2_EFFECT_MODEL_TYPE;
 	tmpData.colliderType = BLOOD2_EFFECT_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BLOOD2_EFFECT_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BLOOD2_EFFECT_MODEL_SCALE;
 	tmpData.renderLayer = BLOOD2_EFFECT_MODEL_RENDERLAYER;
@@ -251,6 +268,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BLOOD3_EFFECT_MODEL_EXTENTS;
 	tmpData.objectType = BLOOD3_EFFECT_MODEL_TYPE;
 	tmpData.colliderType = BLOOD3_EFFECT_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BLOOD3_EFFECT_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BLOOD3_EFFECT_MODEL_SCALE;
 	tmpData.renderLayer = BLOOD3_EFFECT_MODEL_RENDERLAYER;
@@ -265,6 +283,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BLOOD4_EFFECT_MODEL_EXTENTS;
 	tmpData.objectType = BLOOD4_EFFECT_MODEL_TYPE;
 	tmpData.colliderType = BLOOD4_EFFECT_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BLOOD4_EFFECT_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BLOOD4_EFFECT_MODEL_SCALE;
 	tmpData.renderLayer = BLOOD4_EFFECT_MODEL_RENDERLAYER;
@@ -279,6 +298,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BLOOD5_EFFECT_MODEL_EXTENTS;
 	tmpData.objectType = BLOOD5_EFFECT_MODEL_TYPE;
 	tmpData.colliderType = BLOOD5_EFFECT_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BLOOD5_EFFECT_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BLOOD5_EFFECT_MODEL_SCALE;
 	tmpData.renderLayer = BLOOD5_EFFECT_MODEL_RENDERLAYER;
@@ -293,6 +313,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BLOOD6_EFFECT_MODEL_EXTENTS;
 	tmpData.objectType = BLOOD6_EFFECT_MODEL_TYPE;
 	tmpData.colliderType = BLOOD6_EFFECT_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BLOOD6_EFFECT_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BLOOD6_EFFECT_MODEL_SCALE;
 	tmpData.renderLayer = BLOOD6_EFFECT_MODEL_RENDERLAYER;
@@ -307,6 +328,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BLOOD7_EFFECT_MODEL_EXTENTS;
 	tmpData.objectType = BLOOD7_EFFECT_MODEL_TYPE;
 	tmpData.colliderType = BLOOD7_EFFECT_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BLOOD7_EFFECT_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BLOOD7_EFFECT_MODEL_SCALE;
 	tmpData.renderLayer = BLOOD7_EFFECT_MODEL_RENDERLAYER;
@@ -322,6 +344,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = WEAPON_MODEL_EXTENTS;
 	tmpData.objectType = WEAPON_MODEL_TYPE;
 	tmpData.colliderType = WEAPON_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = WEAPON_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WEAPON_MODEL_SCALE;
 	tmpData.renderLayer = WEAPON_MODEL_RENDERLAYER;
@@ -336,6 +359,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CUBE_MODEL_EXTENTS;
 	tmpData.objectType = CUBE_MODEL_TYPE;
 	tmpData.colliderType = CUBE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = CUBE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CUBE_MODEL_SCALE;
 	tmpData.renderLayer = CUBE_MODEL_RENDERLAYER;
@@ -345,264 +369,12 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ CUBE_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(CUBE_MODEL_NAME);
 
-	//// 기본 데모 오브젝트
-	//tmpData.pstrObjectPath = GROUND_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = GROUND_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = GROUND_MODEL_EXTENTS;
-	//tmpData.objectType = GROUND_MODEL_TYPE;
-	//tmpData.colliderType = GROUND_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = GROUND_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = GROUND_MODEL_SCALE;
-	//tmpData.renderLayer = GROUND_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = GROUND_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ GROUND_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(GROUND_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = CARPET_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = CARPET_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = CARPET_MODEL_EXTENTS;
-	//tmpData.objectType = CARPET_MODEL_TYPE;
-	//tmpData.colliderType = CARPET_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = CARPET_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = CARPET_MODEL_SCALE;
-	//tmpData.renderLayer = CARPET_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = CARPET_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ CARPET_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(CARPET_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = DRAWER_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = DRAWER_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = DRAWER_MODEL_EXTENTS;
-	//tmpData.objectType = DRAWER_MODEL_TYPE;
-	//tmpData.colliderType = DRAWER_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = DRAWER_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = DRAWER_MODEL_SCALE;
-	//tmpData.renderLayer = DRAWER_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = DRAWER_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ DRAWER_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(DRAWER_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = MECHANICAL_ARM_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = MECHANICAL_ARM_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = MECHANICAL_ARM_MODEL_EXTENTS;
-	//tmpData.objectType = MECHANICAL_ARM_MODEL_TYPE;
-	//tmpData.colliderType = MECHANICAL_ARM_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = MECHANICAL_ARM_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = MECHANICAL_ARM_MODEL_SCALE;
-	//tmpData.renderLayer = MECHANICAL_ARM_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(-1.0f, tmpData.xmf3Extents.y, 0.8f);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = MECHANICAL_ARM_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ MECHANICAL_ARM_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(MECHANICAL_ARM_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = OFFICE_CHAIR_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = OFFICE_CHAIR_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = OFFICE_CHAIR_MODEL_EXTENTS;
-	//tmpData.objectType = OFFICE_CHAIR_MODEL_TYPE;
-	//tmpData.colliderType = OFFICE_CHAIR_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = OFFICE_CHAIR_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = OFFICE_CHAIR_MODEL_SCALE;
-	//tmpData.renderLayer = OFFICE_CHAIR_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = OFFICE_CHAIR_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ OFFICE_CHAIR_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(OFFICE_CHAIR_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = DOOR_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = DOOR_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = DOOR_MODEL_EXTENTS;
-	//tmpData.objectType = DOOR_MODEL_TYPE;
-	//tmpData.colliderType = DOOR_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = DOOR_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = DOOR_MODEL_SCALE;
-	//tmpData.renderLayer = DOOR_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = DOOR_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ DOOR_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(DOOR_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = SERVER_RACK_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = SERVER_RACK_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = SERVER_RACK_MODEL_EXTENTS;
-	//tmpData.objectType = SERVER_RACK_MODEL_TYPE;
-	//tmpData.colliderType = SERVER_RACK_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = SERVER_RACK_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = SERVER_RACK_MODEL_SCALE;
-	//tmpData.renderLayer = SERVER_RACK_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = SERVER_RACK_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ SERVER_RACK_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(SERVER_RACK_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = SHELF_CRATE_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = SHELF_CRATE_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = SHELF_CRATE_MODEL_EXTENTS;
-	//tmpData.objectType = SHELF_CRATE_MODEL_TYPE;
-	//tmpData.colliderType = SHELF_CRATE_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = SHELF_CRATE_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = SHELF_CRATE_MODEL_SCALE;
-	//tmpData.renderLayer = SHELF_CRATE_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = SHELF_CRATE_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ SHELF_CRATE_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(SHELF_CRATE_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = SHELF_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = SHELF_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = SHELF_MODEL_EXTENTS;
-	//tmpData.objectType = SHELF_MODEL_TYPE;
-	//tmpData.colliderType = SHELF_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = SHELF_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = SHELF_MODEL_SCALE;
-	//tmpData.renderLayer = SHELF_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = SHELF_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ SHELF_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(SHELF_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = STOOL_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = STOOL_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = STOOL_MODEL_EXTENTS;
-	//tmpData.objectType = STOOL_MODEL_TYPE;
-	//tmpData.colliderType = STOOL_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = STOOL_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = STOOL_MODEL_SCALE;
-	//tmpData.renderLayer = STOOL_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = STOOL_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ STOOL_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(STOOL_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = TABLE_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = TABLE_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = TABLE_MODEL_EXTENTS;
-	//tmpData.objectType = TABLE_MODEL_TYPE;
-	//tmpData.colliderType = TABLE_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = TABLE_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = TABLE_MODEL_SCALE;
-	//tmpData.renderLayer = TABLE_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = TABLE_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ TABLE_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(TABLE_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = TABLE_GLASS_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = TABLE_GLASS_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = TABLE_GLASS_MODEL_EXTENTS;
-	//tmpData.objectType = TABLE_GLASS_MODEL_TYPE;
-	//tmpData.colliderType = TABLE_GLASS_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = TABLE_GLASS_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = TABLE_GLASS_MODEL_SCALE;
-	//tmpData.renderLayer = TABLE_GLASS_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = TABLE_GLASS_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ TABLE_GLASS_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(TABLE_GLASS_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = TABLE_SET_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = TABLE_SET_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = TABLE_SET_MODEL_EXTENTS;
-	//tmpData.objectType = TABLE_SET_MODEL_TYPE;
-	//tmpData.colliderType = TABLE_SET_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = TABLE_SET_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = TABLE_SET_MODEL_SCALE;
-	//tmpData.renderLayer = TABLE_SET_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = TABLE_SET_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ TABLE_SET_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(TABLE_SET_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = VASE_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = VASE_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = VASE_MODEL_EXTENTS;
-	//tmpData.objectType = VASE_MODEL_TYPE;
-	//tmpData.colliderType = VASE_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = VASE_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = VASE_MODEL_SCALE;
-	//tmpData.renderLayer = VASE_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = VASE_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ VASE_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(VASE_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = WALL_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = WALL_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = WALL_MODEL_EXTENTS;
-	//tmpData.objectType = WALL_MODEL_TYPE;
-	//tmpData.colliderType = WALL_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = WALL_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = WALL_MODEL_SCALE;
-	//tmpData.renderLayer = WALL_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(-tmpData.xmf3Extents.x, tmpData.xmf3Extents.y, 0.08f);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = WALL_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ WALL_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(WALL_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = WALL_WITH_WINDOWS_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = WALL_WITH_WINDOWS_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = WALL_WITH_WINDOWS_MODEL_EXTENTS;
-	//tmpData.objectType = WALL_WITH_WINDOWS_MODEL_TYPE;
-	//tmpData.colliderType = WALL_WITH_WINDOWS_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = WALL_WITH_WINDOWS_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = WALL_WITH_WINDOWS_MODEL_SCALE;
-	//tmpData.renderLayer = WALL_WITH_WINDOWS_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = WALL_WITH_WINDOWS_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ WALL_WITH_WINDOWS_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(WALL_WITH_WINDOWS_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = WALL_PILLAR_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = WALL_PILLAR_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = WALL_PILLAR_MODEL_EXTENTS;
-	//tmpData.objectType = WALL_PILLAR_MODEL_TYPE;
-	//tmpData.colliderType = WALL_PILLAR_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = WALL_PILLAR_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = WALL_PILLAR_MODEL_SCALE;
-	//tmpData.renderLayer = WALL_PILLAR_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, tmpData.xmf3Extents.y, 0);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = WALL_PILLAR_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ WALL_PILLAR_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(WALL_PILLAR_MODEL_NAME);
-
-	//tmpData.pstrObjectPath = WALL_PILLAR_3_MODEL_OBJECTPATH;
-	//tmpData.pstrTexPath = WALL_PILLAR_3_MODEL_TEXPATH;
-	//tmpData.xmf3Extents = WALL_PILLAR_3_MODEL_EXTENTS;
-	//tmpData.objectType = WALL_PILLAR_3_MODEL_TYPE;
-	//tmpData.colliderType = WALL_PILLAR_3_MODEL_COLLIDERTYPE;
-	//tmpData.nMass = WALL_PILLAR_3_MODEL_MASS;
-	//tmpData.xmf3OffsetScale = WALL_PILLAR_3_MODEL_SCALE;
-	//tmpData.renderLayer = WALL_PILLAR_3_MODEL_RENDERLAYER;
-	//tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0.1f, tmpData.xmf3Extents.y, -0.1f);
-	//tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	//tmpData.bShadowed = WALL_PILLAR_3_MODEL_SHADOW;
-	//g_DefaultObjectData.insert({ WALL_PILLAR_3_MODEL_NAME, tmpData });
-	//g_DefaultObjectNames.emplace_back(WALL_PILLAR_3_MODEL_NAME);
-
 	tmpData.pstrObjectPath = PLATFORM_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = PLATFORM_MODEL_TEXPATH;
 	tmpData.xmf3Extents = PLATFORM_MODEL_EXTENTS;
 	tmpData.objectType = PLATFORM_MODEL_TYPE;
 	tmpData.colliderType = PLATFORM_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = PLATFORM_MODEL_MASS;
 	tmpData.xmf3OffsetScale = PLATFORM_MODEL_SCALE;
 	tmpData.renderLayer = PLATFORM_MODEL_RENDERLAYER;
@@ -617,6 +389,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = JUST_MODEL_EXTENTS;
 	tmpData.objectType = JUST_MODEL_TYPE;
 	tmpData.colliderType = JUST_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = JUST_MODEL_MASS;
 	tmpData.xmf3OffsetScale = JUST_MODEL_SCALE;
 	tmpData.renderLayer = JUST_MODEL_RENDERLAYER;
@@ -626,14 +399,13 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ JUST_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(JUST_MODEL_NAME);
 
-
-
 	// 아이템
 	tmpData.pstrObjectPath = SCOREITEM1_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = SCOREITEM1_MODEL_TEXPATH;
 	tmpData.xmf3Extents = SCOREITEM1_MODEL_EXTENTS;
 	tmpData.objectType = SCOREITEM1_MODEL_TYPE;
 	tmpData.colliderType = SCOREITEM1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = SCOREITEM1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SCOREITEM1_MODEL_SCALE;
 	tmpData.renderLayer = SCOREITEM1_MODEL_RENDERLAYER;
@@ -648,6 +420,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = SCOREITEM2_MODEL_EXTENTS;
 	tmpData.objectType = SCOREITEM2_MODEL_TYPE;
 	tmpData.colliderType = SCOREITEM2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = SCOREITEM2_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SCOREITEM2_MODEL_SCALE;
 	tmpData.renderLayer = SCOREITEM2_MODEL_RENDERLAYER;
@@ -662,6 +435,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = SCOREITEM3_MODEL_EXTENTS;
 	tmpData.objectType = SCOREITEM3_MODEL_TYPE;
 	tmpData.colliderType = SCOREITEM3_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = SCOREITEM3_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SCOREITEM3_MODEL_SCALE;
 	tmpData.renderLayer = SCOREITEM3_MODEL_RENDERLAYER;
@@ -676,6 +450,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = SCOREITEM4_MODEL_EXTENTS;
 	tmpData.objectType = SCOREITEM4_MODEL_TYPE;
 	tmpData.colliderType = SCOREITEM4_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = SCOREITEM4_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SCOREITEM4_MODEL_SCALE;
 	tmpData.renderLayer = SCOREITEM4_MODEL_RENDERLAYER;
@@ -690,6 +465,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = SCOREITEM5_MODEL_EXTENTS;
 	tmpData.objectType = SCOREITEM5_MODEL_TYPE;
 	tmpData.colliderType = SCOREITEM5_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = SCOREITEM5_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SCOREITEM5_MODEL_SCALE;
 	tmpData.renderLayer = SCOREITEM5_MODEL_RENDERLAYER;
@@ -704,6 +480,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = HEALITEM_MODEL_EXTENTS;
 	tmpData.objectType = HEALITEM_MODEL_TYPE;
 	tmpData.colliderType = HEALITEM_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = HEALITEM_MODEL_MASS;
 	tmpData.xmf3OffsetScale = HEALITEM_MODEL_SCALE;
 	tmpData.renderLayer = HEALITEM_MODEL_RENDERLAYER;
@@ -719,6 +496,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ENTER_BOX_MODEL_EXTENTS;
 	tmpData.objectType = ENTER_BOX_MODEL_TYPE;
 	tmpData.colliderType = ENTER_BOX_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = ENTER_BOX_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ENTER_BOX_MODEL_SCALE;
 	tmpData.renderLayer = ENTER_BOX_MODEL_RENDERLAYER;
@@ -734,6 +512,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = GRASS_GROUND_MODEL_EXTENTS;
 	tmpData.objectType = GRASS_GROUND_MODEL_TYPE;
 	tmpData.colliderType = GRASS_GROUND_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = GRASS_GROUND_MODEL_MASS;
 	tmpData.xmf3OffsetScale = GRASS_GROUND_MODEL_SCALE;
 	tmpData.renderLayer = GRASS_GROUND_MODEL_RENDERLAYER;
@@ -748,6 +527,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = HOSPITAL_MODEL_EXTENTS;
 	tmpData.objectType = HOSPITAL_MODEL_TYPE;
 	tmpData.colliderType = HOSPITAL_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = HOSPITAL_MODEL_MASS;
 	tmpData.xmf3OffsetScale = HOSPITAL_MODEL_SCALE;
 	tmpData.renderLayer = HOSPITAL_MODEL_RENDERLAYER;
@@ -762,6 +542,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BARREL1_MODEL_EXTENTS;
 	tmpData.objectType = BARREL1_MODEL_TYPE;
 	tmpData.colliderType = BARREL1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Wood_Heavy;
 	tmpData.nMass = BARREL1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BARREL1_MODEL_SCALE;
 	tmpData.renderLayer = BARREL1_MODEL_RENDERLAYER;
@@ -776,6 +557,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BARREL2_MODEL_EXTENTS;
 	tmpData.objectType = BARREL2_MODEL_TYPE;
 	tmpData.colliderType = BARREL2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Heavy;
 	tmpData.nMass = BARREL2_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BARREL2_MODEL_SCALE;
 	tmpData.renderLayer = BARREL2_MODEL_RENDERLAYER;
@@ -790,6 +572,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BARREL3_MODEL_EXTENTS;
 	tmpData.objectType = BARREL3_MODEL_TYPE;
 	tmpData.colliderType = BARREL3_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Heavy;
 	tmpData.nMass = BARREL3_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BARREL3_MODEL_SCALE;
 	tmpData.renderLayer = BARREL3_MODEL_RENDERLAYER;
@@ -804,6 +587,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BARREL4_MODEL_EXTENTS;
 	tmpData.objectType = BARREL4_MODEL_TYPE;
 	tmpData.colliderType = BARREL4_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Heavy;
 	tmpData.nMass = BARREL4_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BARREL4_MODEL_SCALE;
 	tmpData.renderLayer = BARREL4_MODEL_RENDERLAYER;
@@ -818,6 +602,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BARREL5_MODEL_EXTENTS;
 	tmpData.objectType = BARREL5_MODEL_TYPE;
 	tmpData.colliderType = BARREL5_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Heavy;
 	tmpData.nMass = BARREL5_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BARREL5_MODEL_SCALE;
 	tmpData.renderLayer = BARREL5_MODEL_RENDERLAYER;
@@ -832,6 +617,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BENCH_MODEL_EXTENTS;
 	tmpData.objectType = BENCH_MODEL_TYPE;
 	tmpData.colliderType = BENCH_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Wood_Light;
 	tmpData.nMass = BENCH_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BENCH_MODEL_SCALE;
 	tmpData.renderLayer = BENCH_MODEL_RENDERLAYER;
@@ -846,6 +632,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BOILER_MODEL_EXTENTS;
 	tmpData.objectType = BOILER_MODEL_TYPE;
 	tmpData.colliderType = BOILER_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BOILER_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BOILER_MODEL_SCALE;
 	tmpData.renderLayer = BOILER_MODEL_RENDERLAYER;
@@ -860,6 +647,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BIGSHELF_MODEL_EXTENTS;
 	tmpData.objectType = BIGSHELF_MODEL_TYPE;
 	tmpData.colliderType = BIGSHELF_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BIGSHELF_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BIGSHELF_MODEL_SCALE;
 	tmpData.renderLayer = BIGSHELF_MODEL_RENDERLAYER;
@@ -874,6 +662,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BIGSHELF_STOCK_MODEL_EXTENTS;
 	tmpData.objectType = BIGSHELF_STOCK_MODEL_TYPE;
 	tmpData.colliderType = BIGSHELF_STOCK_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BIGSHELF_STOCK_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BIGSHELF_STOCK_MODEL_SCALE;
 	tmpData.renderLayer = BIGSHELF_STOCK_MODEL_RENDERLAYER;
@@ -888,6 +677,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = WOOD_BOX1_MODEL_EXTENTS;
 	tmpData.objectType = WOOD_BOX1_MODEL_TYPE;
 	tmpData.colliderType = WOOD_BOX1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Wood_Light;
 	tmpData.nMass = WOOD_BOX1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WOOD_BOX1_MODEL_SCALE;
 	tmpData.renderLayer = WOOD_BOX1_MODEL_RENDERLAYER;
@@ -902,6 +692,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CABELS_MODEL_EXTENTS;
 	tmpData.objectType = CABELS_MODEL_TYPE;
 	tmpData.colliderType = CABELS_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = CABELS_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CABELS_MODEL_SCALE;
 	tmpData.renderLayer = CABELS_MODEL_RENDERLAYER;
@@ -915,7 +706,8 @@ void CreateObjectDefaultData()
 	tmpData.pstrTexPath =  CAN_MODEL_TEXPATH;
 	tmpData.xmf3Extents =  CAN_MODEL_EXTENTS;
 	tmpData.objectType =  CAN_MODEL_TYPE;
-	tmpData.colliderType =  CAN_MODEL_COLLIDERTYPE;
+	tmpData.colliderType = CAN_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Light;
 	tmpData.nMass =  CAN_MODEL_MASS;
 	tmpData.xmf3OffsetScale =  CAN_MODEL_SCALE;
 	tmpData.renderLayer =  CAN_MODEL_RENDERLAYER;
@@ -930,6 +722,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CAN_DAMAGED_MODEL_EXTENTS;
 	tmpData.objectType = CAN_DAMAGED_MODEL_TYPE;
 	tmpData.colliderType = CAN_DAMAGED_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Light;
 	tmpData.nMass = CAN_DAMAGED_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CAN_DAMAGED_MODEL_SCALE;
 	tmpData.renderLayer = CAN_DAMAGED_MODEL_RENDERLAYER;
@@ -944,6 +737,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CONTAINER_MODEL_EXTENTS;
 	tmpData.objectType = CONTAINER_MODEL_TYPE;
 	tmpData.colliderType = CONTAINER_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = CONTAINER_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CONTAINER_MODEL_SCALE;
 	tmpData.renderLayer = CONTAINER_MODEL_RENDERLAYER;
@@ -958,6 +752,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents =  DUMP_CONTAINER_MODEL_EXTENTS;
 	tmpData.objectType =  DUMP_CONTAINER_MODEL_TYPE;
 	tmpData.colliderType =  DUMP_CONTAINER_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass =  DUMP_CONTAINER_MODEL_MASS;
 	tmpData.xmf3OffsetScale =  DUMP_CONTAINER_MODEL_SCALE;
 	tmpData.renderLayer =  DUMP_CONTAINER_MODEL_RENDERLAYER;
@@ -972,6 +767,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = OUTSIDE_WOOD_CHAIR_MODEL_EXTENTS;
 	tmpData.objectType = OUTSIDE_WOOD_CHAIR_MODEL_TYPE;
 	tmpData.colliderType = OUTSIDE_WOOD_CHAIR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Wood_Light;
 	tmpData.nMass = OUTSIDE_WOOD_CHAIR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = OUTSIDE_WOOD_CHAIR_MODEL_SCALE;
 	tmpData.renderLayer = OUTSIDE_WOOD_CHAIR_MODEL_RENDERLAYER;
@@ -986,6 +782,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CONCRETE_FENCE1_MODEL_EXTENTS;
 	tmpData.objectType = CONCRETE_FENCE1_MODEL_TYPE;
 	tmpData.colliderType = CONCRETE_FENCE1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = CONCRETE_FENCE1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CONCRETE_FENCE1_MODEL_SCALE;
 	tmpData.renderLayer = CONCRETE_FENCE1_MODEL_RENDERLAYER;
@@ -1000,6 +797,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CONCRETE_FENCE2_MODEL_EXTENTS;
 	tmpData.objectType = CONCRETE_FENCE2_MODEL_TYPE;
 	tmpData.colliderType = CONCRETE_FENCE2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = CONCRETE_FENCE2_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CONCRETE_FENCE2_MODEL_SCALE;
 	tmpData.renderLayer = CONCRETE_FENCE2_MODEL_RENDERLAYER;
@@ -1014,6 +812,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CONCRETE_FENCE3_MODEL_EXTENTS;
 	tmpData.objectType = CONCRETE_FENCE3_MODEL_TYPE;
 	tmpData.colliderType = CONCRETE_FENCE3_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = CONCRETE_FENCE3_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CONCRETE_FENCE3_MODEL_SCALE;
 	tmpData.renderLayer = CONCRETE_FENCE3_MODEL_RENDERLAYER;
@@ -1028,6 +827,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ELECTO_PANEL_MODEL_EXTENTS;
 	tmpData.objectType = ELECTO_PANEL_MODEL_TYPE;
 	tmpData.colliderType = ELECTO_PANEL_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = ELECTO_PANEL_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ELECTO_PANEL_MODEL_SCALE;
 	tmpData.renderLayer = ELECTO_PANEL_MODEL_RENDERLAYER;
@@ -1042,6 +842,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = METAL_FENCE_MODEL_EXTENTS;
 	tmpData.objectType = METAL_FENCE_MODEL_TYPE;
 	tmpData.colliderType = METAL_FENCE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = METAL_FENCE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = METAL_FENCE_MODEL_SCALE;
 	tmpData.renderLayer = METAL_FENCE_MODEL_RENDERLAYER;
@@ -1056,6 +857,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = FLOOR_PANEL2_MODEL_EXTENTS;
 	tmpData.objectType = FLOOR_PANEL2_MODEL_TYPE;
 	tmpData.colliderType = FLOOR_PANEL2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = FLOOR_PANEL2_MODEL_MASS;
 	tmpData.xmf3OffsetScale = FLOOR_PANEL2_MODEL_SCALE;
 	tmpData.renderLayer = FLOOR_PANEL2_MODEL_RENDERLAYER;
@@ -1070,6 +872,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = HANGAR_MODEL_EXTENTS;
 	tmpData.objectType = HANGAR_MODEL_TYPE;
 	tmpData.colliderType = HANGAR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = HANGAR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = HANGAR_MODEL_SCALE;
 	tmpData.renderLayer = HANGAR_MODEL_RENDERLAYER;
@@ -1084,6 +887,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = MAIN_DOOR_MODEL_EXTENTS;
 	tmpData.objectType = MAIN_DOOR_MODEL_TYPE;
 	tmpData.colliderType = MAIN_DOOR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = MAIN_DOOR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = MAIN_DOOR_MODEL_SCALE;
 	tmpData.renderLayer = MAIN_DOOR_MODEL_RENDERLAYER;
@@ -1098,6 +902,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = MACHINE1_MODEL_EXTENTS;
 	tmpData.objectType = MACHINE1_MODEL_TYPE;
 	tmpData.colliderType = MACHINE1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = MACHINE1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = MACHINE1_MODEL_SCALE;
 	tmpData.renderLayer = MACHINE1_MODEL_RENDERLAYER;
@@ -1112,6 +917,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = MACHINE2_MODEL_EXTENTS;
 	tmpData.objectType = MACHINE2_MODEL_TYPE;
 	tmpData.colliderType = MACHINE2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = MACHINE2_MODEL_MASS;
 	tmpData.xmf3OffsetScale = MACHINE2_MODEL_SCALE;
 	tmpData.renderLayer = MACHINE2_MODEL_RENDERLAYER;
@@ -1126,6 +932,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents =  MACHINE3_MODEL_EXTENTS;
 	tmpData.objectType =  MACHINE3_MODEL_TYPE;
 	tmpData.colliderType =  MACHINE3_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass =  MACHINE3_MODEL_MASS;
 	tmpData.xmf3OffsetScale =  MACHINE3_MODEL_SCALE;
 	tmpData.renderLayer =  MACHINE3_MODEL_RENDERLAYER;
@@ -1140,6 +947,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = MACHINE6_MODEL_EXTENTS;
 	tmpData.objectType = MACHINE6_MODEL_TYPE;
 	tmpData.colliderType = MACHINE6_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = MACHINE6_MODEL_MASS;
 	tmpData.xmf3OffsetScale = MACHINE6_MODEL_SCALE;
 	tmpData.renderLayer = MACHINE6_MODEL_RENDERLAYER;
@@ -1154,6 +962,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = MACHINE7_MODEL_EXTENTS;
 	tmpData.objectType = MACHINE7_MODEL_TYPE;
 	tmpData.colliderType = MACHINE7_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = MACHINE7_MODEL_MASS;
 	tmpData.xmf3OffsetScale = MACHINE7_MODEL_SCALE;
 	tmpData.renderLayer = MACHINE7_MODEL_RENDERLAYER;
@@ -1168,6 +977,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = OIL_TANK_MODEL_EXTENTS;
 	tmpData.objectType = OIL_TANK_MODEL_TYPE;
 	tmpData.colliderType = OIL_TANK_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = OIL_TANK_MODEL_MASS;
 	tmpData.xmf3OffsetScale = OIL_TANK_MODEL_SCALE;
 	tmpData.renderLayer = OIL_TANK_MODEL_RENDERLAYER;
@@ -1182,6 +992,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = OLD_SEA_TREE_MODEL_EXTENTS;
 	tmpData.objectType = OLD_SEA_TREE_MODEL_TYPE;
 	tmpData.colliderType = OLD_SEA_TREE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = OLD_SEA_TREE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = OLD_SEA_TREE_MODEL_SCALE;
 	tmpData.renderLayer = OLD_SEA_TREE_MODEL_RENDERLAYER;
@@ -1196,6 +1007,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents =  PIPE_MODEL_EXTENTS;
 	tmpData.objectType =  PIPE_MODEL_TYPE;
 	tmpData.colliderType =  PIPE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass =  PIPE_MODEL_MASS;
 	tmpData.xmf3OffsetScale =  PIPE_MODEL_SCALE;
 	tmpData.renderLayer =  PIPE_MODEL_RENDERLAYER;
@@ -1210,6 +1022,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = PIPE_PILE1_MODEL_EXTENTS;
 	tmpData.objectType = PIPE_PILE1_MODEL_TYPE;
 	tmpData.colliderType = PIPE_PILE1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = PIPE_PILE1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = PIPE_PILE1_MODEL_SCALE;
 	tmpData.renderLayer = PIPE_PILE1_MODEL_RENDERLAYER;
@@ -1224,6 +1037,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = PIPE_PILE2_MODEL_EXTENTS;
 	tmpData.objectType = PIPE_PILE2_MODEL_TYPE;
 	tmpData.colliderType = PIPE_PILE2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = PIPE_PILE2_MODEL_MASS;
 	tmpData.xmf3OffsetScale = PIPE_PILE2_MODEL_SCALE;
 	tmpData.renderLayer = PIPE_PILE2_MODEL_RENDERLAYER;
@@ -1238,6 +1052,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ROAD_BLOCK_MODEL_EXTENTS;
 	tmpData.objectType = ROAD_BLOCK_MODEL_TYPE;
 	tmpData.colliderType = ROAD_BLOCK_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Stone;
 	tmpData.nMass = ROAD_BLOCK_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ROAD_BLOCK_MODEL_SCALE;
 	tmpData.renderLayer = ROAD_BLOCK_MODEL_RENDERLAYER;
@@ -1252,6 +1067,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ROAD_B_FLOOR_MODEL_EXTENTS;
 	tmpData.objectType = ROAD_B_FLOOR_MODEL_TYPE;
 	tmpData.colliderType = ROAD_B_FLOOR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = ROAD_B_FLOOR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ROAD_B_FLOOR_MODEL_SCALE;
 	tmpData.renderLayer = ROAD_B_FLOOR_MODEL_RENDERLAYER;
@@ -1266,6 +1082,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ROAD_S_BEND2_MODEL_EXTENTS;
 	tmpData.objectType = ROAD_S_BEND2_MODEL_TYPE;
 	tmpData.colliderType = ROAD_S_BEND2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = ROAD_S_BEND2_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ROAD_S_BEND2_MODEL_SCALE;
 	tmpData.renderLayer = ROAD_S_BEND2_MODEL_RENDERLAYER;
@@ -1280,6 +1097,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ROAD_S_FLOOR_MODEL_EXTENTS;
 	tmpData.objectType = ROAD_S_FLOOR_MODEL_TYPE;
 	tmpData.colliderType = ROAD_S_FLOOR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = ROAD_S_FLOOR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ROAD_S_FLOOR_MODEL_SCALE;
 	tmpData.renderLayer = ROAD_S_FLOOR_MODEL_RENDERLAYER;
@@ -1294,6 +1112,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ROAD_S_TILE_MODEL_EXTENTS;
 	tmpData.objectType = ROAD_S_TILE_MODEL_TYPE;
 	tmpData.colliderType = ROAD_S_TILE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = ROAD_S_TILE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ROAD_S_TILE_MODEL_SCALE;
 	tmpData.renderLayer = ROAD_S_TILE_MODEL_RENDERLAYER;
@@ -1308,6 +1127,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = SMALL_METALIC_CASE_MODEL_EXTENTS;
 	tmpData.objectType = SMALL_METALIC_CASE_MODEL_TYPE;
 	tmpData.colliderType = SMALL_METALIC_CASE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Heavy;
 	tmpData.nMass = SMALL_METALIC_CASE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SMALL_METALIC_CASE_MODEL_SCALE;
 	tmpData.renderLayer = SMALL_METALIC_CASE_MODEL_RENDERLAYER;
@@ -1322,6 +1142,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = TOWER_MODEL_EXTENTS;
 	tmpData.objectType = TOWER_MODEL_TYPE;
 	tmpData.colliderType = TOWER_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = TOWER_MODEL_MASS;
 	tmpData.xmf3OffsetScale = TOWER_MODEL_SCALE;
 	tmpData.renderLayer = TOWER_MODEL_RENDERLAYER;
@@ -1336,6 +1157,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = TOWER_SHORT_MODEL_EXTENTS;
 	tmpData.objectType = TOWER_SHORT_MODEL_TYPE;
 	tmpData.colliderType = TOWER_SHORT_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = TOWER_SHORT_MODEL_MASS;
 	tmpData.xmf3OffsetScale = TOWER_SHORT_MODEL_SCALE;
 	tmpData.renderLayer = TOWER_SHORT_MODEL_RENDERLAYER;
@@ -1350,6 +1172,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = WOODEN_BOX_MODEL_EXTENTS;
 	tmpData.objectType = WOODEN_BOX_MODEL_TYPE;
 	tmpData.colliderType = WOODEN_BOX_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Wood_Heavy;
 	tmpData.nMass = WOODEN_BOX_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WOODEN_BOX_MODEL_SCALE;
 	tmpData.renderLayer = WOODEN_BOX_MODEL_RENDERLAYER;
@@ -1364,6 +1187,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = WOODEN_BOX_SQUARE_MODEL_EXTENTS;
 	tmpData.objectType = WOODEN_BOX_SQUARE_MODEL_TYPE;
 	tmpData.colliderType = WOODEN_BOX_SQUARE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Wood_Light;
 	tmpData.nMass = WOODEN_BOX_SQUARE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WOODEN_BOX_SQUARE_MODEL_SCALE;
 	tmpData.renderLayer = WOODEN_BOX_SQUARE_MODEL_RENDERLAYER;
@@ -1378,6 +1202,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BED_MODEL_EXTENTS;
 	tmpData.objectType = BED_MODEL_TYPE;
 	tmpData.colliderType = BED_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Heavy;
 	tmpData.nMass = BED_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BED_MODEL_SCALE;
 	tmpData.renderLayer = BED_MODEL_RENDERLAYER;
@@ -1392,6 +1217,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BED_FEATHER_MODEL_EXTENTS;
 	tmpData.objectType = BED_FEATHER_MODEL_TYPE;
 	tmpData.colliderType = BED_FEATHER_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Fabric;
 	tmpData.nMass = BED_FEATHER_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BED_FEATHER_MODEL_SCALE;
 	tmpData.renderLayer = BED_FEATHER_MODEL_RENDERLAYER;
@@ -1406,6 +1232,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BEDROOM_FACING_MODEL_EXTENTS;
 	tmpData.objectType = BEDROOM_FACING_MODEL_TYPE;
 	tmpData.colliderType = BEDROOM_FACING_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BEDROOM_FACING_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BEDROOM_FACING_MODEL_SCALE;
 	tmpData.renderLayer = BEDROOM_FACING_MODEL_RENDERLAYER;
@@ -1420,6 +1247,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BEDROOM_FLOOR_MODEL_EXTENTS;
 	tmpData.objectType = BEDROOM_FLOOR_MODEL_TYPE;
 	tmpData.colliderType = BEDROOM_FLOOR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BEDROOM_FLOOR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BEDROOM_FLOOR_MODEL_SCALE;
 	tmpData.renderLayer = BEDROOM_FLOOR_MODEL_RENDERLAYER;
@@ -1434,6 +1262,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BLACK_PLANE_MODEL_EXTENTS;
 	tmpData.objectType = BLACK_PLANE_MODEL_TYPE;
 	tmpData.colliderType = BLACK_PLANE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BLACK_PLANE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BLACK_PLANE_MODEL_SCALE;
 	tmpData.renderLayer = BLACK_PLANE_MODEL_RENDERLAYER;
@@ -1448,6 +1277,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BOARD_MODEL_EXTENTS;
 	tmpData.objectType = BOARD_MODEL_TYPE;
 	tmpData.colliderType = BOARD_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BOARD_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BOARD_MODEL_SCALE;
 	tmpData.renderLayer = BOARD_MODEL_RENDERLAYER;
@@ -1462,6 +1292,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents =CASEMETALIC_MODEL_EXTENTS;
 	tmpData.objectType =CASEMETALIC_MODEL_TYPE;
 	tmpData.colliderType =CASEMETALIC_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Heavy;
 	tmpData.nMass =CASEMETALIC_MODEL_MASS;
 	tmpData.xmf3OffsetScale =CASEMETALIC_MODEL_SCALE;
 	tmpData.renderLayer =CASEMETALIC_MODEL_RENDERLAYER;
@@ -1476,6 +1307,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CHAIR_LEATHER_MODEL_EXTENTS;
 	tmpData.objectType = CHAIR_LEATHER_MODEL_TYPE;
 	tmpData.colliderType = CHAIR_LEATHER_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Light;
 	tmpData.nMass = CHAIR_LEATHER_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CHAIR_LEATHER_MODEL_SCALE;
 	tmpData.renderLayer = CHAIR_LEATHER_MODEL_RENDERLAYER;
@@ -1490,6 +1322,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CHAIR_SCHOOL_MODEL_EXTENTS;
 	tmpData.objectType = CHAIR_SCHOOL_MODEL_TYPE;
 	tmpData.colliderType = CHAIR_SCHOOL_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Wood_Light;
 	tmpData.nMass = CHAIR_SCHOOL_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CHAIR_SCHOOL_MODEL_SCALE;
 	tmpData.renderLayer = CHAIR_SCHOOL_MODEL_RENDERLAYER;
@@ -1504,6 +1337,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CHAIR_WHITE_MODEL_EXTENTS;
 	tmpData.objectType = CHAIR_WHITE_MODEL_TYPE;
 	tmpData.colliderType = CHAIR_WHITE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Wood_Light;
 	tmpData.nMass = CHAIR_WHITE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CHAIR_WHITE_MODEL_SCALE;
 	tmpData.renderLayer = CHAIR_WHITE_MODEL_RENDERLAYER;
@@ -1518,6 +1352,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CLASSROOM_FLOOR_MODEL_EXTENTS;
 	tmpData.objectType = CLASSROOM_FLOOR_MODEL_TYPE;
 	tmpData.colliderType = CLASSROOM_FLOOR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = CLASSROOM_FLOOR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CLASSROOM_FLOOR_MODEL_SCALE;
 	tmpData.renderLayer = CLASSROOM_FLOOR_MODEL_RENDERLAYER;
@@ -1532,6 +1367,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CURTAIN_MEDIC_MODEL_EXTENTS;
 	tmpData.objectType = CURTAIN_MEDIC_MODEL_TYPE;
 	tmpData.colliderType = CURTAIN_MEDIC_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Light;
 	tmpData.nMass = CURTAIN_MEDIC_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CURTAIN_MEDIC_MODEL_SCALE;
 	tmpData.renderLayer = CURTAIN_MEDIC_MODEL_RENDERLAYER;
@@ -1546,6 +1382,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = DINNING_FLOOR_MODEL_EXTENTS;
 	tmpData.objectType = DINNING_FLOOR_MODEL_TYPE;
 	tmpData.colliderType = DINNING_FLOOR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = DINNING_FLOOR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = DINNING_FLOOR_MODEL_SCALE;
 	tmpData.renderLayer = DINNING_FLOOR_MODEL_RENDERLAYER;
@@ -1560,6 +1397,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = DOOR_MODEL_EXTENTS;
 	tmpData.objectType = DOOR_MODEL_TYPE;
 	tmpData.colliderType = DOOR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = DOOR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = DOOR_MODEL_SCALE;
 	tmpData.renderLayer = DOOR_MODEL_RENDERLAYER;
@@ -1574,6 +1412,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = DOOR_V3_MODEL_EXTENTS;
 	tmpData.objectType = DOOR_V3_MODEL_TYPE;
 	tmpData.colliderType = DOOR_V3_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = DOOR_V3_MODEL_MASS;
 	tmpData.xmf3OffsetScale = DOOR_V3_MODEL_SCALE;
 	tmpData.renderLayer = DOOR_V3_MODEL_RENDERLAYER;
@@ -1588,6 +1427,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = DOORD_V1_MODEL_EXTENTS;
 	tmpData.objectType = DOORD_V1_MODEL_TYPE;
 	tmpData.colliderType = DOORD_V1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = DOORD_V1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = DOORD_V1_MODEL_SCALE;
 	tmpData.renderLayer = DOORD_V1_MODEL_RENDERLAYER;
@@ -1602,6 +1442,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = DOORD_V2_FRAME_MODEL_EXTENTS;
 	tmpData.objectType = DOORD_V2_FRAME_MODEL_TYPE;
 	tmpData.colliderType = DOORD_V2_FRAME_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = DOORD_V2_FRAME_MODEL_MASS;
 	tmpData.xmf3OffsetScale = DOORD_V2_FRAME_MODEL_SCALE;
 	tmpData.renderLayer = DOORD_V2_FRAME_MODEL_RENDERLAYER;
@@ -1616,6 +1457,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = DOORD_V2_LEFT_MODEL_EXTENTS;
 	tmpData.objectType = DOORD_V2_LEFT_MODEL_TYPE;
 	tmpData.colliderType = DOORD_V2_LEFT_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = DOORD_V2_LEFT_MODEL_MASS;
 	tmpData.xmf3OffsetScale = DOORD_V2_LEFT_MODEL_SCALE;
 	tmpData.renderLayer = DOORD_V2_LEFT_MODEL_RENDERLAYER;
@@ -1630,6 +1472,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = DOORD_V2_RIGHT_MODEL_EXTENTS;
 	tmpData.objectType = DOORD_V2_RIGHT_MODEL_TYPE;
 	tmpData.colliderType = DOORD_V2_RIGHT_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = DOORD_V2_RIGHT_MODEL_MASS;
 	tmpData.xmf3OffsetScale = DOORD_V2_RIGHT_MODEL_SCALE;
 	tmpData.renderLayer = DOORD_V2_RIGHT_MODEL_RENDERLAYER;
@@ -1644,6 +1487,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = HEATER_MODEL_EXTENTS;
 	tmpData.objectType = HEATER_MODEL_TYPE;
 	tmpData.colliderType = HEATER_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = HEATER_MODEL_MASS;
 	tmpData.xmf3OffsetScale = HEATER_MODEL_SCALE;
 	tmpData.renderLayer = HEATER_MODEL_RENDERLAYER;
@@ -1658,6 +1502,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = INSIDE_FLOOR_MODEL_EXTENTS;
 	tmpData.objectType = INSIDE_FLOOR_MODEL_TYPE;
 	tmpData.colliderType = INSIDE_FLOOR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = INSIDE_FLOOR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = INSIDE_FLOOR_MODEL_SCALE;
 	tmpData.renderLayer = INSIDE_FLOOR_MODEL_RENDERLAYER;
@@ -1672,6 +1517,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = INSIDE_ROOF_MODEL_EXTENTS;
 	tmpData.objectType = INSIDE_ROOF_MODEL_TYPE;
 	tmpData.colliderType = INSIDE_ROOF_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = INSIDE_ROOF_MODEL_MASS;
 	tmpData.xmf3OffsetScale = INSIDE_ROOF_MODEL_SCALE;
 	tmpData.renderLayer = INSIDE_ROOF_MODEL_RENDERLAYER;
@@ -1686,6 +1532,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents =  MATTRESS_MODEL_EXTENTS;
 	tmpData.objectType =  MATTRESS_MODEL_TYPE;
 	tmpData.colliderType =  MATTRESS_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Light;
 	tmpData.nMass =  MATTRESS_MODEL_MASS;
 	tmpData.xmf3OffsetScale =  MATTRESS_MODEL_SCALE;
 	tmpData.renderLayer =  MATTRESS_MODEL_RENDERLAYER;
@@ -1700,6 +1547,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = MEDRACK_MODEL_EXTENTS;
 	tmpData.objectType = MEDRACK_MODEL_TYPE;
 	tmpData.colliderType = MEDRACK_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = MEDRACK_MODEL_MASS;
 	tmpData.xmf3OffsetScale = MEDRACK_MODEL_SCALE;
 	tmpData.renderLayer = MEDRACK_MODEL_RENDERLAYER;
@@ -1714,6 +1562,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = MORGUE_FLOOR_MODEL_EXTENTS;
 	tmpData.objectType = MORGUE_FLOOR_MODEL_TYPE;
 	tmpData.colliderType = MORGUE_FLOOR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = MORGUE_FLOOR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = MORGUE_FLOOR_MODEL_SCALE;
 	tmpData.renderLayer = MORGUE_FLOOR_MODEL_RENDERLAYER;
@@ -1728,6 +1577,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = MORGUE_BOX_MODEL_EXTENTS;
 	tmpData.objectType = MORGUE_BOX_MODEL_TYPE;
 	tmpData.colliderType = MORGUE_BOX_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = MORGUE_BOX_MODEL_MASS;
 	tmpData.xmf3OffsetScale = MORGUE_BOX_MODEL_SCALE;
 	tmpData.renderLayer = MORGUE_BOX_MODEL_RENDERLAYER;
@@ -1742,6 +1592,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = MORGUE_TABLE_MODEL_EXTENTS;
 	tmpData.objectType = MORGUE_TABLE_MODEL_TYPE;
 	tmpData.colliderType = MORGUE_TABLE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Heavy;
 	tmpData.nMass = MORGUE_TABLE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = MORGUE_TABLE_MODEL_SCALE;
 	tmpData.renderLayer = MORGUE_TABLE_MODEL_RENDERLAYER;
@@ -1756,6 +1607,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents =  MORGUE_WHEEL_BED_MODEL_EXTENTS;
 	tmpData.objectType =  MORGUE_WHEEL_BED_MODEL_TYPE;
 	tmpData.colliderType =  MORGUE_WHEEL_BED_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Heavy;
 	tmpData.nMass =  MORGUE_WHEEL_BED_MODEL_MASS;
 	tmpData.xmf3OffsetScale =  MORGUE_WHEEL_BED_MODEL_SCALE;
 	tmpData.renderLayer =  MORGUE_WHEEL_BED_MODEL_RENDERLAYER;
@@ -1770,6 +1622,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = NEONLAMP_MODEL_EXTENTS;
 	tmpData.objectType = NEONLAMP_MODEL_TYPE;
 	tmpData.colliderType = NEONLAMP_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = NEONLAMP_MODEL_MASS;
 	tmpData.xmf3OffsetScale = NEONLAMP_MODEL_SCALE;
 	tmpData.renderLayer = NEONLAMP_MODEL_RENDERLAYER;
@@ -1784,6 +1637,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = PILLOW_MODEL_EXTENTS;
 	tmpData.objectType = PILLOW_MODEL_TYPE;
 	tmpData.colliderType = PILLOW_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Fabric;
 	tmpData.nMass = PILLOW_MODEL_MASS;
 	tmpData.xmf3OffsetScale = PILLOW_MODEL_SCALE;
 	tmpData.renderLayer = PILLOW_MODEL_RENDERLAYER;
@@ -1798,6 +1652,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = POSTER_MODEL_EXTENTS;
 	tmpData.objectType = POSTER_MODEL_TYPE;
 	tmpData.colliderType = POSTER_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = POSTER_MODEL_MASS;
 	tmpData.xmf3OffsetScale = POSTER_MODEL_SCALE;
 	tmpData.renderLayer = POSTER_MODEL_RENDERLAYER;
@@ -1812,6 +1667,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = SINGLE_LIGHT_MODEL_EXTENTS;
 	tmpData.objectType = SINGLE_LIGHT_MODEL_TYPE;
 	tmpData.colliderType = SINGLE_LIGHT_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = SINGLE_LIGHT_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SINGLE_LIGHT_MODEL_SCALE;
 	tmpData.renderLayer = SINGLE_LIGHT_MODEL_RENDERLAYER;
@@ -1826,6 +1682,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = SINK_MODEL_EXTENTS;
 	tmpData.objectType = SINK_MODEL_TYPE;
 	tmpData.colliderType = SINK_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = SINK_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SINK_MODEL_SCALE;
 	tmpData.renderLayer = SINK_MODEL_RENDERLAYER;
@@ -1840,6 +1697,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents =  STOCK_FLOOR_MODEL_EXTENTS;
 	tmpData.objectType =  STOCK_FLOOR_MODEL_TYPE;
 	tmpData.colliderType =  STOCK_FLOOR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass =  STOCK_FLOOR_MODEL_MASS;
 	tmpData.xmf3OffsetScale =  STOCK_FLOOR_MODEL_SCALE;
 	tmpData.renderLayer =  STOCK_FLOOR_MODEL_RENDERLAYER;
@@ -1854,6 +1712,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = SURGERY_TABLE_MODEL_EXTENTS;
 	tmpData.objectType = SURGERY_TABLE_MODEL_TYPE;
 	tmpData.colliderType = SURGERY_TABLE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Light;
 	tmpData.nMass = SURGERY_TABLE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SURGERY_TABLE_MODEL_SCALE;
 	tmpData.renderLayer = SURGERY_TABLE_MODEL_RENDERLAYER;
@@ -1868,6 +1727,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents =  SURGERY_WHEEL_BAD_MODEL_EXTENTS;
 	tmpData.objectType =  SURGERY_WHEEL_BAD_MODEL_TYPE;
 	tmpData.colliderType =  SURGERY_WHEEL_BAD_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Heavy;
 	tmpData.nMass =  SURGERY_WHEEL_BAD_MODEL_MASS;
 	tmpData.xmf3OffsetScale =  SURGERY_WHEEL_BAD_MODEL_SCALE;
 	tmpData.renderLayer =  SURGERY_WHEEL_BAD_MODEL_RENDERLAYER;
@@ -1882,6 +1742,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = SUSPENSION_MODEL_EXTENTS;
 	tmpData.objectType = SUSPENSION_MODEL_TYPE;
 	tmpData.colliderType = SUSPENSION_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = SUSPENSION_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SUSPENSION_MODEL_SCALE;
 	tmpData.renderLayer = SUSPENSION_MODEL_RENDERLAYER;
@@ -1896,6 +1757,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = TABLE_BED_MODEL_EXTENTS;
 	tmpData.objectType = TABLE_BED_MODEL_TYPE;
 	tmpData.colliderType = TABLE_BED_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Wood_Light;
 	tmpData.nMass = TABLE_BED_MODEL_MASS;
 	tmpData.xmf3OffsetScale = TABLE_BED_MODEL_SCALE;
 	tmpData.renderLayer = TABLE_BED_MODEL_RENDERLAYER;
@@ -1910,6 +1772,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents =  TABLE_SCHOOL_MODEL_EXTENTS;
 	tmpData.objectType =  TABLE_SCHOOL_MODEL_TYPE;
 	tmpData.colliderType =  TABLE_SCHOOL_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Wood_Heavy;
 	tmpData.nMass =  TABLE_SCHOOL_MODEL_MASS;
 	tmpData.xmf3OffsetScale =  TABLE_SCHOOL_MODEL_SCALE;
 	tmpData.renderLayer =  TABLE_SCHOOL_MODEL_RENDERLAYER;
@@ -1924,6 +1787,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = TABLE_WHITE_MODEL_EXTENTS;
 	tmpData.objectType = TABLE_WHITE_MODEL_TYPE;
 	tmpData.colliderType = TABLE_WHITE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Wood_Heavy;
 	tmpData.nMass = TABLE_WHITE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = TABLE_WHITE_MODEL_SCALE;
 	tmpData.renderLayer = TABLE_WHITE_MODEL_RENDERLAYER;
@@ -1938,6 +1802,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = TABLE_WHITE_KITCHEN_MODEL_EXTENTS;
 	tmpData.objectType = TABLE_WHITE_KITCHEN_MODEL_TYPE;
 	tmpData.colliderType = TABLE_WHITE_KITCHEN_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Wood_Heavy;
 	tmpData.nMass = TABLE_WHITE_KITCHEN_MODEL_MASS;
 	tmpData.xmf3OffsetScale = TABLE_WHITE_KITCHEN_MODEL_SCALE;
 	tmpData.renderLayer = TABLE_WHITE_KITCHEN_MODEL_RENDERLAYER;
@@ -1952,6 +1817,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = TAP_MODEL_EXTENTS;
 	tmpData.objectType = TAP_MODEL_TYPE;
 	tmpData.colliderType = TAP_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = TAP_MODEL_MASS;
 	tmpData.xmf3OffsetScale = TAP_MODEL_SCALE;
 	tmpData.renderLayer = TAP_MODEL_RENDERLAYER;
@@ -1966,6 +1832,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = WALL_MODEL_EXTENTS;
 	tmpData.objectType = WALL_MODEL_TYPE;
 	tmpData.colliderType = WALL_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = WALL_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WALL_MODEL_SCALE;
 	tmpData.renderLayer = WALL_MODEL_RENDERLAYER;
@@ -1980,6 +1847,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents =  WALL2_MODEL_EXTENTS;
 	tmpData.objectType =  WALL2_MODEL_TYPE;
 	tmpData.colliderType =  WALL2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass =  WALL2_MODEL_MASS;
 	tmpData.xmf3OffsetScale =  WALL2_MODEL_SCALE;
 	tmpData.renderLayer =  WALL2_MODEL_RENDERLAYER;
@@ -1994,6 +1862,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = WALL_HALF_MODEL_EXTENTS;
 	tmpData.objectType = WALL_HALF_MODEL_TYPE;
 	tmpData.colliderType = WALL_HALF_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = WALL_HALF_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WALL_HALF_MODEL_SCALE;
 	tmpData.renderLayer = WALL_HALF_MODEL_RENDERLAYER;
@@ -2008,6 +1877,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = WALL_DOORWAY_MODEL_EXTENTS;
 	tmpData.objectType = WALL_DOORWAY_MODEL_TYPE;
 	tmpData.colliderType = WALL_DOORWAY_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = WALL_DOORWAY_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WALL_DOORWAY_MODEL_SCALE;
 	tmpData.renderLayer = WALL_DOORWAY_MODEL_RENDERLAYER;
@@ -2022,6 +1892,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = WHEEL_CHAIR_MODEL_EXTENTS;
 	tmpData.objectType = WHEEL_CHAIR_MODEL_TYPE;
 	tmpData.colliderType = WHEEL_CHAIR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Light;
 	tmpData.nMass = WHEEL_CHAIR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WHEEL_CHAIR_MODEL_SCALE;
 	tmpData.renderLayer = WHEEL_CHAIR_MODEL_RENDERLAYER;
@@ -2036,6 +1907,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = WINDOW_MODEL_EXTENTS;
 	tmpData.objectType = WINDOW_MODEL_TYPE;
 	tmpData.colliderType = WINDOW_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = WINDOW_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WINDOW_MODEL_SCALE;
 	tmpData.renderLayer = WINDOW_MODEL_RENDERLAYER;
@@ -2050,6 +1922,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = WINDOW_BARRIER_MODEL_EXTENTS;
 	tmpData.objectType = WINDOW_BARRIER_MODEL_TYPE;
 	tmpData.colliderType = WINDOW_BARRIER_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = WINDOW_BARRIER_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WINDOW_BARRIER_MODEL_SCALE;
 	tmpData.renderLayer = WINDOW_BARRIER_MODEL_RENDERLAYER;
@@ -2064,6 +1937,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = WINDOW_HALL_MODEL_EXTENTS;
 	tmpData.objectType = WINDOW_HALL_MODEL_TYPE;
 	tmpData.colliderType = WINDOW_HALL_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = WINDOW_HALL_MODEL_MASS;
 	tmpData.xmf3OffsetScale = WINDOW_HALL_MODEL_SCALE;
 	tmpData.renderLayer = WINDOW_HALL_MODEL_RENDERLAYER;
@@ -2078,6 +1952,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BB_1X1X1_MODEL_EXTENTS;
 	tmpData.objectType = BB_1X1X1_MODEL_TYPE;
 	tmpData.colliderType = BB_1X1X1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BB_1X1X1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BB_1X1X1_MODEL_SCALE;
 	tmpData.renderLayer = BB_1X1X1_MODEL_RENDERLAYER;
@@ -2092,6 +1967,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BB_1X8X1_MODEL_EXTENTS;
 	tmpData.objectType = BB_1X8X1_MODEL_TYPE;
 	tmpData.colliderType = BB_1X8X1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BB_1X8X1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BB_1X8X1_MODEL_SCALE;
 	tmpData.renderLayer = BB_1X8X1_MODEL_RENDERLAYER;
@@ -2106,6 +1982,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BB_4X8X1_MODEL_EXTENTS;
 	tmpData.objectType = BB_4X8X1_MODEL_TYPE;
 	tmpData.colliderType = BB_4X8X1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BB_4X8X1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BB_4X8X1_MODEL_SCALE;
 	tmpData.renderLayer = BB_4X8X1_MODEL_RENDERLAYER;
@@ -2120,6 +1997,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BB_8X16X1_MODEL_EXTENTS;
 	tmpData.objectType = BB_8X16X1_MODEL_TYPE;
 	tmpData.colliderType = BB_8X16X1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BB_8X16X1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BB_8X16X1_MODEL_SCALE;
 	tmpData.renderLayer = BB_8X16X1_MODEL_RENDERLAYER;
@@ -2134,6 +2012,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BB_CORNER_8X8X1_MODEL_EXTENTS;
 	tmpData.objectType = BB_CORNER_8X8X1_MODEL_TYPE;
 	tmpData.colliderType = BB_CORNER_8X8X1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BB_CORNER_8X8X1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BB_CORNER_8X8X1_MODEL_SCALE;
 	tmpData.renderLayer = BB_CORNER_8X8X1_MODEL_RENDERLAYER;
@@ -2148,6 +2027,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BUILDING_FLOOR_MODEL_EXTENTS;
 	tmpData.objectType = BUILDING_FLOOR_MODEL_TYPE;
 	tmpData.colliderType = BUILDING_FLOOR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BUILDING_FLOOR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BUILDING_FLOOR_MODEL_SCALE;
 	tmpData.renderLayer = BUILDING_FLOOR_MODEL_RENDERLAYER;
@@ -2162,6 +2042,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = BUILDING_FLOOR_SHORT_MODEL_EXTENTS;
 	tmpData.objectType = BUILDING_FLOOR_SHORT_MODEL_TYPE;
 	tmpData.colliderType = BUILDING_FLOOR_SHORT_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = BUILDING_FLOOR_SHORT_MODEL_MASS;
 	tmpData.xmf3OffsetScale = BUILDING_FLOOR_SHORT_MODEL_SCALE;
 	tmpData.renderLayer = BUILDING_FLOOR_SHORT_MODEL_RENDERLAYER;
@@ -2176,6 +2057,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CARPET_10_MODEL_EXTENTS;
 	tmpData.objectType = CARPET_10_MODEL_TYPE;
 	tmpData.colliderType = CARPET_10_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = CARPET_10_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CARPET_10_MODEL_SCALE;
 	tmpData.renderLayer = CARPET_10_MODEL_RENDERLAYER;
@@ -2190,6 +2072,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CENTER_PLATFORM_MODEL_EXTENTS;
 	tmpData.objectType = CENTER_PLATFORM_MODEL_TYPE;
 	tmpData.colliderType = CENTER_PLATFORM_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = CENTER_PLATFORM_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CENTER_PLATFORM_MODEL_SCALE;
 	tmpData.renderLayer = CENTER_PLATFORM_MODEL_RENDERLAYER;
@@ -2204,6 +2087,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = CUEBE_CHAINS_MODEL_EXTENTS;
 	tmpData.objectType = CUEBE_CHAINS_MODEL_TYPE;
 	tmpData.colliderType = CUEBE_CHAINS_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = CUEBE_CHAINS_MODEL_MASS;
 	tmpData.xmf3OffsetScale = CUEBE_CHAINS_MODEL_SCALE;
 	tmpData.renderLayer = CUEBE_CHAINS_MODEL_RENDERLAYER;
@@ -2218,6 +2102,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = DUNGEON_FLOOR_MODEL_EXTENTS;
 	tmpData.objectType = DUNGEON_FLOOR_MODEL_TYPE;
 	tmpData.colliderType = DUNGEON_FLOOR_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = DUNGEON_FLOOR_MODEL_MASS;
 	tmpData.xmf3OffsetScale = DUNGEON_FLOOR_MODEL_SCALE;
 	tmpData.renderLayer = DUNGEON_FLOOR_MODEL_RENDERLAYER;
@@ -2232,6 +2117,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents =  DUNGEON_ROOF_MODEL_EXTENTS;
 	tmpData.objectType =  DUNGEON_ROOF_MODEL_TYPE;
 	tmpData.colliderType =  DUNGEON_ROOF_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass =  DUNGEON_ROOF_MODEL_MASS;
 	tmpData.xmf3OffsetScale =  DUNGEON_ROOF_MODEL_SCALE;
 	tmpData.renderLayer =  DUNGEON_ROOF_MODEL_RENDERLAYER;
@@ -2246,6 +2132,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = FLAG1_MODEL_EXTENTS;
 	tmpData.objectType = FLAG1_MODEL_TYPE;
 	tmpData.colliderType = FLAG1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Wood_Light;
 	tmpData.nMass = FLAG1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = FLAG1_MODEL_SCALE;
 	tmpData.renderLayer = FLAG1_MODEL_RENDERLAYER;
@@ -2260,6 +2147,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = FLAG2_MODEL_EXTENTS;
 	tmpData.objectType = FLAG2_MODEL_TYPE;
 	tmpData.colliderType = FLAG2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Wood_Light;
 	tmpData.nMass = FLAG2_MODEL_MASS;
 	tmpData.xmf3OffsetScale = FLAG2_MODEL_SCALE;
 	tmpData.renderLayer = FLAG2_MODEL_RENDERLAYER;
@@ -2274,6 +2162,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents =  KANDLE1_MODEL_EXTENTS;
 	tmpData.objectType =  KANDLE1_MODEL_TYPE;
 	tmpData.colliderType =  KANDLE1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Stone;
 	tmpData.nMass =  KANDLE1_MODEL_MASS;
 	tmpData.xmf3OffsetScale =  KANDLE1_MODEL_SCALE;
 	tmpData.renderLayer =  KANDLE1_MODEL_RENDERLAYER;
@@ -2288,6 +2177,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents =  KANDLE2_MODEL_EXTENTS;
 	tmpData.objectType =  KANDLE2_MODEL_TYPE;
 	tmpData.colliderType =  KANDLE2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Stone;
 	tmpData.nMass =  KANDLE2_MODEL_MASS;
 	tmpData.xmf3OffsetScale =  KANDLE2_MODEL_SCALE;
 	tmpData.renderLayer =  KANDLE2_MODEL_RENDERLAYER;
@@ -2302,6 +2192,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents =  KANDLE3_MODEL_EXTENTS;
 	tmpData.objectType =  KANDLE3_MODEL_TYPE;
 	tmpData.colliderType =  KANDLE3_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Stone;
 	tmpData.nMass =  KANDLE3_MODEL_MASS;
 	tmpData.xmf3OffsetScale =  KANDLE3_MODEL_SCALE;
 	tmpData.renderLayer =  KANDLE3_MODEL_RENDERLAYER;
@@ -2316,6 +2207,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = MAGIC_CRYSTAL_MODEL_EXTENTS;
 	tmpData.objectType = MAGIC_CRYSTAL_MODEL_TYPE;
 	tmpData.colliderType = MAGIC_CRYSTAL_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Stone;
 	tmpData.nMass = MAGIC_CRYSTAL_MODEL_MASS;
 	tmpData.xmf3OffsetScale = MAGIC_CRYSTAL_MODEL_SCALE;
 	tmpData.renderLayer = MAGIC_CRYSTAL_MODEL_RENDERLAYER;
@@ -2330,6 +2222,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = METAL_BRIDGELEG_MODEL_EXTENTS;
 	tmpData.objectType = METAL_BRIDGELEG_MODEL_TYPE;
 	tmpData.colliderType = METAL_BRIDGELEG_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = METAL_BRIDGELEG_MODEL_MASS;
 	tmpData.xmf3OffsetScale = METAL_BRIDGELEG_MODEL_SCALE;
 	tmpData.renderLayer = METAL_BRIDGELEG_MODEL_RENDERLAYER;
@@ -2344,6 +2237,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = METAL_BRIDGELEG_SIDE_MODEL_EXTENTS;
 	tmpData.objectType = METAL_BRIDGELEG_SIDE_MODEL_TYPE;
 	tmpData.colliderType = METAL_BRIDGELEG_SIDE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = METAL_BRIDGELEG_SIDE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = METAL_BRIDGELEG_SIDE_MODEL_SCALE;
 	tmpData.renderLayer = METAL_BRIDGELEG_SIDE_MODEL_RENDERLAYER;
@@ -2358,6 +2252,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ROCK_FORMATION1_MODEL_EXTENTS;
 	tmpData.objectType = ROCK_FORMATION1_MODEL_TYPE;
 	tmpData.colliderType = ROCK_FORMATION1_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Stone;
 	tmpData.nMass = ROCK_FORMATION1_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ROCK_FORMATION1_MODEL_SCALE;
 	tmpData.renderLayer = ROCK_FORMATION1_MODEL_RENDERLAYER;
@@ -2372,6 +2267,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ROCK_FORMATION2_MODEL_EXTENTS;
 	tmpData.objectType = ROCK_FORMATION2_MODEL_TYPE;
 	tmpData.colliderType = ROCK_FORMATION2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Stone;
 	tmpData.nMass = ROCK_FORMATION2_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ROCK_FORMATION2_MODEL_SCALE;
 	tmpData.renderLayer = ROCK_FORMATION2_MODEL_RENDERLAYER;
@@ -2386,6 +2282,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = ROCK_FORMATION5_MODEL_EXTENTS;
 	tmpData.objectType = ROCK_FORMATION5_MODEL_TYPE;
 	tmpData.colliderType = ROCK_FORMATION5_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Stone;
 	tmpData.nMass = ROCK_FORMATION5_MODEL_MASS;
 	tmpData.xmf3OffsetScale = ROCK_FORMATION5_MODEL_SCALE;
 	tmpData.renderLayer = ROCK_FORMATION5_MODEL_RENDERLAYER;
@@ -2400,6 +2297,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = SANCTUARY_CUBE_MODEL_EXTENTS;
 	tmpData.objectType = SANCTUARY_CUBE_MODEL_TYPE;
 	tmpData.colliderType = SANCTUARY_CUBE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Stone;
 	tmpData.nMass = SANCTUARY_CUBE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = SANCTUARY_CUBE_MODEL_SCALE;
 	tmpData.renderLayer = SANCTUARY_CUBE_MODEL_RENDERLAYER;
@@ -2414,6 +2312,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = STATUE_MODEL_EXTENTS;
 	tmpData.objectType = STATUE_MODEL_TYPE;
 	tmpData.colliderType = STATUE_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Stone;
 	tmpData.nMass = STATUE_MODEL_MASS;
 	tmpData.xmf3OffsetScale = STATUE_MODEL_SCALE;
 	tmpData.renderLayer = STATUE_MODEL_RENDERLAYER;
@@ -2428,6 +2327,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = STATUE2_MODEL_EXTENTS;
 	tmpData.objectType = STATUE2_MODEL_TYPE;
 	tmpData.colliderType = STATUE2_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Stone;
 	tmpData.nMass = STATUE2_MODEL_MASS;
 	tmpData.xmf3OffsetScale = STATUE2_MODEL_SCALE;
 	tmpData.renderLayer = STATUE2_MODEL_RENDERLAYER;
@@ -2442,6 +2342,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = TELEPORT_MODEL_EXTENTS;
 	tmpData.objectType = TELEPORT_MODEL_TYPE;
 	tmpData.colliderType = TELEPORT_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Light;
 	tmpData.nMass = TELEPORT_MODEL_MASS;
 	tmpData.xmf3OffsetScale = TELEPORT_MODEL_SCALE;
 	tmpData.renderLayer = TELEPORT_MODEL_RENDERLAYER;
@@ -2456,6 +2357,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = TOWER_EXTENTION_MODEL_EXTENTS;
 	tmpData.objectType = TOWER_EXTENTION_MODEL_TYPE;
 	tmpData.colliderType = TOWER_EXTENTION_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = TOWER_EXTENTION_MODEL_MASS;
 	tmpData.xmf3OffsetScale = TOWER_EXTENTION_MODEL_SCALE;
 	tmpData.renderLayer = TOWER_EXTENTION_MODEL_RENDERLAYER;
@@ -2470,6 +2372,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = TUBECHANNEL_MODEL_EXTENTS;
 	tmpData.objectType = TUBECHANNEL_MODEL_TYPE;
 	tmpData.colliderType = TUBECHANNEL_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
 	tmpData.nMass = TUBECHANNEL_MODEL_MASS;
 	tmpData.xmf3OffsetScale = TUBECHANNEL_MODEL_SCALE;
 	tmpData.renderLayer = TUBECHANNEL_MODEL_RENDERLAYER;
@@ -2484,6 +2387,7 @@ void CreateObjectDefaultData()
 	tmpData.xmf3Extents = VINTILATIONBOX_MODEL_EXTENTS;
 	tmpData.objectType = VINTILATIONBOX_MODEL_TYPE;
 	tmpData.colliderType = VINTILATIONBOX_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_Steel_Light;
 	tmpData.nMass = VINTILATIONBOX_MODEL_MASS;
 	tmpData.xmf3OffsetScale = VINTILATIONBOX_MODEL_SCALE;
 	tmpData.renderLayer = VINTILATIONBOX_MODEL_RENDERLAYER;

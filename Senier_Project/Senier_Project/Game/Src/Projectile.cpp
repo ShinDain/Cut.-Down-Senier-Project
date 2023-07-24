@@ -1,4 +1,5 @@
 #include "../Header/Projectile.h"
+#include "../../DirectXRendering/Header/Scene.h"
 
 /////////////////////////////////////////////////
 // 충돌체가 있는 투사체를 사용할 경우 
@@ -156,8 +157,10 @@ void Projectile::Update(float elapsedTime)
 		m_pBody->SetPosition(XMFLOAT3(xmf3Position.x, 0, xmf3Position.z));
 		m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
 
-
 		m_bDestroying = true;
+
+		// 충돌음
+		EmitHitSound();
 	}
 }
 
@@ -200,6 +203,9 @@ void Projectile::Intersect(float elapsedTime)
 				m_DissolveTime = 0;
 
 				m_bDestroying = true;
+
+				// 충돌음
+				EmitHitSound();
 				return;
 			}
 		}
@@ -227,6 +233,9 @@ void Projectile::Intersect(float elapsedTime)
 
 				m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
 				m_bDestroying = true;
+				// 충돌음
+				float pitch = (float)(rand() % 60) / 100 + 0.7f;
+				Scene::EmitSound("Sound/PlayerProjectile/Hit.wav", false, pitch, VOLUME_DEFAULT);
 				return;
 			}
 		}
@@ -244,6 +253,10 @@ void Projectile::Intersect(float elapsedTime)
 
 			m_bDestroying = true;
 			m_bVisible = false;
+
+			// 충돌음
+			EmitHitSound();
+
 			return;
 		}
 		// 월드 오브젝트와의 검사 (움직이는, 고정된)
@@ -265,11 +278,18 @@ void Projectile::Intersect(float elapsedTime)
 
 			if (m_IntersectCollider.Intersects(*objCollider->GetOBB()))
 			{
-				g_vpWorldObjs[i]->ApplyDamage(m_ProjectilePower, xmf3Direction, XMFLOAT3(0, 0, 0));
+				if(g_vpWorldObjs[i]->GetObjectType() == Object_Movable)
+					g_vpWorldObjs[i]->ApplyDamage(m_ProjectilePower, xmf3Direction, XMFLOAT3(0, 0, 0));
+
 				g_vpWorldObjs[i]->GetBody()->SetIsAwake(true);
 
 				m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
 				m_bDestroying = true;
+				m_bVisible = false;
+
+				// 충돌음
+				EmitHitSound();
+
 				return;
 			}
 		}
@@ -307,5 +327,14 @@ void Projectile::ChasingPlayer(float elapsedTime)
 	XMStoreFloat3(&xmf3Velocity, velocity);
 	m_pBody->SetVelocity(xmf3Velocity);
 
+}
 
+void Projectile::EmitHitSound()
+{
+	if (m_bDestroying)
+		return;
+
+	// 충돌음
+	float pitch = (float)(rand() % 60) / 100 + 0.7f;
+	Scene::EmitSound(m_HitSoundFilePath, false, pitch, VOLUME_DEFAULT);
 }

@@ -70,6 +70,7 @@
     <ClInclude Include="DataDefine\ItemAndEventData.h" />
     <ClInclude Include="DataDefine\ProjectileData.h" />
     <ClInclude Include="DataDefine\OutsideObjectData.h" />
+    <ClInclude Include="DataDefine\SoundFilePath.h" />
     <ClInclude Include="DirectXRendering\Header\AnimationController.h" />
     <ClInclude Include="DirectXRendering\Header\Camera.h" />
     <ClInclude Include="DirectXRendering\Header\DepthMap.h" />
