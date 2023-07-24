@@ -57,6 +57,15 @@ bool CuttedObject::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLis
 	return true;
 }
 
+void CuttedObject::Animate(float elapsedTime)
+{
+	if (m_pAnimationController)
+		m_pAnimationController->AdvanceTime(0.0f, this);
+
+	if (m_pSibling) { m_pSibling->Animate(0.0f); }
+	if (m_pChild) { m_pChild->Animate(0.0f); }
+}
+
 void CuttedObject::Update(float elapsedTime)
 {
 	if (!m_bIsAlive)
@@ -166,8 +175,8 @@ void CuttedObject::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dComm
 
 void CuttedObject::Cutting(XMFLOAT3 xmf3PlaneNormal)
 {
-	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, 1, XMFLOAT3(1, 1, 0), true);
-//	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, -1, XMFLOAT3(1, 1, 0), true);
+	Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList, this, 1, XMFLOAT3(1, 1, 0), true);
+//	Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList, this, -1, XMFLOAT3(1, 1, 0), true);
 }
 
 void CuttedObject::UpdateCuttedCB()

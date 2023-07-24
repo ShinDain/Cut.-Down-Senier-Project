@@ -1373,20 +1373,6 @@ void CreateObjectDefaultData()
 	g_DefaultObjectData.insert({ WOODEN_BOX_SQUARE_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(WOODEN_BOX_SQUARE_MODEL_NAME);
 
-	tmpData.pstrObjectPath = STOCK_FLOOR_MODEL_OBJECTPATH;
-	tmpData.pstrTexPath =  STOCK_FLOOR_MODEL_TEXPATH;
-	tmpData.xmf3Extents =  STOCK_FLOOR_MODEL_EXTENTS;
-	tmpData.objectType =  STOCK_FLOOR_MODEL_TYPE;
-	tmpData.colliderType =  STOCK_FLOOR_MODEL_COLLIDERTYPE;
-	tmpData.nMass =  STOCK_FLOOR_MODEL_MASS;
-	tmpData.xmf3OffsetScale =  STOCK_FLOOR_MODEL_SCALE;
-	tmpData.renderLayer =  STOCK_FLOOR_MODEL_RENDERLAYER;
-	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
-	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	tmpData.bShadowed =  STOCK_FLOOR_MODEL_SHADOW;
-	g_DefaultObjectData.insert({  STOCK_FLOOR_MODEL_NAME, tmpData });
-	g_DefaultObjectNames.emplace_back( STOCK_FLOOR_MODEL_NAME);
-
 	tmpData.pstrObjectPath = BED_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = BED_MODEL_TEXPATH;
 	tmpData.xmf3Extents = BED_MODEL_EXTENTS;

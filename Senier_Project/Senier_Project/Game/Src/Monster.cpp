@@ -1840,10 +1840,10 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 
 			// 다음 패턴 
 			m_nPattern = rand() % 2;
-			m_nPattern = NecromancerAttackPattern::Melee_Attack;
-			//m_nAttackCnt++;
-			//if (m_nAttackCnt > m_nMaxAttackCnt)
-			//	m_nPattern = NecromancerAttackPattern::Summon_Monster;
+			//m_nPattern = NecromancerAttackPattern::Melee_Attack;
+			m_nAttackCnt++;
+			if (m_nAttackCnt > m_nMaxAttackCnt)
+				m_nPattern = NecromancerAttackPattern::Summon_Monster;
 		}
 	}
 	break;
@@ -2051,7 +2051,7 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 void Necromancer::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
 {
 	// 사운드 재생 테스트
-	Sound::PlaySoundFile(L"Sound/123.wav", true);
+	//Sound::PlaySoundFile(L"Sound/123.wav", true);
 	//Sound::PlayBGM(L"Sound/123.wav", t);
 
 	UINT hitAnimIdx = Necromancer_Anim_Index_Hit;

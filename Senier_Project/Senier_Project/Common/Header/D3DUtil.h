@@ -39,6 +39,9 @@
 #include <d2d1_3.h>
 #include <dwrite.h>
 
+///////////////////////////////////////////////////////////////////////
+
+
 extern const int gNumFrameResources;
 
 inline void d3dSetDebugName(IDXGIObject* obj, const char* name)

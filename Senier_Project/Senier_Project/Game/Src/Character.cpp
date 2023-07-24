@@ -316,6 +316,8 @@ void Character::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 
 	m_pBody->AddVelocity(xmf3DeltaVelocity);
 
 	UINT nEffectCnt = (UINT)power / 5 + 1;
+	if (nEffectCnt > 10)
+		nEffectCnt = 10;
 	SpawnBloodEffect(nEffectCnt);
 }
 
@@ -325,8 +327,8 @@ void Character::Cutting(XMFLOAT3 xmf3PlaneNormal)
 	//XMStoreFloat4(&m_xmf4Orientation, orientation);
 
 	m_bIsAlive = false;
-	std::shared_ptr<Object> tmp1 = Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, 1, xmf3PlaneNormal, false);
-	std::shared_ptr<Object> tmp2 = Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, -1, xmf3PlaneNormal, false);
+	std::shared_ptr<Object> tmp1 = Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList, this, 1, xmf3PlaneNormal, false);
+	std::shared_ptr<Object> tmp2 = Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList, this, -1, xmf3PlaneNormal, false);
 
 	tmp1->GetCollider()->SetIsActive(false);
 	tmp2->GetCollider()->SetIsActive(false);

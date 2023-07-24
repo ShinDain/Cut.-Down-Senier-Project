@@ -164,7 +164,7 @@ protected:
 	float m_ElapsedActiveTime = 0.0f;
 	
 	// 사운드 파일
-	wchar_t m_Death_SoundFileName[64];
+	const char* m_DeathSoundFilePath = "Sound/123.wav";
 
 public:
 	virtual void Move(DWORD dwDirection) {}
@@ -258,8 +258,6 @@ public:
 
 	void SetDestroyTime(float destroyTime) { m_DestroyTime = destroyTime; }
 	void SetDissolveTime(float dissolveTime) { m_DissolveTime = dissolveTime; }
-
-	void SetDeathSoundFileName(const wchar_t* pstrSoundFileName) {wcscpy_s(m_Death_SoundFileName, pstrSoundFileName);	}
 
 	bool GetIsMesh() { return m_pMesh ? true : false; }
 

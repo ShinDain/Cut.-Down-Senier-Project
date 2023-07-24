@@ -5,7 +5,7 @@
 #include "Header/Scene.h"
 #include "Header/DWriteText.h"
 #include "../Game/Header/ObjectDefaultData.h"
-
+#include "../Game/Header/Sound.h"
 
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;

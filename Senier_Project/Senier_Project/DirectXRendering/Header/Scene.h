@@ -68,6 +68,8 @@ public:
 	void UpdatePlayerData(float elapsedTime);
 	void UpdateSceneCamera(float elapsedTime);
 	void UpdateUI(float elapsedTime);
+	void UpdateSound();
+
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 	void RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList);
 
@@ -94,7 +96,6 @@ public:
 	void ProcessPhysics(float elapsedTime);
 
 	void PlayCinematic(UINT nCinematicNum);
-
 	void ClearObjectLayer();
 
 private:
@@ -158,8 +159,14 @@ private:
 public:
 	void SetViewProjMatrix(XMFLOAT4X4 viewProj) { m_xmf4x4ViewProj = viewProj; }
 
-	static ID3D12Device* m_pd3dDevice;
-	static ID3D12GraphicsCommandList* m_pd3dCommandList;
+// »ç¿îµå
+public:
+	static void EmitSound(const char* pstrFilePath, bool bLoop);
+
+protected:
+	static std::shared_ptr<CSound> m_pMainBGM;
+	static std::vector<std::shared_ptr<CSound>> m_vpSounds;
+
 
 #if defined(_DEBUG) | defined(DEBUG)
 public:

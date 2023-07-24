@@ -6,6 +6,9 @@ SenierProjectApp::SenierProjectApp(HINSTANCE hInstance) : DirectXApp(hInstance)
 
 SenierProjectApp::~SenierProjectApp()
 {
+	// Sound 클래스 릴리즈
+	CSound::Release();
+
 	if (m_d3d12Device != nullptr)
 		FlushCommandQueue();
 }
@@ -18,6 +21,9 @@ bool SenierProjectApp::Initialize()
 	// 명령목록 초기화
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
+	// Sound 클래스 초기화
+	CSound::Init();
+
 	// 각종 변수 초기화
 	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_Static, std::make_shared<Shader>()));
 	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_TextureMesh, std::make_shared<TextureMeshShader>()));
@@ -29,12 +35,12 @@ bool SenierProjectApp::Initialize()
 	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_CuttedStatic, std::make_shared<CuttedStaticMeshShader>()));
 	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_CuttedTextureMesh, std::make_shared<CuttedTextureMeshShader>()));
 	g_Shaders.insert(std::make_pair<ShaderType, std::shared_ptr<Shader>>(ShaderType::Shader_CuttedSkinned, std::make_shared<CuttedSkinnedMeshShader>()));
-
+	
 	for (auto iter = g_Shaders.begin(); iter != g_Shaders.end(); ++iter)
 	{
 		iter->second->Initialize(m_d3d12Device.Get(), m_CommandList.Get(), NULL);
 	}
-
+	
 	// 오브젝트 기본 정보 생성
 	CreateObjectDefaultData();
 	 
@@ -44,7 +50,7 @@ bool SenierProjectApp::Initialize()
 		std::shared_ptr<ModelDataInfo> pModelData =
 			Object::LoadModelDataFromFile(m_d3d12Device.Get(), m_CommandList.Get(), pstrFileName,
 				g_DefaultObjectData[pstrFileName].pstrObjectPath, g_DefaultObjectData[pstrFileName].pstrTexPath);
-
+		
 		g_LoadedModelData.insert({ pstrFileName, pModelData });
 	}
 

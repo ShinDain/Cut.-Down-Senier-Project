@@ -360,7 +360,7 @@ void Object::CreateScoreItems(int nCnt)
 		{
 		case 0:
 		{
-			std::shared_ptr<Object> pObject = Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position,
+			std::shared_ptr<Object> pObject = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, m_xmf3Position,
 			XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCOREITEM1_MODEL_NAME, 0);
 
 			Item* pItem = (Item*)pObject.get();
@@ -370,7 +370,7 @@ void Object::CreateScoreItems(int nCnt)
 			break;
 		case 1:
 		{
-			std::shared_ptr<Object> pObject = Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position,
+			std::shared_ptr<Object> pObject = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, m_xmf3Position,
 				XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCOREITEM2_MODEL_NAME, 0);
 
 			Item* pItem = (Item*)pObject.get();
@@ -380,7 +380,7 @@ void Object::CreateScoreItems(int nCnt)
 		break;
 		case 2:
 		{
-			std::shared_ptr<Object> pObject = Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position,
+			std::shared_ptr<Object> pObject = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, m_xmf3Position,
 				XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCOREITEM3_MODEL_NAME, 0);
 
 			Item* pItem = (Item*)pObject.get();
@@ -390,7 +390,7 @@ void Object::CreateScoreItems(int nCnt)
 		break;
 		case 3:
 		{
-			std::shared_ptr<Object> pObject = Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position,
+			std::shared_ptr<Object> pObject = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, m_xmf3Position,
 				XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCOREITEM4_MODEL_NAME, 0);
 
 			Item* pItem = (Item*)pObject.get();
@@ -400,7 +400,7 @@ void Object::CreateScoreItems(int nCnt)
 		break;
 		case 4:
 		{
-			std::shared_ptr<Object> pObject = Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position,
+			std::shared_ptr<Object> pObject = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, m_xmf3Position,
 				XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCOREITEM5_MODEL_NAME, 0);
 
 			Item* pItem = (Item*)pObject.get();
@@ -419,7 +419,7 @@ void Object::CreateHealItems(int nCnt)
 
 	for (int i = 0; i < nCnt; ++i)
 	{
-		std::shared_ptr<Object> pObject = Scene::CreateObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, m_xmf3Position,
+		std::shared_ptr<Object> pObject = Scene::CreateObject(g_pd3dDevice, g_pd3dCommandList, m_xmf3Position,
 			XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HEALITEM_MODEL_NAME, 0);
 
 		Item* pItem = (Item*)pObject.get();
@@ -720,8 +720,8 @@ void Object::Cutting(XMFLOAT3 xmf3PlaneNormal)
 	XMStoreFloat3(&xmf3CutNormal, cutNormal);
 
 	m_bIsAlive = false;
-	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, 1, xmf3CutNormal, false);
-	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList, this, -1, xmf3CutNormal, false);
+	Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList, this, 1, xmf3CutNormal, false);
+	Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList, this, -1, xmf3CutNormal, false);
 }
 
 void Object::DegradedBroken()
@@ -755,22 +755,22 @@ void Object::DegradedBroken()
 		XMStoreFloat3(&xmf3PlaneNormal[i], planeNormal[i]);
 	}
 
-	std::shared_ptr<Object> pCuttedPositive_1 = Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+	std::shared_ptr<Object> pCuttedPositive_1 = Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList,
 		this, 1, xmf3PlaneNormal[0], false);
-	std::shared_ptr<Object> pCuttedPositive_2 = Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+	std::shared_ptr<Object> pCuttedPositive_2 = Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList,
 		pCuttedPositive_1.get(), 1, xmf3PlaneNormal[1], true);
-	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+	Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList,
 		pCuttedPositive_1.get(), 1, xmf3PlaneNormal[2], true);
-	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+	Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList,
 		pCuttedPositive_2.get(), 1, xmf3PlaneNormal[2], true);
 
-	std::shared_ptr<Object> pCuttedNegative_1 = Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+	std::shared_ptr<Object> pCuttedNegative_1 = Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList,
 		this, -1, xmf3PlaneNormal[0], false);
-	std::shared_ptr<Object> pCuttedNegative_2 = Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+	std::shared_ptr<Object> pCuttedNegative_2 = Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList,
 		pCuttedNegative_1.get(), 1, xmf3PlaneNormal[1], true);
-	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+	Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList,
 		pCuttedNegative_1.get(), 1, xmf3PlaneNormal[2], true);
-	Scene::CreateCuttedObject(Scene::m_pd3dDevice, Scene::m_pd3dCommandList,
+	Scene::CreateCuttedObject(g_pd3dDevice, g_pd3dCommandList,
 		pCuttedNegative_2.get(), 1, xmf3PlaneNormal[2], true);
 
 	m_bIsAlive = false;
@@ -1022,6 +1022,8 @@ void Object::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf
 			Cutting(xmf3CuttingDirection);
 		else
 			DegradedBroken();
+
+		Scene::EmitSound(m_DeathSoundFilePath, false);
 
 		return;
 	}

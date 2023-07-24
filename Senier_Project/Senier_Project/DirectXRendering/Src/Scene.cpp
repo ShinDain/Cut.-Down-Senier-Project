@@ -1,29 +1,32 @@
 #include "../Header/Scene.h"
 
-ID3D12Device* Scene::m_pd3dDevice;
-ID3D12GraphicsCommandList* Scene::m_pd3dCommandList;
-
 std::vector<std::shared_ptr<Object>> Scene::m_vObjectLayer[(int)RenderLayer::Render_Count];
 CollisionData Scene::m_CollisionData;
 std::unique_ptr<CollisionResolver> Scene::m_pCollisionResolver;
+
+/// <summary>
+/// ////////////
+/// </summary>
+std::shared_ptr<CSound> Scene::m_pMainBGM = nullptr;
+std::vector<std::shared_ptr<CSound>> Scene::m_vpSounds;
+/////////////
 
 Scene::Scene()
 {
 	m_CollisionData.Reset(MAX_CONTACT_CNT);
 	m_pCollisionResolver = std::make_unique<CollisionResolver>(MAX_CONTACT_CNT * 8);
-
-	m_pd3dDevice = nullptr;
-	m_pd3dCommandList = nullptr;
 }
 
 Scene::~Scene()
 {
+	//m_pMainBGM.reset();
+	//for (int i = 0; i < m_vpSounds.size(); ++i)
+	//	m_vpSounds[i].reset();
+   //
 }
 
 bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText)
 {
-	m_pd3dDevice = pd3dDevice;
-	m_pd3dCommandList = pd3dCommandList;
 
 	// 패스 버퍼 생성
 	m_pPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
@@ -42,35 +45,27 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// 바닥
 	// 차후 맵 로드 함수로 이동
 	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, -1, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -460);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, -1, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -460);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(1, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -150);
 	
 	// 월드 오브젝트 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HOSPITAL_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), STOCK_FLOOR_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), MORGUE_BOX_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
 
 	// 맵 데이터 로드
-	InitMapData(pd3dDevice, pd3dCommandList);
+	//InitMapData(pd3dDevice, pd3dCommandList);
 	// UI 초기화
 	InitUI(pd3dDevice, pd3dCommandList, pDWriteText);
 	// 시네마틱 초기화
 	//InitCinematic();
 
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(400, 20, -400), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(400, 20, -400), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CYBER_TWINS_MODEL_NAME, MONSTER_TRACK_CNT);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 25), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 25), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 25), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 30), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 30), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 30), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
 	
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), EVENT_BOX_MODEL_NAME, 0);
 
@@ -96,6 +91,8 @@ bool Scene::InitMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
 	//LoadMapData(pd3dDevice, pd3dCommandList, "OutSideMap");
 	LoadMapData(pd3dDevice, pd3dCommandList, "HospitalInsideMap");
+	m_pMainBGM = std::make_shared<CSound>("Sound/testBGM.wav", true);
+	m_pMainBGM->Play();
 	//LoadMapData(pd3dDevice, pd3dCommandList, "DungeonMap");
 
 	return true;
@@ -250,6 +247,8 @@ void Scene::Update(float totalTime ,float elapsedTime)
 	// UI 이미지 업데이트
 	UpdateUI(elapsedTime);
 
+	// Sound 업데이트
+	UpdateSound();
 }
 
 void Scene::UpdateObject(float elapsedTime)
@@ -327,6 +326,28 @@ void Scene::UpdateUI(float elapsedTime)
 	m_pPlayerHPBar->Update(elapsedTime);
 	m_pEnemyHPBar->Update(elapsedTime);
 	m_pPlayerAim->Update(elapsedTime);
+}
+
+void Scene::UpdateSound()
+{
+	if (m_pMainBGM)
+	{
+		m_pMainBGM->Update();
+	}
+	for (int i = 0; i < m_vpSounds.size(); ++i)
+	{
+		if(m_vpSounds[i])
+			m_vpSounds[i]->Update();
+	}
+	for (int i = 0; i < m_vpSounds.size(); ++i)
+	{
+		// 단발성 효과음 종료시
+		if (!m_vpSounds[i]->GetIsPlaying())
+		{
+			m_vpSounds[i].reset();
+			m_vpSounds.erase(m_vpSounds.begin() + i);
+		}
+	}
 }
 
 void Scene::UpdatePlayerData(float elapsedTime)
@@ -472,6 +493,7 @@ void Scene::UpdateShadowPassCB(float totalTime, float elapsedTime)
 
 void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	ChangeShader(ShaderType::Shader_Skinned, pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
 	{
 		if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
@@ -482,6 +504,7 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(0.0f);
 			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
 				m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
+			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(elapsedTime, pd3dCommandList);
 		}
 	}
 
@@ -505,20 +528,20 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(elapsedTime, pd3dCommandList);
 	}
 
-	ChangeShader(ShaderType::Shader_Skinned, pd3dCommandList);
-	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
-	{
-		if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
-		{
-			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->GetIsAlive())
-				continue;
-			// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
-			//m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(0.0f);
-			//if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
-			//	m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
-			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(elapsedTime, pd3dCommandList);
-		}
-	}
+	//ChangeShader(ShaderType::Shader_Skinned, pd3dCommandList);
+	//for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
+	//{
+	//	if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
+	//	{
+	//		if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->GetIsAlive())
+	//			continue;
+	//		// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
+	//		//m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(0.0f);
+	//		//if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
+	//		//	m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
+	//		m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(elapsedTime, pd3dCommandList);
+	//	}
+	//}
 
 	ChangeShader(ShaderType::Shader_CuttedStatic, pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedStatic].size(); ++i)
@@ -546,9 +569,9 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->GetIsAlive())
 			continue;
 		// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
-		//m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Animate(0.0f);
-		//if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->m_pAnimationController)
-		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->UpdateTransform(NULL);
+		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Animate(0.0f);
+		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->m_pAnimationController)
+			m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->UpdateTransform(NULL);
 		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Render(elapsedTime, pd3dCommandList);
 	}
 
@@ -1109,8 +1132,6 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 
 	if (pObject && strFileName.c_str() != nullptr) strcpy_s(pObject->m_pstrFileName, strFileName.c_str());
 
-	pObject->SetDeathSoundFileName(L"Sound/123.wav");
-
 	return pObject;
 }
 
@@ -1438,6 +1459,14 @@ void Scene::PlayCinematic(UINT nCinematicNum)
 	m_bInCinematic = true;
 	m_nCurCinematicNum = nCinematicNum;
 	m_vpCinematics[m_nCurCinematicNum]->Play();
+}
+
+void Scene::EmitSound(const char* pstrFilePath, bool bLoop)
+{
+	std::shared_ptr<CSound> newSound = std::make_shared<CSound>(pstrFilePath, bLoop);
+	newSound->Play();
+
+	m_vpSounds.emplace_back(newSound);
 }
 
 void Scene::ClearObjectLayer()
