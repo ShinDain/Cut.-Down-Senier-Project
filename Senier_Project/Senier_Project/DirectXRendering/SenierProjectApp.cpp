@@ -21,6 +21,10 @@ bool SenierProjectApp::Initialize()
 	// 명령목록 초기화
 	ThrowIfFailed(m_CommandList->Reset(m_DirectCmdListAlloc.Get(), nullptr));
 
+	// device, commandlist 저장
+	g_pd3dDevice = m_d3d12Device.Get();
+	g_pd3dCommandList = m_CommandList.Get();
+
 	// Sound 클래스 초기화
 	CSound::Init();
 
@@ -63,10 +67,6 @@ bool SenierProjectApp::Initialize()
 	m_Scene = std::make_unique<Scene>();
 	if (!m_Scene->Initialize(m_d3d12Device.Get(), m_CommandList.Get(), m_pSceneTextUI))
 		return false;
-
-	// device, commandlist 저장
-	g_pd3dDevice = m_d3d12Device.Get();
-	g_pd3dCommandList = m_CommandList.Get();
 
 #if defined(_DEBUG) | defined(DEBUG)
 
@@ -191,7 +191,6 @@ void SenierProjectApp::ProcessInput()
 void SenierProjectApp::KeyDownEvent(WPARAM wParam)
 {
 	if (m_Scene) m_Scene->KeyDownEvent(wParam);
-
 }
 
 void SenierProjectApp::KeyUpEvent(WPARAM wParam)

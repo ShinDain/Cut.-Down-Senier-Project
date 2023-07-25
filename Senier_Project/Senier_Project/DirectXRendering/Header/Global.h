@@ -21,6 +21,7 @@ class ColliderSphere;
 class ModelDataInfo;
 class Object;
 class Player;
+class CEvent;
 
 extern float g_tmpCaptionNum;
 
@@ -39,6 +40,8 @@ extern std::vector<std::shared_ptr<Object>> g_vpWorldObjs;
 extern std::vector<std::shared_ptr<Object>> g_vpShadowedObjs;
 
 extern std::vector<std::shared_ptr<Object>> g_vpCuttedObjects;
+
+extern std::vector<std::shared_ptr<CEvent>> g_vpEventObjs;
 
 extern std::map<std::string, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;
 

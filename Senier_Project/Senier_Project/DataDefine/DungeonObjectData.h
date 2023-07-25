@@ -116,7 +116,7 @@ using namespace DirectX;
 #define CUEBE_CHAINS_MODEL_MASS 9999
 #define CUEBE_CHAINS_MODEL_SCALE XMFLOAT3(10.0f, 10.0f, 10.0f)
 #define CUEBE_CHAINS_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
-#define CUEBE_CHAINS_MODEL_SHADOW true
+#define CUEBE_CHAINS_MODEL_SHADOW false
 
 #define DUNGEON_FLOOR_MODEL_NAME "DungeonFloor"
 #define DUNGEON_FLOOR_MODEL_OBJECTPATH "WorldObject/Dungeon"
@@ -275,10 +275,10 @@ using namespace DirectX;
 #define STATUE_MODEL_NAME "Statue"
 #define STATUE_MODEL_OBJECTPATH "WorldObject/Dungeon"
 #define STATUE_MODEL_TEXPATH "WorldObject/Dungeon/Statue"
-#define STATUE_MODEL_EXTENTS XMFLOAT3(1.0f, 1.65f, 0.8f)
+#define STATUE_MODEL_EXTENTS XMFLOAT3(1.0f, 1.8f, 0.8f)
 #define STATUE_MODEL_TYPE Object_Movable
 #define STATUE_MODEL_COLLIDERTYPE Collider_Box
-#define STATUE_MODEL_MASS 10
+#define STATUE_MODEL_MASS 50
 #define STATUE_MODEL_SCALE XMFLOAT3(10.0f, 10.0f, 10.0f)
 #define STATUE_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
 #define STATUE_MODEL_SHADOW true
@@ -287,10 +287,10 @@ using namespace DirectX;
 #define STATUE2_MODEL_NAME "Statue2"
 #define STATUE2_MODEL_OBJECTPATH "WorldObject/Dungeon"
 #define STATUE2_MODEL_TEXPATH "WorldObject/Dungeon/Statue"
-#define STATUE2_MODEL_EXTENTS XMFLOAT3(1.0f, 1.65f, 0.8f)
+#define STATUE2_MODEL_EXTENTS XMFLOAT3(1.0f, 1.8f, 0.8f)
 #define STATUE2_MODEL_TYPE Object_Movable
 #define STATUE2_MODEL_COLLIDERTYPE Collider_Box
-#define STATUE2_MODEL_MASS 10
+#define STATUE2_MODEL_MASS 50
 #define STATUE2_MODEL_SCALE XMFLOAT3(10.0f, 10.0f, 10.0f)
 #define STATUE2_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
 #define STATUE2_MODEL_SHADOW true
@@ -334,7 +334,7 @@ using namespace DirectX;
 #define VINTILATIONBOX_MODEL_EXTENTS XMFLOAT3(0.75f, 0.4f, 0.43f)
 #define VINTILATIONBOX_MODEL_TYPE Object_Movable
 #define VINTILATIONBOX_MODEL_COLLIDERTYPE Collider_Box
-#define VINTILATIONBOX_MODEL_MASS 9999
+#define VINTILATIONBOX_MODEL_MASS 20
 #define VINTILATIONBOX_MODEL_SCALE XMFLOAT3(10.0f, 10.0f, 10.0f)
 #define VINTILATIONBOX_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
 #define VINTILATIONBOX_MODEL_SHADOW true

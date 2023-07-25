@@ -30,6 +30,8 @@ public:
 	virtual void Render(ID3D11On12Device* pd3d11On12Device, ID2D1Bitmap1* pd2dBackBuffer, ID2D1DeviceContext* pd2dDeviceContext,
 		ID3D11DeviceContext* pd3d11DeviceContext, ID3D11Resource* pWrappedBuffer);
 
+
+
 protected:
 	Microsoft::WRL::ComPtr<ID2D1SolidColorBrush> m_SolidColorBrush = nullptr;
 	Microsoft::WRL::ComPtr<IDWriteTextFormat> m_TextFormat = nullptr;
@@ -46,6 +48,7 @@ protected:
 	// 출력할 폰트를 저장하는 vector
 	std::vector<TextUI> m_vTextUIs;
 
+	bool m_bVisible = true;
 public:
 	const float GetTextUIPosX(int nIndex) {
 		return m_vTextUIs.at(nIndex).PosX;
@@ -57,4 +60,6 @@ public:
 		return m_vTextUIs.at(nIndex).strText;
 	}
 	size_t GetTextUICount() { return m_vTextUIs.size(); }
+
+	void SetVisible(bool bVisible) { m_bVisible = bVisible; }
 };

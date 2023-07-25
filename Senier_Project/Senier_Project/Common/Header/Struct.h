@@ -52,7 +52,6 @@ enum RenderLayer : UINT
 	Render_Skinned,
 	Render_Effect,
 	Render_Image,
-	Render_WireFrame,
 	Render_CuttedStatic,
 	Render_CuttedTexture,
 	Render_CuttedSkinned,

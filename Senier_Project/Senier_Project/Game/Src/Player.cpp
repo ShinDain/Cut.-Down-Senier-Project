@@ -1150,6 +1150,8 @@ std::shared_ptr<Object> Player::CameraRayToMovableObject(bool bCharacter, float&
 	cameraRight = XMVector3TransformNormal(cameraRight, R);
 	R = XMMatrixRotationAxis(cameraRight, XMConvertToRadians(m_xmf3CameraRotation.x));
 	cameraLook = XMVector3TransformNormal(cameraLook, R);
+	//cameraPos += cameraLook * 4
+
 
 	// cameraLook => 광선의 방향
 
@@ -1159,31 +1161,33 @@ std::shared_ptr<Object> Player::CameraRayToMovableObject(bool bCharacter, float&
 	float closestDistance = 9999;
 	int bestIndex = -1;
 
-	for (int i = 0; i < g_vpMovableObjs.size(); ++i)
+	for (int i = 0; i < g_vpWorldObjs.size(); ++i)
 	{
-		if (g_vpMovableObjs[i]->GetColliderType() != ColliderType::Collider_Box)
+		if (g_vpWorldObjs[i]->GetColliderType() != ColliderType::Collider_Box)
 			continue;
 
 		// 캐릭터 제외
 		if (!bCharacter)
 		{
-			UINT objType = g_vpMovableObjs[i]->GetObjectType();
+			UINT objType = g_vpWorldObjs[i]->GetObjectType();
 			if (objType == ObjectType::Object_Monster || objType == ObjectType::Object_Player)
 				continue;
 		}
 		// 이미 잡힌 물체 제외
-		if (g_vpMovableObjs[i] == m_pGrabedObject)
+		if (g_vpWorldObjs[i] == m_pGrabedObject)
 			continue;
 		// 렌더링된 물체만
-		if (!g_vpMovableObjs[i]->GetVisible())
+		if (!g_vpWorldObjs[i]->GetVisible())
 			continue;
 
-		ColliderBox* pColliderBox = (ColliderBox*)(g_vpMovableObjs[i]->GetCollider().get());
-		BoundingSphere* pBS = pColliderBox->GetBoundingSphere().get();
+		ColliderBox* pColliderBox = (ColliderBox*)(g_vpWorldObjs[i]->GetCollider().get());
+		//BoundingSphere* pBS = pColliderBox->GetBoundingSphere().get();
+		BoundingOrientedBox* pOBB = pColliderBox->GetOBB().get();
 
 		pColliderBox->SetIntersect(0);
 
-		pBS->Intersects(cameraPos, cameraLook, distance);
+		//pBS->Intersects(cameraPos, cameraLook, distance);
+		pOBB->Intersects(cameraPos, cameraLook, distance);
 		// 사거리보다 가까운 / 0 이상인 / 이전 물체보다 가까운
 		if (distance < standard && distance > 0 && distance < closestDistance)
 		{
@@ -1192,10 +1196,10 @@ std::shared_ptr<Object> Player::CameraRayToMovableObject(bool bCharacter, float&
 		}
 	}
 
-	if (bestIndex >= 0)
+	if (bestIndex >= 0 && g_vpWorldObjs[bestIndex]->GetObjectType() == ObjectType::Object_Movable)
 	{
 		outDistance = closestDistance;
-		return g_vpMovableObjs[bestIndex];
+		return g_vpWorldObjs[bestIndex];
 	}
 	else
 		return nullptr;

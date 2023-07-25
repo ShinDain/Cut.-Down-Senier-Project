@@ -39,6 +39,7 @@
     <ClCompile Include="Game\Src\Character.cpp" />
     <ClCompile Include="Game\Src\Cinematic.cpp" />
     <ClCompile Include="Game\Src\CuttedObject.cpp" />
+    <ClCompile Include="Game\Src\Event.cpp" />
     <ClCompile Include="Game\Src\Item.cpp" />
     <ClCompile Include="Game\Src\Monster.cpp" />
     <ClCompile Include="Game\Src\ObjectDefaultData.cpp" />
@@ -87,6 +88,7 @@
     <ClInclude Include="Game\Header\Character.h" />
     <ClInclude Include="Game\Header\Cinematic.h" />
     <ClInclude Include="Game\Header\CuttedObject.h" />
+    <ClInclude Include="Game\Header\Event.h" />
     <ClInclude Include="Game\Header\Item.h" />
     <ClInclude Include="Game\Header\Monster.h" />
     <ClInclude Include="Game\Header\ObjectDefaultData.h" />

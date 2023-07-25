@@ -419,7 +419,7 @@ protected:
 	bool m_bSummonDone = false;
 	std::vector<std::shared_ptr<Object>> m_vpSummonedMonsters;
 
-	float m_FloatingHeight = 75.0f;
+	float m_FloatingHeight = 50.0f;
 
 	UINT m_nPattern = NecromancerAttackPattern::Melee_Attack;
 	//UINT m_nPattern = NecromancerAttackPattern::Magic_Cast;

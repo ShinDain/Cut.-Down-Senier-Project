@@ -97,7 +97,6 @@ int DirectXApp::Run()
 
 			if (!m_AppPaused)
 			{
-				
 				CalculateFrameStats();
 				Update(elapsedTime);
 				//Render(elapsedTime);

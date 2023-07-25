@@ -142,7 +142,7 @@ ColliderBox::ColliderBox(std::shared_ptr<RigidBody>pBody, XMFLOAT3 xmf3Extents)
 
 	m_pBoundingSphere = std::make_shared <BoundingSphere>();
 
-	m_pBoundingSphere->Radius = bestLen;
+	m_pBoundingSphere->Radius = bestLen * 1.2f;
 	m_pBoundingSphere->Center = m_xmf3Position;
 
 	m_pOBB = std::make_shared<BoundingOrientedBox>();

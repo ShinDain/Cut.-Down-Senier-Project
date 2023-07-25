@@ -1,5 +1,6 @@
 #include "../Header/Scene.h"
 
+UINT Scene::m_nStageNum = 2;
 std::vector<std::shared_ptr<Object>> Scene::m_vObjectLayer[(int)RenderLayer::Render_Count];
 CollisionData Scene::m_CollisionData;
 std::unique_ptr<CollisionResolver> Scene::m_pCollisionResolver;
@@ -35,32 +36,19 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_ShadowMap = std::make_unique<DepthMap>(pd3dDevice, 2048, 2048);
 	BuildDescriptorHeap(pd3dDevice, pd3dCommandList);
 
-	// 캐릭터 테스트
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0,15, -20), XMFLOAT4(0,0,0,1), XMFLOAT3(0,0,0), XMFLOAT3(0.8f, 0.8f, 0.8f), CHARACTER_MODEL_NAME, PLAYER_TRACK_CNT);
+	StageStart(m_nStageNum);
 
-	// 무기
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-0.59f, 0.135f, 0.063f), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90), XMFLOAT3(1, 1, 1), WEAPON_MODEL_NAME, 0);
-	
-	// 바닥
-	// 차후 맵 로드 함수로 이동
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, -1, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -460);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(1, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -150);
-	
 	// 월드 오브젝트 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFL OAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HOSPITAL_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HOSPITAL_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HANGAR_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), STOCK_FLOOR_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), MORGUE_BOX_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), EVENT_BOX_MODEL_NAME, 0);
 
-	// 맵 데이터 로드
-	InitMapData(pd3dDevice, pd3dCommandList);
-	// UI 초기화
-	InitUI(pd3dDevice, pd3dCommandList, pDWriteText);
-	// 시네마틱 초기화
-	//InitCinematic();
+	//g_vpEventObjs[0]->SetIsActive(true);
 
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(400, 20, -400), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(0.8f, 0.8f, 0.8f), CYBER_TWINS_MODEL_NAME, MONSTER_TRACK_CNT);
+	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(400, 20, -400), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(0.8f, 0.8f, 0.8f), CYBER_TWINS_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 25), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 25), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 30), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
@@ -68,33 +56,10 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), EVENT_BOX_MODEL_NAME, 0);
 
-	// 카메라 초기화
-	if (g_pPlayer)
-	{
-		m_pCamera = std::make_unique<Third_Person_Camera>(g_pPlayer);
-		m_pCamera->Pitch(15);
-	}
-
-#if defined(_DEBUG)
-	//m_pCamera = std::make_unique<Camera>();
-	//m_pCamera->SetPosition(0, 30, -100);
-	//m_pCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
-
-#endif
-
-	return true;
-}
-
-bool Scene::InitMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
-{
-	//LoadMapData(pd3dDevice, pd3dCommandList, "Map");
-	//LoadMapData(pd3dDevice, pd3dCommandList, "OutSideMap");
-	LoadMapData(pd3dDevice, pd3dCommandList, "HospitalInsideMap");
-	// 실내맵에선 캐릭터들의 사이즈를 80%로 조정
-	//m_pMainBGM = std::make_shared<CSound>("Sound/BGM/testBGM.wav", true);
-	//m_pMainBGM->Play();
-	//m_pMainBGM->SetVolme(0.3f);
-	//LoadMapData(pd3dDevice, pd3dCommandList, "DungeonMap");
+	// UI 초기화
+	InitUI(pd3dDevice, pd3dCommandList, pDWriteText);
+	// 시네마틱 초기화
+	//InitCinematic();
 
 	return true;
 }
@@ -134,52 +99,7 @@ bool Scene::InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComm
 	m_pTextUIs->AddTextUI(L"HP ", -CLIENT_WIDTH / 2 + 35, -CLIENT_HEIGHT / 2 + 40);
 	m_pTextUIs->AddTextUI(L"Score ", -CLIENT_WIDTH / 2 + 65, -CLIENT_HEIGHT / 2 + 81);
 	m_pTextUIs->AddTextUI(L"Monster Name", 0, -CLIENT_HEIGHT / 2 + 47);
-
-	return true;
-}
-
-bool Scene::InitCinematic()
-{
-	m_pCinematicCamera = std::make_shared<Camera>();
-	//m_pCinematicCamera->SetPosition(0, 30, -100);
-	m_pCinematicCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
-
-	std::shared_ptr<Cinematic> pCinematic = std::make_shared<Cinematic>();
-
-	std::shared_ptr<Object> pObject;
-	XMFLOAT3 position;
-	XMFLOAT3 rotation;
-	XMFLOAT3 scale;
-	auto pFunction = nullptr;
-
-	// 카메라 연결 및 조작
-	pCinematic->AddCamera(m_pCinematicCamera, XMFLOAT3(0, 20, 0), XMFLOAT3(0,0,0));
-	pCinematic->AddCameraKeyFrame(0.5f, XMFLOAT3(0, 20, 0), XMFLOAT3(0, 0, 0));
-	//pCinematic->AddCameraKeyFrame(1.0f, XMFLOAT3(0, 0, 0),   XMFLOAT3(0, 0, 0));
-	//pCinematic->AddCameraKeyFrame(1.5f, XMFLOAT3(0, 50, 0),  XMFLOAT3(0, 90, 0));
-
-	// 오브젝트 연결 및 조작
-	pObject = m_vObjectLayer[RenderLayer::Render_Skinned][1];
-	position = pObject->GetPosition();
-	rotation = pObject->GetRotation();
-	scale = pObject->GetScale();
-
-	pCinematic->AddTrack(pObject, position, rotation, scale);
-	pCinematic->AddKeyFrame(0, 0.5f, position, XMFLOAT3(0, 30, 0), scale, pFunction);
-	pCinematic->AddKeyFrame(0, 1.0f, position,  XMFLOAT3(0, 30, 0), scale, pFunction);
-	pCinematic->AddKeyFrame(0, 1.5f, position,  XMFLOAT3(0, 90, 0), scale, pFunction);
-
-	pObject = m_vObjectLayer[RenderLayer::Render_TextureMesh][5];
-	position = pObject->GetPosition();
-	rotation = pObject->GetRotation();
-	scale = pObject->GetScale();
-
-	pCinematic->AddTrack(pObject, position, rotation, scale);
-	pCinematic->AddKeyFrame(1, 0.5f, position, XMFLOAT3(0, 30, 0), scale, pFunction);
-	pCinematic->AddKeyFrame(1, 1.0f, position, XMFLOAT3(0, 30, 100), scale, pFunction);
-	pCinematic->AddKeyFrame(1, 1.5f, position, XMFLOAT3(0, 90, 500), scale, pFunction);
-
-	m_vpCinematics.emplace_back(pCinematic);
+	m_pTextUIs->AddTextUI(L"Loading...", CLIENT_WIDTH / 2 - 100, CLIENT_HEIGHT / 2 - 40);
 
 	return true;
 }
@@ -244,6 +164,10 @@ void Scene::OnResize(float aspectRatio, float newWidth, float newHeight)
 
 void Scene::Update(float totalTime ,float elapsedTime)
 {
+	ChangeStage();
+	// 화면 전환 효과
+	UpdateFadeInOut(elapsedTime);
+
 	// 오브젝트
 	UpdateObject(elapsedTime);
 	// 카메라
@@ -267,6 +191,9 @@ void Scene::Update(float totalTime ,float elapsedTime)
 
 	// Sound 업데이트
 	UpdateSound();
+
+	// 이벤트 객체 업데이트
+	UpdateEvent(elapsedTime);
 }
 
 void Scene::UpdateObject(float elapsedTime)
@@ -298,7 +225,6 @@ void Scene::UpdateObject(float elapsedTime)
 
 		if (g_vpAllObjs[i]) g_vpAllObjs[i]->Update(elapsedTime);
 	}
-
 }
 
 void Scene::UpdateUI(float elapsedTime)
@@ -352,6 +278,35 @@ void Scene::UpdateUI(float elapsedTime)
 	}
 	m_pTextUIs->UpdateTextUI(pstrName, m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Monster_Name), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Monster_Name), Text_UI_Idx_Monster_Name);
 
+	if (m_FadeInValue >= 1.0f)
+	{
+		m_pPlayerHP_Bar->SetVisible(true);
+		m_pPlayerHP_Frame->SetVisible(true);
+		m_pPlayer_Aim->SetVisible(true);
+
+		m_pHP_Back->SetVisible(true);
+		m_pScore_Back->SetVisible(true);
+
+		m_pTextUIs->UpdateTextUI(L"HP ", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_HP), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_HP), Text_UI_Idx_HP);
+		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Loading), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Loading), Text_UI_Idx_Loading);
+	}
+	else
+	{
+		m_pPlayerHP_Bar->SetVisible(false);
+		m_pPlayerHP_Frame->SetVisible(false);
+		m_pPlayer_Aim->SetVisible(false);
+		m_pEnemyHP_Bar->SetVisible(false);
+		m_pEnemyHP_Frame->SetVisible(false);
+		m_pEnemyName_Back->SetVisible(false);
+		m_pHP_Back->SetVisible(false);
+		m_pScore_Back->SetVisible(false);
+
+		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_HP), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_HP), Text_UI_Idx_HP);
+		m_pTextUIs->UpdateTextUI(L"", -CLIENT_WIDTH / 2 + 65 + (length * 7), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Score), Text_UI_Idx_Score);
+		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Monster_Name), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Monster_Name), Text_UI_Idx_Monster_Name);
+		m_pTextUIs->UpdateTextUI(L"Loading...", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Loading), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Loading), Text_UI_Idx_Loading);
+	}
+
 	// Scene 이미지 UI 업데이트
 	m_pPlayerHP_Bar->Update(elapsedTime);
 	m_pPlayerHP_Frame->Update(elapsedTime);
@@ -385,6 +340,21 @@ void Scene::UpdateSound()
 	}
 }
 
+void Scene::UpdateEvent(float elapsedTime)
+{
+	for (int i = 0; i < g_vpEventObjs.size(); ++i)
+	{
+		if (g_vpEventObjs[i]) 
+		{
+			g_vpEventObjs[i]->Update(elapsedTime);
+
+			if (g_vpEventObjs[i]->GetIntersect())
+				g_vpEventObjs[i]->Destroy();
+		}
+		
+	}
+}
+
 void Scene::UpdatePlayerData(float elapsedTime)
 {
 	if (g_pPlayer)
@@ -405,6 +375,39 @@ void Scene::UpdatePlayerData(float elapsedTime)
 			tmpPlayer->SetIsShoulderView(false);
 			tmpPlayer->GetBody()->SetCharacterPitch(0);
 			tmpPlayer->SetCameraRotation(XMFLOAT3(m_pCamera->GetPitch(), m_pCamera->GetYaw(), 0));
+		}
+	}
+}
+
+void Scene::UpdateFadeInOut(float elapsedTime)
+{
+	if (m_FadeState == 0)
+	{
+		m_FadeInValue -= elapsedTime / 2;
+		if (m_FadeInValue <= 0.0f)
+		{
+			m_FadeState = 2;
+			m_FadeInValue = 0.0f;
+		}
+	}
+	else if (m_FadeState == 1)
+	{
+		m_FadeInValue += elapsedTime / 2;
+		if (m_FadeInValue >= 1.0f)
+		{
+			m_FadeState = 2;
+			m_FadeInValue = 1.0f;
+		}
+	}
+
+	if (m_bFadeTimer)
+	{
+		m_ElapsedFadeTimer += elapsedTime;
+		if (m_ElapsedFadeTimer >= m_FadeTimer)
+		{
+			m_bFadeTimer = false;
+			m_ElapsedFadeTimer = 0.0f;
+			m_FadeState = 1;
 		}
 	}
 }
@@ -452,7 +455,7 @@ void Scene::UpdatePassCB(float totalTime, float elapsedTime)
 	passConstant.TotalTime = totalTime;
 	passConstant.DeltaTime = elapsedTime;
 	passConstant.AmbientLight = { 0.7f, 0.7f, 0.7f, 1.0f };
-	passConstant.Lights[0].Direction = m_BaseLightDirections[0];
+	passConstant.Lights[0].Direction = m_BaseLightDirections[m_nStageNum];
 	passConstant.Lights[0].Strength = { 0.2f, 0.2f, 0.3f };
 	//passConstant.Lights[0].Strength = { 0.0f, 0.0f, 0.0f };
 	passConstant.Lights[0].Position = { 0, 30.0f, 20 };
@@ -464,10 +467,12 @@ void Scene::UpdatePassCB(float totalTime, float elapsedTime)
 
 void Scene::UpdateShadowPassCB(float totalTime, float elapsedTime)
 {
-	float sceneBoundRadius = 300;
+	float sceneBoundRadius = 400;
+	if(m_nStageNum == 0)
+		sceneBoundRadius = 600;
 
 	// Only the first "main" light casts a shadow.
-	XMVECTOR lightDir = XMLoadFloat3(&m_BaseLightDirections[0]);
+	XMVECTOR lightDir = XMLoadFloat3(&m_BaseLightDirections[m_nStageNum]);
 	lightDir = XMVector3Normalize(lightDir);
 	XMFLOAT3 xmf3PlayerPos = g_pPlayer->GetPosition();
 	XMVECTOR targetPos = XMLoadFloat3(&xmf3PlayerPos);
@@ -528,6 +533,9 @@ void Scene::UpdateShadowPassCB(float totalTime, float elapsedTime)
 
 void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	if (m_FadeInValue <= 0)
+		return;
+
 	ChangeShader(ShaderType::Shader_Skinned, pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
 	{
@@ -562,21 +570,6 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->UpdateTransform(NULL);
 		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(elapsedTime, pd3dCommandList);
 	}
-
-	//ChangeShader(ShaderType::Shader_Skinned, pd3dCommandList);
-	//for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
-	//{
-	//	if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
-	//	{
-	//		if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->GetIsAlive())
-	//			continue;
-	//		// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
-	//		//m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(0.0f);
-	//		//if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
-	//		//	m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
-	//		m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(elapsedTime, pd3dCommandList);
-	//	}
-	//}
 
 	ChangeShader(ShaderType::Shader_CuttedStatic, pd3dCommandList);
 	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedStatic].size(); ++i)
@@ -648,7 +641,8 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 
 void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 {
-	//return;
+	if (m_FadeInValue <= 0)
+		return;
 
 	ID3D12DescriptorHeap* descriptorHeaps[] = { m_SrvDescriptorHeap.Get() };
 	pd3dCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
@@ -747,8 +741,11 @@ void Scene::RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList)
 void Scene::ChangeShader(ShaderType nShaderType, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	g_Shaders[nShaderType]->ChangeShader(pd3dCommandList);
-	
+
 	pd3dCommandList->SetGraphicsRootConstantBufferView(m_nPassCBParameterIdx, m_pPassCB->Resource()->GetGPUVirtualAddress());
+
+	if (nShaderType == ShaderType::Shader_WireFrame)
+		return;
 
 	// Scene 그림자맵 
 	ID3D12DescriptorHeap* descriptorHeap[] = { m_SrvDescriptorHeap.Get() };
@@ -760,6 +757,8 @@ void Scene::ChangeShader(ShaderType nShaderType, ID3D12GraphicsCommandList* pd3d
 
 void Scene::ProcessInput(UCHAR* pKeybuffer)
 {
+	if (m_FadeState != 2)
+		return;
 	// 시네마틱 재생중
 	if (m_bInCinematic)
 		return;
@@ -810,14 +809,7 @@ void Scene::KeyDownEvent(WPARAM wParam)
 	switch (wParam)
 	{
 	case 'U':
-		m_FadeInValue += 0.1f;
-		if (m_FadeInValue > 1.0f)
-			m_FadeInValue = 1.0f;
-		break;
-	case 'I':
-		m_FadeInValue -= 0.1f;
-		if(m_FadeInValue < 0.0f)
-			m_FadeInValue = 0.0f;
+		//m_FadeState = 0;
 		break;
 	case 'O':
 		g_pPlayer->GetBody()->SetScale(XMFLOAT3(10.0f, 10.0f, 10.0f));
@@ -832,8 +824,9 @@ void Scene::KeyDownEvent(WPARAM wParam)
 		//LoadMapData(g_pd3dDevice, g_pd3dCommandList, "OutSideMap");
 		break;
 	case 'P':
-		//PlayCinematic(0);
+		m_bNextStage = true;
 		break;
+	
 	}
 	
 	// 시네마틱 재생중
@@ -1030,6 +1023,9 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	{
 	case Object_Player:
 	{
+		if (m_nStageNum == 1)
+			objectData.xmf3Scale = XMFLOAT3(8, 8, 8);
+
 		std::shared_ptr<Player> pPlayer = std::make_shared<Player>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 		strcpy_s(pPlayer->m_pstrFileName, strFileName.c_str());
 		wcscpy_s(pPlayer->m_pstrOutName, L"Player");
@@ -1045,6 +1041,9 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 
 	case Object_Monster:
 	{
+		if (m_nStageNum == 1)
+			objectData.xmf3Scale = XMFLOAT3(8, 8, 8);
+
 		if (!strcmp(pstrFileName, ZOMBIE_MODEL_NAME))
 		{
 			std::shared_ptr<Zombie> pMonster = std::make_shared<Zombie>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
@@ -1167,6 +1166,15 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 
 		g_vpAllObjs.emplace_back(pObject);
 		g_vpWorldObjs.emplace_back(pObject);
+		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
+	}
+		break;
+	case Object_Event:
+	{
+		std::shared_ptr<CEvent> pEvent = std::make_shared<CEvent>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+		g_vpEventObjs.emplace_back(pEvent);
+
+		pObject = std::static_pointer_cast<Object>(pEvent);
 		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
 	}
 		break;
@@ -1372,6 +1380,7 @@ void Scene::GenerateContact()
 	{
 		if (!g_vpCharacters[k]->GetIsAlive()) continue;
 		ColliderBox* characterBox = (ColliderBox*)g_vpCharacters[k]->GetCollider().get();
+		XMVECTOR position_1 = XMLoadFloat3(&g_vpCharacters[k]->GetPosition());
 
 		if (!characterBox) continue;
 
@@ -1394,8 +1403,12 @@ void Scene::GenerateContact()
 			if (characterBox == pColliderBox) continue;
 
 			// 박스 검사 이전 가능 여부 선행 검사 
-			if (!characterBox->GetBoundingSphere()->Intersects(*(pColliderBox->GetBoundingSphere().get())))
-				continue;
+			//if (!characterBox->GetBoundingSphere()->Intersects(*(pColliderBox->GetBoundingSphere().get())))
+			//	continue;
+
+			XMVECTOR position_2 = XMLoadFloat3(&g_vpAllObjs[i]->GetPosition());
+			float distance = XMVectorGetX(XMVector3Length(position_1 - position_2));
+			if (distance > 100) continue;
 
 			Object* pObject1 = g_vpCharacters[k].get();
 			Object* pObject2 = g_vpAllObjs[i].get();
@@ -1437,17 +1450,16 @@ void Scene::GenerateContact()
 			if (!g_vpWorldObjs[k]->GetIsAlive()) continue;
 			if (g_vpWorldObjs[k]->GetColliderType() != ColliderType::Collider_Box) continue;
 
-			//XMVECTOR position_2 = XMLoadFloat3(&g_vpWorldObjs[k]->GetPosition());
-			//float distance = XMVectorGetX(XMVector3Length(position_1 - position_2));
-			//if (distance > 100) continue;
-
 			ColliderBox* pColliderBox2 = (ColliderBox*)g_vpWorldObjs[k]->GetCollider().get();
-
 			if (pColliderBox1 == pColliderBox2) continue;
 
+			XMVECTOR position_2 = XMLoadFloat3(&g_vpWorldObjs[k]->GetPosition());
+			float distance = XMVectorGetX(XMVector3Length(position_1 - position_2));
+			if (distance > 100) continue;
+
 			// 박스 검사 이전 가능 여부 선행 검사 
-			if (!pColliderBox1->GetBoundingSphere()->Intersects(*(pColliderBox2->GetBoundingSphere().get())))
-				continue;
+			//if (!pColliderBox1->GetBoundingSphere()->Intersects(*(pColliderBox2->GetBoundingSphere().get())))
+			//	continue;
 
 			Object* pObject1 = g_vpWorldObjs[i].get();
 			Object* pObject2 = g_vpWorldObjs[k].get();
@@ -1482,13 +1494,12 @@ void Scene::GenerateContact()
 			if (!g_vpWorldObjs[k]->GetIsAlive()) continue;
 			if (g_vpWorldObjs[k]->GetColliderType() != ColliderType::Collider_Box) continue;
 
+			ColliderBox* pColliderBox2 = (ColliderBox*)g_vpWorldObjs[k]->GetCollider().get();
+			if (pColliderBox1 == pColliderBox2) continue;
+
 			XMVECTOR position_2 = XMLoadFloat3(&g_vpWorldObjs[k]->GetPosition());
 			float distance = XMVectorGetX(XMVector3Length(position_1 - position_2));
 			if (distance > 100) continue;
-
-			ColliderBox* pColliderBox2 = (ColliderBox*)g_vpWorldObjs[k]->GetCollider().get();
-
-			if (pColliderBox1 == pColliderBox2) continue;
 
 			Object* pObject1 = g_vpCuttedObjects[i].get();
 			Object* pObject2 = g_vpWorldObjs[k].get();
@@ -1577,6 +1588,16 @@ void Scene::ClearObjectLayer()
 			g_vpCuttedObjects.erase(g_vpCuttedObjects.begin() + i);
 		}
 	}
+
+	for (int i = 0; i < g_vpEventObjs.size(); ++i)
+	{
+		if (!g_vpEventObjs[i]->GetIsAlive())
+		{
+			g_vpEventObjs[i]->DestroyRunTime();
+			g_vpEventObjs.erase(g_vpEventObjs.begin() + i);
+		}
+	}
+
 
 	// 레이어 순회
 	for (int i = 0; i < RenderLayer::Render_Count; ++i)
@@ -1672,6 +1693,7 @@ void Scene::EmitCutSound(SoundType nType, bool bLoop)
 	case Sound_Stone:
 		strcpy_s(pstrFilePath, STONE_CUT_SOUND);
 		tmpRand = rand() % 2 + 1;
+		volume = 1.0f;
 		break;
 	case Sound_Steel_Light:
 		strcpy_s(pstrFilePath, STEEL_LIGHT_CUT_SOUND);
@@ -1721,6 +1743,7 @@ void Scene::EmitBrokenSound(SoundType nType, bool bLoop)
 	case Sound_Stone:
 		strcpy_s(pstrFilePath, STONE_BROKEN_SOUND);
 		tmpRand = rand() % 3 + 1;
+		volume = 1.0f;
 		break;
 	case Sound_Steel_Light:
 		strcpy_s(pstrFilePath, STEEL_LIGHT_BROKEN_SOUND);
@@ -1743,4 +1766,148 @@ void Scene::EmitBrokenSound(SoundType nType, bool bLoop)
 	strcat_s(pstrFilePath, std::to_string(tmpRand).c_str());
 	strcat_s(pstrFilePath, ".wav");
 	EmitSound(pstrFilePath, bLoop, 1.0f, volume);
+}
+
+void Scene::ChangeStage()
+{
+	if (m_bNextStage)
+	{
+		if (m_FadeInValue <= 0.0f)
+		{
+			m_nStageNum += 1;
+			m_nStageNum %= 3;
+			StageStart(m_nStageNum);
+			m_bFadeTimer = true;
+			m_bNextStage = false;
+		}
+		else if (m_FadeInValue >= 1.0f && m_FadeState == 2)
+		{
+			m_FadeState = 0;
+		}
+	}
+}
+void Scene::StageStart(UINT nMapNum)
+{
+	float hp = 300;
+	UINT score = 0;
+	if (g_pPlayer)
+	{
+		hp = g_pPlayer->GetHP();
+		score = ((Player*)(g_pPlayer.get()))->GetScore();
+	}
+
+	for (int i = 0; i < g_vpAllObjs.size(); ++i)
+	{
+		g_vpAllObjs[i]->DestroyRunTime();
+	}
+
+	ClearObjectLayer();
+
+	// 플레이어
+	CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 10, -20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.0f, 1.0f, 1.0f),
+		CHARACTER_MODEL_NAME, PLAYER_TRACK_CNT);
+	g_pPlayer->SetHP(hp);
+	((Player*)(g_pPlayer.get()))->SetScore(score);
+
+	// 카메라 초기화
+	m_pCamera = nullptr;
+	m_pCamera = std::make_unique<Third_Person_Camera>(g_pPlayer);
+	m_pCamera->Pitch(15);
+
+	// 무기
+	CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(-0.59f, 0.135f, 0.063f), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90), XMFLOAT3(1, 1, 1), WEAPON_MODEL_NAME, 0);
+	// 바닥
+	CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, 0);
+
+	switch (nMapNum)
+	{
+	case 0:
+		g_pPlayer->SetRotate(XMFLOAT3(0, 90, 0));
+		m_pCamera->RotateY(90);
+		CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, -1, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -460);
+		CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(1, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -150);
+		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "OutSideMap");
+		break;
+	case 1:
+		g_pPlayer->SetRotate(XMFLOAT3(0, 180, 0));
+		m_pCamera->RotateY(180);
+		g_pPlayer->GetBody()->SetPosition(XMFLOAT3(0, 10, 10));
+		CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, -1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -40);
+		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "HospitalInsideMap");
+		break;
+	case 2:
+		g_pPlayer->SetRotate(XMFLOAT3(0, 90, 0));
+		m_pCamera->RotateY(90);
+		g_pPlayer->GetBody()->SetPosition(XMFLOAT3(20, 10, 0));
+		CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, -1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -80);
+		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "DungeonMap");
+		break;
+
+	default:
+		assert(false);
+	}
+}
+
+bool Scene::InitCinematic()
+{
+	m_pCinematicCamera = std::make_shared<Camera>();
+	//m_pCinematicCamera->SetPosition(0, 30, -100);
+	m_pCinematicCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
+
+	std::shared_ptr<Cinematic> pCinematic = std::make_shared<Cinematic>();
+
+	std::shared_ptr<Object> pObject;
+	XMFLOAT3 position;
+	XMFLOAT3 rotation;
+	XMFLOAT3 scale;
+	auto pFunction = nullptr;
+
+	// 카메라 연결 및 조작
+	pCinematic->AddCamera(m_pCinematicCamera, XMFLOAT3(0, 20, 0), XMFLOAT3(0, 0, 0));
+	pCinematic->AddCameraKeyFrame(0.5f, XMFLOAT3(0, 20, 0), XMFLOAT3(0, 0, 0));
+	//pCinematic->AddCameraKeyFrame(1.0f, XMFLOAT3(0, 0, 0),   XMFLOAT3(0, 0, 0));
+	//pCinematic->AddCameraKeyFrame(1.5f, XMFLOAT3(0, 50, 0),  XMFLOAT3(0, 90, 0));
+
+	// 오브젝트 연결 및 조작
+	pObject = m_vObjectLayer[RenderLayer::Render_Skinned][1];
+	position = pObject->GetPosition();
+	rotation = pObject->GetRotation();
+	scale = pObject->GetScale();
+
+	pCinematic->AddTrack(pObject, position, rotation, scale);
+	pCinematic->AddKeyFrame(0, 0.5f, position, XMFLOAT3(0, 30, 0), scale, pFunction);
+	pCinematic->AddKeyFrame(0, 1.0f, position, XMFLOAT3(0, 30, 0), scale, pFunction);
+	pCinematic->AddKeyFrame(0, 1.5f, position, XMFLOAT3(0, 90, 0), scale, pFunction);
+
+	pObject = m_vObjectLayer[RenderLayer::Render_TextureMesh][5];
+	position = pObject->GetPosition();
+	rotation = pObject->GetRotation();
+	scale = pObject->GetScale();
+
+	pCinematic->AddTrack(pObject, position, rotation, scale);
+	pCinematic->AddKeyFrame(1, 0.5f, position, XMFLOAT3(0, 30, 0), scale, pFunction);
+	pCinematic->AddKeyFrame(1, 1.0f, position, XMFLOAT3(0, 30, 100), scale, pFunction);
+	pCinematic->AddKeyFrame(1, 1.5f, position, XMFLOAT3(0, 90, 500), scale, pFunction);
+
+	m_vpCinematics.emplace_back(pCinematic);
+
+	return true;
+}
+
+bool Scene::InitEvent(UINT nMapNum)
+{
+	// 기존 이벤트 모두 제거
+	for (int i = 0; i < g_vpEventObjs.size(); ++i)
+	{
+		g_vpEventObjs[i]->Destroy();
+	}
+
+	switch (nMapNum)
+	{
+	default:
+		break;
+	}
+
+
+	return true;
 }

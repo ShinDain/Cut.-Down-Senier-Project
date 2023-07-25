@@ -21,6 +21,9 @@ std::vector<std::shared_ptr<Object>> g_vpShadowedObjs;
 
 std::vector<std::shared_ptr<Object>> g_vpCuttedObjects;
 
+std::vector<std::shared_ptr<CEvent>> g_vpEventObjs;
+
+
 std::map<std::string, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;
 
 UINT g_curShader = ShaderType::Shader_Count;

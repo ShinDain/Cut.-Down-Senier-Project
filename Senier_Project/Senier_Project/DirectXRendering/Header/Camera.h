@@ -146,7 +146,7 @@ public:
 
 	void SetOffsetLength(float value) { m_OffsetLength = value; }
 	//void SetOffset(DirectX::XMFLOAT3 xmf3Offset) {	m_xmf3Offset = xmf3Offset;}
-	void SetTrackedObject(const std::shared_ptr<Object> pObject) { m_pObject = pObject; }
+	void SetTrackedObject(std::shared_ptr<Object> pObject) { m_pObject = pObject; }
 	void SetIsShoulderView(bool bShoulderView) { m_bShoulderView = bShoulderView; }
 	void SetShoulderCameraPitch(float shoulderPitch) { m_ShoulderCameraPitch = shoulderPitch; }
 

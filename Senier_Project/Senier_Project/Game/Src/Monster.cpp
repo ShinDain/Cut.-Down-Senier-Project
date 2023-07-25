@@ -1933,7 +1933,7 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 		m_nSummonCnt = 0;
 		for (int i = 0; i < m_vpSummonedMonsters.size(); ++i)
 		{
-			if (!m_vpSummonedMonsters[i]->GetIsDestroying())
+			if (m_vpSummonedMonsters[i]->GetIsAlive())
 				m_nSummonCnt++;
 		}
 		if (m_nSummonCnt == 0 && m_bSummonDone)

@@ -79,7 +79,7 @@ bool Weapon::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_Mass = objData.nMass;
 	m_bShadow = objData.bShadow;
 
-#if defined(_DEBUG)
+#if defined(_DEBUG) && defined(COLLIDER_RENDER)
 	if (m_pCollider) m_pCollider->BuildMesh(pd3dDevice, pd3dCommandList);
 #endif
 

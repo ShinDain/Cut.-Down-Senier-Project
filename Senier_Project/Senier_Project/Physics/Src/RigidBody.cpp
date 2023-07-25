@@ -119,11 +119,11 @@ void RigidBody::Update(float elapsedTime)
 		float currentMotion = XMVectorGetX(XMVectorSum(velocity * velocity)) +
 			XMVectorGetX(XMVectorSum(angularVelocity * angularVelocity));
 
-		float bias = powf(0.5f, elapsedTime);
-		m_Motion = bias * m_Motion + (1 - bias) * currentMotion;
-
-		//float bias = 0.3f;
+		//float bias = powf(0.5f, elapsedTime);
 		//m_Motion = bias * m_Motion + (1 - bias) * currentMotion;
+
+		float bias = 0.7f;
+		m_Motion = bias * m_Motion + (1 - bias) * currentMotion;
 
 		if (m_Motion < Physics::sleepEpsilon)
 			SetIsAwake(false);

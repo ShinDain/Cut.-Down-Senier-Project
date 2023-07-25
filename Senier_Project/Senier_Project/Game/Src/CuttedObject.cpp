@@ -76,6 +76,7 @@ void CuttedObject::Update(float elapsedTime)
 	{
 		if (m_bDissolveStart)
 		{
+			m_pCollider->SetIsActive(false);
 			m_ElapsedDestroyTime += elapsedTime;
 			m_DissolveValue = m_ElapsedDestroyTime / (m_DestroyTime);
 			if (m_ElapsedDestroyTime >= m_DestroyTime)

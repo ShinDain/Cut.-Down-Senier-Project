@@ -63,13 +63,16 @@ void DWriteText::Render(ID3D11On12Device* pd3d11On12Device, ID2D1Bitmap1* pd2dBa
 
 	pd2dDeviceContext->SetTarget(pd2dBackBuffer);
 	pd2dDeviceContext->BeginDraw();
-	for (int i = 0; i < m_vTextUIs.size(); ++i)
+	if (m_bVisible)
 	{
-		D2D1::Matrix3x2F mat3x2Ftrans = D2D1::Matrix3x2F::Translation(m_vTextUIs[i].PosX, m_vTextUIs[i].PosY);
+		for (int i = 0; i < m_vTextUIs.size(); ++i)
+		{
+			D2D1::Matrix3x2F mat3x2Ftrans = D2D1::Matrix3x2F::Translation(m_vTextUIs[i].PosX, m_vTextUIs[i].PosY);
 
-		pd2dDeviceContext->SetTransform(mat3x2Ftrans);
-		pd2dDeviceContext->DrawTextW(m_vTextUIs[i].strText.c_str(), m_vTextUIs[i].strText.length(),
-			m_TextFormat.Get(), &textRect, m_SolidColorBrush.Get());
+			pd2dDeviceContext->SetTransform(mat3x2Ftrans);
+			pd2dDeviceContext->DrawTextW(m_vTextUIs[i].strText.c_str(), m_vTextUIs[i].strText.length(),
+				m_TextFormat.Get(), &textRect, m_SolidColorBrush.Get());
+		}
 	}
 	pd2dDeviceContext->EndDraw();
 

@@ -491,6 +491,21 @@ void CreateObjectDefaultData()
 	g_DefaultObjectNames.emplace_back(HEALITEM_MODEL_NAME);
 
 	// 이벤트 오브젝트
+	tmpData.pstrObjectPath = EVENT_BOX_MODEL_OBJECTPATH;
+	tmpData.pstrTexPath = EVENT_BOX_MODEL_TEXPATH;
+	tmpData.xmf3Extents = EVENT_BOX_MODEL_EXTENTS;
+	tmpData.objectType = EVENT_BOX_MODEL_TYPE;
+	tmpData.colliderType = EVENT_BOX_MODEL_COLLIDERTYPE;
+	tmpData.soundType = SoundType::Sound_None;
+	tmpData.nMass = EVENT_BOX_MODEL_MASS;
+	tmpData.xmf3OffsetScale = EVENT_BOX_MODEL_SCALE;
+	tmpData.renderLayer = EVENT_BOX_MODEL_RENDERLAYER;
+	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, 0);
+	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
+	tmpData.bShadowed = EVENT_BOX_MODEL_SHADOW;
+	g_DefaultObjectData.insert({ EVENT_BOX_MODEL_NAME, tmpData });
+	g_DefaultObjectNames.emplace_back(EVENT_BOX_MODEL_NAME);
+
 	tmpData.pstrObjectPath = ENTER_BOX_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = ENTER_BOX_MODEL_TEXPATH;
 	tmpData.xmf3Extents = ENTER_BOX_MODEL_EXTENTS;
@@ -581,21 +596,6 @@ void CreateObjectDefaultData()
 	tmpData.bShadowed = BARREL3_MODEL_SHADOW;
 	g_DefaultObjectData.insert({ BARREL3_MODEL_NAME, tmpData });
 	g_DefaultObjectNames.emplace_back(BARREL3_MODEL_NAME);
-
-	tmpData.pstrObjectPath = BARREL4_MODEL_OBJECTPATH;
-	tmpData.pstrTexPath = BARREL4_MODEL_TEXPATH;
-	tmpData.xmf3Extents = BARREL4_MODEL_EXTENTS;
-	tmpData.objectType = BARREL4_MODEL_TYPE;
-	tmpData.colliderType = BARREL4_MODEL_COLLIDERTYPE;
-	tmpData.soundType = SoundType::Sound_Steel_Heavy;
-	tmpData.nMass = BARREL4_MODEL_MASS;
-	tmpData.xmf3OffsetScale = BARREL4_MODEL_SCALE;
-	tmpData.renderLayer = BARREL4_MODEL_RENDERLAYER;
-	tmpData.xmf3MeshOffsetPosition = XMFLOAT3(0, 0, tmpData.xmf3Extents.z);
-	tmpData.xmf3MeshOffsetRotation = XMFLOAT3(0, 0, 0);
-	tmpData.bShadowed = BARREL4_MODEL_SHADOW;
-	g_DefaultObjectData.insert({ BARREL4_MODEL_NAME, tmpData });
-	g_DefaultObjectNames.emplace_back(BARREL4_MODEL_NAME);
 
 	tmpData.pstrObjectPath = BARREL5_MODEL_OBJECTPATH;
 	tmpData.pstrTexPath = BARREL5_MODEL_TEXPATH;

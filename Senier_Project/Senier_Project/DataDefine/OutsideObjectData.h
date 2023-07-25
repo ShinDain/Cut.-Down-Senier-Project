@@ -63,17 +63,6 @@ using namespace DirectX;
 #define BARREL3_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
 #define BARREL3_MODEL_SHADOW true
 
-#define BARREL4_MODEL_NAME "Barrels_2"
-#define BARREL4_MODEL_OBJECTPATH "WorldObject/Outside"
-#define BARREL4_MODEL_TEXPATH "WorldObject/Barrel"
-#define BARREL4_MODEL_EXTENTS XMFLOAT3(0.27f, 0.27f, 0.4f)
-#define BARREL4_MODEL_TYPE Object_Movable
-#define BARREL4_MODEL_COLLIDERTYPE Collider_Box
-#define BARREL4_MODEL_MASS 10
-#define BARREL4_MODEL_SCALE XMFLOAT3(10,10,10)
-#define BARREL4_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
-#define BARREL4_MODEL_SHADOW true
-
 #define BARREL5_MODEL_NAME "Barrels_3"
 #define BARREL5_MODEL_OBJECTPATH "WorldObject/Outside"
 #define BARREL5_MODEL_TEXPATH "WorldObject/Barrel"
@@ -275,7 +264,7 @@ using namespace DirectX;
 #define HANGAR_MODEL_NAME "Hangar_v1_full"
 #define HANGAR_MODEL_OBJECTPATH "WorldObject/Outside"
 #define HANGAR_MODEL_TEXPATH "WorldObject/Hangar"
-#define HANGAR_MODEL_EXTENTS XMFLOAT3(4.8f, 2.35f, 3.7f)
+#define HANGAR_MODEL_EXTENTS XMFLOAT3(5.0f, 2.5f, 3.8f)
 #define HANGAR_MODEL_TYPE Object_World
 #define HANGAR_MODEL_COLLIDERTYPE Collider_Box
 #define HANGAR_MODEL_MASS 9999
@@ -354,7 +343,7 @@ using namespace DirectX;
 #define OIL_TANK_MODEL_TEXPATH "WorldObject/Oil_tank"
 #define OIL_TANK_MODEL_EXTENTS XMFLOAT3(5.0f, 3.25f, 5.0f)
 #define OIL_TANK_MODEL_TYPE Object_World
-#define OIL_TANK_MODEL_COLLIDERTYPE Collider_Box
+#define OIL_TANK_MODEL_COLLIDERTYPE Collider_None
 #define OIL_TANK_MODEL_MASS 9999
 #define OIL_TANK_MODEL_SCALE XMFLOAT3(10,10,10)
 #define OIL_TANK_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
@@ -374,7 +363,7 @@ using namespace DirectX;
 #define PIPE_MODEL_NAME "Pipe"
 #define PIPE_MODEL_OBJECTPATH "WorldObject/Outside"
 #define PIPE_MODEL_TEXPATH "WorldObject/Pipe"
-#define PIPE_MODEL_EXTENTS XMFLOAT3(0.1f, 3.6f, 0.1f)
+#define PIPE_MODEL_EXTENTS XMFLOAT3(0.1f, 3.9f, 0.1f)
 #define PIPE_MODEL_TYPE Object_World
 #define PIPE_MODEL_COLLIDERTYPE Collider_Box
 #define PIPE_MODEL_MASS 9999

@@ -146,6 +146,9 @@
     <ClCompile Include="Game\Src\Sound.cpp">
       <Filter>Game\Src</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Src\Event.cpp">
+      <Filter>Game\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Physics\Header\Collider.h">
@@ -282,6 +285,9 @@
     </ClInclude>
     <ClInclude Include="DataDefine\SoundFilePath.h">
       <Filter>DataDefine</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Header\Event.h">
+      <Filter>Game\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

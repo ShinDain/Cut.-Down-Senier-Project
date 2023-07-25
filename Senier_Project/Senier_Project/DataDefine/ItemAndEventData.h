@@ -77,16 +77,26 @@ using namespace DirectX;
 
 
 // 이벤트 박스
+#define EVENT_BOX_MODEL_NAME "Event_Box"
+#define EVENT_BOX_MODEL_OBJECTPATH ""
+#define EVENT_BOX_MODEL_TEXPATH ""
+#define EVENT_BOX_MODEL_EXTENTS XMFLOAT3(0.5f, 0.5f, 0.5f)
+#define EVENT_BOX_MODEL_TYPE Object_Event
+//#define EVENT_BOX_MODEL_COLLIDERTYPE Collider_Box
+#define EVENT_BOX_MODEL_COLLIDERTYPE Collider_Box
+#define EVENT_BOX_MODEL_MASS 9999
+#define EVENT_BOX_MODEL_SCALE XMFLOAT3(10,10,10)
+#define EVENT_BOX_MODEL_RENDERLAYER RenderLayer::Render_Static
+#define EVENT_BOX_MODEL_SHADOW false
+
 #define ENTER_BOX_MODEL_NAME "Enter_Object"
 #define ENTER_BOX_MODEL_OBJECTPATH ""
 #define ENTER_BOX_MODEL_TEXPATH ""
 #define ENTER_BOX_MODEL_EXTENTS XMFLOAT3(0.5f, 0.5f, 0.5f)
 #define ENTER_BOX_MODEL_TYPE Object_Event
-//#define EVENT_BOX_MODEL_COLLIDERTYPE Collider_Box
-#define ENTER_BOX_MODEL_COLLIDERTYPE Collider_None
+#define ENTER_BOX_MODEL_COLLIDERTYPE Collider_Box
 #define ENTER_BOX_MODEL_MASS 9999
 #define ENTER_BOX_MODEL_SCALE XMFLOAT3(10,10,10)
 #define ENTER_BOX_MODEL_RENDERLAYER RenderLayer::Render_TextureMesh
 #define ENTER_BOX_MODEL_SHADOW false
-
 #endif

@@ -23,6 +23,7 @@
 #include "../../Game/Header/Item.h"
 #include "../../Game/header/CuttedObject.h"
 #include "../../Game/Header/Projectile.h"
+#include "../../Game/Header/Event.h"
 #include "../../Game/Header/Sound.h"
 #include "../../DataDefine/SoundFilePath.h"
 
@@ -51,7 +52,8 @@ enum TextUIIdx
 {
 	Text_UI_Idx_HP,
 	Text_UI_Idx_Score,
-	Text_UI_Idx_Monster_Name
+	Text_UI_Idx_Monster_Name,
+	Text_UI_Idx_Loading
 };
 
 class Scene
@@ -64,12 +66,13 @@ public:
 
 	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText);
 
-	bool InitMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	bool InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText);
 	bool InitCinematic();
+	bool InitEvent(UINT nMapNum);
 
 	void BuildDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
+	void StageStart(UINT nMapNum);
 
 	virtual void OnResize(float aspectRatio, float newWidth, float newHeight);
 	virtual void Update(float totalTime, float elapsedTime);
@@ -78,6 +81,9 @@ public:
 	void UpdateSceneCamera(float elapsedTime);
 	void UpdateUI(float elapsedTime);
 	void UpdateSound();
+	void UpdateEvent(float elapsedTime);
+	void UpdateFadeInOut(float elapsedTime);
+	void ChangeStage();
 
 	virtual void Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList);
 	void RenderSceneToShadowMap(ID3D12GraphicsCommandList* pd3dCommandList);
@@ -139,11 +145,11 @@ private:
 	std::unique_ptr<ImgObject> m_pHP_Back = nullptr;
 	std::unique_ptr<ImgObject> m_pScore_Back = nullptr;
 
-	float m_tmptmp = 100;
 
 	// Text·Î Ç¥½ÃµÉ UIÀÇ ÀüÃ¼ ÃÑ°ý °´Ã¼
 	std::shared_ptr<DWriteText> m_pTextUIs = nullptr;
 
+	static UINT m_nStageNum;
 	static std::unique_ptr<CollisionResolver> m_pCollisionResolver;
 	static CollisionData m_CollisionData;
 
@@ -154,10 +160,9 @@ private:
 	// ===============================================================
 
 	XMFLOAT3 m_BaseLightDirections[3] = {
-	//XMFLOAT3(-0.57735f, -0.57735f, -0.57735f),
+	XMFLOAT3(-0.57735f, -0.57735f, -0.57735f),
 	XMFLOAT3(0.0f, -1.0f, 0.01f),
-	XMFLOAT3(-0.57735f, -0.57735f, 0.57735f),
-	XMFLOAT3(0.0f, -0.707f, -0.707f)
+	XMFLOAT3(0.0f, -1.0f, 0.01f)
 	};
 
 	XMFLOAT4X4 m_xmf4x4ShadowTransform = MathHelper::identity4x4();
@@ -169,7 +174,13 @@ private:
 	UINT m_nDescTableParameterIdx = 4;
 
 	float m_FadeInValue = 1.0f;
+	UINT m_FadeState = 2;		// 0 : fadeOut , 0 : fadeIn, 0 : normal
+	float m_FadeTimer = 2.0f;
+	bool m_bFadeTimer = false;
+	float m_ElapsedFadeTimer = 0.0f;
 
+	bool m_bNextStage = false;
+	
 public:
 	void SetViewProjMatrix(XMFLOAT4X4 viewProj) { m_xmf4x4ViewProj = viewProj; }
 

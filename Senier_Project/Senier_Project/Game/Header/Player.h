@@ -196,6 +196,8 @@ public:
 	Object* GetPlayerTargetObject() { return m_pTargetObject.get(); }
 
 
+	void SetScore(UINT nScore) { m_nScore = nScore; }
+	void SetHP(float nHP) { m_HP = nHP; }
 	void SetWeapon(std::shared_ptr<Weapon> pWeapon) { m_pWeapon = pWeapon; }
 	void SetCameraRotation(XMFLOAT3 xmf3CameraRotation) { m_xmf3CameraRotation = xmf3CameraRotation; }
 	void SetCameraPosition(XMFLOAT3 xmf3CameraPosition) { m_xmf3CameraPosition = xmf3CameraPosition; }
