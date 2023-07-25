@@ -413,7 +413,7 @@ void Object::CreateScoreItems(int nCnt)
 	}
 
 	// 생성 효과음
-	Scene::EmitSound("Sound/Item/SpawnScore.wav", false, 0.75f, 0.1f);
+	//Scene::EmitSound("Sound/Item/SpawnScore.wav", false, 0.75f, 0.1f);
 }
 
 void Object::CreateHealItems(int nCnt)

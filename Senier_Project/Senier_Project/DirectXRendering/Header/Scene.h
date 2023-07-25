@@ -33,17 +33,25 @@
 
 // UI 표시 사이즈 
 #define PLAYER_HP_BAR_WIDTH 256
-#define PLAYER_HP_BAR_HEIGHT 16
+#define PLAYER_HP_BAR_HEIGHT 24
 #define ENEMY_HP_BAR_WIDTH 256
-#define ENEMY_HP_BAR_HEIGHT 16
-#define PLAYER_AIM_WIDTH 128
-#define PLAYER_AIM_HEIGHT 128
+#define ENEMY_HP_BAR_HEIGHT 24
+#define ENEMY_NAME_WIDTH 256
+#define ENEMY_NAME_HEIGHT 48
+#define PLAYER_AIM_WIDTH 32
+#define PLAYER_AIM_HEIGHT 32
+
+#define HP_BACK_WIDTH 400
+#define HP_BACK_HEIGHT 40
+#define SCORE_BACK_WIDTH 320
+#define SCORE_BACK_HEIGHT 40
 
 // Text UI Index
 enum TextUIIdx
 {
 	Text_UI_Idx_HP,
-	Text_UI_Idx_Score
+	Text_UI_Idx_Score,
+	Text_UI_Idx_Monster_Name
 };
 
 class Scene
@@ -122,9 +130,14 @@ private:
 	static std::vector<std::shared_ptr<Object>> m_vObjectLayer[(int)RenderLayer::Render_Count];
 	
 	// UI 표시에 사용될 ImageObject들
-	std::unique_ptr<ImgObject> m_pPlayerHPBar = nullptr;
-	std::unique_ptr<ImgObject> m_pEnemyHPBar = nullptr;
-	std::unique_ptr<ImgObject> m_pPlayerAim = nullptr;
+	std::unique_ptr<ImgObject> m_pPlayerHP_Bar = nullptr;
+	std::unique_ptr<ImgObject> m_pPlayerHP_Frame = nullptr;
+	std::unique_ptr<ImgObject> m_pEnemyHP_Bar = nullptr;
+	std::unique_ptr<ImgObject> m_pEnemyHP_Frame = nullptr;
+	std::unique_ptr<ImgObject> m_pPlayer_Aim = nullptr;
+	std::unique_ptr<ImgObject> m_pEnemyName_Back = nullptr;
+	std::unique_ptr<ImgObject> m_pHP_Back = nullptr;
+	std::unique_ptr<ImgObject> m_pScore_Back = nullptr;
 
 	float m_tmptmp = 100;
 

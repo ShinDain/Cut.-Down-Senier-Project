@@ -94,7 +94,7 @@ protected:
 
 public:
 	char m_pstrFileName[64];
-	char m_pstrOutName[64];
+	wchar_t m_pstrOutName[64];
 	std::unique_ptr<AnimationController> m_pAnimationController = nullptr;
 	UINT m_nObjectConstantsParameterIdx = 0;
 	UINT m_nObjectCBParameterIdx = 3;
@@ -265,7 +265,7 @@ public:
 	const XMFLOAT4X4& GetLocalTransform() { return m_xmf4x4LocalTransform; }
 
 	const char* GetName() { return m_FrameName; }
-	const char* GetOutName() { return m_pstrOutName; }
+	const wchar_t* GetOutName() { return m_pstrOutName; }
 	const XMFLOAT3& GetPosition() { return(m_xmf3Position); }
 	const XMFLOAT3& GetRenderPosition() { return(m_xmf3RenderPosition); }
 	const XMFLOAT3& GetScale() { return(m_xmf3Scale); }

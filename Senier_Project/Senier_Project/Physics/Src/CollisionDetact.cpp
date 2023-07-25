@@ -84,6 +84,9 @@ void ObjectCrushTest(Object* pObject1, Object* pObject2)
 	if (!pObject1->GetCollider()->GetCharacterActive())
 		return;
 
+	if (pObject1->GetBody()->GetIsCharacter() && pObject2->GetBody()->GetIsCharacter())
+		return;
+
 	float length = 0;
 	float power = 0;
 	float maxPower = 30;

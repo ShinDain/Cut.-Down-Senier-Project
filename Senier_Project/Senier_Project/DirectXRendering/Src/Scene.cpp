@@ -91,9 +91,9 @@ bool Scene::InitMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	//LoadMapData(pd3dDevice, pd3dCommandList, "OutSideMap");
 	LoadMapData(pd3dDevice, pd3dCommandList, "HospitalInsideMap");
 	// 실내맵에선 캐릭터들의 사이즈를 80%로 조정
-	m_pMainBGM = std::make_shared<CSound>("Sound/BGM/testBGM.wav", true);
-	m_pMainBGM->Play();
-	m_pMainBGM->SetVolme(0.3f);
+	//m_pMainBGM = std::make_shared<CSound>("Sound/BGM/testBGM.wav", true);
+	//m_pMainBGM->Play();
+	//m_pMainBGM->SetVolme(0.3f);
 	//LoadMapData(pd3dDevice, pd3dCommandList, "DungeonMap");
 
 	return true;
@@ -102,33 +102,38 @@ bool Scene::InitMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 bool Scene::InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText)
 {
 	// 각종 UI들 초기화  함수로 분리 예정
-	m_pPlayerHPBar = std::make_unique<ImgObject>();
-	m_pEnemyHPBar = std::make_unique<ImgObject>();
-	m_pPlayerAim = std::make_unique<ImgObject>();
+	m_pPlayerHP_Bar = std::make_unique<ImgObject>();
+	m_pPlayerHP_Frame = std::make_unique<ImgObject>();
+	m_pPlayer_Aim = std::make_unique<ImgObject>();
+	m_pEnemyHP_Bar = std::make_unique<ImgObject>();
+	m_pEnemyHP_Frame = std::make_unique<ImgObject>();
+	m_pEnemyName_Back = std::make_unique<ImgObject>();
+	m_pHP_Back = std::make_unique<ImgObject>();
+	m_pScore_Back = std::make_unique<ImgObject>();
 
-	m_pPlayerHPBar->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Textures/RedBack.dds", PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT);
-	m_pEnemyHPBar->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Textures/RedBack.dds", ENEMY_HP_BAR_WIDTH, ENEMY_HP_BAR_HEIGHT);
-	m_pPlayerAim->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"Textures/Aim.dds", PLAYER_AIM_WIDTH, PLAYER_AIM_HEIGHT);
-	m_pPlayerHPBar->ChangePosition(80, 35);
-	m_pEnemyHPBar->ChangePosition((CLIENT_WIDTH / 2) - (m_pEnemyHPBar->GetBitmapWidth() / 2), 35);
-	m_pPlayerAim->ChangePosition((CLIENT_WIDTH / 2) - (m_pPlayerAim->GetBitmapWidth() / 2), (CLIENT_HEIGHT / 2) - (m_pPlayerAim->GetBitmapHeight() / 2));
-	m_pPlayerAim->SetVisible(false);
+	m_pPlayerHP_Bar->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"GUI/Hp_line.dds", PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT);
+	m_pPlayerHP_Frame->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"GUI/Hp_frame.dds", PLAYER_HP_BAR_WIDTH, PLAYER_HP_BAR_HEIGHT);
+	m_pPlayer_Aim->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"GUI/Aim.dds", PLAYER_AIM_WIDTH, PLAYER_AIM_HEIGHT);
+	m_pEnemyHP_Bar->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"GUI/Hp_line.dds", ENEMY_HP_BAR_WIDTH, ENEMY_HP_BAR_HEIGHT);
+	m_pEnemyHP_Frame->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"GUI/Hp_frame.dds", ENEMY_HP_BAR_WIDTH, ENEMY_HP_BAR_HEIGHT);
+	m_pEnemyName_Back->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"GUI/Name_Back.dds", ENEMY_NAME_WIDTH, ENEMY_NAME_HEIGHT);
+	m_pHP_Back->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"GUI/Score_Back.dds", HP_BACK_WIDTH, HP_BACK_HEIGHT);
+	m_pScore_Back->Initialize(pd3dDevice, pd3dCommandList, CLIENT_WIDTH, CLIENT_HEIGHT, L"GUI/Score_Back.dds", SCORE_BACK_WIDTH, SCORE_BACK_HEIGHT);
+
+	m_pPlayerHP_Bar->ChangePosition(80, 30);
+	m_pPlayerHP_Frame->ChangePosition(80, 30);
+	m_pPlayer_Aim->ChangePosition((CLIENT_WIDTH / 2) - (m_pPlayer_Aim->GetBitmapWidth() / 2), (CLIENT_HEIGHT / 2) - (m_pPlayer_Aim->GetBitmapHeight() / 2));
+	m_pEnemyHP_Bar->ChangePosition((CLIENT_WIDTH / 2) - (m_pEnemyHP_Bar->GetBitmapWidth() / 2), 65);
+	m_pEnemyHP_Frame->ChangePosition((CLIENT_WIDTH / 2) - (m_pEnemyHP_Bar->GetBitmapWidth() / 2), 65);
+	m_pEnemyName_Back->ChangePosition((CLIENT_WIDTH / 2) - (m_pEnemyHP_Bar->GetBitmapWidth() / 2), 25);
+	m_pHP_Back->ChangePosition(-3, 21);
+	m_pScore_Back->ChangePosition(0, 63);
+
 	// TextUI 초기화
 	m_pTextUIs = pDWriteText;
-	m_pTextUIs->AddTextUI(L"HP ", 35, -CLIENT_HEIGHT / 2 + 40);
-	m_pTextUIs->AddTextUI(L"Score ", 35, -CLIENT_HEIGHT / 2 + 80);
-
-	
-	char tmpstr[64];
-	strcpy_s(tmpstr, g_pPlayer->GetOutName());
-	
-	wchar_t* pstr;
-	int strSize = MultiByteToWideChar(CP_ACP, 0, tmpstr, -1, NULL, NULL);
-	
-	pstr = new wchar_t[strSize];
-	
-	MultiByteToWideChar(CP_ACP, 0, tmpstr, strlen(tmpstr)+1, pstr, strSize);
-	m_pTextUIs->AddTextUI(pstr, 35, -CLIENT_HEIGHT / 2 + 120);
+	m_pTextUIs->AddTextUI(L"HP ", -CLIENT_WIDTH / 2 + 35, -CLIENT_HEIGHT / 2 + 40);
+	m_pTextUIs->AddTextUI(L"Score ", -CLIENT_WIDTH / 2 + 65, -CLIENT_HEIGHT / 2 + 81);
+	m_pTextUIs->AddTextUI(L"Monster Name", 0, -CLIENT_HEIGHT / 2 + 47);
 
 	return true;
 }
@@ -303,43 +308,59 @@ void Scene::UpdateUI(float elapsedTime)
 	// 플레이어 HP 
 	float playerHPRate = g_pPlayer->GetHP() / g_pPlayer->GetMaxHP();
 	float playerHPBarWidth = PLAYER_HP_BAR_WIDTH * playerHPRate;
-	m_pPlayerHPBar->ChangeSize(playerHPBarWidth, PLAYER_HP_BAR_HEIGHT);
+	m_pPlayerHP_Bar->ChangeSize(playerHPBarWidth, PLAYER_HP_BAR_HEIGHT);
 
 	// 몬스터 HP
 	Object* pTargetObject = pPlayer->GetPlayerTargetObject();
 	if (pTargetObject && pTargetObject->GetObjectType() == Object_Monster)
 	{
-		m_pEnemyHPBar->SetVisible(true);
+		m_pEnemyHP_Bar->SetVisible(true);
+		m_pEnemyHP_Frame->SetVisible(true);
+		m_pEnemyName_Back->SetVisible(true);
 
 		float targetHPRate = pTargetObject->GetHP() / pTargetObject->GetMaxHP();
 		float targetHPBarWidth = ENEMY_HP_BAR_WIDTH * targetHPRate;
-		m_pEnemyHPBar->ChangeSize(targetHPBarWidth, ENEMY_HP_BAR_HEIGHT);
-
+		m_pEnemyHP_Bar->ChangeSize(targetHPBarWidth, ENEMY_HP_BAR_HEIGHT);
 	}
 	else
 	{
-		m_pEnemyHPBar->SetVisible(false);
+		m_pEnemyHP_Bar->SetVisible(false);
+		m_pEnemyHP_Frame->SetVisible(false);
+		m_pEnemyName_Back->SetVisible(false);
 	}
 
 	Third_Person_Camera* tmpCam = (Third_Person_Camera*)m_pCamera.get();
 	if (tmpCam->GetIsShoulderView())
-		m_pPlayerAim->SetVisible(true);
+		m_pPlayer_Aim->SetVisible(true);
 	else
-		m_pPlayerAim->SetVisible(false);
+		m_pPlayer_Aim->SetVisible(false);
 
-	m_pPlayerAim->SetVisible(true);
+	m_pPlayer_Aim->SetVisible(true);
 
+	// Text UI 업데이트
 	// 점수 Text 갱신
 	wchar_t pstrScore[64] = L"Score : ";
 	wcscat_s(pstrScore, std::to_wstring(pPlayer->GetScore()).c_str());
+	int length = wcslen(pstrScore) - 9;
+	m_pTextUIs->UpdateTextUI(pstrScore, -CLIENT_WIDTH / 2 + 65 + (length * 7), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Score), Text_UI_Idx_Score);
 
-	// Text UI 업데이트
-	m_pTextUIs->UpdateTextUI(pstrScore, m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Score), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Score), Text_UI_Idx_Score);
+	// 몬스터 이름 출력
+	wchar_t pstrName[64] = L"";
+	if (pTargetObject && pTargetObject->GetObjectType() == Object_Monster)
+	{
+		wcscpy_s(pstrName, pTargetObject->GetOutName());
+	}
+	m_pTextUIs->UpdateTextUI(pstrName, m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Monster_Name), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Monster_Name), Text_UI_Idx_Monster_Name);
 
 	// Scene 이미지 UI 업데이트
-	m_pPlayerHPBar->Update(elapsedTime);
-	m_pEnemyHPBar->Update(elapsedTime);
-	m_pPlayerAim->Update(elapsedTime);
+	m_pPlayerHP_Bar->Update(elapsedTime);
+	m_pPlayerHP_Frame->Update(elapsedTime);
+	m_pEnemyHP_Bar->Update(elapsedTime);
+	m_pEnemyHP_Frame->Update(elapsedTime);
+	m_pPlayer_Aim->Update(elapsedTime);
+	m_pEnemyName_Back->Update(elapsedTime);
+	m_pHP_Back->Update(elapsedTime);
+	m_pScore_Back->Update(elapsedTime);
 }
 
 void Scene::UpdateSound()
@@ -612,9 +633,16 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 
 		pd3dCommandList->SetGraphicsRoot32BitConstants(0, 16, &m_xmf4x4ImgObjMat, 0);
 
-		m_pPlayerHPBar->Render(elapsedTime, pd3dCommandList);
-		m_pEnemyHPBar->Render(elapsedTime, pd3dCommandList);
-		m_pPlayerAim->Render(elapsedTime, pd3dCommandList);
+		m_pHP_Back->Render(elapsedTime, pd3dCommandList);
+		m_pScore_Back->Render(elapsedTime, pd3dCommandList);
+
+		m_pPlayerHP_Frame->Render(elapsedTime, pd3dCommandList);
+		m_pPlayerHP_Bar->Render(elapsedTime, pd3dCommandList);
+		m_pPlayer_Aim->Render(elapsedTime, pd3dCommandList);
+		m_pEnemyName_Back->Render(elapsedTime, pd3dCommandList);
+
+		m_pEnemyHP_Bar->Render(elapsedTime, pd3dCommandList);
+		m_pEnemyHP_Frame->Render(elapsedTime, pd3dCommandList);
 	}
 }
 
@@ -1004,7 +1032,7 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	{
 		std::shared_ptr<Player> pPlayer = std::make_shared<Player>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 		strcpy_s(pPlayer->m_pstrFileName, strFileName.c_str());
-		strcpy_s(pPlayer->m_pstrOutName, strFileName.c_str());
+		wcscpy_s(pPlayer->m_pstrOutName, L"Player");
 		//m_pPlayer = pPlayer;
 		pObject = std::static_pointer_cast<Object>(pPlayer);
 
@@ -1021,31 +1049,37 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		{
 			std::shared_ptr<Zombie> pMonster = std::make_shared<Zombie>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 			pObject = std::static_pointer_cast<Object>(pMonster);
+			wcscpy_s(pObject->m_pstrOutName, L"좀비");
 		}
 		else if (!strcmp(pstrFileName, HIGHZOMBIE_MODEL_NAME))
 		{
 			std::shared_ptr<HighZombie> pMonster = std::make_shared<HighZombie>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 			pObject = std::static_pointer_cast<Object>(pMonster);
+			wcscpy_s(pObject->m_pstrOutName, L"강화된 좀비");
 		}
 		else if (!strcmp(pstrFileName, SCAVENGER_MODEL_NAME))
 		{
 			std::shared_ptr<Scavenger> pMonster = std::make_shared<Scavenger>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 			pObject = std::static_pointer_cast<Object>(pMonster);
+			wcscpy_s(pObject->m_pstrOutName, L"사마귀");
 		}
 		else if (!strcmp(pstrFileName, GHOUL_MODEL_NAME))
 		{
 			std::shared_ptr<Ghoul> pMonster = std::make_shared<Ghoul>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 			pObject = std::static_pointer_cast<Object>(pMonster);
+			wcscpy_s(pObject->m_pstrOutName, L"구울");
 		}
 		else if (!strcmp(pstrFileName, CYBER_TWINS_MODEL_NAME))
 		{
 			std::shared_ptr<CyberTwins> pMonster = std::make_shared<CyberTwins>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 			pObject = std::static_pointer_cast<Object>(pMonster);
+			wcscpy_s(pObject->m_pstrOutName, L"트윈스");
 		}
 		else if (!strcmp(pstrFileName, NECROMANCER_MODEL_NAME))
 		{
 			std::shared_ptr<Necromancer> pMonster = std::make_shared<Necromancer>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 			pObject = std::static_pointer_cast<Object>(pMonster);
+			wcscpy_s(pObject->m_pstrOutName, L"강령술사");
 		}
 		else
 		{
@@ -1623,6 +1657,7 @@ void Scene::EmitCutSound(SoundType nType, bool bLoop)
 {
 	char pstrFilePath[64];
 	int tmpRand;
+	float volume = 0.3f;
 
 	switch (nType)
 	{
@@ -1641,10 +1676,12 @@ void Scene::EmitCutSound(SoundType nType, bool bLoop)
 	case Sound_Steel_Light:
 		strcpy_s(pstrFilePath, STEEL_LIGHT_CUT_SOUND);
 		tmpRand = rand() % 3 + 1;
+		volume = 1.0f;
 		break;
 	case Sound_Steel_Heavy:
 		strcpy_s(pstrFilePath, STEEL_HEAVY_CUT_SOUND);
 		tmpRand = rand() % 3 + 1;
+		volume = 1.0f;
 		break;
 	case Sound_Fabric:
 		strcpy_s(pstrFilePath, FABRIC_CUT_SOUND);
@@ -1661,7 +1698,7 @@ void Scene::EmitCutSound(SoundType nType, bool bLoop)
 	strcat_s(pstrFilePath, std::to_string(tmpRand).c_str());
 	strcat_s(pstrFilePath, ".wav");
 
-	EmitSound(pstrFilePath, bLoop, 1.0f, 0.3f);
+	EmitSound(pstrFilePath, bLoop, 1.0f, volume);
 }
 
 

@@ -191,7 +191,16 @@ void Weapon::Intersect(XMFLOAT3 xmf3PlayerLook, XMFLOAT3 xmf3CuttingNormal)
 			Player* pPlayer = (Player*)g_pPlayer.get();
 			pPlayer->SetPlayerTargetObject(g_vpMovableObjs[i]);
 
-			g_vpMovableObjs[i]->ApplyDamage(m_Power, xmf3PlayerLook, xmf3CuttingNormal);
+			XMVECTOR cuttingNormal = XMLoadFloat3(&xmf3CuttingNormal);
+			float rand_X = (float)(rand() % 200) / 10 - 10;
+			float rand_Y = (float)(rand() % 200) / 10 - 10;
+			float rand_Z = (float)(rand() % 200) / 10 - 10;
+			XMVECTOR orientation = XMQuaternionRotationRollPitchYaw(rand_X, rand_Y, rand_Z);
+			cuttingNormal =  XMVector3Rotate(cuttingNormal, orientation);
+			XMFLOAT3 xmf3Result;
+			XMStoreFloat3(&xmf3Result, cuttingNormal);
+
+			g_vpMovableObjs[i]->ApplyDamage(m_Power, xmf3PlayerLook, xmf3Result);
 			g_vpMovableObjs[i]->GetBody()->SetIsAwake(true);
 		}
 	}

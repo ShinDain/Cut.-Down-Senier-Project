@@ -54,10 +54,11 @@ bool SenierProjectApp::Initialize()
 		g_LoadedModelData.insert({ pstrFileName, pModelData });
 	}
 
+	
 	// Scene √ ±‚»≠
 	m_pSceneTextUI = std::make_shared<DWriteText>();
-	if (!m_pSceneTextUI->Initialize(m_d2dDeviceContext.Get(), m_dWriteFactory.Get(), 25, D2D1::ColorF::Black,
-		DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_LEADING))
+	if (!m_pSceneTextUI->Initialize(m_d2dDeviceContext.Get(), m_dWriteFactory.Get(), 25, D2D1::ColorF::LightGray,
+		DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_CENTER))
 		return false;
 	m_Scene = std::make_unique<Scene>();
 	if (!m_Scene->Initialize(m_d3d12Device.Get(), m_CommandList.Get(), m_pSceneTextUI))

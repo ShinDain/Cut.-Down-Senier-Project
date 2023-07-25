@@ -388,7 +388,7 @@ bool ImageObjectShader::BuildPSO(ID3D12Device* pd3dDevice)
 
 
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-	//depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthEnable = false;
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 	ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));

@@ -308,7 +308,7 @@ void Character::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 
 
 	XMVECTOR damageDirection = XMLoadFloat3(&xmf3DamageDirection);
 	damageDirection = XMVector3Normalize(damageDirection);
-	XMVECTOR deltaVelocity = damageDirection * power * 5;
+	XMVECTOR deltaVelocity = damageDirection * power;
 
 	XMFLOAT3 xmf3DeltaVelocity;
 	XMStoreFloat3(&xmf3DeltaVelocity, deltaVelocity);

@@ -79,7 +79,6 @@ void Player::Update(float elapsedTime)
 	// 오브젝트 파괴 타이머
 	if (m_bDestroying)
 	{
-
 	}
 
 	// 무적 시간 경과 누적
@@ -135,6 +134,12 @@ void Player::Update(float elapsedTime)
 	// 잡힌 물체 위치 조정
 	UpdateGrabedObjectPosition(elapsedTime);
 
+	if (m_pTargetObject)
+	{
+		if (!m_pTargetObject->GetIsAlive())
+			m_pTargetObject = nullptr;
+	}
+	
 	//if (m_bDecreaseMaxSpeed)
 	//{
 	//	XMFLOAT3 xmf3Velocity = m_pBody->GetVelocity();
@@ -474,16 +479,16 @@ void Player::ThrowProjectile()
 	}
 	else
 	{
-		XMFLOAT3 xmf3ProjectilePos = m_xmf3Position;
+		XMFLOAT3 xmf3ProjectilePos = m_xmf3CameraPosition;
 		XMVECTOR projectilePos = XMLoadFloat3(&xmf3ProjectilePos);
 
 		projectilePos += look * 3;
-		projectilePos += right * 4;
-		projectilePos += cameraUp * 10;
+		//projectilePos += right * 4;
+		//projectilePos += cameraUp * 5;
 		XMStoreFloat3(&xmf3ProjectilePos, projectilePos);
 		XMVECTOR projectileTarget = projectilePos;
 		projectileTarget += cameraLook * 10;
-		projectileTarget += cameraUp;
+		//projectileTarget += cameraUp;
 		XMVECTOR projectileVelocity = projectileTarget - projectilePos;
 		projectileVelocity = XMVector3Normalize(projectileVelocity);
 
@@ -491,6 +496,8 @@ void Player::ThrowProjectile()
 		projectileVelocity = projectileVelocity * 300;
 		XMStoreFloat3(&xmf3ProjectileVelocity, projectileVelocity);
 
+
+		// 모델 결정 및 효과음 적용
 		int nRand = rand() % 3;
 		char pstr[64];
 		switch (nRand)
