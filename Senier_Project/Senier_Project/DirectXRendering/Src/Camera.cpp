@@ -485,6 +485,7 @@ CinematicCamera::CinematicCamera()
 {
 	SetLens(0.25 * MathHelper::Pi, 1.0f, 1.0f, 1000.f);
 
+	m_pCameraFrustum = std::make_shared<BoundingFrustum>(XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, 0, 1), 0.6375f, -0.6375f, 0.425f, -0.425f, 1.0, 5000.0f);
 }
 
 CinematicCamera::~CinematicCamera()
@@ -506,4 +507,10 @@ void CinematicCamera::Update(float Etime)
 	m_bViewDirty = true;
 
 	UpdateViewMatrix();
+}
+
+void CinematicCamera::UpdateViewFrustum()
+{
+	m_pCameraFrustum->Origin = m_xmf3Position;
+	m_pCameraFrustum->Orientation = m_xmf4Orientation;
 }

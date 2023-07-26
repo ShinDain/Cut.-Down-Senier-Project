@@ -62,7 +62,9 @@ public:
 
 public:
 	void Play();
+	void Stop();
 	void Update(float elapsedTime);
+	void Destroy();
 
 	void AddCamera(std::shared_ptr<Camera> pCamera, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotation);
 	void AddTrack(std::shared_ptr<Object> pObject, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotation, XMFLOAT3 xmf3Scale);
@@ -83,8 +85,6 @@ protected:
 
 
 public:
-
-
 	bool GetCinematicEnd() { return m_bCinematicEnd; }
 
 };

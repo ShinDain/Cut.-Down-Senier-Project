@@ -14,6 +14,11 @@ void Cinematic::Play()
 	m_bPlay = true;
 }
 
+void Cinematic::Stop()
+{
+	m_bPlay = false;
+}
+
 void Cinematic::Update(float elapsedTime)
 {
 	if (m_bPlay)
@@ -61,6 +66,19 @@ void Cinematic::Update(float elapsedTime)
 			GetKeyFrameData(i, nCurIdx);
 		}
 	}
+}
+
+void Cinematic::Destroy()
+{
+	std::vector<CinematicTrack> m_vCinematicTracks;
+	CinematicCameraTrack m_CameraTrack;
+
+	for (int i = 0; i < m_vCinematicTracks.size(); ++i)
+	{
+		m_vCinematicTracks[i].pObject.reset();
+	}
+
+	m_CameraTrack.pCamera.reset();
 }
 
 void Cinematic::AddTrack(std::shared_ptr<Object> pObject, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotation, XMFLOAT3 xmf3Scale)
@@ -157,10 +175,14 @@ void Cinematic::GetCameraKeyFrameData(UINT nCurIdx)
 		// Rotation 보간
 		XMFLOAT4 xmf4NewOrientation;
 		XMVECTOR newOrientation;
-		XMVECTOR prevRotation = XMLoadFloat3(&cameraPrevKeyFrame.xmf3Rotation);
-		XMVECTOR prevOrientation = XMQuaternionRotationRollPitchYawFromVector(prevRotation);
-		XMVECTOR nextRotation = XMLoadFloat3(&cameraNextKeyFrame.xmf3Rotation);
-		XMVECTOR nextOrientation = XMQuaternionRotationRollPitchYawFromVector(nextRotation);
+		XMVECTOR prevOrientation = XMQuaternionRotationRollPitchYaw(
+			XMConvertToRadians(cameraPrevKeyFrame.xmf3Rotation.x),
+			XMConvertToRadians(cameraPrevKeyFrame.xmf3Rotation.y),
+			XMConvertToRadians(cameraPrevKeyFrame.xmf3Rotation.z));
+		XMVECTOR nextOrientation = XMQuaternionRotationRollPitchYaw(
+			XMConvertToRadians(cameraNextKeyFrame.xmf3Rotation.x),
+			XMConvertToRadians(cameraNextKeyFrame.xmf3Rotation.y),
+			XMConvertToRadians(cameraNextKeyFrame.xmf3Rotation.z));
 		newOrientation = XMQuaternionSlerp(prevOrientation, nextOrientation, weight);
 		XMStoreFloat4(&xmf4NewOrientation, newOrientation);
 
@@ -198,12 +220,12 @@ void Cinematic::GetKeyFrameData(UINT nTrackIdx, UINT nCurIdx)
 
 
 		// Rotation 보간
-		XMVECTOR prevRotation = XMLoadFloat3(&prevKeyFrame.xmf3Rotation);
-		XMVECTOR nextRotation = XMLoadFloat3(&nextKeyFrame.xmf3Rotation);
 		if(IsCharacter)
 		{
 			XMFLOAT3 xmf3NewRotation;
 			XMVECTOR newRotation;
+			XMVECTOR prevRotation = XMLoadFloat3(&prevKeyFrame.xmf3Rotation);
+			XMVECTOR nextRotation = XMLoadFloat3(&nextKeyFrame.xmf3Rotation);
 			newRotation = XMVectorLerp(prevRotation, nextRotation, weight);
 			XMStoreFloat3(&xmf3NewRotation, newRotation);
 			// Character는 Yaw 회전만 적용된다.
@@ -214,8 +236,15 @@ void Cinematic::GetKeyFrameData(UINT nTrackIdx, UINT nCurIdx)
 		{
 			XMFLOAT4 xmf4NewOrientation;
 			XMVECTOR newOrientation;
-			XMVECTOR prevOrientation = XMQuaternionRotationRollPitchYawFromVector(prevRotation);
-			XMVECTOR nextOrientation = XMQuaternionRotationRollPitchYawFromVector(nextRotation);
+			XMVECTOR prevOrientation = XMQuaternionRotationRollPitchYaw(
+				XMConvertToRadians(prevKeyFrame.xmf3Rotation.x),
+				XMConvertToRadians(prevKeyFrame.xmf3Rotation.y),
+				XMConvertToRadians(prevKeyFrame.xmf3Rotation.z));
+			XMVECTOR nextOrientation = XMQuaternionRotationRollPitchYaw(
+				XMConvertToRadians(nextKeyFrame.xmf3Rotation.x),
+				XMConvertToRadians(nextKeyFrame.xmf3Rotation.y),
+				XMConvertToRadians(nextKeyFrame.xmf3Rotation.z));
+			newOrientation = XMQuaternionSlerp(prevOrientation, nextOrientation, weight);
 			newOrientation = XMQuaternionSlerp(prevOrientation, nextOrientation, weight);
 			XMStoreFloat4(&xmf4NewOrientation, newOrientation);
 			pObject->GetBody()->SetOrientation(xmf4NewOrientation);

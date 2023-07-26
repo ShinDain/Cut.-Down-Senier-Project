@@ -100,6 +100,14 @@ protected:
 public:
 	std::shared_ptr<BoundingFrustum> m_pCameraFrustum;
 	void SetOrientation(XMFLOAT4 xmf4Orientation) { m_xmf4Orientation = xmf4Orientation; }
+
+	void SetOrientationByRotation(XMFLOAT3 xmf3Rotation) {
+		XMVECTOR orientation = XMQuaternionRotationRollPitchYaw(
+			XMConvertToRadians(xmf3Rotation.x),
+			XMConvertToRadians(xmf3Rotation.y),
+			XMConvertToRadians(xmf3Rotation.z));
+		XMStoreFloat4(&m_xmf4Orientation, orientation);
+	}
 };
 
 class Third_Person_Camera : public Camera
@@ -161,6 +169,7 @@ public:
 	virtual ~CinematicCamera();
 
 	virtual void Update(float Etime) override;
+	virtual void UpdateViewFrustum();
 };
 
 #endif

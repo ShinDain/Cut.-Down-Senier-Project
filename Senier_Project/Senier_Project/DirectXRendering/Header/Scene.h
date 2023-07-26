@@ -74,6 +74,8 @@ public:
 
 	void BuildDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
+	void GameStart();
+	void GameEnd();
 	void StageStart(UINT nMapNum);
 
 	virtual void OnResize(float aspectRatio, float newWidth, float newHeight);
@@ -133,6 +135,7 @@ private:
 	UINT m_nCurCinematicNum = 0;
 	std::vector<std::shared_ptr<Cinematic>> m_vpCinematics;
 	bool m_bInCinematic = false;
+	bool m_bPressAnyKey = false;
 
 	// 오브젝트 객체들
 	static std::vector<std::shared_ptr<Object>> m_vObjectLayer[(int)RenderLayer::Render_Count];

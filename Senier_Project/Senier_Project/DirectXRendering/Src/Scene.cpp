@@ -36,8 +36,11 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_ShadowMap = std::make_unique<DepthMap>(pd3dDevice, 2048, 2048);
 	BuildDescriptorHeap(pd3dDevice, pd3dCommandList);
 
-	// 스테이지 초기화 함수
-	StageStart(m_nStageNum);
+	// UI 초기화
+	InitUI(pd3dDevice, pd3dCommandList, pDWriteText);
+
+	// 게임 시작
+	GameStart();
 
 	// 플레이어
 	//CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 10, -20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.0f, 1.0f, 1.0f),
@@ -56,11 +59,6 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//// 월드 오브젝트 테스트
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), VINTILATIONBOX_MODEL_NAME, 0);
 	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
-
-	// UI 초기화
-	InitUI(pd3dDevice, pd3dCommandList, pDWriteText);
-	// 시네마틱 초기화
-	//InitCinematic();
 
 	return true;
 }
@@ -160,7 +158,8 @@ void Scene::OnResize(float aspectRatio, float newWidth, float newHeight)
 {
 	m_pCamera->SetLens(0.25f * MathHelper::Pi, aspectRatio, 1.0f, 10000.0f);
 
-	//m_ShadowMap->OnResize(newWidth, newHeight);
+	m_pCinematicCamera->SetLens(0.25f * MathHelper::Pi, aspectRatio, 1.0f, 10000.f);
+
 }
 
 void Scene::Update(float totalTime ,float elapsedTime)
@@ -204,7 +203,13 @@ void Scene::UpdateObject(float elapsedTime)
 	ClearObjectLayer();
 
 	// 카메라 프러스텀과 교차를 검증하여 렌더링 여부 업데이트
-	BoundingFrustum* camFus = m_pCamera->m_pCameraFrustum.get();
+	BoundingFrustum* camFus;
+	
+	if(m_bInCinematic)
+		camFus = m_pCinematicCamera->m_pCameraFrustum.get();
+	else
+		camFus = m_pCamera->m_pCameraFrustum.get();
+
 	for (int i = 0; i < g_vpAllObjs.size(); ++i)
 	{
 		if (!g_vpAllObjs[i]->GetIsAlive()) continue;
@@ -257,40 +262,36 @@ void Scene::UpdateUI(float elapsedTime)
 		m_pEnemyName_Back->SetVisible(false);
 	}
 
-	Third_Person_Camera* tmpCam = (Third_Person_Camera*)m_pCamera.get();
-	if (tmpCam->GetIsShoulderView())
-		m_pPlayer_Aim->SetVisible(true);
-	else
-		m_pPlayer_Aim->SetVisible(false);
-
-	m_pPlayer_Aim->SetVisible(true);
-
 	// Text UI 업데이트
-	// 점수 Text 갱신
-	wchar_t pstrScore[64] = L"Score : ";
-	wcscat_s(pstrScore, std::to_wstring(pPlayer->GetScore()).c_str());
-	int length = wcslen(pstrScore) - 9;
-	m_pTextUIs->UpdateTextUI(pstrScore, -CLIENT_WIDTH / 2 + 65 + (length * 7), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Score), Text_UI_Idx_Score);
-
-	// 몬스터 이름 출력
-	wchar_t pstrName[64] = L"";
-	if (pTargetObject && pTargetObject->GetObjectType() == Object_Monster)
-	{
-		wcscpy_s(pstrName, pTargetObject->GetOutName());
-	}
-	m_pTextUIs->UpdateTextUI(pstrName, m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Monster_Name), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Monster_Name), Text_UI_Idx_Monster_Name);
-
 	if (m_FadeInValue >= 1.0f)
 	{
-		m_pPlayerHP_Bar->SetVisible(true);
-		m_pPlayerHP_Frame->SetVisible(true);
-		m_pPlayer_Aim->SetVisible(true);
+		if (!m_bInCinematic)
+		{
+			m_pPlayerHP_Bar->SetVisible(true);
+			m_pPlayerHP_Frame->SetVisible(true);
+			m_pPlayer_Aim->SetVisible(true);
 
-		m_pHP_Back->SetVisible(true);
-		m_pScore_Back->SetVisible(true);
+			m_pHP_Back->SetVisible(true);
+			m_pScore_Back->SetVisible(true);
 
-		m_pTextUIs->UpdateTextUI(L"HP ", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_HP), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_HP), Text_UI_Idx_HP);
-		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Loading), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Loading), Text_UI_Idx_Loading);
+			m_pTextUIs->UpdateTextUI(L"HP ", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_HP), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_HP), Text_UI_Idx_HP);
+
+			// 점수 Text 갱신
+			wchar_t pstrScore[64] = L"Score : ";
+			wcscat_s(pstrScore, std::to_wstring(pPlayer->GetScore()).c_str());
+			int length = wcslen(pstrScore) - 9;
+			m_pTextUIs->UpdateTextUI(pstrScore, -CLIENT_WIDTH / 2 + 65 + (length * 7), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Score), Text_UI_Idx_Score);
+
+			// 몬스터 이름 출력
+			wchar_t pstrName[64] = L"";
+			if (pTargetObject && pTargetObject->GetObjectType() == Object_Monster)
+			{
+				wcscpy_s(pstrName, pTargetObject->GetOutName());
+			}
+			m_pTextUIs->UpdateTextUI(pstrName, m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Monster_Name), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Monster_Name), Text_UI_Idx_Monster_Name);
+		}
+		else
+			m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Loading), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Loading), Text_UI_Idx_Loading);
 	}
 	else
 	{
@@ -304,7 +305,7 @@ void Scene::UpdateUI(float elapsedTime)
 		m_pScore_Back->SetVisible(false);
 
 		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_HP), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_HP), Text_UI_Idx_HP);
-		m_pTextUIs->UpdateTextUI(L"", -CLIENT_WIDTH / 2 + 65 + (length * 7), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Score), Text_UI_Idx_Score);
+		m_pTextUIs->UpdateTextUI(L"", -CLIENT_WIDTH / 2 + 65, m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Score), Text_UI_Idx_Score);
 		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Monster_Name), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Monster_Name), Text_UI_Idx_Monster_Name);
 		m_pTextUIs->UpdateTextUI(L"Loading...", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Loading), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Loading), Text_UI_Idx_Loading);
 	}
@@ -476,7 +477,11 @@ void Scene::UpdateShadowPassCB(float totalTime, float elapsedTime)
 	// Only the first "main" light casts a shadow.
 	XMVECTOR lightDir = XMLoadFloat3(&m_BaseLightDirections[m_nStageNum]);
 	lightDir = XMVector3Normalize(lightDir);
-	XMFLOAT3 xmf3PlayerPos = g_pPlayer->GetPosition();
+	XMFLOAT3 xmf3PlayerPos;
+	if (m_bInCinematic)
+		xmf3PlayerPos = m_pCinematicCamera->GetPosition3f();
+	else
+		xmf3PlayerPos = g_pPlayer->GetPosition();
 	XMVECTOR targetPos = XMLoadFloat3(&xmf3PlayerPos);
 	//XMVECTOR targetPos = XMVectorSet(0, 0, 0, 1);
 	XMVECTOR lightPos = targetPos + -2.0f * sceneBoundRadius * lightDir;
@@ -773,7 +778,10 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 		return;
 	// 시네마틱 재생중
 	if (m_bInCinematic)
+	{
 		return;
+	}
+		
 
 	if (m_pCamera)
 	{
@@ -820,31 +828,25 @@ void Scene::KeyDownEvent(WPARAM wParam)
 {
 	switch (wParam)
 	{
-	case 'U':
-		//m_FadeState = 0;
+	case 'P':		// 다음 스테이지로 가는 테스트용 
+		//m_bNextStage = true;
+		InitCinematic();
 		break;
-	case 'O':
-		g_pPlayer->GetBody()->SetScale(XMFLOAT3(10.0f, 10.0f, 10.0f));
-		//for (int i = 0; i < g_vpAllObjs.size(); ++i)
-		//{
-		//	if (g_pPlayer.get() == g_vpAllObjs[i].get()) continue;
-		//	//if ( == g_vpAllObjs[i].get()) continue;
-		//
-		//	g_vpAllObjs[i]->SetIsAlive(false);
-		//}
-		//
-		//LoadMapData(g_pd3dDevice, g_pd3dCommandList, "OutSideMap");
+	default:
 		break;
-	case 'P':
-		m_bNextStage = true;
-		break;
-	
 	}
-	
-	// 시네마틱 재생중
-	if (m_bInCinematic)
-		return;
 
+	if (m_bInCinematic)
+	{
+		if (m_bPressAnyKey)
+		{
+			m_vpCinematics[m_nCurCinematicNum]->Play();
+			m_bPressAnyKey = false;
+		}
+		return;
+	}
+
+	// 애니메이션 테스트 용도
 	for (int i = 0; i < g_vpCharacters.size(); ++i)
 	{
 		g_vpCharacters[i]->KeyDownEvent(wParam);
@@ -866,7 +868,15 @@ void Scene::LeftButtonDownEvent()
 {
 	// 시네마틱 재생중
 	if (m_bInCinematic)
+	{
+		if (m_bPressAnyKey)
+		{
+			m_vpCinematics[m_nCurCinematicNum]->Play();
+			m_bPressAnyKey = false;
+		}
 		return;
+	}
+		
 
 	if (g_pPlayer)
 	{
@@ -879,7 +889,14 @@ void Scene::RightButtonDownEvent()
 {
 	// 시네마틱 재생중
 	if (m_bInCinematic)
+	{
+		if (m_bPressAnyKey)
+		{
+			m_vpCinematics[m_nCurCinematicNum]->Play();
+			m_bPressAnyKey = false;
+		}
 		return;
+	}
 
 	if (g_pPlayer) 
 	{
@@ -1824,6 +1841,35 @@ void Scene::ChangeStage()
 		}
 	}
 }
+
+void Scene::GameStart()
+{
+	// 페이드 아웃 상태로 시작
+	m_FadeState = 0;
+	m_FadeInValue = 0.0f;
+
+	// 0번 스테이지부터 시작
+	m_nStageNum = 0;
+	// 스테이지 초기화 함수
+	StageStart(m_nStageNum);
+
+	// 페이드 인
+	m_FadeState = 1;
+
+	// 시작 시네마틱 초기화
+	InitCinematic();
+
+	// 플레이 직후 종료 => 키입력 후부터 시작
+	PlayCinematic(m_nCurCinematicNum);
+	m_vpCinematics[m_nCurCinematicNum]->Stop();
+	// 키입력 수신
+	m_bPressAnyKey = true;
+}
+
+void Scene::GameEnd()
+{
+}
+
 void Scene::StageStart(UINT nMapNum)
 {
 	float hp = 300;
@@ -1888,44 +1934,52 @@ void Scene::StageStart(UINT nMapNum)
 
 bool Scene::InitCinematic()
 {
-	m_pCinematicCamera = std::make_shared<Camera>();
-	//m_pCinematicCamera->SetPosition(0, 30, -100);
+	for (int i = 0; i < m_vpCinematics.size(); ++i)
+	{
+		m_vpCinematics[i]->Destroy();
+		m_vpCinematics.erase(m_vpCinematics.begin() + i);
+	}
+	
+	m_pCinematicCamera = std::make_shared<CinematicCamera>();
+	m_pCinematicCamera->SetPosition(XMFLOAT3(20, 10, 20));
+	m_pCinematicCamera->SetOrientationByRotation(XMFLOAT3(0, -120, 0));
 	m_pCinematicCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
 
 	std::shared_ptr<Cinematic> pCinematic = std::make_shared<Cinematic>();
 
-	std::shared_ptr<Object> pObject;
-	XMFLOAT3 position;
-	XMFLOAT3 rotation;
-	XMFLOAT3 scale;
-	auto pFunction = nullptr;
+	//std::shared_ptr<Object> pObject;
+	//XMFLOAT3 position;
+	//XMFLOAT3 rotation;
+	//XMFLOAT3 scale;
+	//auto pFunction = nullptr;
 
 	// 카메라 연결 및 조작
-	pCinematic->AddCamera(m_pCinematicCamera, XMFLOAT3(0, 20, 0), XMFLOAT3(0, 0, 0));
-	pCinematic->AddCameraKeyFrame(0.5f, XMFLOAT3(0, 20, 0), XMFLOAT3(0, 0, 0));
+	pCinematic->AddCamera(m_pCinematicCamera, XMFLOAT3(20, 10, 20), XMFLOAT3(0, -120, 0));
+	pCinematic->AddCameraKeyFrame(1.0f, XMFLOAT3(20, 10, 20), XMFLOAT3(0, -120, 0));
+	pCinematic->AddCameraKeyFrame(5.0f, XMFLOAT3(0, 15, -70), XMFLOAT3(15, 0, 0));
 	//pCinematic->AddCameraKeyFrame(1.0f, XMFLOAT3(0, 0, 0),   XMFLOAT3(0, 0, 0));
 	//pCinematic->AddCameraKeyFrame(1.5f, XMFLOAT3(0, 50, 0),  XMFLOAT3(0, 90, 0));
 
 	// 오브젝트 연결 및 조작
-	pObject = m_vObjectLayer[RenderLayer::Render_Skinned][1];
-	position = pObject->GetPosition();
-	rotation = pObject->GetRotation();
-	scale = pObject->GetScale();
-
-	pCinematic->AddTrack(pObject, position, rotation, scale);
-	pCinematic->AddKeyFrame(0, 0.5f, position, XMFLOAT3(0, 30, 0), scale, pFunction);
-	pCinematic->AddKeyFrame(0, 1.0f, position, XMFLOAT3(0, 30, 0), scale, pFunction);
-	pCinematic->AddKeyFrame(0, 1.5f, position, XMFLOAT3(0, 90, 0), scale, pFunction);
-
-	pObject = m_vObjectLayer[RenderLayer::Render_TextureMesh][5];
-	position = pObject->GetPosition();
-	rotation = pObject->GetRotation();
-	scale = pObject->GetScale();
-
-	pCinematic->AddTrack(pObject, position, rotation, scale);
-	pCinematic->AddKeyFrame(1, 0.5f, position, XMFLOAT3(0, 30, 0), scale, pFunction);
-	pCinematic->AddKeyFrame(1, 1.0f, position, XMFLOAT3(0, 30, 100), scale, pFunction);
-	pCinematic->AddKeyFrame(1, 1.5f, position, XMFLOAT3(0, 90, 500), scale, pFunction);
+	//pObject = m_vObjectLayer[RenderLayer::Render_Skinned][1];
+	//position = pObject->GetPosition();
+	//rotation = pObject->GetRotation();
+	//scale = pObject->GetScale();
+	//
+	//pCinematic->AddTrack(pObject, position, rotation, scale);
+	//pCinematic->AddKeyFrame(0, 0.5f, position, XMFLOAT3(0, 30, 0), scale, pFunction);
+	//pCinematic->AddKeyFrame(0, 1.0f, position, XMFLOAT3(0, 30, 0), scale, pFunction);
+	//pCinematic->AddKeyFrame(0, 1.5f, position, XMFLOAT3(0, 90, 0), scale, pFunction);
+	//
+	//pObject = m_vObjectLayer[RenderLayer::Render_TextureMesh][5];
+	//position = pObject->GetPosition();
+	//rotation = pObject->GetRotation();
+	//scale = pObject->GetScale();
+	//
+	//pCinematic->AddTrack(pObject, position, rotation, scale);
+	//pCinematic->AddKeyFrame(1, 0.5f, position, XMFLOAT3(0, 30, 0), scale, pFunction);
+	//pCinematic->AddKeyFrame(1, 1.0f, position, XMFLOAT3(0, 30, 100), scale, pFunction);
+	//pCinematic->AddKeyFrame(1, 1.5f, position, XMFLOAT3(0, 90, 500), scale, pFunction);
 
 	m_vpCinematics.emplace_back(pCinematic);
 
