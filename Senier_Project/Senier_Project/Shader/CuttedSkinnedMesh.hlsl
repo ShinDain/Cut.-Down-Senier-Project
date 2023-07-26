@@ -128,7 +128,7 @@ float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 	// 흔히 하는 방식대로, 분산 재질에서 알파를 가져온다.
 	litColor.a = diffuseAlbedo.a;
 
-	return litColor;
+	return litColor * gFadeInValue;
 }
 
 

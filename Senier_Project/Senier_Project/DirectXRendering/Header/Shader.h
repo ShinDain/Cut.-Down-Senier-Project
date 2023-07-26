@@ -75,8 +75,26 @@ protected:
 	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
 };
 
-// ½ºÅ°´× ¸Þ½Ã ¼ÎÀÌ´õ
+class BackfaceShader : public Shader
+{
+public:
+	BackfaceShader();
+	BackfaceShader(const BackfaceShader& rhs) = delete;
+	BackfaceShader& operator=(const BackfaceShader& rhs) = delete;
+	virtual ~BackfaceShader();
 
+	virtual void ChangeShader(ID3D12GraphicsCommandList* pd3dCommandList)
+	{
+		Shader::ChangeShader(pd3dCommandList);
+		g_curShader = m_Type;
+	}
+protected:
+	virtual bool BuildPSO(ID3D12Device* pd3dDevice);
+	virtual bool BuildShadersAndInputLayout();
+	virtual bool BuildRootSignature(ID3D12Device* pd3dDevice);
+};
+
+// ½ºÅ°´× ¸Þ½Ã ¼ÎÀÌ´õ
 class SkinnedMeshShader : public Shader
 {
 public:

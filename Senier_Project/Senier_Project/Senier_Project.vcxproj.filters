@@ -149,6 +149,9 @@
     <ClCompile Include="Game\Src\Event.cpp">
       <Filter>Game\Src</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Src\BackfaceObject.cpp">
+      <Filter>Game\Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Physics\Header\Collider.h">
@@ -289,6 +292,9 @@
     <ClInclude Include="Game\Header\Event.h">
       <Filter>Game\Header</Filter>
     </ClInclude>
+    <ClInclude Include="Game\Header\BackfaceObject.h">
+      <Filter>Game\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\default.hlsl">
@@ -322,6 +328,9 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shader\Shadow_Cutted.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\Backface.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

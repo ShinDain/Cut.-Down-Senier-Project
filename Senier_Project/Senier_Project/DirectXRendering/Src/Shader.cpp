@@ -231,6 +231,107 @@ bool TextureMeshShader::BuildRootSignature(ID3D12Device* pd3dDevice)
 	return true;
 }
 
+// 은면 셰이더
+BackfaceShader::BackfaceShader()
+{
+	m_Type = ShaderType::Shader_BackFace;
+}
+
+BackfaceShader::~BackfaceShader()
+{
+}
+
+bool BackfaceShader::BuildShadersAndInputLayout()
+{
+	HRESULT hr = S_OK;
+
+	m_vsByteCode = d3dUtil::CompileShader(L"Shader\\Backface.hlsl", nullptr, "VS", "vs_5_0");
+	m_psByteCode = d3dUtil::CompileShader(L"Shader\\Backface.hlsl", nullptr, "PS", "ps_5_0");
+
+	m_vInputLayout = {
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
+		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 2, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
+		{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 3, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
+		{"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 4, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
+	};
+
+	return true;
+}
+
+bool BackfaceShader::BuildPSO(ID3D12Device* pd3dDevice)
+{
+	
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
+	ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+	psoDesc.InputLayout = { m_vInputLayout.data(), (UINT)m_vInputLayout.size() };
+	psoDesc.pRootSignature = m_RootSignature.Get();
+	psoDesc.VS = {
+		reinterpret_cast<BYTE*>(m_vsByteCode->GetBufferPointer()),
+		m_vsByteCode->GetBufferSize() };
+	psoDesc.PS = {
+		reinterpret_cast<BYTE*>(m_psByteCode->GetBufferPointer()),
+		m_psByteCode->GetBufferSize() };
+
+	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	// 은면을 그린다.
+	psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_FRONT;
+	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	psoDesc.SampleMask = UINT_MAX;
+	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	psoDesc.NumRenderTargets = 1;
+	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	psoDesc.SampleDesc.Count = 1;
+	psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+	ThrowIfFailed(pd3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_PSO)));
+
+	return true;
+}
+
+bool BackfaceShader::BuildRootSignature(ID3D12Device* pd3dDevice)
+{
+	CD3DX12_ROOT_PARAMETER slotRootParameter[6];
+
+	CD3DX12_DESCRIPTOR_RANGE texTable1;
+	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0);
+
+	CD3DX12_DESCRIPTOR_RANGE texTable2;
+	texTable2.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 2, 0);
+
+	slotRootParameter[0].InitAsConstants(32, 0);		// 월드 변환 행렬	// 오브젝트 상수 버퍼 
+	slotRootParameter[1].InitAsConstantBufferView(3);	// 패스 버퍼
+	slotRootParameter[2].InitAsConstantBufferView(4);	// 재질 버퍼
+	slotRootParameter[3].InitAsConstantBufferView(5);	// 오브젝트 버퍼
+	slotRootParameter[4].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_ALL);
+	slotRootParameter[5].InitAsDescriptorTable(1, &texTable2, D3D12_SHADER_VISIBILITY_ALL);
+
+	// 샘플러
+	auto staticSamplers = GetStaticSampler();
+
+	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(_countof(slotRootParameter), slotRootParameter,
+		(UINT)staticSamplers.size(), staticSamplers.data(),
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+	ComPtr<ID3DBlob> serializedRootSig = nullptr;
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+		serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+	if (errorBlob != nullptr)
+	{
+		::OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	}
+
+	ThrowIfFailed(hr);
+
+	ThrowIfFailed(pd3dDevice->CreateRootSignature(
+		0, serializedRootSig->GetBufferPointer(),
+		serializedRootSig->GetBufferSize(),
+		IID_PPV_ARGS(&m_RootSignature)));
+	return true;
+}
 
 //////////////////////////////////////////////////////////
 

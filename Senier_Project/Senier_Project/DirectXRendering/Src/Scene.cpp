@@ -1,6 +1,6 @@
 #include "../Header/Scene.h"
 
-UINT Scene::m_nStageNum = 2;
+UINT Scene::m_nStageNum = 0;
 std::vector<std::shared_ptr<Object>> Scene::m_vObjectLayer[(int)RenderLayer::Render_Count];
 CollisionData Scene::m_CollisionData;
 std::unique_ptr<CollisionResolver> Scene::m_pCollisionResolver;
@@ -36,25 +36,26 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	m_ShadowMap = std::make_unique<DepthMap>(pd3dDevice, 2048, 2048);
 	BuildDescriptorHeap(pd3dDevice, pd3dCommandList);
 
+	// 스테이지 초기화 함수
 	StageStart(m_nStageNum);
 
-	// 월드 오브젝트 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HOSPITAL_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HANGAR_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), STOCK_FLOOR_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(200, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), MORGUE_BOX_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(20, 0, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), EVENT_BOX_MODEL_NAME, 0);
-
-	//g_vpEventObjs[0]->SetIsActive(true);
-
-	CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(400, 20, -400), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(0.8f, 0.8f, 0.8f), CYBER_TWINS_MODEL_NAME, MONSTER_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 25), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), SCAVENGER_MODEL_NAME, MONSTER_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 25), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 30), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), HIGHZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-50, 20, 30), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
-	
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(-40, 20, 40), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), EVENT_BOX_MODEL_NAME, 0);
+	// 플레이어
+	//CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 10, -20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.0f, 1.0f, 1.0f),
+	//	CHARACTER_MODEL_NAME, PLAYER_TRACK_CNT);
+	//
+	//// 카메라 초기화
+	//m_pCamera = nullptr;
+	//m_pCamera = std::make_unique<Third_Person_Camera>(g_pPlayer);
+	//m_pCamera->Pitch(15);
+	//
+	//// 무기
+	//CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(-0.59f, 0.135f, 0.063f), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90), XMFLOAT3(1, 1, 1), WEAPON_MODEL_NAME, 0);
+	//// 바닥
+	//CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, 0);
+	//
+	//// 월드 오브젝트 테스트
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), VINTILATIONBOX_MODEL_NAME, 0);
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
 
 	// UI 초기화
 	InitUI(pd3dDevice, pd3dCommandList, pDWriteText);
@@ -164,6 +165,7 @@ void Scene::OnResize(float aspectRatio, float newWidth, float newHeight)
 
 void Scene::Update(float totalTime ,float elapsedTime)
 {
+	// 언제든지 m_bNextStage 변수가 참 일시,
 	ChangeStage();
 	// 화면 전환 효과
 	UpdateFadeInOut(elapsedTime);
@@ -566,9 +568,19 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 	{
 		if (!m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->GetIsAlive())
 			continue;
-
+	
 		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->UpdateTransform(NULL);
 		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(elapsedTime, pd3dCommandList);
+	}
+
+	ChangeShader(ShaderType::Shader_BackFace, pd3dCommandList);
+	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Backface].size(); ++i)
+	{
+		if (!m_vObjectLayer[RenderLayer::Render_Backface][i]->GetIsAlive())
+			continue;
+
+		m_vObjectLayer[RenderLayer::Render_Backface][i]->UpdateTransform(NULL);
+		m_vObjectLayer[RenderLayer::Render_Backface][i]->Render(elapsedTime, pd3dCommandList);
 	}
 
 	ChangeShader(ShaderType::Shader_CuttedStatic, pd3dCommandList);
@@ -1110,11 +1122,19 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	case Object_Movable:
 	{
 		pObject = std::make_shared<Object>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
-
 		g_vpAllObjs.emplace_back(pObject);
 		g_vpMovableObjs.emplace_back(pObject);
 		g_vpWorldObjs.emplace_back(pObject);
 		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
+	   
+		objectData.xmf3Scale.x *= 1.03f;
+		objectData.xmf3Scale.y *= 1.03f;
+		objectData.xmf3Scale.z *= 1.03f;
+		objectData.bShadow = false;
+		std::shared_ptr<BackfaceObject> pBackfaceObject = std::make_shared<BackfaceObject>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+		pBackfaceObject->SetOriginalObject(pObject);
+		g_vpAllObjs.emplace_back(pBackfaceObject);
+		m_vObjectLayer[Render_Backface].emplace_back(pBackfaceObject);
 	}
 	break;
 
@@ -1141,6 +1161,15 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 			g_vpWorldObjs.emplace_back(pObject);
 		}
 		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
+
+		objectData.xmf3Scale.x *= 1.03f;
+		objectData.xmf3Scale.y *= 1.03f;
+		objectData.xmf3Scale.z *= 1.03f;
+		objectData.bShadow = false;
+		std::shared_ptr<BackfaceObject> pBackfaceObject = std::make_shared<BackfaceObject>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+		pBackfaceObject->SetOriginalObject(pObject);
+		g_vpAllObjs.emplace_back(pBackfaceObject);
+		m_vObjectLayer[Render_Backface].emplace_back(pBackfaceObject);
 	}
 	break;
 
@@ -1157,6 +1186,15 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 			g_vpWorldObjs.emplace_back(pObject);
 		}
 		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
+
+		objectData.xmf3Scale.x *= 1.03f;
+		objectData.xmf3Scale.y *= 1.03f;
+		objectData.xmf3Scale.z *= 1.03f;
+		objectData.bShadow = false;
+		std::shared_ptr<BackfaceObject> pBackfaceObject = std::make_shared<BackfaceObject>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
+		pBackfaceObject->SetOriginalObject(pObject);
+		g_vpAllObjs.emplace_back(pBackfaceObject);
+		m_vObjectLayer[Render_Backface].emplace_back(pBackfaceObject);
 	}
 	break;
 

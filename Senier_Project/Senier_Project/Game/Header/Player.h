@@ -175,8 +175,9 @@ protected:
 
 	void ObjectGrab();
 	void UpdateGrabedObjectPosition(float elapsedTime);
-	std::shared_ptr<Object> CameraRayToMovableObject(bool bCharacter, float& outDistance);
+	void CameraRayToMovableObject();
 
+	std::shared_ptr<Object> m_pPickedObject = nullptr;
 	std::shared_ptr<Object> m_pGrabedObject = nullptr;
 	GrabState m_GrabState = GrabState::Grab_Empty;
 	float m_GrappleTime = 10.0f;

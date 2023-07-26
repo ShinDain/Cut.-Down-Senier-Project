@@ -131,6 +131,7 @@ void Player::Update(float elapsedTime)
 		m_MaxSpeedXZ = m_DefaultMaxSpeedXZ;
 	}
 
+	CameraRayToMovableObject();
 	// 잡힌 물체 위치 조정
 	UpdateGrabedObjectPosition(elapsedTime);
 
@@ -163,6 +164,12 @@ void Player::Destroy()
 
 	if(m_pWeapon) m_pWeapon->Destroy();
 	m_pWeapon.reset();
+
+	if (m_pPickedObject)
+		m_pPickedObject.reset();
+
+	if (m_pTargetObject)
+		m_pTargetObject.reset();
 }
 
 void Player::ProcessInput(UCHAR* pKeybuffer)
@@ -419,7 +426,6 @@ void Player::ThrowProjectile()
 	//	Sound::PlaySoundFile(throw2_SoundFileName, true);
 	
 	float pickDistance = 0;
-	std::shared_ptr<Object> pickedObject = CameraRayToMovableObject(true, pickDistance);
 
 	m_bCanThrow = false;
 
@@ -443,9 +449,9 @@ void Player::ThrowProjectile()
 		XMVECTOR projectilePos = XMLoadFloat3(&xmf3ProjectilePos);
 
 		XMVECTOR projectileTarget;
-		if (pickedObject)
+		if (m_pPickedObject)
 		{
-			projectileTarget = XMLoadFloat3(&pickedObject->GetPosition());
+			projectileTarget = XMLoadFloat3(&m_pPickedObject->GetPosition());
 		}
 		else
 		{
@@ -456,11 +462,6 @@ void Player::ThrowProjectile()
 
 		XMVECTOR projectileVelocity = projectileTarget - projectilePos;
 		projectileVelocity = XMVector3Normalize(projectileVelocity);
-
-		//if (XMVectorGetX(XMVector3Length(projectileVelocity)) < 200)
-		//{
-		//	projectileVelocity = projectileVelocity * 200;
-		//}
 
 		XMFLOAT3 xmf3ProjectileVelocity;
 		projectileVelocity = projectileVelocity * 300;
@@ -1006,9 +1007,12 @@ void Player::ObjectGrab()
 {
 	float distance;
 
-	std::shared_ptr<Object> pickedObject = CameraRayToMovableObject(false, distance);
-	if (pickedObject)
+	//std::shared_ptr<Object> pickedObject = CameraRayToMovableObject(false, distance);
+	if (m_pPickedObject)
 	{
+		if (m_pPickedObject->GetObjectType() == ObjectType::Object_Monster)
+			return;
+
 		// 손이 빈 경우
 		if (m_GrabState == GrabState::Grab_Empty)
 		{
@@ -1019,12 +1023,12 @@ void Player::ObjectGrab()
 			//	Sound::PlaySoundFile(grab2_SoundFileName, true);
 
 
-			ColliderBox* pColliderBox = (ColliderBox*)(pickedObject->GetCollider().get());
+			ColliderBox* pColliderBox = (ColliderBox*)(m_pPickedObject->GetCollider().get());
 
 			// 디버그용
 			pColliderBox->SetIntersect(1);
 
-			m_pGrabedObject = pickedObject;
+			m_pGrabedObject = m_pPickedObject;
 			m_GrabState = GrabState::Grab_Moving;
 			// 충돌검사 비활성화
 			m_pGrabedObject->GetCollider()->SetIsActive(false);
@@ -1045,12 +1049,12 @@ void Player::ObjectGrab()
 
 			m_ElapsedGrappleTime = 0.0f;
 
-			ColliderBox* pColliderBox = (ColliderBox*)(pickedObject->GetCollider().get());
+			ColliderBox* pColliderBox = (ColliderBox*)(m_pPickedObject->GetCollider().get());
 
 			// 디버그용
 			pColliderBox->SetIntersect(1);
 
-			m_pGrabedObject = pickedObject;
+			m_pGrabedObject = m_pPickedObject;
 			m_GrabState = GrabState::Grab_Moving;
 			// 충돌검사 비활성화
 			m_pGrabedObject->GetCollider()->SetIsActive(false);
@@ -1138,8 +1142,15 @@ void Player::UpdateGrabedObjectPosition(float elapsedTime)
 	}
 }
 
-std::shared_ptr<Object> Player::CameraRayToMovableObject(bool bCharacter, float& outDistance)
+void Player::CameraRayToMovableObject()
 {
+	if (m_pPickedObject)
+	{
+		if (m_pPickedObject->GetObjectType() == ObjectType::Object_Movable)
+			m_pPickedObject->SetPicked(false);
+		m_pPickedObject = nullptr;
+	}
+
 	XMVECTOR cameraPos = XMLoadFloat3(&m_xmf3CameraPosition);
 
 	XMVECTOR cameraLook = XMVectorSet(0, 0, 1, 0);
@@ -1150,10 +1161,6 @@ std::shared_ptr<Object> Player::CameraRayToMovableObject(bool bCharacter, float&
 	cameraRight = XMVector3TransformNormal(cameraRight, R);
 	R = XMMatrixRotationAxis(cameraRight, XMConvertToRadians(m_xmf3CameraRotation.x));
 	cameraLook = XMVector3TransformNormal(cameraLook, R);
-	//cameraPos += cameraLook * 4
-
-
-	// cameraLook => 광선의 방향
 
 	float distance = 0;
 	float standard = 250;
@@ -1163,16 +1170,14 @@ std::shared_ptr<Object> Player::CameraRayToMovableObject(bool bCharacter, float&
 
 	for (int i = 0; i < g_vpWorldObjs.size(); ++i)
 	{
-		if (g_vpWorldObjs[i]->GetColliderType() != ColliderType::Collider_Box)
-			continue;
+		if (!g_vpWorldObjs[i]->GetIsAlive()) continue;
+		if (g_vpWorldObjs[i]->GetColliderType() != ColliderType::Collider_Box)	continue;
 
 		// 캐릭터 제외
-		if (!bCharacter)
-		{
-			UINT objType = g_vpWorldObjs[i]->GetObjectType();
-			if (objType == ObjectType::Object_Monster || objType == ObjectType::Object_Player)
-				continue;
-		}
+		UINT objType = g_vpWorldObjs[i]->GetObjectType();
+		if (objType == ObjectType::Object_Player)
+			continue;
+
 		// 이미 잡힌 물체 제외
 		if (g_vpWorldObjs[i] == m_pGrabedObject)
 			continue;
@@ -1181,12 +1186,9 @@ std::shared_ptr<Object> Player::CameraRayToMovableObject(bool bCharacter, float&
 			continue;
 
 		ColliderBox* pColliderBox = (ColliderBox*)(g_vpWorldObjs[i]->GetCollider().get());
-		//BoundingSphere* pBS = pColliderBox->GetBoundingSphere().get();
 		BoundingOrientedBox* pOBB = pColliderBox->GetOBB().get();
 
 		pColliderBox->SetIntersect(0);
-
-		//pBS->Intersects(cameraPos, cameraLook, distance);
 		pOBB->Intersects(cameraPos, cameraLook, distance);
 		// 사거리보다 가까운 / 0 이상인 / 이전 물체보다 가까운
 		if (distance < standard && distance > 0 && distance < closestDistance)
@@ -1196,11 +1198,14 @@ std::shared_ptr<Object> Player::CameraRayToMovableObject(bool bCharacter, float&
 		}
 	}
 
-	if (bestIndex >= 0 && g_vpWorldObjs[bestIndex]->GetObjectType() == ObjectType::Object_Movable)
+	if (bestIndex >= 0 && g_vpWorldObjs[bestIndex]->GetBody()->GetPhysics())
 	{
-		outDistance = closestDistance;
-		return g_vpWorldObjs[bestIndex];
+		m_pPickedObject = g_vpWorldObjs[bestIndex];
+		if(g_vpWorldObjs[bestIndex]->GetObjectType() == ObjectType::Object_Movable)
+			m_pPickedObject->SetPicked(true);
 	}
 	else
-		return nullptr;
+	{
+		m_pPickedObject = nullptr;
+	}
 }

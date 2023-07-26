@@ -35,7 +35,7 @@ public:
 		   ObjectInitData objData,
 		   std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext);
 
-	//Object(const Object& rhs);
+	Object(const Object& rhs) = delete;
 	Object& operator=(const Object& rhs) = delete;
 	virtual ~Object();
 
@@ -295,9 +295,13 @@ public:
 
 	bool GetVisible() { return m_bVisible; }
 
+private:
+	bool m_bPicked = false;
+
+public:
+	void SetPicked(bool bPicked) { m_bPicked = bPicked; }
+
+	bool GetPicked() { return m_bPicked; }
 };
-
-
-
 
 #endif // !OBJECT_H
