@@ -43,7 +43,7 @@ public:
 	std::shared_ptr<RigidBody> GetBody() const { return m_pRigidBody; }
 
 	void SetIsActive(bool bIsActive) { m_bIsActive = bIsActive; }
-	const bool GetIsActive() const { return m_bIsActive; }
+ 	const bool GetIsActive() const { return m_bIsActive; }
 	void SetCharacterActive(bool bIsActive) { m_bCharacterActive = bIsActive; }
 	const bool GetCharacterActive() const { return m_bCharacterActive; }
 	void SetIntersect(float intersect) { m_Intersect = intersect; }

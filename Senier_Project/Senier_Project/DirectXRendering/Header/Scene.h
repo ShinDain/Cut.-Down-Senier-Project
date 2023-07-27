@@ -55,7 +55,16 @@ enum TextUIIdx
 	Text_UI_Idx_HP,
 	Text_UI_Idx_Score,
 	Text_UI_Idx_Monster_Name,
-	Text_UI_Idx_Loading
+	Text_UI_Idx_Loading,
+	Text_UI_Idx_AnyKey,
+	Text_UI_Idx_Thanks
+};
+
+enum BigSizeTextUIIdx
+{
+	Big_Text_UI_Idx_Title,
+	Big_Text_UI_Idx_End,
+	Big_Text_UI_Idx_Over
 };
 
 class Scene
@@ -66,17 +75,15 @@ public:
 	Scene& operator=(const Scene& rhs) = delete;
 	virtual ~Scene();
 
-	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText);
+	virtual bool Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		std::shared_ptr<DWriteText> pDWriteText, std::shared_ptr<DWriteText> pBigSizeText);
 
-	bool InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText);
+	bool InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+		std::shared_ptr<DWriteText> pDWriteText, std::shared_ptr<DWriteText> pBigSizeText);
 	bool InitCinematic();
 	bool InitEvent(UINT nMapNum);
 
 	void BuildDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
-
-	void GameStart();
-	void GameEnd();
-	void StageStart(UINT nMapNum);
 
 	virtual void OnResize(float aspectRatio, float newWidth, float newHeight);
 	virtual void Update(float totalTime, float elapsedTime);
@@ -132,11 +139,6 @@ private:
 	std::unique_ptr<Camera> m_pCamera = nullptr;
 	std::shared_ptr<Camera> m_pCinematicCamera = nullptr;
 
-	UINT m_nCurCinematicNum = 0;
-	std::vector<std::shared_ptr<Cinematic>> m_vpCinematics;
-	bool m_bInCinematic = false;
-	bool m_bPressAnyKey = false;
-
 	// 오브젝트 객체들
 	static std::vector<std::shared_ptr<Object>> m_vObjectLayer[(int)RenderLayer::Render_Count];
 	
@@ -153,10 +155,13 @@ private:
 
 	// Text로 표시될 UI의 전체 총괄 객체
 	std::shared_ptr<DWriteText> m_pTextUIs = nullptr;
+	std::shared_ptr<DWriteText> m_pBigSizeTextUI = nullptr;
 
 	static UINT m_nStageNum;
 	static std::unique_ptr<CollisionResolver> m_pCollisionResolver;
 	static CollisionData m_CollisionData;
+
+	float m_PlayerStartScore = 0;
 
 	POINT m_LastMousePos = { 0,0 };
 
@@ -183,8 +188,6 @@ private:
 	float m_FadeTimer = 2.0f;
 	bool m_bFadeTimer = false;
 	float m_ElapsedFadeTimer = 0.0f;
-
-	bool m_bNextStage = false;
 	
 public:
 	void SetViewProjMatrix(XMFLOAT4X4 viewProj) { m_xmf4x4ViewProj = viewProj; }
@@ -201,6 +204,26 @@ protected:
 	static std::shared_ptr<CSound> m_pMainBGM;
 	static std::vector<std::shared_ptr<CSound>> m_vpSounds;
 
+// 게임 로직 관련
+public:
+	void GameStart();
+	void Restart();
+	void GameOver();
+	void GameEnd();
+	void StageStart(UINT nMapNum);
+
+
+
+private:
+	UINT m_nCurCinematicNum = 0;
+	std::vector<std::shared_ptr<Cinematic>> m_vpCinematics;
+	bool m_bInCinematic = false;
+	bool m_bPressAnyKey = false;
+	bool m_bThanks = false;
+	bool m_bGameStart = false;
+	bool m_bGameOver = false;
+	bool m_bGameEnd = false;
+	bool m_bNextStage = false;
 
 #if defined(_DEBUG) | defined(DEBUG)
 public:

@@ -23,6 +23,8 @@ public:
 	DirectX::XMFLOAT3 GetPosition3f()const;
 	void SetPosition(float x, float y, float z);
 	void SetPosition(const DirectX::XMFLOAT3& v);
+	void SetPitch(float pitch) { m_Pitch = pitch; }
+	void SetYaw(float yaw) { m_Yaw = yaw; }
 
 	DirectX::XMVECTOR GetRight()const;
 	DirectX::XMFLOAT3 GetRight3f()const;

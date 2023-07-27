@@ -65,8 +65,14 @@ bool SenierProjectApp::Initialize()
 	if (!m_pSceneTextUI->Initialize(m_d2dDeviceContext.Get(), m_dWriteFactory.Get(), 25, D2D1::ColorF::LightGray,
 		DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_CENTER))
 		return false;
+
+	m_pBigSizeTextUI = std::make_shared<DWriteText>();
+	if (!m_pBigSizeTextUI->Initialize(m_d2dDeviceContext.Get(), m_dWriteFactory.Get(), 100, D2D1::ColorF::LightGray,
+		DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, DWRITE_TEXT_ALIGNMENT_CENTER))
+		return false;
+
 	m_Scene = std::make_unique<Scene>();
-	if (!m_Scene->Initialize(m_d3d12Device.Get(), m_CommandList.Get(), m_pSceneTextUI))
+	if (!m_Scene->Initialize(m_d3d12Device.Get(), m_CommandList.Get(), m_pSceneTextUI, m_pBigSizeTextUI))
 		return false;
 
 #if defined(_DEBUG) | defined(DEBUG)
@@ -147,11 +153,20 @@ void SenierProjectApp::Render(float elapsedTime)
 
 	// D3D12 Render를 모두 종료한 후 
 	// D2D Render를 진행한다. D3D12 CommandList를 Execute한 후 진행해야 한다.
+	DWriteText::PreRender(m_d3d11On12Device.Get(), m_d2dRenderTargets[m_CurrBackBuffer].Get(), m_d2dDeviceContext.Get(),
+		m_d3d11DeviceContext.Get(), m_d3d11On12WrappedResoruces[m_CurrBackBuffer].Get());
 	if (m_pSceneTextUI)
 	{
 		m_pSceneTextUI->Render(m_d3d11On12Device.Get(), m_d2dRenderTargets[m_CurrBackBuffer].Get(), m_d2dDeviceContext.Get(),
 			m_d3d11DeviceContext.Get(), m_d3d11On12WrappedResoruces[m_CurrBackBuffer].Get());
 	}
+	if (m_pBigSizeTextUI)
+	{
+		m_pBigSizeTextUI->Render(m_d3d11On12Device.Get(), m_d2dRenderTargets[m_CurrBackBuffer].Get(), m_d2dDeviceContext.Get(),
+			m_d3d11DeviceContext.Get(), m_d3d11On12WrappedResoruces[m_CurrBackBuffer].Get());
+	}
+	DWriteText::PostRender(m_d3d11On12Device.Get(), m_d2dRenderTargets[m_CurrBackBuffer].Get(), m_d2dDeviceContext.Get(),
+		m_d3d11DeviceContext.Get(), m_d3d11On12WrappedResoruces[m_CurrBackBuffer].Get());
 	
 #if defined(_DEBUG) | defined(DEBUG)
 

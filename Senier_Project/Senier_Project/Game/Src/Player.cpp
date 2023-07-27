@@ -195,7 +195,7 @@ void Player::KeyDownEvent(WPARAM wParam)
 #if defined(_DEBUG) || defined(DEBUG)
 	if (wParam == 'K')
 	{
-		ApplyDamage(10, XMFLOAT3(0, 0, -1), XMFLOAT3(0,0,0));
+		ApplyDamage(200, XMFLOAT3(0, 0, -1), XMFLOAT3(0,0,0));
 	}
 #endif
 

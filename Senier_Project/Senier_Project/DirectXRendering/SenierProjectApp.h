@@ -37,6 +37,7 @@ private:
 
 	std::unique_ptr<Scene> m_Scene = nullptr;
 	std::shared_ptr<DWriteText> m_pSceneTextUI = nullptr;
+	std::shared_ptr<DWriteText> m_pBigSizeTextUI = nullptr;
 
 	//std::unique_ptr<Player> m_Player;
 

@@ -5,9 +5,7 @@ std::vector<std::shared_ptr<Object>> Scene::m_vObjectLayer[(int)RenderLayer::Ren
 CollisionData Scene::m_CollisionData;
 std::unique_ptr<CollisionResolver> Scene::m_pCollisionResolver;
 
-/// <summary>
 /// ////////////
-/// </summary>
 std::shared_ptr<CSound> Scene::m_pMainBGM = nullptr;
 std::vector<std::shared_ptr<CSound>> Scene::m_vpSounds;
 /////////////
@@ -23,10 +21,10 @@ Scene::~Scene()
 	m_pMainBGM.reset();
 	for (int i = 0; i < m_vpSounds.size(); ++i)
 		m_vpSounds[i].reset();
-	   
 }
 
-bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText)
+bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	std::shared_ptr<DWriteText> pDWriteText, std::shared_ptr<DWriteText> pBigSizeText)
 {
 	// 패스 버퍼 생성
 	m_pPassCB = std::make_unique<UploadBuffer<PassConstant>>(pd3dDevice, 1, true);
@@ -37,7 +35,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	BuildDescriptorHeap(pd3dDevice, pd3dCommandList);
 
 	// UI 초기화
-	InitUI(pd3dDevice, pd3dCommandList, pDWriteText);
+	InitUI(pd3dDevice, pd3dCommandList, pDWriteText, pBigSizeText);
 
 	// 게임 시작
 	GameStart();
@@ -63,7 +61,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	return true;
 }
 
-bool Scene::InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, std::shared_ptr<DWriteText> pDWriteText)
+bool Scene::InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
+	std::shared_ptr<DWriteText> pDWriteText, std::shared_ptr<DWriteText> pBigSizeText)
 {
 	// 각종 UI들 초기화  함수로 분리 예정
 	m_pPlayerHP_Bar = std::make_unique<ImgObject>();
@@ -99,6 +98,14 @@ bool Scene::InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComm
 	m_pTextUIs->AddTextUI(L"Score ", -CLIENT_WIDTH / 2 + 65, -CLIENT_HEIGHT / 2 + 81);
 	m_pTextUIs->AddTextUI(L"Monster Name", 0, -CLIENT_HEIGHT / 2 + 47);
 	m_pTextUIs->AddTextUI(L"Loading...", CLIENT_WIDTH / 2 - 100, CLIENT_HEIGHT / 2 - 40);
+	m_pTextUIs->AddTextUI(L"Press Any Key", 0, CLIENT_HEIGHT / 3 - 80);
+	m_pTextUIs->AddTextUI(L"Thank you for playing.", 0, 70);
+
+	// 큰 크기의 텍스트
+	m_pBigSizeTextUI = pBigSizeText;
+	m_pBigSizeTextUI->AddTextUI(L"", 450, -250);
+	m_pBigSizeTextUI->AddTextUI(L"", 0, -30);
+	m_pBigSizeTextUI->AddTextUI(L"", 0, 0);
 
 	return true;
 }
@@ -164,35 +171,38 @@ void Scene::OnResize(float aspectRatio, float newWidth, float newHeight)
 
 void Scene::Update(float totalTime ,float elapsedTime)
 {
-	// 언제든지 m_bNextStage 변수가 참 일시,
+	if(m_bInCinematic)
+		SetCursorPos(CLIENT_WIDTH / 2, CLIENT_HEIGHT / 2);
+
+	// m_bNextStage 변수가 참 일시,
 	ChangeStage();
+	// m_bGameOver 변수가 참 일시,
+	GameOver();
+	// m_bGameEnd 변수가 참 일시,
+	GameEnd();
+
+
 	// 화면 전환 효과
 	UpdateFadeInOut(elapsedTime);
-
 	// 오브젝트
 	UpdateObject(elapsedTime);
 	// 카메라
 	UpdateSceneCamera(elapsedTime);
 	// 플레이어
 	UpdatePlayerData(elapsedTime);
-
 	// 패스버퍼 업데이트
 	UpdateShadowPassCB(totalTime, elapsedTime);
 	UpdatePassCB(totalTime, elapsedTime);
-
 	// ImageObject 렌더를 위한  직교 투영행렬 업데이트
 	m_xmf4x4ImgObjMat = m_pCamera->GetOrtho4x4f();
 
 	// 충돌 검사
 	GenerateContact();
 	ProcessPhysics(elapsedTime);
-
 	// UI 이미지 업데이트
 	UpdateUI(elapsedTime);
-
 	// Sound 업데이트
 	UpdateSound();
-
 	// 이벤트 객체 업데이트
 	UpdateEvent(elapsedTime);
 }
@@ -290,8 +300,8 @@ void Scene::UpdateUI(float elapsedTime)
 			}
 			m_pTextUIs->UpdateTextUI(pstrName, m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Monster_Name), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Monster_Name), Text_UI_Idx_Monster_Name);
 		}
-		else
-			m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Loading), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Loading), Text_UI_Idx_Loading);
+		
+		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Loading), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Loading), Text_UI_Idx_Loading);
 	}
 	else
 	{
@@ -307,8 +317,18 @@ void Scene::UpdateUI(float elapsedTime)
 		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_HP), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_HP), Text_UI_Idx_HP);
 		m_pTextUIs->UpdateTextUI(L"", -CLIENT_WIDTH / 2 + 65, m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Score), Text_UI_Idx_Score);
 		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Monster_Name), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Monster_Name), Text_UI_Idx_Monster_Name);
-		m_pTextUIs->UpdateTextUI(L"Loading...", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Loading), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Loading), Text_UI_Idx_Loading);
+		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_AnyKey), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_AnyKey), Text_UI_Idx_AnyKey);
 	}
+
+	if (m_bPressAnyKey && m_FadeState == 2)
+		m_pTextUIs->UpdateTextUI(L"Press Any Key", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_AnyKey), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_AnyKey), Text_UI_Idx_AnyKey);
+	else
+		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_AnyKey), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_AnyKey), Text_UI_Idx_AnyKey);
+	if (m_bThanks && m_FadeState == 2)
+		m_pTextUIs->UpdateTextUI(L"Thank you for playing.", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Thanks), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Thanks), Text_UI_Idx_Thanks);
+	else
+		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Thanks), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Thanks), Text_UI_Idx_Thanks);
+
 
 	// Scene 이미지 UI 업데이트
 	m_pPlayerHP_Bar->Update(elapsedTime);
@@ -782,7 +802,6 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 		return;
 	}
 		
-
 	if (m_pCamera)
 	{
 		Third_Person_Camera* tmpCam = (Third_Person_Camera*)m_pCamera.get();
@@ -826,32 +845,74 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 
 void Scene::KeyDownEvent(WPARAM wParam)
 {
+#if defined(_DEBUG)
 	switch (wParam)
 	{
-	case 'P':		// 다음 스테이지로 가는 테스트용 
-		//m_bNextStage = true;
-		InitCinematic();
+	case 'P':		// 게임 종료 테스트용 
+		m_bGameEnd = true;
+		break;
+	case 'I':		// 다음 스테이지로 가는 테스트용 
+		m_bNextStage = true;
 		break;
 	default:
 		break;
 	}
-
-	if (m_bInCinematic)
-	{
-		if (m_bPressAnyKey)
-		{
-			m_vpCinematics[m_nCurCinematicNum]->Play();
-			m_bPressAnyKey = false;
-		}
-		return;
-	}
-
-	// 애니메이션 테스트 용도
+		// 애니메이션 테스트 용도
 	for (int i = 0; i < g_vpCharacters.size(); ++i)
 	{
 		g_vpCharacters[i]->KeyDownEvent(wParam);
 	}
 
+#endif
+
+	// 키입력 수신
+	if (m_bPressAnyKey && m_FadeState == 2)
+	{
+		// 게임 시작시
+		if (m_bGameStart)
+		{
+			m_vpCinematics[m_nCurCinematicNum]->Play();
+			m_bPressAnyKey = false;
+			m_bGameStart = false;
+
+			m_pBigSizeTextUI->UpdateTextUI(L"",
+				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Title),
+				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Title),
+				Big_Text_UI_Idx_Title);
+		}
+
+		// 게임 오버시
+		if (m_bGameOver)
+		{
+			m_bGameOver = false;
+			m_bPressAnyKey = false;
+			Restart();
+			m_pBigSizeTextUI->UpdateTextUI(L"",
+				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Over),
+				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Over),
+				Big_Text_UI_Idx_Over);
+		}
+		// 게임 종료시
+		if (m_bGameEnd)
+		{
+			m_bGameEnd = false;
+			m_bThanks = false; 
+			m_bPressAnyKey = false;
+			GameStart();
+			m_pBigSizeTextUI->UpdateTextUI(L"",
+				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_End),
+				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_End),
+				Big_Text_UI_Idx_End);
+		}
+		return;
+	}
+
+	// 시네마틱 재생중
+	if (m_bInCinematic)
+	{
+		return;
+	}
+	
 	if(g_pPlayer) g_pPlayer->KeyDownEvent(wParam);
 }
 
@@ -866,17 +927,53 @@ void Scene::KeyUpEvent(WPARAM wParam)
 
 void Scene::LeftButtonDownEvent()
 {
-	// 시네마틱 재생중
-	if (m_bInCinematic)
+	// 키입력 수신
+	if (m_bPressAnyKey && m_FadeState == 2)
 	{
-		if (m_bPressAnyKey)
+		// 게임 시작시
+		if (m_bGameStart)
 		{
 			m_vpCinematics[m_nCurCinematicNum]->Play();
 			m_bPressAnyKey = false;
+			m_bGameStart = false;
+
+			m_pBigSizeTextUI->UpdateTextUI(L"",
+				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Title),
+				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Title),
+				Big_Text_UI_Idx_Title);
+		}
+
+		// 게임 오버시
+		if (m_bGameOver)
+		{
+			m_bGameOver = false;
+			m_bPressAnyKey = false;
+			Restart();
+			m_pBigSizeTextUI->UpdateTextUI(L"",
+				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Over),
+				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Over),
+				Big_Text_UI_Idx_Over);
+		}
+		// 게임 종료시
+		if (m_bGameEnd)
+		{
+			m_bGameEnd = false;
+			m_bThanks = false;
+			m_bPressAnyKey = false;
+			GameStart();
+			m_pBigSizeTextUI->UpdateTextUI(L"",
+				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_End),
+				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_End),
+				Big_Text_UI_Idx_End);
 		}
 		return;
 	}
-		
+
+	// 시네마틱 재생중
+	if (m_bInCinematic)
+	{
+		return;
+	}
 
 	if (g_pPlayer)
 	{
@@ -887,14 +984,51 @@ void Scene::LeftButtonDownEvent()
 
 void Scene::RightButtonDownEvent()
 {
-	// 시네마틱 재생중
-	if (m_bInCinematic)
+	// 키입력 수신
+	if (m_bPressAnyKey && m_FadeState == 2)
 	{
-		if (m_bPressAnyKey)
+		// 게임 시작시
+		if (m_bGameStart)
 		{
 			m_vpCinematics[m_nCurCinematicNum]->Play();
 			m_bPressAnyKey = false;
+			m_bGameStart = false;
+
+			m_pBigSizeTextUI->UpdateTextUI(L"",
+				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Title),
+				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Title),
+				Big_Text_UI_Idx_Title);
 		}
+
+		// 게임 오버시
+		if (m_bGameOver)
+		{
+			m_bGameOver = false;
+			m_bPressAnyKey = false;
+			Restart();
+			m_pBigSizeTextUI->UpdateTextUI(L"",
+				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Over),
+				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Over),
+				Big_Text_UI_Idx_Over);
+		}
+		// 게임 종료시
+		if (m_bGameEnd)
+		{
+			m_bGameEnd = false;
+			m_bThanks = false;
+			m_bPressAnyKey = false;
+			GameStart();
+			m_pBigSizeTextUI->UpdateTextUI(L"",
+				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_End),
+				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_End),
+				Big_Text_UI_Idx_End);
+		}
+		return;
+	}
+
+	// 시네마틱 재생중
+	if (m_bInCinematic)
+	{
 		return;
 	}
 
@@ -1058,7 +1192,6 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 		std::shared_ptr<Player> pPlayer = std::make_shared<Player>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
 		strcpy_s(pPlayer->m_pstrFileName, strFileName.c_str());
 		wcscpy_s(pPlayer->m_pstrOutName, L"Player");
-		//m_pPlayer = pPlayer;
 		pObject = std::static_pointer_cast<Object>(pPlayer);
 
 		g_vpAllObjs.emplace_back(pObject);
@@ -1827,8 +1960,11 @@ void Scene::ChangeStage()
 {
 	if (m_bNextStage)
 	{
+		m_pTextUIs->UpdateTextUI(L"Loading...", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Loading), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Loading), Text_UI_Idx_Loading);
 		if (m_FadeInValue <= 0.0f)
 		{
+			m_PlayerStartScore = ((Player*)g_pPlayer.get())->GetScore();
+
 			m_nStageNum += 1;
 			m_nStageNum %= 3;
 			StageStart(m_nStageNum);
@@ -1844,9 +1980,19 @@ void Scene::ChangeStage()
 
 void Scene::GameStart()
 {
+	// 타이틀 출력
+	m_pBigSizeTextUI->UpdateTextUI(L"CUT. DOWN.", m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Title), m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Title), Big_Text_UI_Idx_Title);
+
 	// 페이드 아웃 상태로 시작
 	m_FadeState = 0;
 	m_FadeInValue = 0.0f;
+
+	if (g_pPlayer)
+	{
+		g_pPlayer->DestroyRunTime();
+		g_pPlayer = nullptr;
+		m_PlayerStartScore = 0;
+	}
 
 	// 0번 스테이지부터 시작
 	m_nStageNum = 0;
@@ -1864,10 +2010,61 @@ void Scene::GameStart()
 	m_vpCinematics[m_nCurCinematicNum]->Stop();
 	// 키입력 수신
 	m_bPressAnyKey = true;
+	m_bGameStart = true;
+}
+
+void Scene::Restart()
+{
+	// 스테이지 시작 점수로 복귀
+	((Player*)(g_pPlayer.get()))->SetScore(m_PlayerStartScore);
+	((Player*)(g_pPlayer.get()))->SetHP(g_pPlayer->GetMaxHP());
+
+	m_nStageNum -= 1;
+	m_bNextStage = true;
+}
+
+void Scene::GameOver()
+{
+	if (g_pPlayer->GetHP() <= 0)
+		m_bGameOver = true;
+
+	if (m_bGameOver)
+	{
+		if (m_FadeInValue <= 0.0f)
+		{
+			m_pBigSizeTextUI->UpdateTextUI(L"Game Over",
+				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Over),
+				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Over),
+				Big_Text_UI_Idx_Over);
+
+			m_bPressAnyKey = true;
+		}
+		else if (m_FadeInValue >= 1.0f && m_FadeState == 2)
+		{
+			m_FadeState = 0;
+		}
+	}
 }
 
 void Scene::GameEnd()
 {
+	if (m_bGameEnd)
+	{
+		if (m_FadeInValue <= 0.0f)
+		{
+			m_pBigSizeTextUI->UpdateTextUI(L"The End.",
+				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_End),
+				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_End),
+				Big_Text_UI_Idx_End);
+
+			m_bThanks = true;
+			m_bPressAnyKey = true;
+		}
+		else if (m_FadeInValue >= 1.0f && m_FadeState == 2)
+		{
+			m_FadeState = 0;
+		}
+	}
 }
 
 void Scene::StageStart(UINT nMapNum)
@@ -1896,7 +2093,7 @@ void Scene::StageStart(UINT nMapNum)
 	// 카메라 초기화
 	m_pCamera = nullptr;
 	m_pCamera = std::make_unique<Third_Person_Camera>(g_pPlayer);
-	m_pCamera->Pitch(15);
+	m_pCamera->SetPitch(15);
 
 	// 무기
 	CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(-0.59f, 0.135f, 0.063f), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(50, 0, 90), XMFLOAT3(1, 1, 1), WEAPON_MODEL_NAME, 0);
@@ -1907,7 +2104,7 @@ void Scene::StageStart(UINT nMapNum)
 	{
 	case 0:
 		g_pPlayer->SetRotate(XMFLOAT3(0, 90, 0));
-		m_pCamera->RotateY(90);
+		m_pCamera->SetYaw(90);
 		CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, -1, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -460);
 		CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(1, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -150);
 		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "OutSideMap");
@@ -1941,8 +2138,8 @@ bool Scene::InitCinematic()
 	}
 	
 	m_pCinematicCamera = std::make_shared<CinematicCamera>();
-	m_pCinematicCamera->SetPosition(XMFLOAT3(20, 10, 20));
-	m_pCinematicCamera->SetOrientationByRotation(XMFLOAT3(0, -120, 0));
+	m_pCinematicCamera->SetPosition(XMFLOAT3(35, 20, -55));
+	m_pCinematicCamera->SetOrientationByRotation(XMFLOAT3(10, -30, 0));
 	m_pCinematicCamera->SetLens(0.25f * MathHelper::Pi, 1.5f, 1.0f, 10000.f);
 
 	std::shared_ptr<Cinematic> pCinematic = std::make_shared<Cinematic>();
@@ -1954,9 +2151,10 @@ bool Scene::InitCinematic()
 	//auto pFunction = nullptr;
 
 	// 카메라 연결 및 조작
-	pCinematic->AddCamera(m_pCinematicCamera, XMFLOAT3(20, 10, 20), XMFLOAT3(0, -120, 0));
-	pCinematic->AddCameraKeyFrame(1.0f, XMFLOAT3(20, 10, 20), XMFLOAT3(0, -120, 0));
-	pCinematic->AddCameraKeyFrame(5.0f, XMFLOAT3(0, 15, -70), XMFLOAT3(15, 0, 0));
+	pCinematic->AddCamera(m_pCinematicCamera, XMFLOAT3(35, 20, -55), XMFLOAT3(10, -30, 0));
+	pCinematic->AddCameraKeyFrame(1.0f, XMFLOAT3(35, 20, -55), XMFLOAT3(10, -30, 0));
+	pCinematic->AddCameraKeyFrame(5.0f, XMFLOAT3(-50, 38, -20), XMFLOAT3(15, 90, 0));
+	pCinematic->AddCameraKeyFrame(6.0f, XMFLOAT3(-48, 38, -20), XMFLOAT3(15, 90, 0));
 	//pCinematic->AddCameraKeyFrame(1.0f, XMFLOAT3(0, 0, 0),   XMFLOAT3(0, 0, 0));
 	//pCinematic->AddCameraKeyFrame(1.5f, XMFLOAT3(0, 50, 0),  XMFLOAT3(0, 90, 0));
 
@@ -1999,7 +2197,6 @@ bool Scene::InitEvent(UINT nMapNum)
 	default:
 		break;
 	}
-
 
 	return true;
 }

@@ -53,16 +53,20 @@ bool DWriteText::UpdateTextUI(const wchar_t* pstrText, float posX, float posY, i
 	return true; 
 }
 
-void DWriteText::Render(ID3D11On12Device* pd3d11On12Device, ID2D1Bitmap1* pd2dBackBuffer, 
-	ID2D1DeviceContext* pd2dDeviceContext, ID3D11DeviceContext* pd3d11DeviceContext, ID3D11Resource* pWrappedBuffer)
+void DWriteText::PreRender(ID3D11On12Device* pd3d11On12Device, ID2D1Bitmap1* pd2dBackBuffer, ID2D1DeviceContext* pd2dDeviceContext, ID3D11DeviceContext* pd3d11DeviceContext, ID3D11Resource* pWrappedBuffer)
 {
-	D2D1_SIZE_F rtSize = pd2dBackBuffer->GetSize();
-	D2D1_RECT_F textRect = D2D1::RectF(0, 0, rtSize.width, rtSize.height);
-
 	pd3d11On12Device->AcquireWrappedResources(&pWrappedBuffer, 1);
 
 	pd2dDeviceContext->SetTarget(pd2dBackBuffer);
 	pd2dDeviceContext->BeginDraw();
+}
+
+void DWriteText::Render(ID3D11On12Device* pd3d11On12Device, ID2D1Bitmap1* pd2dBackBuffer,
+	ID2D1DeviceContext* pd2dDeviceContext, ID3D11DeviceContext* pd3d11DeviceContext, ID3D11Resource* pWrappedBuffer)
+{
+	D2D1_SIZE_F rtSize = pd2dBackBuffer->GetSize();
+	D2D1_RECT_F textRect = D2D1::RectF(0, 0, rtSize.width, rtSize.height);
+	
 	if (m_bVisible)
 	{
 		for (int i = 0; i < m_vTextUIs.size(); ++i)
@@ -74,6 +78,10 @@ void DWriteText::Render(ID3D11On12Device* pd3d11On12Device, ID2D1Bitmap1* pd2dBa
 				m_TextFormat.Get(), &textRect, m_SolidColorBrush.Get());
 		}
 	}
+}
+
+void DWriteText::PostRender(ID3D11On12Device* pd3d11On12Device, ID2D1Bitmap1* pd2dBackBuffer, ID2D1DeviceContext* pd2dDeviceContext, ID3D11DeviceContext* pd3d11DeviceContext, ID3D11Resource* pWrappedBuffer)
+{
 	pd2dDeviceContext->EndDraw();
 
 	// WrappedResource를 Release하며 state가 Present(설정한 state)로 변경된다.

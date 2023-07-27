@@ -27,7 +27,11 @@ public:
 	void AddTextUI(const wchar_t* pstrText, float PosX, float PosY);
 	bool UpdateTextUI(const wchar_t* pstrText, float posX, float posY, int nIndex);
 
+	static void PreRender(ID3D11On12Device* pd3d11On12Device, ID2D1Bitmap1* pd2dBackBuffer, ID2D1DeviceContext* pd2dDeviceContext,
+		ID3D11DeviceContext* pd3d11DeviceContext, ID3D11Resource* pWrappedBuffer);
 	virtual void Render(ID3D11On12Device* pd3d11On12Device, ID2D1Bitmap1* pd2dBackBuffer, ID2D1DeviceContext* pd2dDeviceContext,
+		ID3D11DeviceContext* pd3d11DeviceContext, ID3D11Resource* pWrappedBuffer);
+	static void PostRender(ID3D11On12Device* pd3d11On12Device, ID2D1Bitmap1* pd2dBackBuffer, ID2D1DeviceContext* pd2dDeviceContext,
 		ID3D11DeviceContext* pd3d11DeviceContext, ID3D11Resource* pWrappedBuffer);
 
 
