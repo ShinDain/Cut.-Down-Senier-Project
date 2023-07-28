@@ -42,6 +42,7 @@ extern std::vector<std::shared_ptr<Object>> g_vpShadowedObjs;
 extern std::vector<std::shared_ptr<Object>> g_vpCuttedObjects;
 
 extern std::vector<std::shared_ptr<CEvent>> g_vpEventObjs;
+extern std::shared_ptr<CEvent> g_pEnterObject;
 
 extern std::map<std::string, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;
 

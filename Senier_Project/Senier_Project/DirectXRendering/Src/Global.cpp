@@ -12,7 +12,7 @@ std::vector<std::shared_ptr<ColliderPlane>> g_ppColliderPlanes;
 std::vector<std::shared_ptr<ColliderBox>> g_ppColliderBoxs;
 std::vector<std::shared_ptr<ColliderSphere>> g_ppColliderSpheres;
 
-std::shared_ptr<Object> g_pPlayer;
+std::shared_ptr<Object> g_pPlayer = nullptr;
 std::vector<std::shared_ptr<Object>> g_vpAllObjs;
 std::vector<std::shared_ptr<Object>> g_vpMovableObjs;
 std::vector<std::shared_ptr<Object>> g_vpCharacters;
@@ -22,6 +22,8 @@ std::vector<std::shared_ptr<Object>> g_vpShadowedObjs;
 std::vector<std::shared_ptr<Object>> g_vpCuttedObjects;
 
 std::vector<std::shared_ptr<CEvent>> g_vpEventObjs;
+
+std::shared_ptr<CEvent> g_pEnterObject = nullptr;
 
 
 std::map<std::string, std::shared_ptr<ModelDataInfo>> g_LoadedModelData;

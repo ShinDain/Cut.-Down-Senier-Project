@@ -390,12 +390,6 @@ LRESULT DirectXApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return 0;
 
 	case WM_KEYUP:
-		if (wParam == VK_ESCAPE)
-		{
-			PostQuitMessage(0);
-		}
-		else if ((int)wParam == VK_F2)
-			Set4xMsaaState(!m_4xMsaaState);
 		ProcessInput();
 		KeyUpEvent(wParam);
 		return 0;

@@ -460,7 +460,7 @@ void Third_Person_Camera::Pitch(float angle)
 	if (m_Pitch < m_MinPitch) 
 	{ m_Pitch = m_MinPitch; }
 
-	m_ShoulderCameraPitch += angle;
+	m_ShoulderCameraPitch = m_Pitch;
 	if (m_ShoulderCameraPitch > m_MaxShoulderPitch)
 	{
 		m_ShoulderCameraPitch = m_MaxShoulderPitch;

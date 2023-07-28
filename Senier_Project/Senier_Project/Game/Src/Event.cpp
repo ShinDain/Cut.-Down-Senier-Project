@@ -34,6 +34,9 @@ bool CEvent::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_xmf3Scale = objData.xmf3Scale;
 
 	m_xmf3ColliderExtents = objData.xmf3Extents;
+	m_xmf3ColliderExtents.x *= m_xmf3Scale.x;
+	m_xmf3ColliderExtents.y *= m_xmf3Scale.y;
+	m_xmf3ColliderExtents.z *= m_xmf3Scale.z;
 	m_xmf3RenderOffsetPosition = objData.xmf3MeshOffsetPosition;
 	m_xmf3RenderOffsetRotation = objData.xmf3MeshOffsetRotation;
 	m_bShadow = objData.bShadow;
@@ -42,6 +45,12 @@ bool CEvent::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 	m_pOBB->Center = m_xmf3Position;
 	m_pOBB->Extents = m_xmf3ColliderExtents;
 
+	m_bVisible = false;
+
+#if defined(_DEBUG)
+	m_bVisible = true;
+#endif
+
 	UpdateTransform(nullptr);
 
 	return true;
@@ -49,12 +58,8 @@ bool CEvent::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 void CEvent::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList)
 {
-#if defined(DEBUG) || (_DEBUG)
-
-	Object::Render(elapsedTime, pd3dCommandList);
-
-#endif
-
+	if(m_bIsActive)
+		Object::Render(elapsedTime, pd3dCommandList);
 }
 
 void CEvent::Update(float elapsedTime)

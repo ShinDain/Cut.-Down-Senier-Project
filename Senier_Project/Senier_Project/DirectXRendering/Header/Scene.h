@@ -57,14 +57,18 @@ enum TextUIIdx
 	Text_UI_Idx_Monster_Name,
 	Text_UI_Idx_Loading,
 	Text_UI_Idx_AnyKey,
-	Text_UI_Idx_Thanks
+	Text_UI_Idx_ESC,
+	Text_UI_Idx_Thanks,
+	Text_UI_Idx_Count
 };
 
 enum BigSizeTextUIIdx
 {
 	Big_Text_UI_Idx_Title,
 	Big_Text_UI_Idx_End,
-	Big_Text_UI_Idx_Over
+	Big_Text_UI_Idx_Over,
+	Big_Text_UI_Idx_Paused,
+	Big_Text_UI_Idx_Count
 };
 
 class Scene
@@ -110,7 +114,7 @@ public:
 	void LeftButtonDownEvent();
 	void RightButtonDownEvent();
 
-	void LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName);
+	void LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName, bool bEvent);
 
 	static std::shared_ptr<Object> CreateObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 		XMFLOAT3 xmf3Position, XMFLOAT4 xmf4Orientation, XMFLOAT3 xmf3Rotation, XMFLOAT3 xmf3Scale, const char* pstrFileName, int nAnimationTracks);
@@ -212,7 +216,7 @@ public:
 	void GameEnd();
 	void StageStart(UINT nMapNum);
 
-
+	void AnykeyProcess();
 
 private:
 	UINT m_nCurCinematicNum = 0;
@@ -220,10 +224,14 @@ private:
 	bool m_bInCinematic = false;
 	bool m_bPressAnyKey = false;
 	bool m_bThanks = false;
+	bool m_bTitle = false;
 	bool m_bGameStart = false;
 	bool m_bGameOver = false;
 	bool m_bGameEnd = false;
 	bool m_bNextStage = false;
+	bool m_bPaused = false;
+
+	std::vector<std::shared_ptr<Object>> m_pEvnetObjects;
 
 #if defined(_DEBUG) | defined(DEBUG)
 public:

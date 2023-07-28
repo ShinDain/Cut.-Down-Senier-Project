@@ -40,7 +40,7 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	// 게임 시작
 	GameStart();
 
-	// 플레이어
+	//// 플레이어
 	//CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 10, -20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1.0f, 1.0f, 1.0f),
 	//	CHARACTER_MODEL_NAME, PLAYER_TRACK_CNT);
 	//
@@ -55,9 +55,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, 0);
 	//
 	//// 월드 오브젝트 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 20, 0), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), VINTILATIONBOX_MODEL_NAME, 0);
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 20, 20), XMFLOAT4(0, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ZOMBIE_MODEL_NAME, MONSTER_TRACK_CNT);
-
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), ENTER_BOX_MODEL_NAME, 0);
+	
 	return true;
 }
 
@@ -98,13 +97,15 @@ bool Scene::InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dComm
 	m_pTextUIs->AddTextUI(L"Score ", -CLIENT_WIDTH / 2 + 65, -CLIENT_HEIGHT / 2 + 81);
 	m_pTextUIs->AddTextUI(L"Monster Name", 0, -CLIENT_HEIGHT / 2 + 47);
 	m_pTextUIs->AddTextUI(L"Loading...", CLIENT_WIDTH / 2 - 100, CLIENT_HEIGHT / 2 - 40);
-	m_pTextUIs->AddTextUI(L"Press Any Key", 0, CLIENT_HEIGHT / 3 - 80);
+	m_pTextUIs->AddTextUI(L"Press Any Key To Start", 0, CLIENT_HEIGHT / 3 - 80);
+	m_pTextUIs->AddTextUI(L"Press 'ESC' To Exit", 0, CLIENT_HEIGHT / 3 - 40);
 	m_pTextUIs->AddTextUI(L"Thank you for playing.", 0, 70);
 
 	// 큰 크기의 텍스트
 	m_pBigSizeTextUI = pBigSizeText;
 	m_pBigSizeTextUI->AddTextUI(L"", 450, -250);
 	m_pBigSizeTextUI->AddTextUI(L"", 0, -30);
+	m_pBigSizeTextUI->AddTextUI(L"", 0, 0);
 	m_pBigSizeTextUI->AddTextUI(L"", 0, 0);
 
 	return true;
@@ -181,6 +182,26 @@ void Scene::Update(float totalTime ,float elapsedTime)
 	// m_bGameEnd 변수가 참 일시,
 	GameEnd();
 
+	if (g_pEnterObject)
+	{
+		if (g_pEnterObject->GetIntersect())
+		{
+			m_bNextStage = true;
+			g_pEnterObject->DestroyRunTime();
+			g_pEnterObject = nullptr;
+		}
+	}
+		
+	if (m_bPaused)
+	{
+		// UI 이미지 업데이트
+		UpdateUI(elapsedTime);
+		// 카메라
+		UpdateSceneCamera(0.0f);
+		// 패스버퍼 업데이트
+		UpdatePassCB(totalTime, elapsedTime);
+		return;
+	}
 
 	// 화면 전환 효과
 	UpdateFadeInOut(elapsedTime);
@@ -273,7 +294,7 @@ void Scene::UpdateUI(float elapsedTime)
 	}
 
 	// Text UI 업데이트
-	if (m_FadeInValue >= 1.0f)
+	if (m_FadeInValue >= 1.0f && !m_bPaused)
 	{
 		if (!m_bInCinematic)
 		{
@@ -321,13 +342,46 @@ void Scene::UpdateUI(float elapsedTime)
 	}
 
 	if (m_bPressAnyKey && m_FadeState == 2)
-		m_pTextUIs->UpdateTextUI(L"Press Any Key", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_AnyKey), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_AnyKey), Text_UI_Idx_AnyKey);
+		m_pTextUIs->UpdateTextUI(L"Press Any Key To Start", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_AnyKey), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_AnyKey), Text_UI_Idx_AnyKey);
 	else
 		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_AnyKey), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_AnyKey), Text_UI_Idx_AnyKey);
+
 	if (m_bThanks && m_FadeState == 2)
 		m_pTextUIs->UpdateTextUI(L"Thank you for playing.", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Thanks), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Thanks), Text_UI_Idx_Thanks);
 	else
 		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_Thanks), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_Thanks), Text_UI_Idx_Thanks);
+
+	if(m_bTitle && m_FadeState == 2)
+		m_pBigSizeTextUI->UpdateTextUI(L"CUT. DOWN.",
+			m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Title),
+			m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Title), 
+			Big_Text_UI_Idx_Title);
+	else
+		m_pBigSizeTextUI->UpdateTextUI(L"",
+			m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Title),
+			m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Title),
+			Big_Text_UI_Idx_Title);
+
+	if (m_bPaused)
+	{
+		for (int i = 0; i < Text_UI_Idx_Count; ++i)
+		{
+			m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(i), m_pTextUIs->GetTextUIPosY(i), i);
+		}
+		for (int i = 0; i < Big_Text_UI_Idx_Count; ++i)
+		{
+			m_pBigSizeTextUI->UpdateTextUI(L"", m_pBigSizeTextUI->GetTextUIPosX(i), m_pBigSizeTextUI->GetTextUIPosY(i), i);
+		}
+
+		m_pTextUIs->UpdateTextUI(L"Press Any Key To Start", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_AnyKey), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_AnyKey), Text_UI_Idx_AnyKey);
+		m_pTextUIs->UpdateTextUI(L"Press 'ESC' To Exit", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_ESC), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_ESC), Text_UI_Idx_ESC);
+		m_pBigSizeTextUI->UpdateTextUI(L"Paused", m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Paused), m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Paused), Big_Text_UI_Idx_Paused);
+	}
+	else
+	{
+		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_ESC), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_ESC), Text_UI_Idx_ESC);
+		m_pBigSizeTextUI->UpdateTextUI(L"", m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Paused), m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Paused), Big_Text_UI_Idx_Paused);
+	}
 
 
 	// Scene 이미지 UI 업데이트
@@ -365,6 +419,17 @@ void Scene::UpdateSound()
 
 void Scene::UpdateEvent(float elapsedTime)
 {
+	if (m_pEvnetObjects.size() == 0)
+	{
+		if (g_vpEventObjs.size() > 0)
+			g_vpEventObjs[0]->SetIsActive(true);
+		else if (g_pEnterObject && g_vpEventObjs.size() == 0)
+		{
+			g_pEnterObject->SetIsActive(true);
+			g_pEnterObject->Update(true);
+		}
+	}
+
 	for (int i = 0; i < g_vpEventObjs.size(); ++i)
 	{
 		if (g_vpEventObjs[i]) 
@@ -372,9 +437,12 @@ void Scene::UpdateEvent(float elapsedTime)
 			g_vpEventObjs[i]->Update(elapsedTime);
 
 			if (g_vpEventObjs[i]->GetIntersect())
-				g_vpEventObjs[i]->Destroy();
+			{
+				LoadMapData(g_pd3dDevice, g_pd3dCommandList, g_vpEventObjs[i]->GetFilePath(), true);
+				g_vpEventObjs[i]->DestroyRunTime();
+			}
+				
 		}
-		
 	}
 }
 
@@ -563,93 +631,95 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 	if (m_FadeInValue <= 0)
 		return;
 
-	ChangeShader(ShaderType::Shader_Skinned, pd3dCommandList);
-	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
+	if (!m_bPaused)
 	{
-		if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
+		ChangeShader(ShaderType::Shader_Skinned, pd3dCommandList);
+		for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Skinned].size(); ++i)
 		{
-			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->GetIsAlive())
+			if (m_vObjectLayer[RenderLayer::Render_Skinned][i])
+			{
+				if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->GetIsAlive())
+					continue;
+				// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
+				m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(0.0f);
+				if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
+					m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
+				m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(elapsedTime, pd3dCommandList);
+			}
+		}
+
+		ChangeShader(ShaderType::Shader_Static, pd3dCommandList);
+		for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
+		{
+			if (!m_vObjectLayer[RenderLayer::Render_Static][i]->GetIsAlive())
+				continue;
+
+			m_vObjectLayer[RenderLayer::Render_Static][i]->UpdateTransform(NULL);
+			m_vObjectLayer[RenderLayer::Render_Static][i]->Render(elapsedTime, pd3dCommandList);
+		}
+
+		ChangeShader(ShaderType::Shader_TextureMesh, pd3dCommandList);
+		for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_TextureMesh].size(); ++i)
+		{
+			if (!m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->GetIsAlive())
+				continue;
+
+			m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->UpdateTransform(NULL);
+			m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(elapsedTime, pd3dCommandList);
+		}
+
+		ChangeShader(ShaderType::Shader_BackFace, pd3dCommandList);
+		for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Backface].size(); ++i)
+		{
+			if (!m_vObjectLayer[RenderLayer::Render_Backface][i]->GetIsAlive())
+				continue;
+
+			m_vObjectLayer[RenderLayer::Render_Backface][i]->UpdateTransform(NULL);
+			m_vObjectLayer[RenderLayer::Render_Backface][i]->Render(elapsedTime, pd3dCommandList);
+		}
+
+		ChangeShader(ShaderType::Shader_CuttedStatic, pd3dCommandList);
+		for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedStatic].size(); ++i)
+		{
+			if (!m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->GetIsAlive())
+				continue;
+
+			m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->UpdateTransform(NULL);
+			m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->Render(elapsedTime, pd3dCommandList);
+		}
+
+		ChangeShader(ShaderType::Shader_CuttedTextureMesh, pd3dCommandList);
+		for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedTexture].size(); ++i)
+		{
+			if (!m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->GetIsAlive())
+				continue;
+
+			m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->UpdateTransform(NULL);
+			m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->Render(elapsedTime, pd3dCommandList);
+		}
+
+		ChangeShader(ShaderType::Shader_CuttedSkinned, pd3dCommandList);
+		for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedSkinned].size(); ++i)
+		{
+			if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->GetIsAlive())
 				continue;
 			// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
-			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Animate(0.0f);
-			if (!m_vObjectLayer[RenderLayer::Render_Skinned][i]->m_pAnimationController)
-				m_vObjectLayer[RenderLayer::Render_Skinned][i]->UpdateTransform(NULL);
-			m_vObjectLayer[RenderLayer::Render_Skinned][i]->Render(elapsedTime, pd3dCommandList);
+			m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Animate(0.0f);
+			if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->m_pAnimationController)
+				m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->UpdateTransform(NULL);
+			m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Render(elapsedTime, pd3dCommandList);
+		}
+
+		ChangeShader(ShaderType::Shader_TextureMesh, pd3dCommandList);
+		for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Effect].size(); ++i)
+		{
+			if (!m_vObjectLayer[RenderLayer::Render_Effect][i]->GetIsAlive())
+				continue;
+
+			m_vObjectLayer[RenderLayer::Render_Effect][i]->UpdateTransform(NULL);
+			m_vObjectLayer[RenderLayer::Render_Effect][i]->Render(elapsedTime, pd3dCommandList);
 		}
 	}
-
-	ChangeShader(ShaderType::Shader_Static, pd3dCommandList);
-	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Static].size(); ++i)
-	{
-		if (!m_vObjectLayer[RenderLayer::Render_Static][i]->GetIsAlive())
-			continue;
-	
-		m_vObjectLayer[RenderLayer::Render_Static][i]->UpdateTransform(NULL);
-		m_vObjectLayer[RenderLayer::Render_Static][i]->Render(elapsedTime, pd3dCommandList);
-	}
-
-	ChangeShader(ShaderType::Shader_TextureMesh, pd3dCommandList);
-	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_TextureMesh].size(); ++i)
-	{
-		if (!m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->GetIsAlive())
-			continue;
-	
-		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->UpdateTransform(NULL);
-		m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(elapsedTime, pd3dCommandList);
-	}
-
-	ChangeShader(ShaderType::Shader_BackFace, pd3dCommandList);
-	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Backface].size(); ++i)
-	{
-		if (!m_vObjectLayer[RenderLayer::Render_Backface][i]->GetIsAlive())
-			continue;
-
-		m_vObjectLayer[RenderLayer::Render_Backface][i]->UpdateTransform(NULL);
-		m_vObjectLayer[RenderLayer::Render_Backface][i]->Render(elapsedTime, pd3dCommandList);
-	}
-
-	ChangeShader(ShaderType::Shader_CuttedStatic, pd3dCommandList);
-	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedStatic].size(); ++i)
-	{
-		if (!m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->GetIsAlive())
-			continue;
-
-		m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->UpdateTransform(NULL);
-		m_vObjectLayer[RenderLayer::Render_CuttedStatic][i]->Render(elapsedTime, pd3dCommandList);
-	}
-
-	ChangeShader(ShaderType::Shader_CuttedTextureMesh, pd3dCommandList);
-	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedTexture].size(); ++i)
-	{
-		if (!m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->GetIsAlive())
-			continue;
-
-		m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->UpdateTransform(NULL);
-		m_vObjectLayer[RenderLayer::Render_CuttedTexture][i]->Render(elapsedTime, pd3dCommandList);
-	}
-
-	ChangeShader(ShaderType::Shader_CuttedSkinned, pd3dCommandList);
-	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_CuttedSkinned].size(); ++i)
-	{
-		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->GetIsAlive())
-			continue;
-		// Render 함수 내에서 Bone 행렬이 셰이더로 전달되기 때문에 Render 직전에 애니메이션을 진행해준다.
-		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Animate(0.0f);
-		if (!m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->m_pAnimationController)
-			m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->UpdateTransform(NULL);
-		m_vObjectLayer[RenderLayer::Render_CuttedSkinned][i]->Render(elapsedTime, pd3dCommandList);
-	}
-
-	ChangeShader(ShaderType::Shader_TextureMesh, pd3dCommandList);
-	for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_Effect].size(); ++i)
-	{
-		if (!m_vObjectLayer[RenderLayer::Render_Effect][i]->GetIsAlive())
-			continue;
-
-		m_vObjectLayer[RenderLayer::Render_Effect][i]->UpdateTransform(NULL);
-		m_vObjectLayer[RenderLayer::Render_Effect][i]->Render(elapsedTime, pd3dCommandList);
-	}
-
 	// img 오브젝트
 	{
 		g_Shaders[ShaderType::Shader_Image]->ChangeShader(pd3dCommandList);
@@ -843,28 +913,8 @@ void Scene::ProcessInput(UCHAR* pKeybuffer)
 #endif
 }
 
-void Scene::KeyDownEvent(WPARAM wParam)
+void Scene::AnykeyProcess()
 {
-#if defined(_DEBUG)
-	switch (wParam)
-	{
-	case 'P':		// 게임 종료 테스트용 
-		m_bGameEnd = true;
-		break;
-	case 'I':		// 다음 스테이지로 가는 테스트용 
-		m_bNextStage = true;
-		break;
-	default:
-		break;
-	}
-		// 애니메이션 테스트 용도
-	for (int i = 0; i < g_vpCharacters.size(); ++i)
-	{
-		g_vpCharacters[i]->KeyDownEvent(wParam);
-	}
-
-#endif
-
 	// 키입력 수신
 	if (m_bPressAnyKey && m_FadeState == 2)
 	{
@@ -874,6 +924,7 @@ void Scene::KeyDownEvent(WPARAM wParam)
 			m_vpCinematics[m_nCurCinematicNum]->Play();
 			m_bPressAnyKey = false;
 			m_bGameStart = false;
+			m_bTitle = false;
 
 			m_pBigSizeTextUI->UpdateTextUI(L"",
 				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Title),
@@ -896,7 +947,7 @@ void Scene::KeyDownEvent(WPARAM wParam)
 		if (m_bGameEnd)
 		{
 			m_bGameEnd = false;
-			m_bThanks = false; 
+			m_bThanks = false;
 			m_bPressAnyKey = false;
 			GameStart();
 			m_pBigSizeTextUI->UpdateTextUI(L"",
@@ -906,6 +957,45 @@ void Scene::KeyDownEvent(WPARAM wParam)
 		}
 		return;
 	}
+}
+
+void Scene::KeyDownEvent(WPARAM wParam)
+{
+#if defined(_DEBUG)
+	switch (wParam)
+	{
+	case 'O':
+		m_bGameEnd = true;
+		break;
+	case 'I':		// 다음 스테이지로 가는 테스트용 
+		m_bNextStage = true;
+		break;
+	}
+
+	// 애니메이션 테스트 용도
+	for (int i = 0; i < g_vpCharacters.size(); ++i)
+	{
+		g_vpCharacters[i]->KeyDownEvent(wParam);
+	}
+
+#endif
+
+	switch (wParam)
+	{
+	case 'P':
+		m_bPaused = !m_bPaused;
+		break;
+	case VK_ESCAPE:
+		if (m_bPaused)
+			PostQuitMessage(0);
+		m_bPaused = !m_bPaused;
+		break;
+	default:
+		m_bPaused = false;
+		break;
+	}
+
+	AnykeyProcess();
 
 	// 시네마틱 재생중
 	if (m_bInCinematic)
@@ -927,47 +1017,9 @@ void Scene::KeyUpEvent(WPARAM wParam)
 
 void Scene::LeftButtonDownEvent()
 {
-	// 키입력 수신
-	if (m_bPressAnyKey && m_FadeState == 2)
-	{
-		// 게임 시작시
-		if (m_bGameStart)
-		{
-			m_vpCinematics[m_nCurCinematicNum]->Play();
-			m_bPressAnyKey = false;
-			m_bGameStart = false;
+	m_bPaused = false;
 
-			m_pBigSizeTextUI->UpdateTextUI(L"",
-				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Title),
-				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Title),
-				Big_Text_UI_Idx_Title);
-		}
-
-		// 게임 오버시
-		if (m_bGameOver)
-		{
-			m_bGameOver = false;
-			m_bPressAnyKey = false;
-			Restart();
-			m_pBigSizeTextUI->UpdateTextUI(L"",
-				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Over),
-				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Over),
-				Big_Text_UI_Idx_Over);
-		}
-		// 게임 종료시
-		if (m_bGameEnd)
-		{
-			m_bGameEnd = false;
-			m_bThanks = false;
-			m_bPressAnyKey = false;
-			GameStart();
-			m_pBigSizeTextUI->UpdateTextUI(L"",
-				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_End),
-				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_End),
-				Big_Text_UI_Idx_End);
-		}
-		return;
-	}
+	AnykeyProcess();
 
 	// 시네마틱 재생중
 	if (m_bInCinematic)
@@ -984,47 +1036,9 @@ void Scene::LeftButtonDownEvent()
 
 void Scene::RightButtonDownEvent()
 {
-	// 키입력 수신
-	if (m_bPressAnyKey && m_FadeState == 2)
-	{
-		// 게임 시작시
-		if (m_bGameStart)
-		{
-			m_vpCinematics[m_nCurCinematicNum]->Play();
-			m_bPressAnyKey = false;
-			m_bGameStart = false;
+	m_bPaused = false;
 
-			m_pBigSizeTextUI->UpdateTextUI(L"",
-				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Title),
-				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Title),
-				Big_Text_UI_Idx_Title);
-		}
-
-		// 게임 오버시
-		if (m_bGameOver)
-		{
-			m_bGameOver = false;
-			m_bPressAnyKey = false;
-			Restart();
-			m_pBigSizeTextUI->UpdateTextUI(L"",
-				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Over),
-				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Over),
-				Big_Text_UI_Idx_Over);
-		}
-		// 게임 종료시
-		if (m_bGameEnd)
-		{
-			m_bGameEnd = false;
-			m_bThanks = false;
-			m_bPressAnyKey = false;
-			GameStart();
-			m_pBigSizeTextUI->UpdateTextUI(L"",
-				m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_End),
-				m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_End),
-				Big_Text_UI_Idx_End);
-		}
-		return;
-	}
+	AnykeyProcess();
 
 	// 시네마틱 재생중
 	if (m_bInCinematic)
@@ -1039,7 +1053,7 @@ void Scene::RightButtonDownEvent()
 	}
 }
 
-void Scene::LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName)
+void Scene::LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, const char* pstrFileName, bool bEvent)
 {
 	FILE* pInFile = NULL;
 
@@ -1112,7 +1126,17 @@ void Scene::LoadMapData(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 		}
 		else if (!strcmp(pstrToken, "</Frame>"))
 		{
-			CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, XMFLOAT3(1,1,1), pstrObjectName, 0);
+			std::shared_ptr<Object> pObject;
+
+			if(g_DefaultObjectData[pstrObjectName].objectType == Object_Monster)
+				pObject = CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, XMFLOAT3(1,1,1), pstrObjectName, MONSTER_TRACK_CNT);
+			else if (g_DefaultObjectData[pstrObjectName].objectType == Object_Event)
+				pObject = CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, xmf3Scale, pstrObjectName, 0);
+			else
+				pObject = CreateObject(pd3dDevice, pd3dCommandList, xmf3Position, xmf4Orientation, xmf3Rotation, XMFLOAT3(1, 1, 1), pstrObjectName, 0);
+
+			if (bEvent)
+				m_pEvnetObjects.emplace_back(pObject);
 		}
 		else if (!strcmp(pstrToken, "</Hierarchy>"))
 		{
@@ -1360,8 +1384,16 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 	case Object_Event:
 	{
 		std::shared_ptr<CEvent> pEvent = std::make_shared<CEvent>(pd3dDevice, pd3dCommandList, objectData, pModelData, nAnimationTracks, nullptr);
-		g_vpEventObjs.emplace_back(pEvent);
-
+		
+		if (!strcmp(strFileName.c_str(), "Enter_Object"))
+		{
+			g_pEnterObject = pEvent;
+			pEvent->SetVisible(true);
+		}
+		else
+		{
+			g_vpEventObjs.emplace_back(pEvent);
+		}
 		pObject = std::static_pointer_cast<Object>(pEvent);
 		m_vObjectLayer[g_DefaultObjectData[strFileName].renderLayer].emplace_back(pObject);
 	}
@@ -1787,6 +1819,15 @@ void Scene::ClearObjectLayer()
 	}
 
 
+	for (int i = 0; i < m_pEvnetObjects.size(); ++i)
+	{
+		if (!m_pEvnetObjects[i]->GetIsAlive())
+		{
+			m_pEvnetObjects[i]->DestroyRunTime();
+			m_pEvnetObjects.erase(m_pEvnetObjects.begin() + i);
+		}
+	}
+
 	// 레이어 순회
 	for (int i = 0; i < RenderLayer::Render_Count; ++i)
 	{
@@ -1980,9 +2021,6 @@ void Scene::ChangeStage()
 
 void Scene::GameStart()
 {
-	// 타이틀 출력
-	m_pBigSizeTextUI->UpdateTextUI(L"CUT. DOWN.", m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Title), m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Title), Big_Text_UI_Idx_Title);
-
 	// 페이드 아웃 상태로 시작
 	m_FadeState = 0;
 	m_FadeInValue = 0.0f;
@@ -2011,6 +2049,7 @@ void Scene::GameStart()
 	// 키입력 수신
 	m_bPressAnyKey = true;
 	m_bGameStart = true;
+	m_bTitle = true;
 }
 
 void Scene::Restart()
@@ -2107,21 +2146,24 @@ void Scene::StageStart(UINT nMapNum)
 		m_pCamera->SetYaw(90);
 		CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 0, -1, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -460);
 		CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(1, 0, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -150);
-		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "OutSideMap");
+		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "Outside/OutSideMap", false);
+		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "Outside/OutSideMonsterData", false);
+		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "Outside/Outside_Event", false);
+		//LoadMapData(g_pd3dDevice, g_pd3dCommandList, "Outside/Outside_Cine_1");
 		break;
 	case 1:
 		g_pPlayer->SetRotate(XMFLOAT3(0, 180, 0));
 		m_pCamera->RotateY(180);
 		g_pPlayer->GetBody()->SetPosition(XMFLOAT3(0, 10, 10));
 		CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, -1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -40);
-		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "HospitalInsideMap");
+		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "Hospital/HospitalInsideMap", false);
 		break;
 	case 2:
 		g_pPlayer->SetRotate(XMFLOAT3(0, 90, 0));
 		m_pCamera->RotateY(90);
 		g_pPlayer->GetBody()->SetPosition(XMFLOAT3(20, 10, 0));
 		CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, -1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -80);
-		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "DungeonMap");
+		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "Dungeon/DungeonMap", false);
 		break;
 
 	default:

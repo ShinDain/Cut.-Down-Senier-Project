@@ -120,7 +120,7 @@ void Monster::Patrol()
 	// 플레이어 탐지 시 추적 상태로 변경
 	XMVECTOR searchPos = XMLoadFloat3(&m_xmf3Position);
 	XMVECTOR look = XMLoadFloat3(&m_xmf3Look);
-	searchPos = searchPos + (m_SearchRadius * 0.8f) * look;
+	searchPos = searchPos + (m_SearchRadius * 0.3f) * look;
 	XMFLOAT3 xmf3SearchPos;
 	XMStoreFloat3(&xmf3SearchPos, searchPos);
 
@@ -179,8 +179,8 @@ void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xm
 	else
 	{
 		// 파괴된 위치에 아이템 생성
-		CreateScoreItems(m_MaxHP / 5);
-		CreateHealItems(1);
+		CreateScoreItems(m_MaxHP / 20);
+		//CreateHealItems(1);
 
 		if (XMVectorGetX(XMVector3Length(XMLoadFloat3(&xmf3CuttingDirection))))
 			Cutting(xmf3CuttingDirection);
@@ -900,6 +900,7 @@ void Scavenger::UpdateAnimationTrack(float elapsedTime)
 			targetPosition = targetPosition + direction * 50;
 			XMFLOAT3 xmf3TargetPosition;
 			XMStoreFloat3(&xmf3TargetPosition, targetPosition);
+			xmf3TargetPosition.y = 0;
 
 			m_xmf3RushTargetPosition = xmf3TargetPosition;
 			m_bSuperArmor = true;
@@ -1069,10 +1070,7 @@ void Ghoul::Animate(float elapsedTime)
 	case Monster::Monster_State_Special2:
 	case Monster::Monster_State_Special3:
 	case Monster::Monster_State_Hit:
-		if (m_bVisible)
-		{
-			eTime = 0.0f;
-		}
+		eTime = 0.0f;
 		break;
 
 	case Monster::Monster_State_Attack1:

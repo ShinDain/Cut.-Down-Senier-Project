@@ -452,6 +452,7 @@ void Player::ThrowProjectile()
 		if (m_pPickedObject)
 		{
 			projectileTarget = XMLoadFloat3(&m_pPickedObject->GetPosition());
+			m_pTargetObject = m_pPickedObject;
 		}
 		else
 		{
@@ -535,6 +536,9 @@ void Player::RotateToObj()
 
 	for (int i = 0; i < g_vpMovableObjs.size(); ++i)
 	{
+		if (!g_vpMovableObjs[i]->GetIsAlive())
+			continue;
+
 		if (!(g_vpMovableObjs[i]->GetCollider()->GetIsActive()))
 			continue;
 
@@ -1168,24 +1172,24 @@ void Player::CameraRayToMovableObject()
 	float closestDistance = 9999;
 	int bestIndex = -1;
 
-	for (int i = 0; i < g_vpWorldObjs.size(); ++i)
+	for (int i = 0; i < g_vpMovableObjs.size(); ++i)
 	{
-		if (!g_vpWorldObjs[i]->GetIsAlive()) continue;
-		if (g_vpWorldObjs[i]->GetColliderType() != ColliderType::Collider_Box)	continue;
+		if (!g_vpMovableObjs[i]->GetIsAlive()) continue;
+		if (g_vpMovableObjs[i]->GetColliderType() != ColliderType::Collider_Box)	continue;
 
 		// 캐릭터 제외
-		UINT objType = g_vpWorldObjs[i]->GetObjectType();
+		UINT objType = g_vpMovableObjs[i]->GetObjectType();
 		if (objType == ObjectType::Object_Player)
 			continue;
 
 		// 이미 잡힌 물체 제외
-		if (g_vpWorldObjs[i] == m_pGrabedObject)
+		if (g_vpMovableObjs[i] == m_pGrabedObject)
 			continue;
 		// 렌더링된 물체만
-		if (!g_vpWorldObjs[i]->GetVisible())
+		if (!g_vpMovableObjs[i]->GetVisible())
 			continue;
 
-		ColliderBox* pColliderBox = (ColliderBox*)(g_vpWorldObjs[i]->GetCollider().get());
+		ColliderBox* pColliderBox = (ColliderBox*)(g_vpMovableObjs[i]->GetCollider().get());
 		BoundingOrientedBox* pOBB = pColliderBox->GetOBB().get();
 
 		pColliderBox->SetIntersect(0);
@@ -1198,10 +1202,10 @@ void Player::CameraRayToMovableObject()
 		}
 	}
 
-	if (bestIndex >= 0 && g_vpWorldObjs[bestIndex]->GetBody()->GetPhysics())
+	if (bestIndex >= 0)
 	{
-		m_pPickedObject = g_vpWorldObjs[bestIndex];
-		if(g_vpWorldObjs[bestIndex]->GetObjectType() == ObjectType::Object_Movable)
+		m_pPickedObject = g_vpMovableObjs[bestIndex];
+		if(g_vpMovableObjs[bestIndex]->GetObjectType() == ObjectType::Object_Movable)
 			m_pPickedObject->SetPicked(true);
 	}
 	else

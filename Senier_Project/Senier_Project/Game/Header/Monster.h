@@ -66,7 +66,7 @@ public:
 	virtual void Special3() {}
 
 protected:
-	float m_SearchRadius = 30.0f;
+	float m_SearchRadius = 50.0f;
 
 	float m_AttackDamage = 0.0f;
 	float m_AttackRange = 0.0f;
