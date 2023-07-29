@@ -101,8 +101,9 @@ public:
 	ColliderPlane(const ColliderPlane& rhs) = delete;
 	ColliderPlane& operator=(const ColliderPlane& rhs) = delete;
 	virtual ~ColliderPlane();
-
+#if defined(_DEBUG) | defined(DEBUG)
 	virtual void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) {};
+#endif
 	virtual void Render(float ETime, ID3D12GraphicsCommandList* pd3dCommandList) {};
 
 	virtual void CalculateRotateInertiaMatrix();
@@ -129,8 +130,9 @@ public:
 	ColliderBox(const ColliderBox& rhs) = delete;
 	ColliderBox& operator=(const ColliderBox& rhs) = delete;
 	virtual ~ColliderBox();
-
+#if defined(_DEBUG) | defined(DEBUG)
 	virtual void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+#endif
 
 	virtual void CalculateRotateInertiaMatrix();
 	virtual void UpdateWorldTransform();
@@ -156,7 +158,9 @@ public:
 	ColliderSphere& operator=(const ColliderSphere& rhs) = delete;
 	virtual ~ColliderSphere();
 
+#if defined(_DEBUG) | defined(DEBUG)
 	virtual void BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList) {};
+#endif
 
 	//virtual void CalculateRotateInertiaMatrix();
 

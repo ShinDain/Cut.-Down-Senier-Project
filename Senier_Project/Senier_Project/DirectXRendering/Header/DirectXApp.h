@@ -159,7 +159,7 @@ protected:
 
 
 	// 파생 클래스는 다음 파생 변수들을 초기화해줘야 한다.
-	std::wstring m_MainWndCaption = L"d3d App";
+	std::wstring m_MainWndCaption = L"Cut. Down.";
 	D3D_DRIVER_TYPE m_d3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
 	DXGI_FORMAT m_BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	DXGI_FORMAT m_DepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;

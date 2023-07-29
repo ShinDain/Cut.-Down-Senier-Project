@@ -439,7 +439,7 @@ protected:
 	UINT m_nPattern = NecromancerAttackPattern::Melee_Attack;
 	//UINT m_nPattern = NecromancerAttackPattern::Magic_Cast;
 	UINT m_nSummonPattern = SummonPattern::Summon_1;
-	UINT m_nMaxAttackCnt = 4;
+	UINT m_nMaxAttackCnt = 2;
 	UINT m_nAttackCnt = 0;
 
 	float m_Attack1Cnt = 0;

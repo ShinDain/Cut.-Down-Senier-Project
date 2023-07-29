@@ -8,12 +8,14 @@ Collider::~Collider()
 {
 	m_pRigidBody.reset();
 
+#if defined(_DEBUG) | defined(DEBUG)
 	m_PositionBufferGPU = nullptr;
 	m_PositionBufferUploader = nullptr;
 	m_NormalBufferGPU = nullptr;
 	m_NormalBufferUploader = nullptr;
 	m_IndexBufferGPU = nullptr;
 	m_IndexBufferUploader = nullptr;
+#endif
 
 	m_pBoundingSphere.reset();
 }
@@ -193,7 +195,7 @@ void ColliderBox::UpdateWorldTransform()
 	}
 }
 
-
+#if defined(_DEBUG) | defined(DEBUG)
 void ColliderBox::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	std::vector<XMFLOAT3> Positions;
@@ -287,7 +289,7 @@ void ColliderBox::BuildMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 	m_SubmeshGeometry = subMesh;
 }
-
+#endif
 // =============== Collider Sphere =================================
 
 ColliderSphere::ColliderSphere(std::shared_ptr<RigidBody>pBody, float radius)
