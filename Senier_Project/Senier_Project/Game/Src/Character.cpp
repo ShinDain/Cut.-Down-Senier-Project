@@ -87,6 +87,9 @@ void Character::Update(float elapsedTime)
 		RotateToMove(elapsedTime);
 	IsFalling();
 	UpdateAnimationTrack(elapsedTime);
+
+
+	m_pBody->SetAcceleration(m_xmf3CharacterMovement);
 }
 
 void Character::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)

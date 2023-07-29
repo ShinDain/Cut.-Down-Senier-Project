@@ -35,11 +35,11 @@ protected:
 
 	std::shared_ptr<BoundingOrientedBox> m_pOBB = nullptr;
 
-	char m_pstrEventFilePath[64] = "Outside/Outside_Cine_1";
+	char m_pstrEventFilePath[64] = "";
 
 public:
 	void SetIsActive(bool bIsActive) { m_bIsActive = bIsActive; }
-	void SetFilePath(char* pstrFilePath) { strcpy_s(m_pstrEventFilePath, pstrFilePath); }
+	void SetFilePath(const char* pstrFilePath) { strcpy_s(m_pstrEventFilePath, pstrFilePath); }
 
 	bool GetIntersect() { return m_bIntersect; }
 	char* GetFilePath() { return m_pstrEventFilePath; }

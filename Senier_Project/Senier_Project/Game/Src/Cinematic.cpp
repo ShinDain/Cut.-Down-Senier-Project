@@ -1,8 +1,10 @@
 #include "../Header/Cinematic.h"
 #include "../Header/Character.h"
+#include "../../DirectXRendering/Header/Scene.h"
 
 Cinematic::Cinematic()
 {
+	AddSoundKeyFrame(0.0f, "", 0.0f);
 }
 
 Cinematic::~Cinematic()
@@ -24,12 +26,6 @@ void Cinematic::Update(float elapsedTime)
 	if (m_bPlay)
 	{
 		m_ElapsedTime += elapsedTime;
-		if (m_ElapsedTime > m_EndTime)
-		{
-			m_bPlay = false;
-			m_bCinematicEnd = true;
-			return;
-		}
 		
 		if (!m_CameraTrack.TrackEnd)
 		{
@@ -43,6 +39,28 @@ void Cinematic::Update(float elapsedTime)
 
 			UINT cameraCurIdx = m_CameraTrack.nCurIdx;
 			GetCameraKeyFrameData(cameraCurIdx);
+		}
+
+		if (!m_SoundTrack.TrackEnd)
+		{
+			// 사운드 트랙 업데이트
+			if (m_ElapsedTime > m_SoundTrack.KeyFrameTimes[m_SoundTrack.nCurIdx])
+			{
+				UINT soundCurIdx = m_SoundTrack.nCurIdx;
+				if (soundCurIdx < m_SoundTrack.nKeyFrameCnt && soundCurIdx != 0)
+				{
+					if (m_SoundTrack.SoundKeyFrames[soundCurIdx].volume > 0)
+					{
+						float volume = m_SoundTrack.SoundKeyFrames[soundCurIdx].volume;
+						const char* pstrFilePath = m_SoundTrack.SoundKeyFrames[soundCurIdx].AudioFilePath;
+						Scene::EmitSound(pstrFilePath, false, 1.0f, volume);
+					}
+				}
+
+				m_SoundTrack.nCurIdx += 1;
+				if (m_SoundTrack.nKeyFrameCnt == m_SoundTrack.nCurIdx)
+					m_SoundTrack.TrackEnd = true;
+			}
 		}
 
 		// 참조된 오브젝트를 순회하며 업데이트
@@ -65,6 +83,13 @@ void Cinematic::Update(float elapsedTime)
 			UINT nCurIdx = m_vCinematicTracks[i].nCurIdx;
 			GetKeyFrameData(i, nCurIdx);
 		}
+	}
+
+	if (m_ElapsedTime > m_EndTime)
+	{
+		m_bPlay = false;
+		m_bCinematicEnd = true;
+		return;
 	}
 }
 
@@ -152,6 +177,20 @@ void Cinematic::AddCameraKeyFrame(float time, XMFLOAT3 xmf3Position, XMFLOAT3 xm
 		m_EndTime = time;
 }
 
+void Cinematic::AddSoundKeyFrame(float time, const char* pstrFilePath, float volume)
+{
+	SoundKeyFrame newKeyFrame;
+	newKeyFrame.volume = volume;
+	newKeyFrame.AudioFilePath = pstrFilePath;
+	
+	m_SoundTrack.SoundKeyFrames.push_back(newKeyFrame);
+	m_SoundTrack.KeyFrameTimes.push_back(time);
+	m_SoundTrack.nKeyFrameCnt += 1;
+
+	if (m_EndTime < time)
+		m_EndTime = time;
+}
+
 // 현재 -> 키프레임
 void Cinematic::GetCameraKeyFrameData(UINT nCurIdx)
 {
@@ -209,16 +248,6 @@ void Cinematic::GetKeyFrameData(UINT nTrackIdx, UINT nCurIdx)
 
 		float weight = (m_ElapsedTime - prevTime) / (nextTime - prevTime);
 
-		// Position 보간
-		XMFLOAT3 xmf3NewPosition;
-		XMVECTOR newPosition;
-		XMVECTOR prevPosition = XMLoadFloat3(&prevKeyFrame.xmf3Position);
-		XMVECTOR nextPosition = XMLoadFloat3(&nextKeyFrame.xmf3Position);
-		newPosition = XMVectorLerp(prevPosition, nextPosition, weight);
-		XMStoreFloat3(&xmf3NewPosition, newPosition);
-		pObject->GetBody()->SetPosition(xmf3NewPosition);
-
-
 		// Rotation 보간
 		if(IsCharacter)
 		{
@@ -230,10 +259,19 @@ void Cinematic::GetKeyFrameData(UINT nTrackIdx, UINT nCurIdx)
 			XMStoreFloat3(&xmf3NewRotation, newRotation);
 			// Character는 Yaw 회전만 적용된다.
 			pObject->GetBody()->SetRotate(xmf3NewRotation);
-
 		}
 		else
 		{
+			// Position 보간
+			XMFLOAT3 xmf3NewPosition;
+			XMVECTOR newPosition;
+			XMVECTOR prevPosition = XMLoadFloat3(&prevKeyFrame.xmf3Position);
+			XMVECTOR nextPosition = XMLoadFloat3(&nextKeyFrame.xmf3Position);
+			newPosition = XMVectorLerp(prevPosition, nextPosition, weight);
+			XMStoreFloat3(&xmf3NewPosition, newPosition);
+			pObject->GetBody()->SetPosition(xmf3NewPosition);
+			pObject->SetPosition(xmf3NewPosition);
+
 			XMFLOAT4 xmf4NewOrientation;
 			XMVECTOR newOrientation;
 			XMVECTOR prevOrientation = XMQuaternionRotationRollPitchYaw(
@@ -248,6 +286,7 @@ void Cinematic::GetKeyFrameData(UINT nTrackIdx, UINT nCurIdx)
 			newOrientation = XMQuaternionSlerp(prevOrientation, nextOrientation, weight);
 			XMStoreFloat4(&xmf4NewOrientation, newOrientation);
 			pObject->GetBody()->SetOrientation(xmf4NewOrientation);
+			pObject->SetOrientation(xmf4NewOrientation);
 		}
 
 		// Scale 보간
@@ -258,6 +297,7 @@ void Cinematic::GetKeyFrameData(UINT nTrackIdx, UINT nCurIdx)
 		newScale = XMVectorLerp(prevScale, nextScale, weight);
 		XMStoreFloat3(&xmf3NewScale, newScale);
 		pObject->GetBody()->SetScale(xmf3NewScale);
+		pObject->SetScale(xmf3NewScale);
 	}
 }
 

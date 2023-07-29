@@ -71,7 +71,19 @@ protected:
 
 	void ApplyCharacterFriction(float elapsedTime);
 
+	XMFLOAT3 m_xmf3CharacterMovement = XMFLOAT3(0, 0, 0);
+
 public:
+	virtual void MoveForward() {
+		XMVECTOR characterMovement = XMLoadFloat3(&m_xmf3Look);
+		characterMovement *= m_DefaultAccel;
+
+		XMStoreFloat3(&m_xmf3CharacterMovement, characterMovement);
+	}
+	virtual void MoveStop() {
+		m_xmf3CharacterMovement = XMFLOAT3(0, 0, 0);
+	}
+
 	void SetIsShoulderView(bool bIsShoulderView) { m_bIsShoulderView = bIsShoulderView; }
 };
 

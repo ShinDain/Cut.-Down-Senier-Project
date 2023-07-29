@@ -50,22 +50,26 @@ void Monster::Update(float elapsedTime)
 {
 	Character::Update(elapsedTime);
 
-	m_pBody->SetAcceleration(m_xmf3MonsterMovement);
-
 	// state에 따른 행동
 	StateAction(elapsedTime);
 }
 
 void Monster::UpdateAnimationTrack(float elapsedTime)
 {
-	BlendWithIdleMovement(1);
-}
-void Monster::MonsterMove(XMFLOAT3 xmf3Direction)
-{
-	XMVECTOR monsterMovement = XMLoadFloat3(&xmf3Direction);
-	monsterMovement *= m_DefaultAccel;
+	if (m_State == Monster::Monster_State_Act)
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
 
-	XMStoreFloat3(&m_xmf3MonsterMovement, monsterMovement);
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+			m_State = MonsterState::Monster_State_Idle;
+		}
+	}
 }
 
 void Monster::RotateToPlayer()
@@ -351,6 +355,8 @@ void Zombie::UpdateAnimationTrack(float elapsedTime)
 	default:
 		break;
 	}
+
+	Monster::UpdateAnimationTrack(elapsedTime);
 }
 
 void Zombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
@@ -361,6 +367,21 @@ void Zombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf
 	UINT deathAnimIdx = Zombie_Anim_Index_FallingBack + nAttackAnim;
 
 	Monster::ApplyDamage(power, xmf3DamageDirection, xmf3CuttingDirection, hitAnimIdx, deathAnimIdx);
+}
+
+void Zombie::CinematicAction()
+{
+	MoveStop();
+
+	BlendWithIdleMovement(0);
+	// 그로기 상태
+	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+	m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 1);
+	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Zombie_Anim_Index_Attack2);
+	m_State = MonsterState::Monster_State_Act;
 }
 
 void Zombie::Trace()
@@ -612,6 +633,8 @@ void HighZombie::UpdateAnimationTrack(float elapsedTime)
 	default:
 		break;
 	}
+
+	Monster::UpdateAnimationTrack(elapsedTime);
 }
 
 void HighZombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
@@ -622,6 +645,21 @@ void HighZombie::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3
 	UINT deathAnimIdx = HighZombie_Anim_Index_Death1 + nHitAnim;
 
 	Monster::ApplyDamage(power, xmf3DamageDirection, xmf3CuttingDirection, hitAnimIdx, deathAnimIdx);
+}
+
+void HighZombie::CinematicAction()
+{
+	MoveStop();
+
+	BlendWithIdleMovement(0);
+	// 그로기 상태
+	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+	m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 1);
+	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, HighZombie_Anim_Index_Roar);
+	m_State = MonsterState::Monster_State_Act;
 }
 
 void HighZombie::Trace()
@@ -914,6 +952,8 @@ void Scavenger::UpdateAnimationTrack(float elapsedTime)
 	default:
 		break;
 	}
+
+	Monster::UpdateAnimationTrack(elapsedTime);
 }
 
 void Scavenger::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
@@ -925,6 +965,21 @@ void Scavenger::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 
 
 	Monster::ApplyDamage(power, xmf3DamageDirection, xmf3CuttingDirection, hitAnimIdx, deathAnimIdx);
 	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 2.0f);
+}
+
+void Scavenger::CinematicAction()
+{
+	MoveStop();
+
+	BlendWithIdleMovement(0);
+	// 그로기 상태
+	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+	m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 1);
+	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Scavenger_Anim_Index_Rage);
+	m_State = MonsterState::Monster_State_Act;
 }
 
 void Scavenger::Trace()
@@ -1223,6 +1278,8 @@ void Ghoul::UpdateAnimationTrack(float elapsedTime)
 	default:
 		break;
 	}
+
+	Monster::UpdateAnimationTrack(elapsedTime);
 }
 
 void Ghoul::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
@@ -1237,6 +1294,21 @@ void Ghoul::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3
 	xmf3Velocity.y *= 0.3f;
 	xmf3Velocity.z *= 0.3f;
 	m_pBody->SetVelocity(xmf3Velocity);
+}
+
+void Ghoul::CinematicAction()
+{
+	MoveStop();
+
+	BlendWithIdleMovement(0);
+	// 그로기 상태
+	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+	m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 1);
+	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Ghoul_Anim_Index_Idle);
+	m_State = MonsterState::Monster_State_Act;
 }
 
 void Ghoul::Trace()
@@ -1537,6 +1609,8 @@ void CyberTwins::UpdateAnimationTrack(float elapsedTime)
 	default:
 		break;
 	}
+
+	Monster::UpdateAnimationTrack(elapsedTime);
 }
 
 void CyberTwins::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
@@ -1549,6 +1623,21 @@ void CyberTwins::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3
 
 	if (m_HP / m_MaxHP < 0.5f)
 		m_bRage = true;
+}
+
+void CyberTwins::CinematicAction()
+{
+	MoveStop();
+
+	BlendWithIdleMovement(0);
+	// 그로기 상태
+	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+	m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 1);
+	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, CyberTwins_Anim_Index_Attack1);
+	m_State = MonsterState::Monster_State_Act;
 }
 
 void CyberTwins::Trace()
@@ -2044,6 +2133,8 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 	default:
 		break;
 	}
+
+	Monster::UpdateAnimationTrack(elapsedTime);
 }
 
 void Necromancer::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection)
@@ -2061,6 +2152,21 @@ void Necromancer::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT
 		m_bRage = true;
 	if (m_State == MonsterState::Monster_State_Special3)
 		m_pAnimationController->SetTrackPosition(MONSTER_ONCE_TRACK_1, 0.8f);
+}
+
+void Necromancer::CinematicAction()
+{
+	MoveStop();
+
+	BlendWithIdleMovement(0);
+	// 그로기 상태
+	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
+	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
+	m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 1);
+	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+
+	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Necromancer_Anim_Index_Roar);
+	m_State = MonsterState::Monster_State_Act;
 }
 	
 void Necromancer::Trace()

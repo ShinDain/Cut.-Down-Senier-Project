@@ -23,6 +23,13 @@ struct KeyFrame // map에 시간과 함께 배치
 	void(Object::*pFunction)();
 };
 
+struct SoundKeyFrame // map에 시간과 함께 배치
+{
+	float volume = 0.5f;
+	const char* AudioFilePath;;
+};
+
+
 struct CinematicTrack
 {
 	std::shared_ptr<Object> pObject;
@@ -46,6 +53,18 @@ struct CinematicCameraTrack
 	std::vector<float> KeyFrameTimes;
 	std::vector<KeyFrame> KeyFrames;
 };
+
+struct CinematicSoundTrack
+{
+	bool TrackEnd = false;
+
+	UINT nCurIdx = 0;
+	UINT nKeyFrameCnt = 0;
+
+	std::vector<float> KeyFrameTimes;
+	std::vector<SoundKeyFrame> SoundKeyFrames;
+};
+
 
 // n개의 오브젝트가 참조됨
 // x개의 키프레임
@@ -71,6 +90,8 @@ public:
 	void AddKeyFrame(UINT nTrackIdx, float time, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotation, XMFLOAT3 xmf3Scale, void(Object::*pFunction)());
 	void AddCameraKeyFrame(float time, XMFLOAT3 xmf3Position, XMFLOAT3 xmf3Rotation);
 
+	void AddSoundKeyFrame(float time, const char* pstrFilePath, float volume);
+
 	void GetCameraKeyFrameData(UINT nCurIdx);
 	void GetKeyFrameData(UINT nTrackIdx, UINT nCurIdx);
 
@@ -82,6 +103,7 @@ protected:
 	
 	std::vector<CinematicTrack> m_vCinematicTracks;
 	CinematicCameraTrack m_CameraTrack;
+	CinematicSoundTrack m_SoundTrack;
 
 
 public:

@@ -171,6 +171,10 @@ public:
 	virtual void Jump() {}
 	virtual void IsFalling();
 
+	virtual void MoveForward() {}
+	virtual void MoveStop() {}
+	virtual void CinematicAction() {}
+
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
 
 	void AddPosition(float x, float y, float z)

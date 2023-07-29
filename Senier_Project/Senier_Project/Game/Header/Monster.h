@@ -42,13 +42,13 @@ protected:
 		Monster_State_Death,
 		Monster_State_Special1,
 		Monster_State_Special2,
-		Monster_State_Special3
+		Monster_State_Special3,
+		Monster_State_Act
 	};
 
 	MonsterState m_State = MonsterState::Monster_State_Idle;
 
 public:
-	virtual void MonsterMove(XMFLOAT3 xmf3Direction);
 	virtual void RotateToPlayer();
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection, UINT nHitAnimIdx, UINT nDeathAnimIdx);
 
@@ -71,8 +71,6 @@ protected:
 	float m_AttackDamage = 0.0f;
 	float m_AttackRange = 0.0f;
 	float m_AttackRadius = 0.0f;
-
-	XMFLOAT3 m_xmf3MonsterMovement = XMFLOAT3(0, 0, 0);
 
 	bool m_bAttackEndLag = true;
 	float m_AttackEndDelay = 0.5f;
@@ -121,6 +119,7 @@ private:
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
 
+	virtual void CinematicAction();
 public:
 	virtual void Trace();
 
@@ -165,6 +164,9 @@ private:
 
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
+
+
+	virtual void CinematicAction();
 public:
 	virtual void Trace();
 
@@ -209,6 +211,9 @@ private:
 
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
+
+
+	virtual void CinematicAction();
 public:
 	virtual void Trace();
 
@@ -255,6 +260,9 @@ private:
 
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
+
+
+	virtual void CinematicAction();
 public:
 	virtual void Trace();
 
@@ -304,6 +312,9 @@ private:
 
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
+
+
+	virtual void CinematicAction();
 public:
 	virtual void Trace();
 
@@ -398,6 +409,8 @@ private:
 
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
+
+	virtual void CinematicAction();
 public:
 	virtual void Trace();
 

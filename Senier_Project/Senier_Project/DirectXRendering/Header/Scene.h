@@ -85,7 +85,6 @@ public:
 	bool InitUI(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 		std::shared_ptr<DWriteText> pDWriteText, std::shared_ptr<DWriteText> pBigSizeText);
 	bool InitCinematic();
-	bool InitEvent(UINT nMapNum);
 
 	void BuildDescriptorHeap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 
@@ -125,7 +124,7 @@ public:
 	void GenerateContact();
 	void ProcessPhysics(float elapsedTime);
 
-	void PlayCinematic(UINT nCinematicNum);
+	void PlayCinematic();
 	void ClearObjectLayer();
 
 private:
@@ -219,8 +218,7 @@ public:
 	void AnykeyProcess();
 
 private:
-	UINT m_nCurCinematicNum = 0;
-	std::vector<std::shared_ptr<Cinematic>> m_vpCinematics;
+	std::shared_ptr<Cinematic> m_pCinematic = nullptr;
 	bool m_bInCinematic = false;
 	bool m_bPressAnyKey = false;
 	bool m_bThanks = false;
@@ -231,11 +229,23 @@ private:
 	bool m_bNextStage = false;
 	bool m_bPaused = false;
 
-	std::vector<std::shared_ptr<Object>> m_pEvnetObjects;
+	std::vector<std::shared_ptr<Object>> m_pEventObjects;
 
+
+private:
+	void OutsideCine1(); // 대문 통과
+	void OutsideCine2(); // 좀비 모두 처치 후 포탈 강조
+
+	void HospitalCine1(); // 스테이지 시작
+	void HospitalCine2(); // 몬스터 모두 처치 후 문 열림
+	void HospitalCine3(); // 문 입장 후 다시 문 닫힘, 보스몬스터 포효
+	void HospitalCine4(); // 보스 처치후 문이 열리며 포탈 생성
+
+	void DungeonCine1(); // 보스룸 입장, 뭔가 하던 보스가 쳐다보며 시작
+	void DungeonCine2(); // 보스 처치 후, 크리스탈 파괴하고 유유히 이탈
+	
 #if defined(_DEBUG) | defined(DEBUG)
 public:
-
 	float m_refCnt = 0;
 	float m_DebugValue = 0;
 
