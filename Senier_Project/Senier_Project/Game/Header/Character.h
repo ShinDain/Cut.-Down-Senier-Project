@@ -80,6 +80,15 @@ public:
 
 		XMStoreFloat3(&m_xmf3CharacterMovement, characterMovement);
 	}
+	virtual void WalkForward() 
+	{
+		XMVECTOR characterMovement = XMLoadFloat3(&m_xmf3Look);
+		characterMovement *= 355.0f;
+
+		XMStoreFloat3(&m_xmf3CharacterMovement, characterMovement);
+
+		m_pBody->SetVelocity(m_xmf3CharacterMovement);
+	}
 	virtual void MoveStop() {
 		m_xmf3CharacterMovement = XMFLOAT3(0, 0, 0);
 	}

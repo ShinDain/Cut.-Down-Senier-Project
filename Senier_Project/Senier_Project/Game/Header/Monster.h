@@ -56,6 +56,7 @@ public:
 	virtual void StateAction(float elapsedTime);
 	virtual void Patrol();
 	virtual void Trace();
+	virtual void CinematicFindPlayer() { m_bFindPlayer = true; }
 
 	virtual void Attack1() {}
 	virtual void Attack2() {}
@@ -433,6 +434,7 @@ protected:
 	std::vector<std::shared_ptr<Object>> m_vpSummonedMonsters;
 
 	float m_FloatingHeight = 50.0f;
+	XMFLOAT3 m_SummonOffsetPosition = XMFLOAT3(285, 0, -281);
 
 	UINT m_nPattern = NecromancerAttackPattern::Melee_Attack;
 	//UINT m_nPattern = NecromancerAttackPattern::Magic_Cast;

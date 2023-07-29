@@ -248,9 +248,19 @@ void Cinematic::GetKeyFrameData(UINT nTrackIdx, UINT nCurIdx)
 
 		float weight = (m_ElapsedTime - prevTime) / (nextTime - prevTime);
 
-		// Rotation 보간
+		
 		if(IsCharacter)
 		{
+			// Position 보간
+			XMFLOAT3 xmf3NewPosition;
+			XMVECTOR newPosition;
+			XMVECTOR prevPosition = XMLoadFloat3(&prevKeyFrame.xmf3Position);
+			XMVECTOR nextPosition = XMLoadFloat3(&nextKeyFrame.xmf3Position);
+			newPosition = XMVectorLerp(prevPosition, nextPosition, weight);
+			XMStoreFloat3(&xmf3NewPosition, newPosition);
+			pObject->GetBody()->SetPosition(xmf3NewPosition);
+			pObject->SetPosition(xmf3NewPosition);
+
 			XMFLOAT3 xmf3NewRotation;
 			XMVECTOR newRotation;
 			XMVECTOR prevRotation = XMLoadFloat3(&prevKeyFrame.xmf3Rotation);

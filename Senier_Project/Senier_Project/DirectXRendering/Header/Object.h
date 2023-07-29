@@ -172,8 +172,10 @@ public:
 	virtual void IsFalling();
 
 	virtual void MoveForward() {}
+	virtual void WalkForward() {}
 	virtual void MoveStop() {}
 	virtual void CinematicAction() {}
+	virtual void CinematicFindPlayer() {}
 
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
 

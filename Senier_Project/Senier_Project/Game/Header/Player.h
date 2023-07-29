@@ -37,7 +37,8 @@ private:
 		Player_State_Melee,
 		Player_State_Hit,
 		Player_State_Death,
-		Player_State_Throw
+		Player_State_Throw,
+		Player_State_Act
 	};
 
 	enum PlayerAnimationIndex 
@@ -122,6 +123,7 @@ public:
 
 	void InitializeState();
 
+	virtual void CinematicAction();
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
 
 	virtual void DoLanding();

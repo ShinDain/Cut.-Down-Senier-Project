@@ -89,7 +89,7 @@ void ObjectCrushTest(Object* pObject1, Object* pObject2)
 
 	float length = 0;
 	float power = 0;
-	float maxPower = 30;
+	float maxPower = 100;
 	XMFLOAT3 xmf3Direction[2] = { {0,0,0}, {0,0,0} };
 	if (pObject1->GetBody()->GetPhysics())
 	{

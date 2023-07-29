@@ -234,15 +234,16 @@ private:
 
 private:
 	void OutsideCine1(); // 대문 통과
-	void OutsideCine2(); // 좀비 모두 처치 후 포탈 강조
+	void OutsideCine2(); // 상위 좀비 등장
 
 	void HospitalCine1(); // 스테이지 시작
 	void HospitalCine2(); // 몬스터 모두 처치 후 문 열림
 	void HospitalCine3(); // 문 입장 후 다시 문 닫힘, 보스몬스터 포효
 	void HospitalCine4(); // 보스 처치후 문이 열리며 포탈 생성
 
-	void DungeonCine1(); // 보스룸 입장, 뭔가 하던 보스가 쳐다보며 시작
-	void DungeonCine2(); // 보스 처치 후, 크리스탈 파괴하고 유유히 이탈
+	void DungeonCine1(); // 보스룸 오픈
+	void DungeonCine2(); // 보스룸 입장, 뭔가 하던 보스가 쳐다보며 시작
+	void DungeonCine3(); // 보스 처치 후, 크리스탈 파괴하고 유유히 이탈
 	
 #if defined(_DEBUG) | defined(DEBUG)
 public:

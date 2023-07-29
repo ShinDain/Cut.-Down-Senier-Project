@@ -156,6 +156,7 @@ void Player::Update(float elapsedTime)
 	//		m_bDecreaseMaxSpeed = false;
 	//	}
 	//}
+
 }
 
 void Player::Destroy()
@@ -254,6 +255,8 @@ void Player::Move(DWORD dwDirection)
 	{
 		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
 		m_pBody->SetAcceleration(XMFLOAT3(0, xmf3Accel.y, 0));
+
+		m_pBody->SetAcceleration(m_xmf3CharacterMovement);
 	}
 	else
 	{
@@ -533,12 +536,15 @@ void Player::RotateToObj()
 	
 	float closestDistance = 9999;
 	int closestIdx = -1;
+	bool bMonster = false;
 
+	// 몬스터를 우선 검사
 	for (int i = 0; i < g_vpMovableObjs.size(); ++i)
 	{
+		if (g_vpMovableObjs[i]->GetObjectType() != ObjectType::Object_Monster)
+			continue;
 		if (!g_vpMovableObjs[i]->GetIsAlive())
 			continue;
-
 		if (!(g_vpMovableObjs[i]->GetCollider()->GetIsActive()))
 			continue;
 
@@ -549,10 +555,35 @@ void Player::RotateToObj()
 		float distance = XMVectorGetX(XMVector3Length(tmpPosition - myPosition));
 		if (distance < closestDistance && distance != 0)
 		{
+			bMonster = true;
 			closestDistance = distance;
 			closestIdx = i;
 		}
 	}
+	if (!bMonster)
+	{
+		for (int i = 0; i < g_vpMovableObjs.size(); ++i)
+		{
+			if (g_vpMovableObjs[i]->GetObjectType() == ObjectType::Object_Monster)
+				continue;
+			if (!g_vpMovableObjs[i]->GetIsAlive())
+				continue;
+			if (!(g_vpMovableObjs[i]->GetCollider()->GetIsActive()))
+				continue;
+
+			XMFLOAT3 xmf3TmpPosition = g_vpMovableObjs[i]->GetPosition();
+			//xmf3TmpPosition.y = 0;
+			XMVECTOR tmpPosition = XMLoadFloat3(&xmf3TmpPosition);
+
+			float distance = XMVectorGetX(XMVector3Length(tmpPosition - myPosition));
+			if (distance < closestDistance && distance != 0)
+			{
+				closestDistance = distance;
+				closestIdx = i;
+			}
+		}
+	}
+	
 	if (closestDistance > m_AttackRange)
 		return;
 
@@ -947,6 +978,22 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 			m_nAnimationState = PlayerAnimationState::Player_State_Idle;
 		}
 	}
+	case PlayerAnimationState::Player_State_Act:
+	{
+		float trackRate = m_pAnimationController->GetTrackRate(PLAYER_ONCE_TRACK_1);
+
+		// 시작 블랜딩
+		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, PLAYER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.8f, 5.0f, PLAYER_ONCE_TRACK_1);
+
+		// 종료
+		if (m_pAnimationController->GetTrackOver(PLAYER_ONCE_TRACK_1))
+		{
+			UnableAnimationTrack(PLAYER_ONCE_TRACK_1);
+			m_nAnimationState = PlayerAnimationState::Player_State_Idle;
+		}
+	}
 	break;
 
 	default:
@@ -1212,4 +1259,19 @@ void Player::CameraRayToMovableObject()
 	{
 		m_pPickedObject = nullptr;
 	}
+}
+
+void Player::CinematicAction()
+{
+	MoveStop();
+
+	BlendWithIdleMovement(0);
+	// 그로기 상태
+	UnableAnimationTrack(PLAYER_ONCE_TRACK_1);
+	m_pAnimationController->SetTrackEnable(PLAYER_ONCE_TRACK_1, true);
+	m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1);
+	m_pAnimationController->SetTrackSpeed(PLAYER_ONCE_TRACK_1, 3.0f);
+
+	m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_MeleeTwoHand);
+	m_nAnimationState = PlayerAnimationState::Player_State_Act;
 }

@@ -156,8 +156,9 @@ void Object::Update(float elapsedTime)
 		}
 	}
 
-	if(m_nObjectType != ObjectType::Object_World)
+	//if(m_nObjectType != ObjectType::Object_World)
 		UpdateToRigidBody(elapsedTime);
+
 
 	if (m_bActiveTimer)
 	{

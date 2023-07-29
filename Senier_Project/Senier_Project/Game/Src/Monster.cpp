@@ -62,6 +62,8 @@ void Monster::UpdateAnimationTrack(float elapsedTime)
 
 		// 시작 블랜딩
 		BlendIdleToAnimaiton(trackRate, 0.2f, 5.0f, MONSTER_ONCE_TRACK_1);
+		// 종료 블랜딩
+		BlendAnimationToIdle(trackRate, 0.8f, 5.0f, MONSTER_ONCE_TRACK_1);
 
 		// 종료
 		if (m_pAnimationController->GetTrackOver(MONSTER_ONCE_TRACK_1))
@@ -133,7 +135,22 @@ void Monster::Patrol()
 	boundSphere.Radius = m_SearchRadius;
 	BoundingOrientedBox* playerCollider = std::static_pointer_cast<ColliderBox>(g_pPlayer->GetCollider())->GetOBB().get();
 	if (boundSphere.Intersects(*playerCollider))
+	{
 		m_bFindPlayer = true;
+
+		for (int i = 0; i < g_vpCharacters.size(); ++i)
+		{
+			if (!g_vpCharacters[i]->GetIsAlive()) continue;
+			if (g_vpCharacters[i] == g_pPlayer) continue;
+
+			BoundingSphere aroundSphere;
+			aroundSphere.Center = m_xmf3Position;
+			aroundSphere.Radius = m_SearchRadius;
+
+			if (aroundSphere.Intersects(*g_vpCharacters[i]->GetCollider()->GetBoundingSphere()))
+				g_vpCharacters[i]->CinematicFindPlayer();
+		}
+	}
 }
 
 void Monster::Trace()
@@ -255,7 +272,7 @@ bool Zombie::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3
 
 
 	m_DefaultAccel = 550.0f;
-	m_DefaultMaxSpeedXZ = 100.0f;
+	m_DefaultMaxSpeedXZ = 60.0f;
 	m_DefaultFriction = 400.0f;
 
 
@@ -378,7 +395,7 @@ void Zombie::CinematicAction()
 	UnableAnimationTrack(MONSTER_ONCE_TRACK_1);
 	m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
 	m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_1, 1);
-	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+	m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 3.0f);
 
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Zombie_Anim_Index_Attack2);
 	m_State = MonsterState::Monster_State_Act;
@@ -484,7 +501,7 @@ bool HighZombie::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 	m_HP = 200.0f;
 
 	m_DefaultAccel = 500.0f;
-	m_DefaultMaxSpeedXZ = 100.0f;
+	m_DefaultMaxSpeedXZ = 60.0f;
 	m_DefaultFriction = 400.0f;
 
 	return true;
@@ -771,7 +788,7 @@ bool Scavenger::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* 
 	m_HP = 50.f;
 
 	m_DefaultAccel = 500.0f;
-	m_DefaultMaxSpeedXZ = 200.0f;
+	m_DefaultMaxSpeedXZ = 100.0f;
 	m_DefaultFriction = 350.f;
 
 	// 일단은 100의 속도로 사용
@@ -1107,7 +1124,7 @@ bool Ghoul::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 
 	// 
 	m_DefaultAccel = 800.0f;
-	m_DefaultMaxSpeedXZ = 200.0f;
+	m_DefaultMaxSpeedXZ = 150.0f;
 
 	return true;
 }
@@ -1424,7 +1441,7 @@ bool CyberTwins::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 	// 
 	m_DefaultAccel = 500.0f;
-	m_DefaultMaxSpeedXZ = 100.0f;
+	m_DefaultMaxSpeedXZ = 60.0f;
 
 	return true;
 }
@@ -1864,7 +1881,7 @@ bool Necromancer::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 
 	// 
 	m_DefaultAccel = 500.0f;
-	m_DefaultMaxSpeedXZ = 50.0f;
+	m_DefaultMaxSpeedXZ = 30.0f;
 
 	return true;
 }
@@ -2028,11 +2045,24 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 
 		float trackRate = m_pAnimationController->GetTrackRate(MONSTER_ONCE_TRACK_1);
 
-		if(m_xmf3Position.y < m_FloatingHeight)
-			m_pBody->SetVelocity(XMFLOAT3(0, 30, 0));
+		XMVECTOR position = XMLoadFloat3(&m_xmf3Position);
+		XMVECTOR offsetPosition = XMLoadFloat3(&m_SummonOffsetPosition);
+		XMVECTOR direction = offsetPosition - position;
+		direction = XMVector3Normalize(direction);
+		direction *= 80;
+		XMFLOAT3 xmf3FloationVel;
+		XMStoreFloat3(&xmf3FloationVel, direction);
+
+
+		if (m_xmf3Position.y < m_FloatingHeight)
+		{
+			xmf3FloationVel.y = 30;
+			m_pBody->SetVelocity(xmf3FloationVel);
+		}
 		else
 		{
-			m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
+			xmf3FloationVel.y = 0;
+			m_pBody->SetVelocity(xmf3FloationVel);
 			m_pBody->SetInGravity(false);
 		}
 
