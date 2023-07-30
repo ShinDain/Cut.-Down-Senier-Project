@@ -174,6 +174,11 @@ void DirectXApp::OnResize()
 	// 리소스 수정 전 명령 처리 (Flush)
 	FlushCommandQueueAndReleaseBuffer();
 	
+	RECT clientRect{};
+	GetWindowRect(m_hMainWnd, &clientRect);
+	m_ClientWidth = clientRect.right - clientRect.left;
+	m_ClientHeight = clientRect.bottom - clientRect.top;
+
 	// swap chain 크기 조정
 	ThrowIfFailed(m_SwapChain->ResizeBuffers(
 		SwapChainBufferCount,

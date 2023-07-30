@@ -235,8 +235,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\qwe35\Desktop\Senier_Project\Senier_Project\Senier_Project\FMOD\inc;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\qwe35\Desktop\Senier_Project\Senier_Project\Senier_Project\FMOD\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\qwe35\Desktop\Senier_Project\Senier_Project\Senier_Project\FMOD\inc;C:\Users\뉴 블록버스터 스매쉬 어드벤쳐 쓰리디\Desktop\Senier_Project\Senier_Project\Senier_Project\FMOD\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\qwe35\Desktop\Senier_Project\Senier_Project\Senier_Project\FMOD\lib\x64;C:\Users\뉴 블록버스터 스매쉬 어드벤쳐 쓰리디\Desktop\Senier_Project\Senier_Project\Senier_Project\FMOD\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -287,7 +287,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\qwe35\Desktop\Senier_Project\Senier_Project\Senier_Project\FMOD\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\qwe35\Desktop\Senier_Project\Senier_Project\Senier_Project\FMOD\inc;C:\Users\뉴 블록버스터 스매쉬 어드벤쳐 쓰리디\Desktop\Senier_Project\Senier_Project\Senier_Project\FMOD\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
