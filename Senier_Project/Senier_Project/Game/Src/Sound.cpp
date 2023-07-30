@@ -19,7 +19,7 @@ CSound::CSound(const char* pstrFilePath, bool bLoop)
 
 CSound::~CSound()
 {
-	m_pSound->release();
+	//m_pSound->release();
 }
 
 void CSound::Init()
@@ -27,7 +27,7 @@ void CSound::Init()
 	FMOD_RESULT res;
 	res = FMOD::System_Create(&g_pSystem);
 	if (res != FMOD_OK) return;
-	res = g_pSystem->init(32, FMOD_INIT_NORMAL, 0);
+	res = g_pSystem->init(64, FMOD_INIT_NORMAL, 0);
 	if (res != FMOD_OK) return;
 
 }

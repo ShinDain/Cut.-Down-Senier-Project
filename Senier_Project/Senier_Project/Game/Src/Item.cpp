@@ -26,9 +26,9 @@ bool Item::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 	m_pBody = std::make_shared<RigidBody>(objData.xmf3Position, objData.xmf4Orientation, objData.xmf3Rotation, objData.xmf3Scale, objData.nMass);
 
 	XMFLOAT3 xmf3RandVelocity = {0,0,0};
-	xmf3RandVelocity.x = rand() % 100 - 50;
-	xmf3RandVelocity.y = rand() % 20 + 5;
-	xmf3RandVelocity.z = rand() % 100 - 50;
+	xmf3RandVelocity.x = rand() % 200 - 100;
+	xmf3RandVelocity.y = rand() % 30 + 5;
+	xmf3RandVelocity.z = rand() % 200 - 100;
 	m_pBody->SetVelocity(xmf3RandVelocity);
 
 	m_pCollider = nullptr;
@@ -56,7 +56,7 @@ bool Item::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dC
 	UpdateTransform(nullptr);
 
 	// 시작 속도 결정
-	CalcStartVelocity();
+	//CalcStartVelocity();
 
 	return true;
 }

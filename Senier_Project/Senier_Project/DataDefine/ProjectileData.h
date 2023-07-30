@@ -83,7 +83,7 @@ using namespace DirectX;
 #define ENEMY_MAGIC1_MODEL_TYPE Object_EnemyProjectile
 #define ENEMY_MAGIC1_MODEL_COLLIDERTYPE Collider_None
 #define ENEMY_MAGIC1_MODEL_MASS 10
-#define ENEMY_MAGIC1_MODEL_SCALE XMFLOAT3(1,1,1)
+#define ENEMY_MAGIC1_MODEL_SCALE XMFLOAT3(2.5f,2.5f,2.5f)
 #define ENEMY_MAGIC1_MODEL_RENDERLAYER RenderLayer::Render_Static;
 #define ENEMY_MAGIC1_MODEL_SHADOW true
 
@@ -94,7 +94,7 @@ using namespace DirectX;
 #define ENEMY_MAGIC2_MODEL_TYPE Object_EnemyProjectile
 #define ENEMY_MAGIC2_MODEL_COLLIDERTYPE Collider_None
 #define ENEMY_MAGIC2_MODEL_MASS 10
-#define ENEMY_MAGIC2_MODEL_SCALE XMFLOAT3(1,1,1)
+#define ENEMY_MAGIC2_MODEL_SCALE XMFLOAT3(2.5f,2.5f,2.5f)
 #define ENEMY_MAGIC2_MODEL_RENDERLAYER RenderLayer::Render_Static;
 #define ENEMY_MAGIC2_MODEL_SHADOW true
 

@@ -196,6 +196,17 @@ void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xm
 		m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
 		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, nHitAnimIdx);
 		m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+
+		int nRand = rand() % 2;
+		switch (nRand)
+		{
+		case 0:
+			Scene::EmitSound(hit1_SoundFileName, false, 1.0f, 0.3f);
+			break;
+		case 1:
+			Scene::EmitSound(hit2_SoundFileName, false, 1.0f, 0.3f);
+			break;
+		}
 	}
 	else
 	{
@@ -212,6 +223,17 @@ void Monster::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xm
 		m_pAnimationController->SetTrackEnable(MONSTER_ONCE_TRACK_1, true);
 		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, nDeathAnimIdx);
 		m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, m_AnimationSpeed);
+
+		int nRand = rand() % 2;
+		switch (nRand)
+		{
+		case 0:
+			Scene::EmitSound(death1_SoundFileName, false, 1.0f, 0.15f);
+			break;
+		case 1:
+			Scene::EmitSound(death2_SoundFileName, false, 1.0f, 0.15f);
+			break;
+		}
 	}
 }
 
@@ -239,6 +261,16 @@ void Monster::CreateAttackSphere(float range, float radius, float damage)
 Zombie::Zombie(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
 	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	strcpy_s(run1_SoundFileName, "Sound/Monster/Zombie/Footstep01.wav");
+	strcpy_s(run2_SoundFileName, "Sound/Monster/Zombie/Footstep02.wav");
+	strcpy_s(attack1_SoundFileName, "Sound/Monster/Zombie/Attack01.wav");
+	strcpy_s(attack2_SoundFileName, "Sound/Monster/Zombie/Attack02.wav");
+	strcpy_s(hit1_SoundFileName, "Sound/Monster/Zombie/Hit01.mp3");
+	strcpy_s(hit2_SoundFileName, "Sound/Monster/Zombie/Hit02.mp3");
+	strcpy_s(death1_SoundFileName, "Sound/Monster/Zombie/Death01.wav");
+	strcpy_s(death2_SoundFileName, "Sound/Monster/Zombie/Death02.wav");
+	strcpy_s(rage_SoundFileName, "Sound/Monster/Zombie/Rage.wav");
 }
 
 Zombie::~Zombie()
@@ -285,7 +317,23 @@ void Zombie::UpdateAnimationTrack(float elapsedTime)
 	{
 	case Monster::Monster_State_Idle:
 	case Monster::Monster_State_Trace:
+	{
+		float trackWeight = m_pAnimationController->GetTrackWeight(MONSTER_MOVE_TRACK);
+		float trackPosition = m_pAnimationController->GetTrackPosition(MONSTER_MOVE_TRACK);
+		if (trackWeight > 0.5f)
+		{
+			if (MathHelper::IsEqual(0.35f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run1_SoundFileName, false, 0.9f, 0.05f);
+			if (MathHelper::IsEqual(0.7f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run2_SoundFileName, false, 0.9f, 0.05f);
+			if (MathHelper::IsEqual(1.05f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run1_SoundFileName, false, 0.9f, 0.05f);
+			if (MathHelper::IsEqual(1.4f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run2_SoundFileName, false, 0.9f, 0.05f);
+		}
+
 		BlendWithIdleMovement(1);
+	}
 		break;
 	case Monster::Monster_State_Attack1:
 	{
@@ -399,6 +447,8 @@ void Zombie::CinematicAction()
 
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Zombie_Anim_Index_Attack2);
 	m_State = MonsterState::Monster_State_Act;
+
+	Scene::EmitSound(rage_SoundFileName, false, 1.0f, 0.2f);
 }
 
 void Zombie::Trace()
@@ -458,6 +508,12 @@ void Zombie::Attack1()
 
 		m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Zombie_Anim_Index_Attack1 + attackAnimIdx);
 
+		int nRand = rand() % 2;
+		if (nRand)
+			Scene::EmitSound(attack1_SoundFileName, false, 1.0f, 0.2f);
+		else
+			Scene::EmitSound(attack2_SoundFileName, false, 1.0f, 0.2f);
+
 		break;
 	}
 
@@ -469,6 +525,16 @@ void Zombie::Attack1()
 HighZombie::HighZombie(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
 	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	strcpy_s(run1_SoundFileName, "Sound/Monster/HighZombie/Footstep01.wav");
+	strcpy_s(run2_SoundFileName, "Sound/Monster/HighZombie/Footstep02.wav");
+	strcpy_s(attack1_SoundFileName, "Sound/Monster/HighZombie/Attack01.wav");
+	strcpy_s(attack2_SoundFileName, "Sound/Monster/HighZombie/Attack02.wav");
+	strcpy_s(hit1_SoundFileName, "Sound/Monster/HighZombie/Hit01.mp3");
+	strcpy_s(hit2_SoundFileName, "Sound/Monster/HighZombie/Hit02.mp3");
+	strcpy_s(death1_SoundFileName, "Sound/Monster/HighZombie/Death01.mp3");
+	strcpy_s(death2_SoundFileName, "Sound/Monster/HighZombie/Death02.mp3");
+	strcpy_s(rage_SoundFileName, "Sound/Monster/HighZombie/Rage.wav");
 }
 
 HighZombie::~HighZombie()
@@ -513,7 +579,23 @@ void HighZombie::UpdateAnimationTrack(float elapsedTime)
 	{
 	case Monster::Monster_State_Idle:
 	case Monster::Monster_State_Trace:
+	{
+		float trackWeight = m_pAnimationController->GetTrackWeight(MONSTER_MOVE_TRACK);
+		float trackPosition = m_pAnimationController->GetTrackPosition(MONSTER_MOVE_TRACK);
+		if (trackWeight > 0.5f)
+		{
+			if (MathHelper::IsEqual(0.6f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run1_SoundFileName, false, 1.0f, 0.05f);
+			if (MathHelper::IsEqual(1.2f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run2_SoundFileName, false, 1.0f, 0.05f);
+			if (MathHelper::IsEqual(1.8f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run1_SoundFileName, false, 1.0f, 0.05f);
+			if (MathHelper::IsEqual(2.4f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run2_SoundFileName, false, 1.0f, 0.05f);
+		}
+
 		BlendWithIdleMovement(1);
+	}
 		break;
 	case Monster::Monster_State_Attack1:
 	{
@@ -677,6 +759,9 @@ void HighZombie::CinematicAction()
 
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, HighZombie_Anim_Index_Roar);
 	m_State = MonsterState::Monster_State_Act;
+
+
+	Scene::EmitSound(rage_SoundFileName, false, 1.0f, 0.2f);
 }
 
 void HighZombie::Trace()
@@ -739,10 +824,12 @@ void HighZombie::Attack1()
 		{
 		case 0:
 			m_State = MonsterState::Monster_State_Attack1;
+			Scene::EmitSound(attack1_SoundFileName, false, 1.0f, 0.2f);
 			break;
 
 		case 1:
 			m_State = MonsterState::Monster_State_Attack2;
+			Scene::EmitSound(attack2_SoundFileName, false, 1.0f, 0.2f);
 			break;
 		}
 	}
@@ -756,6 +843,17 @@ void HighZombie::Attack1()
 Scavenger::Scavenger(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
 	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	strcpy_s(run1_SoundFileName, "Sound/Monster/Scavenger/Footstep01.wav");
+	strcpy_s(run2_SoundFileName, "Sound/Monster/Scavenger/Footstep02.wav");
+	strcpy_s(attack1_SoundFileName, "Sound/Monster/Scavenger/Attack01.wav");
+	strcpy_s(attack2_SoundFileName, "Sound/Monster/Scavenger/Attack02.wav");
+	strcpy_s(attack3_SoundFileName, "Sound/Monster/Scavenger/Attack03.wav");
+	strcpy_s(hit1_SoundFileName, "Sound/Monster/Scavenger/Hit01.mp3");
+	strcpy_s(hit2_SoundFileName, "Sound/Monster/Scavenger/Hit02.wav");
+	strcpy_s(death1_SoundFileName, "Sound/Monster/Scavenger/Death01.wav");
+	strcpy_s(death2_SoundFileName, "Sound/Monster/Scavenger/Death02.wav");
+	strcpy_s(rage_SoundFileName, "Sound/Monster/Scavenger/Rage.wav");
 }
 
 Scavenger::~Scavenger()
@@ -804,7 +902,19 @@ void Scavenger::UpdateAnimationTrack(float elapsedTime)
 	{
 	case Monster::Monster_State_Idle:
 	case Monster::Monster_State_Trace:
+	{
+		float trackWeight = m_pAnimationController->GetTrackWeight(MONSTER_MOVE_TRACK);
+		float trackPosition = m_pAnimationController->GetTrackPosition(MONSTER_MOVE_TRACK);
+		if (trackWeight > 0.5f)
+		{
+			if (MathHelper::IsEqual(0.5f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run1_SoundFileName, false, 1.0f, 0.05f);
+			if (MathHelper::IsEqual(1.0f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run2_SoundFileName, false, 1.0f, 0.05f);
+		}
+
 		BlendWithIdleMovement(1);
+	}
 		break;
 	case Monster::Monster_State_Attack1:
 	{
@@ -947,6 +1057,8 @@ void Scavenger::UpdateAnimationTrack(float elapsedTime)
 			m_pAnimationController->SetTrackWeight(MONSTER_ONCE_TRACK_2, 1);
 			m_State = MonsterState::Monster_State_Attack2;
 
+			Scene::EmitSound(attack3_SoundFileName, false, 1.0f, 0.15f);
+
 			// 
 			XMVECTOR targetPosition = XMLoadFloat3(&g_pPlayer->GetPosition());
 			XMVECTOR myPosition = XMLoadFloat3(&m_xmf3Position);
@@ -997,6 +1109,9 @@ void Scavenger::CinematicAction()
 
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Scavenger_Anim_Index_Rage);
 	m_State = MonsterState::Monster_State_Act;
+
+
+	Scene::EmitSound(rage_SoundFileName, false, 1.0f, 0.2f);
 }
 
 void Scavenger::Trace()
@@ -1067,17 +1182,33 @@ void Scavenger::Attack1()
 		switch (m_bRush)
 		{
 		case false:
+		{
 			m_State = MonsterState::Monster_State_Attack1;
 			m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Scavenger_Anim_Index_Attack1);
+			int nRand = rand() % 2;
+			//int nRand = 3;
+			switch (nRand)
+			{
+			case 0:
+				Scene::EmitSound(attack1_SoundFileName, false, 1.0f, 0.15f);
+				break;
+			case 1:
+				Scene::EmitSound(attack2_SoundFileName, false, 1.0f, 0.15f);
+				break;
+			}
+		}
 			break;
 
 		case true:
 			UnableAnimationTrack(MONSTER_ONCE_TRACK_2);
 			m_State = MonsterState::Monster_State_Special1;
+
 			m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Scavenger_Anim_Index_Rage);
 			m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_2, Scavenger_Anim_Index_Attack2);
 			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_1, 1.5f);
 			m_pAnimationController->SetTrackSpeed(MONSTER_ONCE_TRACK_2, 3.0f);
+
+			Scene::EmitSound(rage_SoundFileName, false, 1.0f, 0.15f);
 			break;
 		}
 	}
@@ -1091,6 +1222,16 @@ void Scavenger::Attack1()
 Ghoul::Ghoul(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
 	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	strcpy_s(run1_SoundFileName, "Sound/Monster/Ghoul/Footstep01.wav");
+	strcpy_s(run2_SoundFileName, "Sound/Monster/Ghoul/Footstep02.wav");
+	strcpy_s(attack1_SoundFileName, "Sound/Monster/Ghoul/Attack01.wav");
+	strcpy_s(attack2_SoundFileName, "Sound/Monster/Ghoul/Attack02.wav");
+	strcpy_s(hit1_SoundFileName, "Sound/Monster/Ghoul/Hit01.wav");
+	strcpy_s(hit2_SoundFileName, "Sound/Monster/Ghoul/Hit02.wav");
+	strcpy_s(death1_SoundFileName, "Sound/Monster/Ghoul/Death01.mp3");
+	strcpy_s(death2_SoundFileName, "Sound/Monster/Ghoul/Death02.mp3");
+	strcpy_s(rage_SoundFileName, "Sound/Monster/Ghoul/Rage.wav");
 }
 
 Ghoul::~Ghoul()
@@ -1168,7 +1309,19 @@ void Ghoul::UpdateAnimationTrack(float elapsedTime)
 	{
 	case Monster::Monster_State_Idle:
 	case Monster::Monster_State_Trace:
+	{
+		float trackWeight = m_pAnimationController->GetTrackWeight(MONSTER_MOVE_TRACK);
+		float trackPosition = m_pAnimationController->GetTrackPosition(MONSTER_MOVE_TRACK);
+		if (trackWeight > 0.5f)
+		{
+			if (MathHelper::IsEqual(0.6f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run1_SoundFileName, false, 1.0f, 0.5f);
+			if (MathHelper::IsEqual(1.2f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run2_SoundFileName, false, 1.0f, 0.5f);
+		}
+
 		BlendWithIdleMovement(1);
+	}
 		break;
 	case Monster::Monster_State_Attack1:
 	{
@@ -1326,6 +1479,9 @@ void Ghoul::CinematicAction()
 
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Ghoul_Anim_Index_Idle);
 	m_State = MonsterState::Monster_State_Act;
+
+
+	Scene::EmitSound(rage_SoundFileName, false, 1.0f, 0.2f);
 }
 
 void Ghoul::Trace()
@@ -1389,10 +1545,12 @@ void Ghoul::Attack1()
 		{
 		case 0:
 			m_State = MonsterState::Monster_State_Attack1;
+			Scene::EmitSound(attack1_SoundFileName, false, 1.0f, 0.15f);
 			break;
 
 		case 1:
 			m_State = MonsterState::Monster_State_Attack2;
+			Scene::EmitSound(attack2_SoundFileName, false, 1.0f, 0.15f);
 			break;
 		}
 	}
@@ -1406,6 +1564,18 @@ void Ghoul::Attack1()
 CyberTwins::CyberTwins(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
 	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	strcpy_s(run1_SoundFileName, "Sound/Monster/Twins/Footstep01.wav");
+	strcpy_s(run2_SoundFileName, "Sound/Monster/Twins/Footstep02.wav");
+	strcpy_s(attack1_SoundFileName, "Sound/Monster/Twins/Attack01.wav");
+	strcpy_s(Gun1_SoundFileName, "Sound/Monster/Twins/Gun01.wav");
+	strcpy_s(Gun2_SoundFileName, "Sound/Monster/Twins/Gun02.wav");
+	strcpy_s(Gun3_SoundFileName, "Sound/Monster/Twins/Gun03.wav");
+	strcpy_s(hit1_SoundFileName, "Sound/Monster/Twins/Hit01.wav");
+	strcpy_s(hit2_SoundFileName, "Sound/Monster/Twins/Hit02.wav");
+	strcpy_s(death1_SoundFileName, "Sound/Monster/Twins/Death01.wav");
+	strcpy_s(death2_SoundFileName, "Sound/Monster/Twins/Death02.wav");
+	strcpy_s(rage_SoundFileName, "Sound/Monster/Twins/Rage.mp3");
 }
 
 CyberTwins::~CyberTwins()
@@ -1441,7 +1611,7 @@ bool CyberTwins::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList*
 
 	// 
 	m_DefaultAccel = 500.0f;
-	m_DefaultMaxSpeedXZ = 60.0f;
+	m_DefaultMaxSpeedXZ = 100.0f;
 
 	return true;
 }
@@ -1452,7 +1622,19 @@ void CyberTwins::UpdateAnimationTrack(float elapsedTime)
 	{
 	case Monster::Monster_State_Idle:
 	case Monster::Monster_State_Trace:
+	{
+		float trackWeight = m_pAnimationController->GetTrackWeight(MONSTER_MOVE_TRACK);
+		float trackPosition = m_pAnimationController->GetTrackPosition(MONSTER_MOVE_TRACK);
+		if (trackWeight > 0.5f)
+		{
+			if (MathHelper::IsEqual(0.33f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run1_SoundFileName, false, 1.0f, 0.03f);
+			if (MathHelper::IsEqual(0.65f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run2_SoundFileName, false, 1.0f, 0.03f);
+		}
+
 		BlendWithIdleMovement(1);
+	}
 		break;
 	case Monster::Monster_State_Attack1:
 	{
@@ -1655,6 +1837,9 @@ void CyberTwins::CinematicAction()
 
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, CyberTwins_Anim_Index_Attack1);
 	m_State = MonsterState::Monster_State_Act;
+
+
+	Scene::EmitSound(rage_SoundFileName, false, 1.0f, 0.2f);
 }
 
 void CyberTwins::Trace()
@@ -1718,6 +1903,8 @@ void CyberTwins::Attack1()
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, CyberTwins_Anim_Index_Attack1);
 
 	m_State = MonsterState::Monster_State_Attack1;
+
+	Scene::EmitSound(attack1_SoundFileName, false, 1.0f, 0.15f);
 }
 
 void CyberTwins::Attack2()
@@ -1793,6 +1980,7 @@ void CyberTwins::GunFire()
 
 				tmp->GetBody()->SetVelocity(xmf3Velocity);
 			}
+			Scene::EmitSound(Gun2_SoundFileName, false, 1.0f, 0.15f);
 		}
 		else
 		{
@@ -1830,6 +2018,8 @@ void CyberTwins::GunFire()
 					pProjectile->SetChasePlayer(true);
 					pProjectile->SetProjectileSpeed(150);
 				}
+
+				Scene::EmitSound(Gun3_SoundFileName, false, 1.0f, 0.15f);
 			}
 			else
 			{
@@ -1838,6 +2028,8 @@ void CyberTwins::GunFire()
 					ENEMY_BULLET_MODEL_NAME, 0);
 				tmp->GetBody()->SetInGravity(false);
 				tmp->GetBody()->SetVelocity(xmf3Velocity);
+
+				Scene::EmitSound(Gun1_SoundFileName, false, 1.0f, 0.15f);
 			}
 		}
 	}
@@ -1849,6 +2041,19 @@ void CyberTwins::GunFire()
 Necromancer::Necromancer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ObjectInitData objData, std::shared_ptr<ModelDataInfo> pModel, int nAnimationTracks, void* pContext)
 {
 	Initialize(pd3dDevice, pd3dCommandList, objData, pModel, nAnimationTracks, pContext);
+
+	strcpy_s(run1_SoundFileName, "Sound/Monster/Necromancer/Footstep01.wav");
+	strcpy_s(run2_SoundFileName, "Sound/Monster/Necromancer/Footstep02.wav");
+	strcpy_s(attack1_SoundFileName, "Sound/Monster/Necromancer/Attack01.wav");
+	strcpy_s(magic1_SoundFileName, "Sound/Monster/Necromancer/Magic01.wav");
+	strcpy_s(magic2_SoundFileName, "Sound/Monster/Necromancer/Magic02.wav");
+	strcpy_s(cast_SoundFileName, "Sound/Monster/Necromancer/Cast.wav");
+	strcpy_s(hit1_SoundFileName, "Sound/Monster/Necromancer/Hit01.wav");
+	strcpy_s(hit2_SoundFileName, "Sound/Monster/Necromancer/Hit02.mp3");
+	strcpy_s(death1_SoundFileName, "Sound/Monster/Necromancer/Death01.mp3");
+	strcpy_s(death2_SoundFileName, "Sound/Monster/Necromancer/Death02.mp3");
+	strcpy_s(groggy_SoundFileName, "Sound/Monster/Necromancer/Groggy.mp3");
+	strcpy_s(rage_SoundFileName, "Sound/Monster/Necromancer/Rage.wav");
 }
 
 Necromancer::~Necromancer()
@@ -1894,7 +2099,23 @@ void Necromancer::UpdateAnimationTrack(float elapsedTime)
 	{
 	case Monster::Monster_State_Idle:
 	case Monster::Monster_State_Trace:
+	{
+		float trackWeight = m_pAnimationController->GetTrackWeight(MONSTER_MOVE_TRACK);
+		float trackPosition = m_pAnimationController->GetTrackPosition(MONSTER_MOVE_TRACK);
+		if (trackWeight > 0.5f)
+		{
+			if (MathHelper::IsEqual(0.6f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run1_SoundFileName, false, 1.0f, 0.05f);
+			if (MathHelper::IsEqual(1.2f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run2_SoundFileName, false, 1.0f, 0.05f);
+			if (MathHelper::IsEqual(1.8f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run1_SoundFileName, false, 1.0f, 0.05f);
+			if (MathHelper::IsEqual(2.4f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run2_SoundFileName, false, 1.0f, 0.05f);
+		}
+
 		BlendWithIdleMovement(1);
+	}
 		break;
 	case Monster::Monster_State_Attack1:
 	{
@@ -2197,6 +2418,9 @@ void Necromancer::CinematicAction()
 
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Necromancer_Anim_Index_Roar);
 	m_State = MonsterState::Monster_State_Act;
+
+
+	Scene::EmitSound(rage_SoundFileName, false, 1.0f, 0.2f);
 }
 	
 void Necromancer::Trace()
@@ -2289,6 +2513,8 @@ void Necromancer::Attack1()
 
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Necromancer_Anim_Index_Attack1);
 	m_State = MonsterState::Monster_State_Attack1;
+
+	Scene::EmitSound(attack1_SoundFileName, false, 1.0f, 0.15f);
 }
 
 void Necromancer::Attack2()
@@ -2313,6 +2539,8 @@ void Necromancer::Special2()
 
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Necromancer_Anim_Index_Roar);
 	m_State = MonsterState::Monster_State_Special2;
+
+	Scene::EmitSound(cast_SoundFileName, false, 1.0f, 0.15f);
 }
 
 void Necromancer::Special3()
@@ -2332,6 +2560,8 @@ void Necromancer::Special3()
 
 	m_pAnimationController->SetTrackAnimationSet(MONSTER_ONCE_TRACK_1, Necromancer_Anim_Index_Wound);
 	m_State = MonsterState::Monster_State_Special3;
+
+	Scene::EmitSound(groggy_SoundFileName, false, 1.0f, 0.15f);
 }
 
 void Necromancer::MagicMissile(bool bChase)
@@ -2369,6 +2599,8 @@ void Necromancer::MagicMissile(bool bChase)
 			Projectile* pProjectile = (Projectile*)tmp.get();
 			pProjectile->SetChasePlayer(true);
 			pProjectile->SetProjectileSpeed(200);
+
+			Scene::EmitSound(magic1_SoundFileName, false, 1.0f, 0.15f);
 		}
 		else
 		{
@@ -2377,6 +2609,8 @@ void Necromancer::MagicMissile(bool bChase)
 				ENEMY_MAGIC1_MODEL_NAME, 0);
 			tmp->GetBody()->SetInGravity(false);
 			tmp->GetBody()->SetVelocity(xmf3Velocity);
+
+			Scene::EmitSound(magic2_SoundFileName, false, 1.0f, 0.15f);
 		}
 	}
 }
@@ -2415,6 +2649,8 @@ void Necromancer::SplashMagic()
 
 			tmp->GetBody()->SetVelocity(xmf3Velocity);
 		}
+
+		Scene::EmitSound(magic1_SoundFileName, false, 1.0f, 0.15f);
 	}
 }
 
@@ -2530,6 +2766,8 @@ void Necromancer::SummonMonster()
 		m_vpSummonedMonsters.emplace_back(pMonster1);
 		m_vpSummonedMonsters.emplace_back(pMonster2);
 		m_vpSummonedMonsters.emplace_back(pMonster3);
+		m_vpSummonedMonsters.emplace_back(pMonster4);
+		m_vpSummonedMonsters.emplace_back(pMonster5);
 	}
 		break;
 	case SummonPattern::Summon_5:

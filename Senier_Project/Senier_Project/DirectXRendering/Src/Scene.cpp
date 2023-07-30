@@ -6,7 +6,6 @@ CollisionData Scene::m_CollisionData;
 std::unique_ptr<CollisionResolver> Scene::m_pCollisionResolver;
 
 /// ////////////
-std::shared_ptr<CSound> Scene::m_pMainBGM = nullptr;
 std::vector<std::shared_ptr<CSound>> Scene::m_vpSounds;
 /////////////
 
@@ -18,7 +17,6 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-	m_pMainBGM.reset();
 	for (int i = 0; i < m_vpSounds.size(); ++i)
 		m_vpSounds[i].reset();
 }
@@ -55,8 +53,8 @@ bool Scene::Initialize(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3d
 	//CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, 0);
 	//
 	//// 월드 오브젝트 테스트
-	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), NECROMANCER_MODEL_NAME, MONSTER_TRACK_CNT);
-	
+	//CreateObject(pd3dDevice, pd3dCommandList, XMFLOAT3(0, 0, 20), XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), CHAIR_LEATHER_MODEL_NAME, 0);
+
 	return true;
 }
 
@@ -337,7 +335,7 @@ void Scene::UpdateUI(float elapsedTime)
 	}
 
 	if (m_bPressAnyKey && m_FadeState == 2)
-		m_pTextUIs->UpdateTextUI(L"Press Any Key To Start", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_AnyKey), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_AnyKey), Text_UI_Idx_AnyKey);
+		m_pTextUIs->UpdateTextUI(L"아무 키를 눌러 시작", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_AnyKey), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_AnyKey), Text_UI_Idx_AnyKey);
 	else
 		m_pTextUIs->UpdateTextUI(L"", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_AnyKey), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_AnyKey), Text_UI_Idx_AnyKey);
 
@@ -368,8 +366,8 @@ void Scene::UpdateUI(float elapsedTime)
 			m_pBigSizeTextUI->UpdateTextUI(L"", m_pBigSizeTextUI->GetTextUIPosX(i), m_pBigSizeTextUI->GetTextUIPosY(i), i);
 		}
 
-		m_pTextUIs->UpdateTextUI(L"Press Any Key To Start", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_AnyKey), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_AnyKey), Text_UI_Idx_AnyKey);
-		m_pTextUIs->UpdateTextUI(L"Press 'ESC' To Exit", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_ESC), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_ESC), Text_UI_Idx_ESC);
+		m_pTextUIs->UpdateTextUI(L"아무 키를 눌러 시작", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_AnyKey), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_AnyKey), Text_UI_Idx_AnyKey);
+		m_pTextUIs->UpdateTextUI(L"'ESC'키를 눌러 끝내기", m_pTextUIs->GetTextUIPosX(Text_UI_Idx_ESC), m_pTextUIs->GetTextUIPosY(Text_UI_Idx_ESC), Text_UI_Idx_ESC);
 		m_pBigSizeTextUI->UpdateTextUI(L"Paused", m_pBigSizeTextUI->GetTextUIPosX(Big_Text_UI_Idx_Paused), m_pBigSizeTextUI->GetTextUIPosY(Big_Text_UI_Idx_Paused), Big_Text_UI_Idx_Paused);
 	}
 	else
@@ -392,10 +390,6 @@ void Scene::UpdateUI(float elapsedTime)
 
 void Scene::UpdateSound()
 {
-	if (m_pMainBGM)
-	{
-		m_pMainBGM->Update();
-	}
 	for (int i = 0; i < m_vpSounds.size(); ++i)
 	{
 		if(m_vpSounds[i])
@@ -404,10 +398,13 @@ void Scene::UpdateSound()
 	for (int i = 0; i < m_vpSounds.size(); ++i)
 	{
 		// 단발성 효과음 종료시
-		if (!m_vpSounds[i]->GetIsPlaying())
+		if (m_vpSounds[i])
 		{
-			m_vpSounds[i].reset();
-			m_vpSounds.erase(m_vpSounds.begin() + i);
+			if (!m_vpSounds[i]->GetIsPlaying())
+			{
+				m_vpSounds[i].reset();
+				m_vpSounds.erase(m_vpSounds.begin() + i);
+			}
 		}
 	}
 }
@@ -699,11 +696,33 @@ void Scene::Render(float elapsedTime, ID3D12GraphicsCommandList* pd3dCommandList
 		ChangeShader(ShaderType::Shader_TextureMesh, pd3dCommandList);
 		for (int i = 0; i < m_vObjectLayer[RenderLayer::Render_TextureMesh].size(); ++i)
 		{
+			if (m_nStageNum == 0)
+			{
+				if (i == 1)
+					continue;
+				else if (i == 2)
+					continue;
+			}
+
 			if (!m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->GetIsAlive())
 				continue;
 
 			m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->UpdateTransform(NULL);
 			m_vObjectLayer[RenderLayer::Render_TextureMesh][i]->Render(elapsedTime, pd3dCommandList);
+		}
+		// 첫번째 스테이지 팬스만 특별 취급 => 안좋음
+		if (m_nStageNum == 0)
+		{
+			if (m_vObjectLayer[RenderLayer::Render_TextureMesh][1]->GetIsAlive())
+			{
+				m_vObjectLayer[RenderLayer::Render_TextureMesh][1]->UpdateTransform(NULL);
+				m_vObjectLayer[RenderLayer::Render_TextureMesh][1]->Render(elapsedTime, pd3dCommandList);
+			}
+			if (m_vObjectLayer[RenderLayer::Render_TextureMesh][2]->GetIsAlive())
+			{
+				m_vObjectLayer[RenderLayer::Render_TextureMesh][2]->UpdateTransform(NULL);
+				m_vObjectLayer[RenderLayer::Render_TextureMesh][2]->Render(elapsedTime, pd3dCommandList);
+			}
 		}
 
 		ChangeShader(ShaderType::Shader_BackFace, pd3dCommandList);
@@ -1009,14 +1028,6 @@ void Scene::KeyDownEvent(WPARAM wParam)
 	case 'I':		// 다음 스테이지로 가는 테스트용 
 		m_bNextStage = true;
 		break;
-	case 'Y':
-	{
-		for (int i = 0; i < m_pEventObjects.size(); ++i)
-		{
-			m_pEventObjects[i]->Cutting(XMFLOAT3(1, 0, 1));
-		}
-	}
-		break;
 	}
 
 	// 애니메이션 테스트 용도
@@ -1029,6 +1040,14 @@ void Scene::KeyDownEvent(WPARAM wParam)
 
 	switch (wParam)
 	{
+	case VK_F12:
+	{
+		for (int i = 0; i < m_pEventObjects.size(); ++i)
+		{
+			m_pEventObjects[i]->Cutting(XMFLOAT3(1, 0, 1));
+		}
+	}
+	break;
 	case 'P':
 		m_bPaused = !m_bPaused;
 		break;
@@ -1551,7 +1570,8 @@ std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D
 	objectData.xmf3Rotation = pObject->GetRotation();
 	objectData.xmf4Orientation = pObject->GetOrientation();
 	objectData.xmf3Scale = pObject->GetScale();
-	objectData.nMass = g_DefaultObjectData[pstrFileName].nMass;
+	//objectData.nMass = g_DefaultObjectData[pstrFileName].nMass;
+	objectData.nMass = 10;
 	//objectData.nMass = g_DefaultObjectData[pstrFileName].nMass * 0.3f;
 	objectData.objectType = g_DefaultObjectData[pstrFileName].objectType;
 	objectData.colliderType = g_DefaultObjectData[pstrFileName].colliderType;
@@ -1786,6 +1806,7 @@ void Scene::GenerateContact()
 		{
 			if (m_CollisionData.ContactCnt() > nContactCnt) return;
 			if (!g_vpWorldObjs[k]->GetIsAlive()) continue;
+			if (g_vpWorldObjs[k]->GetObjectType() == Object_Movable) continue;
 			if (g_vpWorldObjs[k]->GetColliderType() != ColliderType::Collider_Box) continue;
 
 			ColliderBox* pColliderBox2 = (ColliderBox*)g_vpWorldObjs[k]->GetCollider().get();
@@ -2013,7 +2034,7 @@ void Scene::EmitCutSound(SoundType nType, bool bLoop)
 		break;
 	case Sound_Character:
 		strcpy_s(pstrFilePath, CHARACTER_CUT_SOUND);
-		tmpRand = rand() % 8 + 1;
+		tmpRand = rand() % 2 + 1;
 		break;
 	default:
 		return;
@@ -2112,7 +2133,7 @@ void Scene::GameStart()
 	m_nStageNum = 0;
 	
 #if defined(_DEBUG)
-	// m_nStageNum = 1;
+	 //m_nStageNum = 1;
 #endif
 	// 스테이지 초기화 함수
 	StageStart(m_nStageNum);
@@ -2132,6 +2153,9 @@ void Scene::GameStart()
 	m_bPressAnyKey = true;
 	m_bGameStart = true;
 	m_bTitle = true;
+
+	EmitSound("Sound/Ambient/GameStart.wav", false, 1.0f, 0.15f);
+	EmitSound("Sound/BGM/Start.mp3", true, 0.8f, 0.1f);
 }
 
 void Scene::Restart()
@@ -2147,7 +2171,9 @@ void Scene::Restart()
 void Scene::GameOver()
 {
 	if (g_pPlayer->GetHP() <= 0)
+	{
 		m_bGameOver = true;
+	}
 
 	if (m_bGameOver)
 	{
@@ -2163,6 +2189,13 @@ void Scene::GameOver()
 		else if (m_FadeInValue >= 1.0f && m_FadeState == 2)
 		{
 			m_FadeState = 0;
+			for (int i = 0; i < m_vpSounds.size(); ++i)
+			{
+				m_vpSounds[i]->Stop();
+				m_vpSounds[i].reset();
+				m_vpSounds.erase(m_vpSounds.begin() + i);
+			}
+			EmitSound("Sound/BGM/GameOver.mp3", false, 1.0f, 0.2f);
 		}
 	}
 }
@@ -2203,6 +2236,13 @@ void Scene::StageStart(UINT nMapNum)
 		g_vpAllObjs[i]->DestroyRunTime();
 	}
 	if(g_pEnterObject) g_pEnterObject->DestroyRunTime();
+
+	for (int i = 0; i < m_vpSounds.size(); ++i)
+	{
+		m_vpSounds[i]->Stop();
+		m_vpSounds[i].reset();
+		m_vpSounds.erase(m_vpSounds.begin() + i);
+	}
 
 	ClearObjectLayer();
 
@@ -2248,6 +2288,9 @@ void Scene::StageStart(UINT nMapNum)
 		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "Dungeon/DungeonMap", false);
 		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "Dungeon/Dungeon", false);
 		CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, -1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -80);
+
+		EmitSound("Sound/BGM/Dungeon.wav", true, 0.8f, 0.2f);
+
 		break;
 
 	default:
@@ -2277,6 +2320,8 @@ bool Scene::InitCinematic()
 	pCinematic->AddCameraKeyFrame(5.0f, XMFLOAT3(-50, 38, -20), XMFLOAT3(15, 90, 0));
 	pCinematic->AddCameraKeyFrame(6.0f, XMFLOAT3(-48, 38, -20), XMFLOAT3(15, 90, 0));
 	
+	pCinematic->AddSoundKeyFrame(0.0f, "Sound/Ambient/Ravens.wav", 0.5f);
+
 	m_pCinematic = pCinematic;
 	
 	return true;
@@ -2376,6 +2421,10 @@ void Scene::OutsideCine1() // 대문 통과
 	rotation.z = 90;
 	pCinematic->AddKeyFrame(10, 3.0f, position, rotation, scale, nullptr);
 
+	//pCinematic->AddSoundKeyFrame(0.0f, "Sound/BGM/Start.mp3", 0.1f);
+	pCinematic->AddSoundKeyFrame(1.0f, "Sound/Ambient/CameraMove2.wav", 0.5f);
+	pCinematic->AddSoundKeyFrame(2.0f, "Sound/Ambient/MetalDoorOpen.mp3", 0.5f);
+
 	m_pCinematic = pCinematic;
 	PlayCinematic();
 }
@@ -2406,6 +2455,9 @@ void Scene::OutsideCine2() // 좀비 모두 처치 후 포탈 강조
 	pCinematic->AddCameraKeyFrame(4.0f, xmf3CameraPosition, xmf3CameraRotation);
 	pCinematic->AddCameraKeyFrame(6.0f, xmf3CameraPosition, xmf3CameraRotation);
 
+	pCinematic->AddSoundKeyFrame(1.5f, "Sound/Ambient/CameraMove1.wav", 0.5f);
+	pCinematic->AddSoundKeyFrame(1.5f, "Sound/Ambient/SomethingChange.wav", 0.2f);
+
 	m_pCinematic = pCinematic;
 	PlayCinematic();
 }
@@ -2429,27 +2481,42 @@ void Scene::HospitalCine1() // 스테이지 시작
 
 	// 카메라 연결 및 조작
 	pCinematic->AddCamera(m_pCinematicCamera, xmf3CameraPosition, xmf3CameraRotation);
+
+	pCinematic->AddSoundKeyFrame(2.5f, "Sound/Ambient/CameraMove1.wav", 0.3f);
+
 	pCinematic->AddCameraKeyFrame(3.0f, xmf3CameraPosition, xmf3CameraRotation);
 	xmf3CameraPosition.x = 155;
 	xmf3CameraPosition.y = 140;
 	xmf3CameraPosition.z = -110;
 	xmf3CameraRotation.x = 70;
 	pCinematic->AddCameraKeyFrame(5.0f, xmf3CameraPosition, xmf3CameraRotation);
+
+	pCinematic->AddSoundKeyFrame(5.5f, "Sound/Ambient/CameraMove1.wav", 0.3f);
+
 	pCinematic->AddCameraKeyFrame(6.0f, xmf3CameraPosition, xmf3CameraRotation);
 	xmf3CameraPosition.x = 48;
 	xmf3CameraPosition.z = -46;
 	xmf3CameraRotation.y = 60;
 	pCinematic->AddCameraKeyFrame(7.5f, xmf3CameraPosition, xmf3CameraRotation);
+
+	pCinematic->AddSoundKeyFrame(8.0f, "Sound/Ambient/CameraMove1.wav", 0.3f);
+
 	pCinematic->AddCameraKeyFrame(8.5f, xmf3CameraPosition, xmf3CameraRotation);
 	xmf3CameraPosition.x = -76;
 	xmf3CameraPosition.z = -87;
 	xmf3CameraRotation.y = 0;
 	pCinematic->AddCameraKeyFrame(9.5f, xmf3CameraPosition, xmf3CameraRotation);
+
+	pCinematic->AddSoundKeyFrame(10.5f, "Sound/Ambient/CameraMove1.wav", 0.3f);
+
 	pCinematic->AddCameraKeyFrame(10.5f, xmf3CameraPosition, xmf3CameraRotation);
 	xmf3CameraPosition.x = -120;
 	xmf3CameraPosition.z = -160;
 	xmf3CameraRotation.y = -120;
 	pCinematic->AddCameraKeyFrame(11.5f, xmf3CameraPosition, xmf3CameraRotation);
+
+	pCinematic->AddSoundKeyFrame(12.0f, "Sound/Ambient/CameraMove1.wav", 0.3f);
+
 	pCinematic->AddCameraKeyFrame(12.5f, xmf3CameraPosition, xmf3CameraRotation);
 	xmf3CameraPosition.x = 3;
 	xmf3CameraPosition.y = 20;
@@ -2457,11 +2524,16 @@ void Scene::HospitalCine1() // 스테이지 시작
 	xmf3CameraRotation.x = 0;
 	xmf3CameraRotation.y = 180;
 	pCinematic->AddCameraKeyFrame(13.5f, xmf3CameraPosition, xmf3CameraRotation);
+
+	pCinematic->AddSoundKeyFrame(14.0f, "Sound/Ambient/CameraMove1.wav", 0.3f);
+
 	pCinematic->AddCameraKeyFrame(14.5f, xmf3CameraPosition, xmf3CameraRotation);
 	xmf3CameraPosition.x = 3;
 	xmf3CameraPosition.z = -270;
 	pCinematic->AddCameraKeyFrame(17.0f, xmf3CameraPosition, xmf3CameraRotation);
 	pCinematic->AddCameraKeyFrame(18.5f, xmf3CameraPosition, xmf3CameraRotation);
+
+	EmitSound("Sound/BGM/Hospital.wav", true, 0.8f, 0.2f);
 
 	m_pCinematic = pCinematic;
 	PlayCinematic();
@@ -2492,7 +2564,7 @@ void Scene::HospitalCine2() // 몬스터 모두 처치 후 문 열림
 	xmf3CameraRotation.x = 0;
 	xmf3CameraRotation.y = 180;
 	pCinematic->AddCameraKeyFrame(2.5f, xmf3CameraPosition, xmf3CameraRotation);
-	pCinematic->AddCameraKeyFrame(5.5f, xmf3CameraPosition, xmf3CameraRotation);
+	pCinematic->AddCameraKeyFrame(6.5f, xmf3CameraPosition, xmf3CameraRotation);
 
 	std::shared_ptr<Object> pObject;
 	XMFLOAT3 position;
@@ -2521,11 +2593,21 @@ void Scene::HospitalCine2() // 몬스터 모두 처치 후 문 열림
 	rotation.y = 90;
 	pCinematic->AddKeyFrame(1, 4.0f, position, rotation, scale, nullptr);
 
+	pCinematic->AddSoundKeyFrame(3.0f, "Sound/Ambient/SomethingChange.wav", 0.1f);
+
 	m_pCinematic = pCinematic;
 	PlayCinematic();
 }
 void Scene::HospitalCine3() // 문 입장 후 다시 문 닫힘, 보스몬스터 포효
 {
+	// 사운드 초기화
+	for (int i = 0; i < m_vpSounds.size(); ++i)
+	{
+		m_vpSounds[i]->Stop();
+		m_vpSounds[i].reset();
+		m_vpSounds.erase(m_vpSounds.begin() + i);
+	}
+
 	m_pCinematic.reset();
 	m_pCinematic = nullptr;
 
@@ -2564,7 +2646,7 @@ void Scene::HospitalCine3() // 문 입장 후 다시 문 닫힘, 보스몬스터 포효
 	position.x = 5;
 	position.z = -325;
 	pCinematic->AddKeyFrame(0, 2.0f, position, rotation, scale, &Object::MoveStop);
-	pCinematic->AddKeyFrame(0, 3.0f, position, rotation, scale, &Object::MoveStop);
+	pCinematic->AddKeyFrame(0, 3.0f, position, rotation, scale, nullptr);
 	rotation.y = 0;
 	pCinematic->AddKeyFrame(0, 4.0f, position, rotation, scale, nullptr);
 	
@@ -2583,7 +2665,6 @@ void Scene::HospitalCine3() // 문 입장 후 다시 문 닫힘, 보스몬스터 포효
 	pCinematic->AddKeyFrame(1, 5.5f, position, rotation, scale, &Object::MoveStop);
 	pCinematic->AddKeyFrame(1, 6.0f, position, rotation, scale, &Object::CinematicAction);
 	pCinematic->AddKeyFrame(1, 8.5f, position, rotation, scale, &Object::CinematicFindPlayer);
-	pCinematic->AddSoundKeyFrame(6.0f, "Sound/Item/SpawnHeal.wav", 1.0f);
 	
 	// 왼쪽 문
 	pObject = g_vpWorldObjs[0];
@@ -2619,11 +2700,23 @@ void Scene::HospitalCine3() // 문 입장 후 다시 문 닫힘, 보스몬스터 포효
 	//pCinematic->AddKeyFrame(3, 3.0f, position, rotation, scale, nullptr);
 	pCinematic->AddKeyFrame(3, 7.5f, position, rotation, scale, nullptr);
 	
+
+	pCinematic->AddSoundKeyFrame(3.0f, "Sound/Ambient/TwinsEnter.wav", 0.1f);
+	pCinematic->AddSoundKeyFrame(7.5f, "Sound/BGM/TwinsBattle.wav", 0.1f);
+
 	m_pCinematic = pCinematic;
 	PlayCinematic();
 }
 void Scene::HospitalCine4() // 보스 처치후 문이 열리며 포탈 생성
 {
+	// 사운드 초기화
+	for (int i = 0; i < m_vpSounds.size(); ++i)
+	{
+		m_vpSounds[i]->Stop();
+		m_vpSounds[i].reset();
+		m_vpSounds.erase(m_vpSounds.begin() + i);
+	}
+
 	m_pCinematic.reset();
 	m_pCinematic = nullptr;
 
@@ -2665,6 +2758,8 @@ void Scene::HospitalCine4() // 보스 처치후 문이 열리며 포탈 생성
 	position.z = -347;
 	rotation.y = -90;
 	pCinematic->AddKeyFrame(0, 3.5f, position, rotation, scale, nullptr);
+
+	pCinematic->AddSoundKeyFrame(2.5f, "Sound/Ambient/DungeonDoorOpen.wav", 0.2f);
 
 	m_pCinematic = pCinematic;
 	PlayCinematic();
@@ -2724,11 +2819,22 @@ void Scene::DungeonCine1() // 보스룸 열림
 	position.z = -405;
 	pCinematic->AddKeyFrame(1, 3.5f, position, rotation, scale, nullptr);
 
+
+	pCinematic->AddSoundKeyFrame(1.5f, "Sound/Ambient/SomethingChange.wav", 0.1f);
+
 	m_pCinematic = pCinematic;
 	PlayCinematic();
 }
 void Scene::DungeonCine2() // 보스룸 입장, 뭔가 하던 보스가 쳐다보며 시작
 {
+	// 사운드 초기화
+	for (int i = 0; i < m_vpSounds.size(); ++i)
+	{
+		m_vpSounds[i]->Stop();
+		m_vpSounds[i].reset();
+		m_vpSounds.erase(m_vpSounds.begin() + i);
+	}
+
 	m_pCinematic.reset();
 	m_pCinematic = nullptr;
 
@@ -2813,11 +2919,22 @@ void Scene::DungeonCine2() // 보스룸 입장, 뭔가 하던 보스가 쳐다보며 시작
 	pCinematic->AddKeyFrame(3, 5.0f, position, rotation, scale, nullptr);
 	pCinematic->AddKeyFrame(3, 9.5f, position, rotation, scale, &Object::CinematicFindPlayer);
 
+	pCinematic->AddSoundKeyFrame(0.0f, "Sound/Ambient/DungeonEnter.wav", 0.1f);
+	pCinematic->AddSoundKeyFrame(9.0f, "Sound/BGM/FinalBossBattle.wav", 0.2f);
+
 	m_pCinematic = pCinematic;
 	PlayCinematic();
 }
 void Scene::DungeonCine3()	// 보스 처치 후, 크리스탈 파괴하고 유유히 이탈
 {
+	// 사운드 초기화
+	for (int i = 0; i < m_vpSounds.size(); ++i)
+	{
+		m_vpSounds[i]->Stop();
+		m_vpSounds[i].reset();
+		m_vpSounds.erase(m_vpSounds.begin() + i);
+	}
+
 	m_pCinematic.reset();
 	m_pCinematic = nullptr;
 
@@ -2901,6 +3018,8 @@ void Scene::DungeonCine3()	// 보스 처치 후, 크리스탈 파괴하고 유유히 이탈
 	scale = pObject->GetScale();
 	pCinematic->AddTrack(pObject, position, rotation, scale);
 	pCinematic->AddKeyFrame(3, 2.5f, position, rotation, scale, &Object::DegradedBroken);
+
+	pCinematic->AddSoundKeyFrame(4.5f, "Sound/BGM/TheEnd.wav", 0.2f);
 
 	m_pCinematic = pCinematic;
 	PlayCinematic();

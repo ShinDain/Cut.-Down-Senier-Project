@@ -60,9 +60,10 @@ private:
 	XMFLOAT3 m_xmf3CrushVelocity = XMFLOAT3(0, 0, 0);
 	bool m_bCalced = false;
 
-	void CalcStartVelocity();
 
 public:
+	void CalcStartVelocity();
+
 	void SetItemType(UINT nItemType) { m_nItemType = nItemType; }
 	void SetCrushVelocity(XMFLOAT3 xmf3CrushVelocity) { m_xmf3CrushVelocity = xmf3CrushVelocity; }
 

@@ -9,6 +9,8 @@
 
 #define ANIMATION_CALLBACK_EPSILON	0.0165f
 
+#define SOUND_EPSILON	0.0165f
+
 using namespace DirectX;
 
 class Object;

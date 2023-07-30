@@ -157,10 +157,12 @@ void Projectile::Update(float elapsedTime)
 		m_pBody->SetPosition(XMFLOAT3(xmf3Position.x, 0, xmf3Position.z));
 		m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
 
-		m_bDestroying = true;
+
 
 		// 충돌음
 		EmitHitSound();
+		m_bDestroying = true;
+
 	}
 }
 
@@ -202,10 +204,10 @@ void Projectile::Intersect(float elapsedTime)
 				m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
 				m_DissolveTime = 0;
 
-				m_bDestroying = true;
-
 				// 충돌음
 				EmitHitSound();
+				m_bDestroying = true;
+
 				return;
 			}
 		}
@@ -232,10 +234,9 @@ void Projectile::Intersect(float elapsedTime)
 				}
 
 				m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
-				m_bDestroying = true;
 				// 충돌음
-				float pitch = (float)(rand() % 60) / 100 + 0.7f;
-				Scene::EmitSound("Sound/PlayerProjectile/Hit.wav", false, pitch, VOLUME_DEFAULT);
+				EmitHitSound();
+				m_bDestroying = true;
 				return;
 			}
 		}
@@ -251,11 +252,11 @@ void Projectile::Intersect(float elapsedTime)
 		{
 			g_pPlayer->ApplyDamage(m_ProjectilePower, xmf3Direction, XMFLOAT3(0, 0, 0));
 
-			m_bDestroying = true;
 			m_bVisible = false;
 
 			// 충돌음
 			EmitHitSound();
+			m_bDestroying = true;
 
 			return;
 		}
@@ -284,11 +285,11 @@ void Projectile::Intersect(float elapsedTime)
 				g_vpWorldObjs[i]->GetBody()->SetIsAwake(true);
 
 				m_pBody->SetVelocity(XMFLOAT3(0, 0, 0));
-				m_bDestroying = true;
 				m_bVisible = false;
 
 				// 충돌음
 				EmitHitSound();
+				m_bDestroying = true;
 
 				return;
 			}

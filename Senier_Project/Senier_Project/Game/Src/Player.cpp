@@ -421,12 +421,23 @@ void Player::ThrowProjectile()
 	if (!m_bCanThrow)
 		return;
 
-	// 사운드
-	//int nRand = rand() % 2;
-	//if (nRand)
-	//	Sound::PlaySoundFile(throw1_SoundFileName, true);
-	//else
-	//	Sound::PlaySoundFile(throw2_SoundFileName, true);
+	//int nRand = rand() % 4;
+	int nRand = 3;
+	switch (nRand)
+	{
+	case 0:
+		Scene::EmitSound(throw1_SoundFileName, false, 1.0f, 0.3f);
+		break;
+	case 1:
+		Scene::EmitSound(throw2_SoundFileName, false, 1.0f, 0.3f);
+		break;
+	case 2:
+		Scene::EmitSound(throw3_SoundFileName, false, 1.0f, 0.3f);
+		break;
+	case 3:
+		Scene::EmitSound(throw4_SoundFileName, false, 1.0f, 0.7f);
+		break;
+	}
 	
 	float pickDistance = 0;
 
@@ -534,6 +545,7 @@ void Player::RotateToObj()
 	//xmf3MyPosition.y = 0;
 	XMVECTOR myPosition = XMLoadFloat3(&xmf3MyPosition);
 	
+	float offsetDistance = 50;
 	float closestDistance = 9999;
 	int closestIdx = -1;
 	bool bMonster = false;
@@ -553,7 +565,7 @@ void Player::RotateToObj()
 		XMVECTOR tmpPosition = XMLoadFloat3(&xmf3TmpPosition);
 
 		float distance = XMVectorGetX(XMVector3Length(tmpPosition - myPosition));
-		if (distance < closestDistance && distance != 0)
+		if (distance < closestDistance && distance != 0 && distance < offsetDistance)
 		{
 			bMonster = true;
 			closestDistance = distance;
@@ -576,7 +588,7 @@ void Player::RotateToObj()
 			XMVECTOR tmpPosition = XMLoadFloat3(&xmf3TmpPosition);
 
 			float distance = XMVectorGetX(XMVector3Length(tmpPosition - myPosition));
-			if (distance < closestDistance && distance != 0)
+			if (distance < closestDistance && distance != 0 && distance < offsetDistance)
 			{
 				closestDistance = distance;
 				closestIdx = i;
@@ -621,7 +633,7 @@ void Player::AcquireItem(UINT itemType)
 		strcat_s(pstrFilePath, ".wav");
 
 		float pitch = (float)(rand() % 30) / 100 + 0.6f;
-		Scene::EmitSound(pstrFilePath, false, pitch, 0.1f);
+		Scene::EmitSound(pstrFilePath, false, pitch, 0.15f);
 
 		m_nScore += 300;
 	}
@@ -630,7 +642,7 @@ void Player::AcquireItem(UINT itemType)
 	{
 		char pstrFilePath[64] = "Sound/Item/Heal";
 		strcat_s(pstrFilePath, ".wav");
-		Scene::EmitSound(pstrFilePath, false, 1.0f, 0.1f);
+		Scene::EmitSound(pstrFilePath, false, 1.0f, 0.15f);
 
 		m_HP += 50;
 		if (m_HP > m_MaxHP)
@@ -703,11 +715,22 @@ void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf
 		m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_GetHit);
 		m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1);
 
-		//int nRand = rand() % 2;
-		//if (nRand)
-		//	Sound::PlaySoundFile(hit1_SoundFileName, true);
-		//else
-		//	Sound::PlaySoundFile(hit2_SoundFileName, true);
+		int nRand = rand() % 4;
+		switch (nRand)
+		{
+		case 0:
+			Scene::EmitSound(hit1_SoundFileName, false, 0.75f, 0.1f);
+			break;
+		case 1:
+			Scene::EmitSound(hit2_SoundFileName, false, 0.75f, 0.1f);
+			break;
+		case 2:
+			Scene::EmitSound(hit3_SoundFileName, false, 0.75f, 0.1f);
+			break;
+		case 3:
+			Scene::EmitSound(hit4_SoundFileName, false, 0.75f, 0.1f);
+			break;
+		}
 	}
 	else
 	{
@@ -722,7 +745,11 @@ void Player::ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf
 		m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_Death);
 		m_pAnimationController->SetTrackWeight(PLAYER_ONCE_TRACK_1, 1);
 
-		//Sound::PlaySoundFile(m_Death_SoundFileName, true);
+		int nRand = rand() % 2;
+		if (nRand)
+			Scene::EmitSound(death1_SoundFileName, false, 0.75f, 0.2f);
+		else
+			Scene::EmitSound(death2_SoundFileName, false, 0.75f, 0.2f);
 	}
 	
 }
@@ -788,10 +815,10 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 		float trackPosition = m_pAnimationController->GetTrackPosition(PLAYER_MOVE_TRACK);
 		if (trackWeight > 0.5f)
 		{
-			//if (MathHelper::IsEqual(0.33f, trackPosition, ANIMATION_CALLBACK_EPSILON))
-			//	Sound::PlaySoundFile(walk1_SoundFileName, true);
-			//if (MathHelper::IsEqual(0.65f, trackPosition, ANIMATION_CALLBACK_EPSILON))
-			//	Sound::PlaySoundFile(walk2_SoundFileName, true);
+			if (MathHelper::IsEqual(0.33f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run1_SoundFileName, false, 0.8f, 0.01f);
+			if (MathHelper::IsEqual(0.65f, trackPosition, SOUND_EPSILON))
+				Scene::EmitSound(run2_SoundFileName, false, 0.8f, 0.01f);
 		}
 
 		// 바닥에서의 기본 움직임
@@ -875,18 +902,18 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 			float trackPosition = m_pAnimationController->GetTrackPosition(PLAYER_ONCE_TRACK_1 + m_nCurAttackTrack);
 			switch (m_nCurAttackTrack)
 			{
-			//case 0:
-			//	if (MathHelper::IsEqual(0.33f, trackPosition, ANIMATION_CALLBACK_EPSILON))
-			//		Sound::PlaySoundFile(attack1_SoundFileName, true);
-			//	break;
-			//case 1:
-			//	if (MathHelper::IsEqual(0.65f, trackPosition, ANIMATION_CALLBACK_EPSILON))
-			//		Sound::PlaySoundFile(attack2_SoundFileName, true);
-			//	break;
-			//case 2:
-			//	if (MathHelper::IsEqual(0.8f, trackPosition, ANIMATION_CALLBACK_EPSILON))
-			//		Sound::PlaySoundFile(attack3_SoundFileName, true);
-			//	break;
+			case 0:
+				if (MathHelper::IsEqual(0.33f, trackPosition, SOUND_EPSILON))
+					Scene::EmitSound(attack1_SoundFileName, false, 0.75f, 0.04f);
+				break;
+			case 1:
+				if (MathHelper::IsEqual(0.65f, trackPosition, SOUND_EPSILON))
+					Scene::EmitSound(attack2_SoundFileName, false, 0.75f, 0.08f);
+				break;
+			case 2:
+				if (MathHelper::IsEqual(0.8f, trackPosition, SOUND_EPSILON))
+					Scene::EmitSound(attack3_SoundFileName, false, 0.75f, 0.04f);
+				break;
 			}
 			
 			m_pWeapon->SetActive(true);
@@ -944,7 +971,7 @@ void Player::UpdateAnimationTrack(float elapsedTime)
 	{
 		XMFLOAT3 xmf3Accel = m_pBody->GetAcceleration();
 		m_pBody->SetAcceleration(XMFLOAT3(0, xmf3Accel.y, 0));
-
+		
 		if (m_pAnimationController->GetTrackOver(PLAYER_ONCE_TRACK_1))
 		{
 			m_ElapsedDestroyTime += elapsedTime;
@@ -1064,16 +1091,16 @@ void Player::ObjectGrab()
 		if (m_pPickedObject->GetObjectType() == ObjectType::Object_Monster)
 			return;
 
+		int nRand = rand() % 2;
+		//int nRand = 1;
+		if (nRand)
+			Scene::EmitSound(grab1_SoundFileName, false, 0.8f, 0.3f);
+		else
+			Scene::EmitSound(grab2_SoundFileName, false, 1.0f, 0.6f);
+
 		// 손이 빈 경우
 		if (m_GrabState == GrabState::Grab_Empty)
 		{
-			//int nRand = rand() % 2;
-			//if (nRand)
-			//	Sound::PlaySoundFile(grab1_SoundFileName, true);
-			//else
-			//	Sound::PlaySoundFile(grab2_SoundFileName, true);
-
-
 			ColliderBox* pColliderBox = (ColliderBox*)(m_pPickedObject->GetCollider().get());
 
 			// 디버그용
@@ -1094,7 +1121,7 @@ void Player::ObjectGrab()
 		{
 			// Grab 상태 초기화
 			m_pGrabedObject->GetBody()->SetAngularVelocity(XMFLOAT3(0, 0, 0));
-			m_pGrabedObject->GetBody()->SetVelocity(XMFLOAT3(0, 0, 0));
+			m_pGrabedObject->GetBody()->SetVelocity(XMFLOAT3(0, -10, 0));
 			m_pGrabedObject->GetCollider()->SetIsActive(true);
 			m_pGrabedObject = nullptr;
 
@@ -1116,6 +1143,24 @@ void Player::ObjectGrab()
 			m_GrapNoiseRight = rand() % 60 - 30;
 			m_GrapNoiseUp = rand() % 20 + 5;
 		}
+
+
+		for (int i = 0; i < g_vpMovableObjs.size(); ++i)
+		{
+			if (g_vpMovableObjs[i]->GetObjectType() == ObjectType::Object_Monster)
+				continue;
+			if (!g_vpMovableObjs[i]->GetIsAlive())
+				continue;
+			if (!(g_vpMovableObjs[i]->GetCollider()->GetIsActive()))
+				continue;
+
+			if (m_pGrabedObject->GetCollider()->GetBoundingSphere()->Intersects(*g_vpMovableObjs[i]->GetCollider()->GetBoundingSphere()))
+			{
+				g_vpMovableObjs[i]->GetBody()->SetIsAwake(true);
+				g_vpMovableObjs[i]->GetBody()->SetVelocity(XMFLOAT3(0, -10, 0));
+			}
+		}
+
 	}
 
 }
@@ -1274,4 +1319,6 @@ void Player::CinematicAction()
 
 	m_pAnimationController->SetTrackAnimationSet(PLAYER_ONCE_TRACK_1, Player_Anim_Index_MeleeTwoHand);
 	m_nAnimationState = PlayerAnimationState::Player_State_Act;
+
+	Scene::EmitSound(attack3_SoundFileName, false, 0.75f, 0.5f);
 }

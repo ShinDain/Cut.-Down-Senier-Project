@@ -204,7 +204,6 @@ public:
 	static void EmitBrokenSound(SoundType nType, bool bLoop);
 
 protected:
-	static std::shared_ptr<CSound> m_pMainBGM;
 	static std::vector<std::shared_ptr<CSound>> m_vpSounds;
 
 // 게임 로직 관련

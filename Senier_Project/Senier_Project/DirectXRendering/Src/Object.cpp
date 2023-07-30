@@ -367,7 +367,8 @@ void Object::CreateScoreItems(int nCnt)
 
 			Item* pItem = (Item*)pObject.get();
 			pItem->SetItemType(Item::ItemType::Score_1);
-			pItem->SetCrushVelocity(xmf3Velocity);
+			//pItem->SetCrushVelocity(xmf3Velocity);
+			//pItem->CalcStartVelocity();
 		}
 			break;
 		case 1:
@@ -377,7 +378,8 @@ void Object::CreateScoreItems(int nCnt)
 
 			Item* pItem = (Item*)pObject.get();
 			pItem->SetItemType(Item::ItemType::Score_2);
-			pItem->SetCrushVelocity(xmf3Velocity);
+			//pItem->SetCrushVelocity(xmf3Velocity);
+			//pItem->CalcStartVelocity();
 		}
 		break;
 		case 2:
@@ -387,7 +389,8 @@ void Object::CreateScoreItems(int nCnt)
 
 			Item* pItem = (Item*)pObject.get();
 			pItem->SetItemType(Item::ItemType::Score_3);
-			pItem->SetCrushVelocity(xmf3Velocity);
+			//pItem->SetCrushVelocity(xmf3Velocity);
+			//pItem->CalcStartVelocity();
 		}
 		break;
 		case 3:
@@ -397,7 +400,8 @@ void Object::CreateScoreItems(int nCnt)
 
 			Item* pItem = (Item*)pObject.get();
 			pItem->SetItemType(Item::ItemType::Score_4);
-			pItem->SetCrushVelocity(xmf3Velocity);
+			//pItem->SetCrushVelocity(xmf3Velocity);
+			//pItem->CalcStartVelocity();
 		}
 		break;
 		case 4:
@@ -407,7 +411,8 @@ void Object::CreateScoreItems(int nCnt)
 
 			Item* pItem = (Item*)pObject.get();
 			pItem->SetItemType(Item::ItemType::Score_5);
-			pItem->SetCrushVelocity(xmf3Velocity);
+			//pItem->SetCrushVelocity(xmf3Velocity);
+			//pItem->CalcStartVelocity();
 		}
 		break;
 		}

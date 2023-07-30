@@ -48,6 +48,17 @@ protected:
 
 	MonsterState m_State = MonsterState::Monster_State_Idle;
 
+	// 사운드 파일 이름
+	char run1_SoundFileName[64];
+	char run2_SoundFileName[64];
+	char attack1_SoundFileName[64];
+	char attack2_SoundFileName[64];
+	char hit1_SoundFileName[64];
+	char hit2_SoundFileName[64];
+	char death1_SoundFileName[64];
+	char death2_SoundFileName[64];
+	char rage_SoundFileName[64];
+
 public:
 	virtual void RotateToPlayer();
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection, UINT nHitAnimIdx, UINT nDeathAnimIdx);
@@ -166,7 +177,6 @@ private:
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
 
-
 	virtual void CinematicAction();
 public:
 	virtual void Trace();
@@ -209,6 +219,8 @@ private:
 		Scavenger_Anim_Index_Death2,
 		Scavenger_Anim_Index_Rage,
 	};
+
+	char attack3_SoundFileName[64];
 
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
@@ -311,6 +323,10 @@ private:
 		Rapid_Shoot
 	};
 
+	char Gun1_SoundFileName[64];
+	char Gun2_SoundFileName[64];
+	char Gun3_SoundFileName[64];
+
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
 
@@ -389,24 +405,10 @@ private:
 		Summon_6		  // 구울 1마리, 사마리 3마리
 	};
 
-	struct SoundList
-	{
-		LPCWSTR IDLE1_SOUND = L"";
-		LPCWSTR IDLE2_SOUND = L"";
-		LPCWSTR IDLE3_SOUND = L"";
-		LPCWSTR WALK1_SOUND = L"";
-		LPCWSTR WALK2_SOUND = L"";
-		LPCWSTR RUN1_SOUND = L"";
-		LPCWSTR RUN2_SOUND = L"";
-		LPCWSTR ATTACK1_SOUND = L"";
-		LPCWSTR ATTACK2_SOUND = L"";
-		LPCWSTR HIT1_SOUND = L"";
-		LPCWSTR HIT2_SOUND = L"";
-		LPCWSTR DEATH1_SOUND = L"";
-		LPCWSTR DEATH2_SOUND = L"";
-		LPCWSTR SPECIAL1_SOUND = L"";
-		LPCWSTR SPECIAL2_SOUND = L"";
-	};
+	char cast_SoundFileName[64];
+	char magic1_SoundFileName[64];
+	char magic2_SoundFileName[64];
+	char groggy_SoundFileName[64];
 
 public:
 	virtual void ApplyDamage(float power, XMFLOAT3 xmf3DamageDirection, XMFLOAT3 xmf3CuttingDirection);
@@ -439,7 +441,7 @@ protected:
 	UINT m_nPattern = NecromancerAttackPattern::Melee_Attack;
 	//UINT m_nPattern = NecromancerAttackPattern::Magic_Cast;
 	UINT m_nSummonPattern = SummonPattern::Summon_1;
-	UINT m_nMaxAttackCnt = 2;
+	UINT m_nMaxAttackCnt = 3;
 	UINT m_nAttackCnt = 0;
 
 	float m_Attack1Cnt = 0;

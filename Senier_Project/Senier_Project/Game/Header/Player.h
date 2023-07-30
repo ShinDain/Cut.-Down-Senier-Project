@@ -65,45 +65,23 @@ private:
 	};
 
 	// »ç¿îµå ÆÄÀÏ ÀÌ¸§
-	//LPCWSTR idle1_SoundFileName = L"";
-	//LPCWSTR idle2_SoundFileName = L"";
-	//LPCWSTR idle3_SoundFileName = L"";
-	//LPCWSTR walk1_SoundFileName = L"Sound/Footstep01.wav";
-	//LPCWSTR walk2_SoundFileName = L"Sound/Footstep02.wav";
-	//LPCWSTR run1_SoundFileName = L"";
-	//LPCWSTR run2_SoundFileName = L"";
-	//LPCWSTR jump_SoundFileName = L"Sound/Evil_Machine_Loop_00.wav";
-	//LPCWSTR doublejump_SoundFileName = L"Sound/123.wav";
-	//LPCWSTR land_SoundFileName = L"Sound/Footstep04.wav";
-	//LPCWSTR attack1_SoundFileName = L"Sound/123.wav";
-	//LPCWSTR attack2_SoundFileName = L"Sound/Footstep04.wav";
-	//LPCWSTR attack3_SoundFileName = L"Sound/Footstep03.wav";
-	//LPCWSTR hit1_SoundFileName = L"Sound/123.wav";
-	//LPCWSTR hit2_SoundFileName = L"Sound/Footstep04.wav";
-	//LPCWSTR grab1_SoundFileName = L"Sound/Footstep01.wav";		// ±×·¦
-	//LPCWSTR grab2_SoundFileName = L"Sound/Footstep02.wav";		// ±×·¦
-	//LPCWSTR throw1_SoundFileName = L"Sound/123.wav";		// ÅõÃ´
-	//LPCWSTR throw2_SoundFileName = L"Sound/123.wav";		// ÅõÃ´
-
-	LPCWSTR idle1_SoundFileName = L"";
-	LPCWSTR idle2_SoundFileName = L"";
-	LPCWSTR idle3_SoundFileName = L"";
-	LPCWSTR walk1_SoundFileName =  L"";
-	LPCWSTR walk2_SoundFileName =  L"";
-	LPCWSTR run1_SoundFileName = L"";
-	LPCWSTR run2_SoundFileName = L"";
-	LPCWSTR jump_SoundFileName = L"";
-	LPCWSTR doublejump_SoundFileName = L"";
-	LPCWSTR land_SoundFileName = L"";
-	LPCWSTR attack1_SoundFileName =  L"";
-	LPCWSTR attack2_SoundFileName =  L"";
-	LPCWSTR attack3_SoundFileName =  L"";
-	LPCWSTR hit1_SoundFileName = L"";
-	LPCWSTR hit2_SoundFileName = L"";
-	LPCWSTR grab1_SoundFileName =  L"";		// ±×·¦
-	LPCWSTR grab2_SoundFileName =  L"";		// ±×·¦
-	LPCWSTR throw1_SoundFileName =  L"";		// ÅõÃ´
-	LPCWSTR throw2_SoundFileName =  L"";		// ÅõÃ´
+	const char* run1_SoundFileName = "Sound/Player/Footstep01.wav";
+	const char* run2_SoundFileName = "Sound/Player/Footstep02.wav";
+	const char* attack1_SoundFileName = "Sound/Player/Attack01.wav";
+	const char* attack2_SoundFileName = "Sound/Player/Attack02.wav";
+	const char* attack3_SoundFileName = "Sound/Player/Attack03.wav";
+	const char* hit1_SoundFileName = "Sound/Player/Hit01.wav";
+	const char* hit2_SoundFileName = "Sound/Player/Hit02.wav";
+	const char* hit3_SoundFileName = "Sound/Player/Hit03.wav";
+	const char* hit4_SoundFileName = "Sound/Player/Hit04.wav";
+	const char* grab1_SoundFileName = "Sound/Player/Grab01.wav";		
+	const char* grab2_SoundFileName = "Sound/Player/Grab02.wav";		
+	const char* throw1_SoundFileName = "Sound/Player/Throw01.wav";		
+	const char* throw2_SoundFileName = "Sound/Player/Throw02.wav";		
+	const char* throw3_SoundFileName = "Sound/Player/Throw03.wav";		
+	const char* throw4_SoundFileName = "Sound/Player/Throw04.wav";		
+	const char* death1_SoundFileName = "Sound/Player/Death01.wav";		
+	const char* death2_SoundFileName = "Sound/Player/Death02.wav";		
 
 public:
 	virtual void ProcessInput(UCHAR* pKeybuffer);
