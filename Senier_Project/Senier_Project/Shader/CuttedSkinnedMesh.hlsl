@@ -86,24 +86,29 @@ float4 PSSkinnedMesh(SkinnedMeshVertexOut pin) : SV_Target
 	//diffuseAlbedo.a = diffuseAlbedo.a * dissolveValue;
 	clip(diffuseAlbedo.a);
 
-	if (dot(pin.PosW, PlaneNormal_1 * (PlaneDirection_1)) < PlaneDistance_1 * (PlaneDirection_1))
-	{
-		diffuseAlbedo = float4(0, 0, 0, 0);
-		// Alpha Test
-		clip(diffuseAlbedo.a - 0.1f);
-	}
-	if (dot(pin.PosW, PlaneNormal_2 * (PlaneDirection_2)) < PlaneDistance_2 * (PlaneDirection_2))
-	{
-		diffuseAlbedo = float4(0, 0, 0, 0);
-		// Alpha Test
-		clip(diffuseAlbedo.a - 0.1f);
-	}
-	if (dot(pin.PosW, PlaneNormal_3 * (PlaneDirection_3)) < PlaneDistance_3 * (PlaneDirection_3))
-	{
-		diffuseAlbedo = float4(0, 0, 0, 0);
-		// Alpha Test
-		clip(diffuseAlbedo.a - 0.1f);
-	}
+	int res = dot(pin.PosW, PlaneNormal_1 * (PlaneDirection_1)) < PlaneDistance_1 * (PlaneDirection_1);
+	res += (dot(pin.PosW, PlaneNormal_2 * (PlaneDirection_2)) < PlaneDistance_2 * (PlaneDirection_2));
+	res += (dot(pin.PosW, PlaneNormal_3 * (PlaneDirection_3)) < PlaneDistance_3 * (PlaneDirection_3));
+	clip(res - PlaneCnt);
+
+	//if (dot(pin.PosW, PlaneNormal_1 * (PlaneDirection_1)) < PlaneDistance_1 * (PlaneDirection_1))
+	//{
+	//	diffuseAlbedo = float4(0, 0, 0, 0);
+	//	// Alpha Test
+	//	clip(diffuseAlbedo.a - 0.1f);
+	//}
+	//if (dot(pin.PosW, PlaneNormal_2 * (PlaneDirection_2)) < PlaneDistance_2 * (PlaneDirection_2))
+	//{
+	//	diffuseAlbedo = float4(0, 0, 0, 0);
+	//	// Alpha Test
+	//	clip(diffuseAlbedo.a - 0.1f);
+	//}
+	//if (dot(pin.PosW, PlaneNormal_3 * (PlaneDirection_3)) < PlaneDistance_3 * (PlaneDirection_3))
+	//{
+	//	diffuseAlbedo = float4(0, 0, 0, 0);
+	//	// Alpha Test
+	//	clip(diffuseAlbedo.a - 0.1f);
+	//}
 
 	//diffuseAlbedo = gDiffuseMap.Sample(gsamAnisotropicWrap, pin.TexC);
 	// Alpha Test

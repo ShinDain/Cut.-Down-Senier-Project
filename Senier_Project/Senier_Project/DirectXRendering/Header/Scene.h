@@ -161,8 +161,8 @@ private:
 	std::shared_ptr<DWriteText> m_pBigSizeTextUI = nullptr;
 
 	static UINT m_nStageNum;
-	static std::unique_ptr<CollisionResolver> m_pCollisionResolver;
-	static CollisionData m_CollisionData;
+	std::unique_ptr<CollisionResolver> m_pCollisionResolver;
+	CollisionData m_CollisionData;
 
 	float m_PlayerStartScore = 0;
 

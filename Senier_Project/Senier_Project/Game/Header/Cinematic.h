@@ -92,8 +92,8 @@ public:
 
 	void AddSoundKeyFrame(float time, const char* pstrFilePath, float volume);
 
-	void GetCameraKeyFrameData(UINT nCurIdx);
-	void GetKeyFrameData(UINT nTrackIdx, UINT nCurIdx);
+	void MoveCameraKeyFrameData(UINT nCurIdx);
+	void MoveKeyFrameData(UINT nTrackIdx, UINT nCurIdx);
 
 protected:
 	bool m_bPlay = false;

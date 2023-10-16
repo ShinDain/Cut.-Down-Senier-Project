@@ -2,8 +2,8 @@
 
 UINT Scene::m_nStageNum = 0;
 std::vector<std::shared_ptr<Object>> Scene::m_vObjectLayer[(int)RenderLayer::Render_Count];
-CollisionData Scene::m_CollisionData;
-std::unique_ptr<CollisionResolver> Scene::m_pCollisionResolver;
+//CollisionData Scene::m_CollisionData;
+//std::unique_ptr<CollisionResolver> Scene::m_pCollisionResolver;
 
 /// ////////////
 std::vector<std::shared_ptr<CSound>> Scene::m_vpSounds;
@@ -1510,7 +1510,8 @@ std::shared_ptr<Object> Scene::CreateObject(ID3D12Device* pd3dDevice, ID3D12Grap
 std::shared_ptr<Object> Scene::CreateCuttedObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList,
 	Object* pObject, float direction, XMFLOAT3 xmf3PlaneNormal, bool bIsCutted)
 {
-	float cuttingPower = rand() % 30 + 40; 
+	//float cuttingPower = rand() % 30 + 40; 
+	float cuttingPower = 40; 
 	
 	XMVECTOR noiseDir = XMLoadFloat3(&xmf3PlaneNormal);
 	noiseDir *= -1 * (float)(rand() % 30) / 100;
@@ -2115,11 +2116,11 @@ void Scene::ChangeStage()
 
 void Scene::GameStart()
 {
-//#if not defined(_DEBUG)
+#if not defined(_DEBUG)
 	// 페이드 아웃 상태로 시작
 	m_FadeState = 0;
 	m_FadeInValue = 0.0f;
-//#endif
+#endif
 	
 
 	if (g_pPlayer)
@@ -2133,15 +2134,15 @@ void Scene::GameStart()
 	m_nStageNum = 0;
 	
 #if defined(_DEBUG)
-	 //m_nStageNum = 1;
+	 m_nStageNum = 3;
 #endif
 	// 스테이지 초기화 함수
 	StageStart(m_nStageNum);
 
-//#if not defined(_DEBUG)
+#if not defined(_DEBUG)
 	// 페이드 인
 	m_FadeState = 1;
-//#endif
+#endif
 
 	// 시작 시네마틱 초기화
 	InitCinematic();
@@ -2293,6 +2294,14 @@ void Scene::StageStart(UINT nMapNum)
 
 		break;
 
+	case 3:
+		g_pPlayer->SetRotate(XMFLOAT3(0, 90, 0));
+		m_pCamera->RotateY(90);
+		g_pPlayer->GetBody()->SetPosition(XMFLOAT3(20, 10, 0));
+		LoadMapData(g_pd3dDevice, g_pd3dCommandList, "TestMap", false);
+		//CreateObject(g_pd3dDevice, g_pd3dCommandList, XMFLOAT3(0, 0, 0), XMFLOAT4(0, -1, 0, 1), XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), nullptr, -80);
+
+		break;
 	default:
 		assert(false);
 	}

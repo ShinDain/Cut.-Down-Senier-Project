@@ -38,7 +38,7 @@ void Cinematic::Update(float elapsedTime)
 			}
 
 			UINT cameraCurIdx = m_CameraTrack.nCurIdx;
-			GetCameraKeyFrameData(cameraCurIdx);
+			MoveCameraKeyFrameData(cameraCurIdx);
 		}
 
 		if (!m_SoundTrack.TrackEnd)
@@ -81,7 +81,7 @@ void Cinematic::Update(float elapsedTime)
 			}
 
 			UINT nCurIdx = m_vCinematicTracks[i].nCurIdx;
-			GetKeyFrameData(i, nCurIdx);
+			MoveKeyFrameData(i, nCurIdx);
 		}
 	}
 
@@ -192,7 +192,7 @@ void Cinematic::AddSoundKeyFrame(float time, const char* pstrFilePath, float vol
 }
 
 // 현재 -> 키프레임
-void Cinematic::GetCameraKeyFrameData(UINT nCurIdx)
+void Cinematic::MoveCameraKeyFrameData(UINT nCurIdx)
 {
 	if (nCurIdx < m_CameraTrack.nKeyFrameCnt && nCurIdx != 0)
 	{
@@ -231,7 +231,7 @@ void Cinematic::GetCameraKeyFrameData(UINT nCurIdx)
 	}
 }
 
-void Cinematic::GetKeyFrameData(UINT nTrackIdx, UINT nCurIdx)
+void Cinematic::MoveKeyFrameData(UINT nTrackIdx, UINT nCurIdx)
 {
 	if (nTrackIdx > m_vCinematicTracks.size())
 		return;

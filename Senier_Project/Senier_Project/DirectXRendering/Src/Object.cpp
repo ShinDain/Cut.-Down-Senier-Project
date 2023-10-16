@@ -729,6 +729,8 @@ void Object::Cutting(XMFLOAT3 xmf3PlaneNormal)
 	XMFLOAT3 xmf3CutNormal = xmf3PlaneNormal;
 	XMVECTOR cutNormal = XMLoadFloat3(&xmf3CutNormal);
 	XMMATRIX xmmatOrientation = XMMatrixRotationQuaternion(XMLoadFloat4(&m_xmf4Orientation));
+	xmmatOrientation = XMMatrixMultiply(xmmatOrientation, 
+		XMMatrixRotationRollPitchYaw(XMConvertToRadians(m_xmf3Rotation.x), XMConvertToRadians(m_xmf3Rotation.y), XMConvertToRadians(m_xmf3Rotation.z)));
 	cutNormal = XMVector3TransformNormal(cutNormal, xmmatOrientation);
 	XMStoreFloat3(&xmf3CutNormal, cutNormal);
 

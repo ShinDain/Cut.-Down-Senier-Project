@@ -101,7 +101,7 @@ public:
 struct CollisionData
 {
 	std::vector<std::shared_ptr<Contact>> pContacts;
-
+	
 	int maxContacts = 256;
 
 	float friction = 0.9f;

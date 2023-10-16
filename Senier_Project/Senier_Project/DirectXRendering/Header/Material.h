@@ -24,10 +24,11 @@ public:
 	
 	bool LoadTextureFromFile(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, FILE* pInFile, Object* pRootObject, const char* pstrFileName, const char* pstrTexPath);
 
+protected:
+
 	std::vector<std::wstring> m_strTextureName;
 	std::vector<std::shared_ptr<Texture>> m_vpTextures;
 
-protected:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = nullptr;
 	std::unique_ptr<UploadBuffer<MatConstant>> m_pMatCB = nullptr;
 	std::shared_ptr<Shader> m_pShader = nullptr;
